@@ -1,0 +1,61 @@
+.shell {
+  max-width: 70rem;
+  margin: 0 auto;
+  color: #172536;
+}
+.header {
+  border-left: 5px solid #326f78;
+  padding: 1.25rem 1.5rem;
+  background: #f2f8f7;
+}
+.header h1 {
+  margin: 0.25rem 0 0.5rem;
+  font-size: clamp(2rem, 4vw, 3.3rem);
+  letter-spacing: -0.04em;
+}
+.header p {
+  max-width: 42rem;
+  margin: 0;
+  line-height: 1.6;
+}
+.kicker {
+  color: #326f78;
+  font:
+    700 0.72rem/1.2 ui-monospace,
+    monospace;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  margin-top: 1.25rem;
+}
+.card {
+  border: 1px solid #d5e2df;
+  border-top: 3px solid #76a69f;
+  padding: 1.25rem;
+  background: #fff;
+}
+.card h2 {
+  margin: 0 0 0.5rem;
+  font-size: 1.05rem;
+}
+.card p,
+.note {
+  margin: 0;
+  color: #465766;
+  line-height: 1.55;
+}
+.note {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: #fafbfc;
+  font-size: 0.9rem;
+}
+@media (max-width: 720px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}

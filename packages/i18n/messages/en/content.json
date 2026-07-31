@@ -1,0 +1,23 @@
+{
+  "content": {
+    "nav": { "label": "Learning resources" },
+    "overview": {
+      "kicker": "Resource library",
+      "title": "Learning resources",
+      "intro": "Find teacher-curated links and materials that support each learning goal.",
+      "notice": "Videos open from YouTube. We store links and educational metadata only; report anything that is unavailable or inappropriate.",
+      "video": {
+        "title": "Video, link-only",
+        "body": "Watch approved YouTube resources without copying them to the platform."
+      },
+      "materials": {
+        "title": "Use and save",
+        "body": "Tutors can assign resources and students can bookmark useful material."
+      },
+      "safety": {
+        "title": "Report concerns",
+        "body": "Reports remove the external link right away and send it to moderation."
+      }
+    }
+  }
+}

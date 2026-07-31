@@ -1,0 +1,125 @@
+.shell {
+  max-width: 68rem;
+  margin: 0 auto;
+  display: grid;
+  gap: 1.5rem;
+  color: #18333a;
+}
+.header {
+  max-width: 43rem;
+}
+.header h1 {
+  margin: 0.2rem 0 0.55rem;
+  color: #12333d;
+  font-size: clamp(2rem, 4vw, 3.3rem);
+  letter-spacing: -0.05em;
+  line-height: 0.98;
+}
+.header p:last-child {
+  margin: 0;
+  color: #48626a;
+  font-size: 1.05rem;
+  line-height: 1.6;
+}
+.kicker,
+.eyebrow {
+  margin: 0;
+  color: #307272;
+  font-size: 0.75rem;
+  font-weight: 750;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.progress {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  overflow: hidden;
+  padding: 1.75rem;
+  border: 1px solid #b9ded4;
+  border-radius: 1.25rem;
+  background: linear-gradient(120deg, #e8f6ed 0%, #f9fbf6 68%);
+}
+.progress h2 {
+  margin: 0.35rem 0;
+  font-size: 1.4rem;
+  letter-spacing: -0.02em;
+}
+.progress p:last-child {
+  max-width: 34rem;
+  margin: 0;
+  color: #42636a;
+  line-height: 1.5;
+}
+.points {
+  min-width: 8.4rem;
+  padding: 1rem;
+  border: 1px solid #9dcfc2;
+  border-radius: 1rem;
+  background: #fffef9;
+  text-align: center;
+  box-shadow: 4px 4px 0 #cae8dd;
+}
+.points span {
+  display: block;
+  color: #ed9e42;
+  font-weight: 900;
+  letter-spacing: 0.18em;
+}
+.points strong {
+  display: block;
+  font-size: 1.3rem;
+}
+.points small {
+  color: #537078;
+}
+.grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.card,
+.community {
+  padding: 1.25rem;
+  border: 1px solid #d8e3df;
+  border-radius: 1rem;
+  background: #fff;
+}
+.card h2,
+.community h2 {
+  margin: 0.2rem 0 0.5rem;
+  font-size: 1.05rem;
+}
+.card p,
+.community p:last-child {
+  margin: 0;
+  color: #536b70;
+  font-size: 0.94rem;
+  line-height: 1.5;
+}
+.community {
+  border-color: #d6c7ed;
+  background: #faf8ff;
+}
+.note {
+  margin: 0;
+  padding: 0.85rem 1rem;
+  border-inline-start: 3px solid #56968b;
+  color: #3f6167;
+  font-size: 0.9rem;
+}
+@media (max-width: 700px) {
+  .progress {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .shell * {
+    transition: none !important;
+  }
+}

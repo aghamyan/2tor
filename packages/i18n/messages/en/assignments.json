@@ -1,0 +1,23 @@
+{
+  "assignments": {
+    "nav": { "label": "Assignments" },
+    "overview": {
+      "kicker": "Coursework",
+      "title": "Assignments and feedback",
+      "intro": "Keep questions, submissions, protected files, and rubric-based feedback together.",
+      "security": "Uploaded files remain quarantined until malware scanning clears them.",
+      "create": {
+        "title": "Create an assignment",
+        "body": "Tutors can set questions, due dates, and scoring guidance for their assigned students."
+      },
+      "submit": {
+        "title": "Submit work",
+        "body": "Students can save answers and securely attach their work."
+      },
+      "grade": {
+        "title": "Grade with a rubric",
+        "body": "Assigned tutors record scores and useful written feedback."
+      }
+    }
+  }
+}

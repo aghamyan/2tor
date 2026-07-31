@@ -1,0 +1,125 @@
+{
+  "reporting": {
+    "nav": {
+      "label": "Reporting"
+    },
+    "common": {
+      "suppressed": "Suppressed",
+      "unavailable": "No data"
+    },
+    "overview": {
+      "kicker": "Measurement ledger",
+      "title": "What changed, and what it rests on",
+      "intro": "A privacy-preserving view of acquisition, service delivery, and learning outcomes. Every number is cohort-based and traceable to first-party operational records.",
+      "period": "Reporting period",
+      "utc": "UTC boundaries",
+      "cadence": "Report cadence",
+      "weekly": "Weekly",
+      "monthly": "Monthly",
+      "generated": "Generated {date}"
+    },
+    "funnel": {
+      "title": "The path into sustained learning",
+      "intro": "Unique rotating first-party subject keys only. A later step counts after its prerequisite step; retention requires the full elapsed interval.",
+      "entry": "Period entry",
+      "fromPrior": "{value} from prior step",
+      "stages": {
+        "visitor": "Visitor",
+        "consultation": "Consultation",
+        "trial": "Trial",
+        "paid": "Paid",
+        "retained_30d": "30-day retention",
+        "retained_90d": "90-day retention"
+      }
+    },
+    "operational": {
+      "title": "Service health",
+      "intro": "Attendance, responsiveness, capacity, and financial reliability from ordinary transactional records.",
+      "metrics": {
+        "tutorAttendanceRate": {
+          "label": "Tutor attendance",
+          "detail": "Tutor join records across lessons where a tutor was expected."
+        },
+        "studentAttendanceRate": {
+          "label": "Student attendance",
+          "detail": "Present or late attendance across expected student places."
+        },
+        "missingFeedbackRate": {
+          "label": "Missing feedback",
+          "detail": "Completed lessons without published structured feedback."
+        },
+        "cancellationRate": {
+          "label": "Cancellations",
+          "detail": "Canceled lessons as a share of lessons due in the period."
+        },
+        "supportResolutionRate": {
+          "label": "Support resolved",
+          "detail": "Tickets opened in the period that reached resolved or closed."
+        },
+        "supportResolutionHours": {
+          "label": "Resolution time",
+          "detail": "Mean elapsed time from ticket creation to resolution."
+        },
+        "utilizationRate": {
+          "label": "Tutor utilization",
+          "detail": "Delivered lesson minutes against recorded available minutes."
+        },
+        "marginPerLesson": {
+          "label": "Margin per lesson",
+          "detail": "Captured lesson revenue less tutor earning, never mixed across currencies."
+        },
+        "paymentFailureRate": {
+          "label": "Payment failures",
+          "detail": "Failed charges across completed or failed charge attempts."
+        },
+        "refundRate": {
+          "label": "Refunds",
+          "detail": "Completed refunds as a share of successful charge attempts."
+        }
+      }
+    },
+    "academic": {
+      "title": "Learning evidence",
+      "intro": "Cohort aggregates describe observed progress without ranking a child, predicting a grade, or turning attention into a score.",
+      "metrics": {
+        "baselineScore": {
+          "label": "Baseline",
+          "detail": "Mean first diagnostic score for learners with a follow-up."
+        },
+        "followUpScore": {
+          "label": "Follow-up",
+          "detail": "Mean latest diagnostic score for the same learner cohort."
+        },
+        "baselineToFollowUpChange": {
+          "label": "Baseline → follow-up",
+          "detail": "Mean learner-level diagnostic percentage-point change."
+        },
+        "milestoneCompletionRate": {
+          "label": "Milestones completed",
+          "detail": "Evidence-backed completed milestones across included milestones."
+        },
+        "planProgressRate": {
+          "label": "Plan progress",
+          "detail": "Completed learning-plan items across active plan items."
+        },
+        "accuracyTrend": {
+          "label": "Accuracy trend",
+          "detail": "Latest minus first normalized assessment accuracy by learner and subject."
+        },
+        "rubricImprovement": {
+          "label": "Rubric improvement",
+          "detail": "Latest minus first normalized score by learner and rubric criterion."
+        },
+        "selfReportedSchoolPerformance": {
+          "label": "Self-reported school performance",
+          "detail": "Learner-reported value only; this is not an observed or predicted grade."
+        }
+      }
+    },
+    "privacy": {
+      "title": "The analytics boundary",
+      "body": "Direct identifiers are removed from reports, cohorts smaller than {count} are suppressed, and responses are private and non-cacheable.",
+      "never": "Never collected here: advertising identifiers, precise location, biometrics, device fingerprints, or manipulative attention analytics. Child learning data is never combined with an advertising profile."
+    }
+  }
+}

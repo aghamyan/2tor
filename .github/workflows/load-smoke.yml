@@ -1,0 +1,94 @@
+name: Load smoke and 5x gate
+
+on:
+  pull_request:
+    paths:
+      - "load/**"
+      - ".github/workflows/load-smoke.yml"
+  workflow_dispatch:
+    inputs:
+      base_url:
+        description: "Isolated load-test environment URL (never production)"
+        required: true
+        type: string
+      profile:
+        description: "launch is the required 250-VU gate; smoke only validates wiring"
+        required: true
+        default: launch
+        type: choice
+        options:
+          - launch
+          - smoke
+      confirm_isolated_target:
+        description: "I confirm this is an isolated, disposable load-test target"
+        required: true
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+jobs:
+  validate-script:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install k6
+        uses: grafana/setup-k6-action@v1
+        with:
+          k6-version: "1.3.0"
+
+      - name: Inspect load-test definition
+        run: k6 inspect load/launch-5x.js
+
+  run-load-gate:
+    if: github.event_name == 'workflow_dispatch'
+    needs: validate-script
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment: load-test
+    env:
+      BASE_URL: ${{ inputs.base_url }}
+      LOAD_PROFILE: ${{ inputs.profile }}
+      PARENT_SESSION_COOKIE: ${{ secrets.LOAD_TEST_PARENT_SESSION_COOKIE }}
+      TUTOR_SESSION_COOKIE: ${{ secrets.LOAD_TEST_TUTOR_SESSION_COOKIE }}
+      MESSAGE_CONVERSATION_ID: ${{ vars.LOAD_TEST_MESSAGE_CONVERSATION_ID }}
+      PARENT_USER_ID: ${{ vars.LOAD_TEST_PARENT_USER_ID }}
+      STUDENT_USER_ID: ${{ vars.LOAD_TEST_STUDENT_USER_ID }}
+      TUTOR_USER_ID: ${{ vars.LOAD_TEST_TUTOR_USER_ID }}
+    steps:
+      - name: Reject unconfirmed or production target
+        env:
+          CONFIRMED: ${{ inputs.confirm_isolated_target }}
+          PRODUCTION_URL: ${{ vars.PRODUCTION_URL }}
+        run: |
+          test "$CONFIRMED" = "true"
+          test -n "$BASE_URL"
+          test -n "$PARENT_SESSION_COOKIE"
+          test -n "$TUTOR_SESSION_COOKIE"
+          if test -n "$PRODUCTION_URL" && test "$BASE_URL" = "$PRODUCTION_URL"; then
+            echo "Refusing to load-test the configured production URL."
+            exit 1
+          fi
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install k6
+        uses: grafana/setup-k6-action@v1
+        with:
+          k6-version: "1.3.0"
+
+      - name: Run load profile
+        run: k6 run --summary-export load-summary.json load/launch-5x.js
+
+      - name: Upload raw load evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: load-${{ inputs.profile }}-${{ github.run_id }}
+          if-no-files-found: error
+          retention-days: 90
+          path: load-summary.json

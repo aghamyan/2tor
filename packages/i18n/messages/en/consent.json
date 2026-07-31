@@ -1,0 +1,89 @@
+{
+  "consent": {
+    "nav": {
+      "label": "Consent"
+    },
+    "overview": {
+      "eyebrow": "Child-data notice & consent",
+      "title": "Verifiable parental consent",
+      "intro": "Before a student's account can use covered features, review the direct notice and complete a verifiable consent step for that child.",
+      "backToFamilies": "Back to family",
+      "emptyTitle": "No students yet",
+      "emptyText": "Add a student in your family profile first — then come back here to complete consent.",
+      "addStudent": "Go to family profiles",
+      "review": "Review",
+      "statusActive": "Active",
+      "statusActionNeeded": "Action needed"
+    },
+    "studentScreen": {
+      "back": "Back to consent overview",
+      "eyebrow": "Child-data notice & consent",
+      "activeBanner": "This student's covered features are active.",
+      "pendingBanner": "Covered features stay off for {name} until consent is recorded and activation is confirmed.",
+      "adultLearnerBanner": "{name} is an adult learner. Parental consent does not apply — activation only requires the family link.",
+      "consentOnFile": "Consent on file: recorded {date} via {method}.",
+      "activateTitle": "Activate covered features",
+      "activateIntro": "This is a separate, deliberate step from recording consent.",
+      "activate": "Activate now",
+      "activating": "Activating…"
+    },
+    "notice": {
+      "title": "Direct notice to parents",
+      "intro": "This describes exactly what we collect about {name} if you give consent, why, and your rights. This notice is separate from, and not satisfied by, agreeing to our general Terms of Service.",
+      "categoriesTitle": "What we would collect",
+      "categories": {
+        "identity_profile": "Basic identity details (preferred name, grade level, age band or birth month/year)",
+        "academic_records": "Academic records (lessons, assignments, grading, progress notes)",
+        "contact_info": "Contact information needed to reach your family about tutoring",
+        "communications": "In-app messages and scheduling communications, always parent- and staff-visible",
+        "payment_billing": "Billing records tied to the lessons you purchase"
+      },
+      "purposeTitle": "Why we collect it",
+      "purposeText": "Solely to operate tutoring for your child: scheduling lessons, tracking academic progress, and billing you for the service. We do not sell this information.",
+      "retentionTitle": "How long we keep it",
+      "retentionText": "Your consent record itself is never automatically deleted — we keep it as long as needed to demonstrate compliance, even after you unenroll.",
+      "rightsTitle": "Your rights",
+      "rightsText": "You may review what we collected, request its deletion, or withdraw consent at any time by contacting support — withdrawing consent pauses this student's covered features.",
+      "acknowledge": "I have read and understood this notice."
+    },
+    "form": {
+      "title": "Complete verifiable consent",
+      "intro": "This step is separate from, and required in addition to, acknowledging the notice above.",
+      "methodLabel": "Verification method",
+      "methodHint": "Only the methods your family can currently complete are selectable.",
+      "methodOptions": {
+        "signed_form": "Typed signed attestation",
+        "identity_verification": "Identity verification (not yet available)",
+        "video_call": "Live video-call check (not yet available)",
+        "payment_card_verification": "Payment-card verification (not yet available)",
+        "other": "Other (not yet available)"
+      },
+      "typedFullNameLabel": "Your full legal name",
+      "typedFullNameHint": "Type your name exactly as it should appear on this record.",
+      "attestationLabel": "Type the attestation below exactly as written",
+      "attestationPhraseCaption": "Required attestation",
+      "submit": "Submit verifiable consent",
+      "submitting": "Submitting…"
+    },
+    "feedback": {
+      "consentRecorded": "Consent recorded. You can now activate this student's covered features.",
+      "activated": "Covered features are now active for this student.",
+      "errors": {
+        "unauthenticated": "Sign in again to continue.",
+        "forbidden": "You do not have access to this student.",
+        "notFound": "The requested student was not found.",
+        "parentRequired": "Create your parent profile first.",
+        "contactVerificationRequired": "Verify your email and phone before completing consent.",
+        "consentNotApplicable": "This student is an adult learner and does not need parental consent.",
+        "methodNotSupported": "That verification method is not available yet.",
+        "verificationFailed": "We could not verify that submission. Check the typed name and attestation and try again.",
+        "consentRequired": "A valid consent record is required before activation.",
+        "familyNotReady": "The family record is not ready for activation yet.",
+        "accountSuspended": "This account is suspended and cannot be activated here.",
+        "invalid": "Check the highlighted information and try again.",
+        "invalidField": "Check this value.",
+        "generic": "The change could not be saved. Try again."
+      }
+    }
+  }
+}

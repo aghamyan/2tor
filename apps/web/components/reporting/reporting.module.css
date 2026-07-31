@@ -1,0 +1,390 @@
+.shell {
+  --ink: #102d3c;
+  --muted: #526872;
+  --rule: #c7d8da;
+  --paper: #f7faf9;
+  --wash: #e8f1f0;
+  --signal: #df6b3f;
+  --aqua: #2d7c83;
+  max-width: 78rem;
+  margin: 0 auto;
+  color: var(--ink);
+  font-family: "Avenir Next", Avenir, "Segoe UI", sans-serif;
+}
+
+.header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 18rem;
+  gap: 3rem;
+  align-items: end;
+  padding: 1.75rem 0 2rem;
+  border-bottom: 1px solid var(--ink);
+}
+
+.header h1 {
+  max-width: 13ch;
+  margin: 0.3rem 0 0.75rem;
+  font-family: Charter, "Iowan Old Style", "Palatino Linotype", serif;
+  font-size: clamp(2.65rem, 6vw, 5.6rem);
+  font-weight: 500;
+  line-height: 0.94;
+  letter-spacing: -0.055em;
+}
+
+.kicker,
+.sectionIndex,
+.sample,
+.periodBlock span,
+.periodBlock small {
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+.kicker {
+  margin: 0;
+  color: var(--aqua);
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.intro {
+  max-width: 42rem;
+  margin: 0;
+  color: var(--muted);
+  font-size: 1.04rem;
+  line-height: 1.65;
+}
+
+.periodBlock {
+  padding: 1.1rem 1.2rem;
+  border: 1px solid var(--rule);
+  background: var(--paper);
+}
+
+.periodBlock span,
+.periodBlock small {
+  display: block;
+  color: var(--muted);
+  font-size: 0.64rem;
+}
+
+.periodBlock strong {
+  display: block;
+  margin: 0.45rem 0;
+  font-family: Charter, "Iowan Old Style", serif;
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.8rem 0;
+  border-bottom: 1px solid var(--rule);
+}
+
+.cadence,
+.activeCadence {
+  padding: 0.45rem 0.75rem;
+  border: 1px solid transparent;
+  color: var(--muted);
+  font-size: 0.82rem;
+  text-decoration: none;
+}
+
+.activeCadence {
+  border-color: var(--ink);
+  background: var(--ink);
+  color: white;
+}
+
+.cadence:hover {
+  border-color: var(--rule);
+  color: var(--ink);
+}
+
+.cadence:focus-visible,
+.activeCadence:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--signal) 55%, transparent);
+  outline-offset: 2px;
+}
+
+.generated {
+  margin-left: auto;
+  color: var(--muted);
+  font-size: 0.75rem;
+}
+
+.funnelSection,
+.metricSection {
+  padding: 3rem 0;
+  border-bottom: 1px solid var(--ink);
+}
+
+.sectionLead {
+  display: grid;
+  grid-template-columns: 2rem minmax(0, 1fr);
+  gap: 1rem;
+  max-width: 48rem;
+  margin-bottom: 1.65rem;
+}
+
+.sectionIndex {
+  margin: 0.2rem 0 0;
+  color: var(--signal);
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.sectionLead h2,
+.privacyBoundary h2 {
+  margin: 0;
+  font-family: Charter, "Iowan Old Style", serif;
+  font-size: clamp(1.7rem, 3vw, 2.5rem);
+  font-weight: 500;
+  letter-spacing: -0.025em;
+}
+
+.sectionLead p {
+  margin: 0.4rem 0 0;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.funnel {
+  position: relative;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.funnel::before {
+  position: absolute;
+  top: 1.7rem;
+  bottom: 1.7rem;
+  left: 1.08rem;
+  width: 1px;
+  background: var(--aqua);
+  content: "";
+}
+
+.funnelRow {
+  position: relative;
+  display: grid;
+  grid-template-columns: 2.2rem minmax(10rem, 14rem) minmax(8rem, 1fr) minmax(5rem, auto);
+  gap: 1rem;
+  align-items: center;
+  min-height: 4.2rem;
+  border-top: 1px solid var(--rule);
+}
+
+.funnelRow:last-child {
+  border-bottom: 1px solid var(--rule);
+}
+
+.stageNumber {
+  z-index: 1;
+  display: grid;
+  width: 2.2rem;
+  height: 2.2rem;
+  place-items: center;
+  border: 1px solid var(--aqua);
+  border-radius: 50%;
+  background: white;
+  color: var(--aqua);
+  font-family: "SFMono-Regular", Consolas, monospace;
+  font-size: 0.65rem;
+}
+
+.stageCopy {
+  display: flex;
+  flex-direction: column;
+}
+
+.stageCopy strong {
+  font-size: 0.92rem;
+}
+
+.stageCopy span {
+  margin-top: 0.15rem;
+  color: var(--muted);
+  font-size: 0.74rem;
+}
+
+.meter {
+  height: 0.42rem;
+  overflow: hidden;
+  background: var(--wash);
+}
+
+.meter span {
+  display: block;
+  width: var(--meter-width);
+  height: 100%;
+  background: linear-gradient(90deg, var(--aqua), #65a5a0);
+}
+
+.funnelRow b {
+  min-width: 5rem;
+  color: var(--ink);
+  font-family: Charter, "Iowan Old Style", serif;
+  font-size: 1.3rem;
+  text-align: right;
+}
+
+.metricGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border-top: 1px solid var(--rule);
+  border-left: 1px solid var(--rule);
+}
+
+.metricCard {
+  position: relative;
+  min-height: 12rem;
+  padding: 1.2rem;
+  border-right: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
+  background:
+    linear-gradient(
+        to bottom,
+        transparent 95%,
+        color-mix(in srgb, var(--rule) 45%, transparent) 95%
+      )
+      0 0 / 100% 1.65rem,
+    var(--paper);
+}
+
+.metricLabel {
+  margin: 0;
+  color: var(--aqua);
+  font-size: 0.77rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.metricValue {
+  margin: 0.7rem 0 0.45rem;
+  font-family: Charter, "Iowan Old Style", serif;
+  font-size: clamp(1.85rem, 3vw, 2.75rem);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  letter-spacing: -0.04em;
+}
+
+.metricDetail {
+  max-width: 30ch;
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.78rem;
+  line-height: 1.5;
+}
+
+.sample {
+  position: absolute;
+  right: 1rem;
+  bottom: 0.8rem;
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.58rem;
+}
+
+.privacyBoundary {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 1.25rem;
+  align-items: start;
+  margin: 2rem 0 0;
+  padding: 1.5rem;
+  border: 1px solid var(--ink);
+  background: var(--wash);
+}
+
+.privacyBoundary h2 {
+  font-size: 1.45rem;
+}
+
+.privacyBoundary p {
+  max-width: 60rem;
+  margin: 0.35rem 0 0;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.privacyMark {
+  display: grid;
+  width: 2.7rem;
+  height: 2.7rem;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--signal);
+  color: white;
+  font-family: Charter, serif;
+  font-size: 1.4rem;
+}
+
+.never {
+  font-weight: 650;
+}
+
+@media (max-width: 860px) {
+  .header {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .periodBlock {
+    max-width: 24rem;
+  }
+
+  .metricGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .funnelRow {
+    grid-template-columns: 2.2rem minmax(8rem, 1fr) 5rem;
+  }
+
+  .meter {
+    display: none;
+  }
+}
+
+@media (max-width: 560px) {
+  .header {
+    padding-top: 0.5rem;
+  }
+
+  .controls {
+    flex-wrap: wrap;
+  }
+
+  .generated {
+    width: 100%;
+    margin: 0.35rem 0 0;
+  }
+
+  .metricGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .funnelRow {
+    gap: 0.65rem;
+  }
+
+  .funnelRow b {
+    font-size: 1rem;
+  }
+
+  .privacyBoundary {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .meter span {
+    transition: none;
+  }
+}

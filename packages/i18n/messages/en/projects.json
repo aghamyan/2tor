@@ -1,0 +1,23 @@
+{
+  "projects": {
+    "nav": { "label": "Projects" },
+    "overview": {
+      "kicker": "Project learning",
+      "title": "Projects and portfolios",
+      "intro": "Bring team members, progress updates, evidence, and rubrics into one protected learning record.",
+      "privacy": "Portfolio items stay private by default. Public sharing needs a linked parent’s explicit approval and never publishes a child’s full name or photo.",
+      "plan": {
+        "title": "Plan together",
+        "body": "Tutors create individual or group projects and define each student’s role."
+      },
+      "evidence": {
+        "title": "Keep evidence secure",
+        "body": "Updates, rubrics, and uploaded work remain protected while files are scanned."
+      },
+      "portfolio": {
+        "title": "Share with permission",
+        "body": "Students assemble private portfolio items; a linked parent can approve a carefully de-identified public view."
+      }
+    }
+  }
+}

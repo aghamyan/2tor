@@ -1,0 +1,37 @@
+{
+  "discussions": {
+    "nav": { "label": "Learning Questions" },
+    "overview": {
+      "eyebrow": "Guided Q&A",
+      "title": "Ask where your learning happens.",
+      "intro": "Questions stay inside your course, group, or subject. Your tutor can review replies and mark a verified answer.",
+      "scope": {
+        "title": "Scoped, not searchable",
+        "body": "Choose a course, group, or subject. Learning Questions are not public and never appear in search engines."
+      },
+      "identity": {
+        "title": "Names stay minimal",
+        "body": "Posts use your first name and a platform identifier. Anonymous posts are not available."
+      },
+      "review": {
+        "title": "Answers are reviewed",
+        "body": "Student answers are shown as unverified until a tutor verifies them."
+      },
+      "sample": {
+        "label": "Example question",
+        "title": "Why does the denominator stay the same?",
+        "scope": "Algebra · Thursday group",
+        "private": "Shared with this group",
+        "answerer": "Maya · Student 042",
+        "answer": "I think we are counting equal parts, so the denominator tells us the size of the parts.",
+        "unverified": "Unverified student answer",
+        "tutor": "Arman · Tutor 12",
+        "tutorAnswer": "That is the right starting point. The denominator names the equal-sized parts; adding fractions combines the number of those parts.",
+        "verified": "Verified by your tutor"
+      },
+      "safety": "Files are checked before anyone can open them. Avoid sharing contact details, addresses, or IDs; those posts are flagged for review.",
+      "sla": "Tutor response target: within 12 service hours on service days. This is a visible target, not a live guarantee.",
+      "noDm": "Need help with a question? Keep it here—Learning Questions does not offer private messaging."
+    }
+  }
+}

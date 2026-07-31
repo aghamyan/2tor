@@ -1,0 +1,12 @@
+{
+  "matching": {
+    "nav": {
+      "label": "Matching"
+    },
+    "queue": {
+      "title": "Matching queue",
+      "intro": "Pending parent tutor-change requests for staff review.",
+      "empty": "No pending matching requests."
+    }
+  }
+}

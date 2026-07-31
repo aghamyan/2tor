@@ -1,0 +1,61 @@
+.form {
+  background: #fff;
+  border: 1px solid #c8d9df;
+  display: grid;
+  gap: 1rem;
+  max-width: 31rem;
+  padding: 1.4rem;
+}
+
+.form label {
+  display: grid;
+  font-size: 0.9rem;
+  font-weight: 700;
+  gap: 0.42rem;
+}
+
+.form input {
+  background: #fff;
+  border: 1px solid #91afba;
+  border-radius: 0.25rem;
+  color: #102f3f;
+  font: inherit;
+  min-height: 3rem;
+  padding: 0.7rem 0.8rem;
+}
+
+.form input:focus-visible {
+  outline: 3px solid #ffb368;
+  outline-offset: 2px;
+}
+
+.form button {
+  background: #008b91;
+  border: 0;
+  border-radius: 0.35rem;
+  color: #fff;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 800;
+  min-height: 3rem;
+  padding: 0.75rem 1rem;
+}
+
+.form button:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+.error {
+  background: #fff0ed;
+  border-left: 3px solid #b83c2e;
+  color: #78251c;
+  margin: 0;
+  padding: 0.75rem;
+}
+
+.privacy {
+  color: #4f6878;
+  font-size: 0.82rem;
+  margin: 0;
+}

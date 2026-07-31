@@ -1,0 +1,23 @@
+{
+  "support": {
+    "nav": { "label": "Support" },
+    "overview": {
+      "kicker": "Help and safety",
+      "title": "Support queue",
+      "intro": "Open a support ticket, follow its comments, and keep urgent lesson issues visible to the operations team.",
+      "tickets": {
+        "title": "Tickets and comments",
+        "body": "Track account, scheduling, academic, payment, privacy, content, and technical questions in one thread."
+      },
+      "lessonNow": {
+        "title": "Lesson starting now",
+        "body": "This urgent option is targeted for a response within 15 support-hours minutes."
+      },
+      "incidents": {
+        "title": "Incident workflow",
+        "body": "Safety reports create a critical incident with recorded actions and escalation."
+      },
+      "safety": "Safety reports are placed first in the queue and escalated immediately. If someone is in immediate danger, contact local emergency services."
+    }
+  }
+}

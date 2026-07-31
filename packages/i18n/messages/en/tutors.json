@@ -1,0 +1,11 @@
+{
+  "tutors": {
+    "nav": { "label": "Tutor profile" },
+    "overview": {
+      "title": "Tutor workspace",
+      "availability": "Weekly availability",
+      "documents": "Verification documents",
+      "quarantine": "Documents remain private while pending review."
+    }
+  }
+}

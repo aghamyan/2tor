@@ -1,0 +1,225 @@
+import { z } from "zod";
+
+const requiredText = (max = 4_000) => z.string().trim().min(1).max(max);
+const nullableText = (max = 4_000) =>
+  z
+    .string()
+    .trim()
+    .max(max)
+    .nullable()
+    .transform((value) => value || null);
+
+const randomValueSchema = z
+  .object({
+    name: z
+      .string()
+      .trim()
+      .regex(/^[A-Za-z][A-Za-z0-9_]{0,39}$/),
+    min: z.number().finite().min(-1_000_000).max(1_000_000),
+    max: z.number().finite().min(-1_000_000).max(1_000_000),
+    step: z.number().finite().positive().max(1_000_000),
+  })
+  .strict()
+  .superRefine((value, context) => {
+    if (value.max < value.min) {
+      context.addIssue({
+        code: "custom",
+        path: ["max"],
+        message: "Maximum must be at least the minimum.",
+      });
+    }
+  });
+
+export const assessmentQuestionInputSchema = z
+  .object({
+    type: z.enum(["multiple_choice", "short_answer", "numeric", "essay", "code"]),
+    prompt: requiredText(12_000),
+    choices: z
+      .array(z.object({ key: requiredText(80), label: requiredText(1_000) }).strict())
+      .min(2)
+      .max(20)
+      .nullable(),
+    correctAnswer: nullableText(20_000),
+    points: z.number().finite().positive().max(10_000),
+    poolId: z.string().trim().min(1).max(100).nullable(),
+    randomizeOptions: z.boolean().default(false),
+    randomValues: z.array(randomValueSchema).max(20).default([]),
+  })
+  .strict()
+  .superRefine((value, context) => {
+    if (value.type === "multiple_choice" && value.choices === null) {
+      context.addIssue({
+        code: "custom",
+        path: ["choices"],
+        message: "Multiple-choice questions require choices.",
+      });
+    }
+    if (value.type !== "multiple_choice" && value.choices !== null) {
+      context.addIssue({
+        code: "custom",
+        path: ["choices"],
+        message: "Only multiple-choice questions may have choices.",
+      });
+    }
+    for (const valueRule of value.randomValues) {
+      if (!value.prompt.includes(`{{${valueRule.name}}}`)) {
+        context.addIssue({
+          code: "custom",
+          path: ["randomValues"],
+          message: `Prompt does not contain {{${valueRule.name}}}.`,
+        });
+      }
+    }
+  });
+
+export const assessmentVersionInputSchema = z
+  .object({
+    changeSummary: nullableText(2_000),
+    durationSeconds: z
+      .number()
+      .int()
+      .min(60)
+      .max(8 * 60 * 60)
+      .nullable(),
+    fullscreenRequired: z.boolean().default(false),
+    randomizeQuestionOrder: z.boolean().default(true),
+    poolSelections: z
+      .record(z.string().trim().min(1).max(100), z.number().int().min(1).max(100))
+      .default({}),
+    camera: z
+      .object({
+        required: z.boolean().default(false),
+        policyVersion: z.string().trim().min(1).max(100).nullable(),
+      })
+      .strict()
+      .default({ required: false, policyVersion: null }),
+    questions: z.array(assessmentQuestionInputSchema).min(1).max(300),
+  })
+  .strict()
+  .superRefine((value, context) => {
+    if (value.camera.required && !value.camera.policyVersion) {
+      context.addIssue({
+        code: "custom",
+        path: ["camera", "policyVersion"],
+        message: "A camera policy version is required.",
+      });
+    }
+    if (!value.camera.required && value.camera.policyVersion) {
+      context.addIssue({
+        code: "custom",
+        path: ["camera", "policyVersion"],
+        message: "A camera policy is only valid when the camera is required.",
+      });
+    }
+    const poolSizes = new Map<string, number>();
+    for (const question of value.questions) {
+      if (question.poolId)
+        poolSizes.set(question.poolId, (poolSizes.get(question.poolId) ?? 0) + 1);
+    }
+    for (const [poolId, count] of Object.entries(value.poolSelections)) {
+      const available = poolSizes.get(poolId) ?? 0;
+      if (available === 0 || count > available) {
+        context.addIssue({
+          code: "custom",
+          path: ["poolSelections", poolId],
+          message: "Pool selection exceeds its available questions.",
+        });
+      }
+    }
+  });
+
+export const createAssessmentSchema = z
+  .object({
+    subjectId: requiredText(100),
+    title: requiredText(240),
+    description: nullableText(8_000),
+    type: z.enum(["diagnostic", "quiz", "exam", "practice"]),
+    status: z.enum(["draft", "published"]).default("draft"),
+    version: assessmentVersionInputSchema,
+  })
+  .strict();
+
+export const startAttemptSchema = z
+  .object({
+    cameraConsent: z
+      .object({
+        accepted: z.boolean(),
+        policyVersion: requiredText(100),
+      })
+      .strict()
+      .nullable()
+      .default(null),
+  })
+  .strict();
+
+export const createVersionRequestSchema = z
+  .object({
+    publish: z.boolean().default(false),
+    version: assessmentVersionInputSchema,
+  })
+  .strict();
+
+export const saveAssessmentAnswerSchema = z
+  .object({
+    answerText: z.string().max(50_000).nullable(),
+    timeSpentSeconds: z
+      .number()
+      .int()
+      .min(0)
+      .max(8 * 60 * 60)
+      .nullable()
+      .default(null),
+  })
+  .strict();
+
+export const integritySignalSchema = z
+  .object({
+    eventType: z.enum([
+      "focus_loss",
+      "fullscreen_exit",
+      "tab_switch",
+      "connectivity_interruption",
+      "copy_attempt",
+      "paste_attempt",
+    ]),
+    clientOccurredAt: z.string().datetime().nullable().default(null),
+    metadata: z
+      .record(
+        z.string().max(80),
+        z.union([z.string().max(500), z.number().finite(), z.boolean(), z.null()]),
+      )
+      .nullable()
+      .default(null),
+  })
+  .strict();
+
+export const submitAssessmentSchema = z
+  .object({
+    honorStatementAccepted: z.boolean(),
+  })
+  .strict();
+
+export const diagnosticReportSchema = z
+  .object({
+    summary: requiredText(12_000),
+    strengths: nullableText(12_000),
+    gaps: nullableText(12_000),
+    recommendedNextSteps: nullableText(12_000),
+  })
+  .strict();
+
+export const consultationSchema = z
+  .object({
+    consultedAt: z.string().datetime().nullable().default(null),
+  })
+  .strict();
+
+export type CreateAssessmentInput = z.input<typeof createAssessmentSchema>;
+export type AssessmentVersionInput = z.input<typeof assessmentVersionInputSchema>;
+export type CreateVersionRequestInput = z.input<typeof createVersionRequestSchema>;
+export type StartAttemptInput = z.input<typeof startAttemptSchema>;
+export type SaveAssessmentAnswerInput = z.input<typeof saveAssessmentAnswerSchema>;
+export type IntegritySignalInput = z.input<typeof integritySignalSchema>;
+export type SubmitAssessmentInput = z.input<typeof submitAssessmentSchema>;
+export type DiagnosticReportInput = z.input<typeof diagnosticReportSchema>;
+export type ConsultationInput = z.input<typeof consultationSchema>;

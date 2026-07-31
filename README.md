@@ -68,14 +68,17 @@ owns its own JSON file).
 
 ```bash
 corepack enable
-pnpm install
-pnpm turbo run build lint typecheck
+cp .env.example .env
+pnpm install --frozen-lockfile
+docker compose up -d --wait
+pnpm --filter @app/db db:migrate
+pnpm --filter @app/db seed
+pnpm dev
 ```
 
-Local infrastructure (Postgres, Redis, MinIO via Docker Compose) is intentionally **not** set
-up in this scaffolding task — `docker-compose.yml` wasn't in scope here and is expected to
-land in a follow-up task. Until then, `packages/db`'s scripts read `DATABASE_URL` and fall
-back to `postgres://postgres:postgres@localhost:5432/app`.
+The Compose stack starts PostgreSQL, Redis, MinIO, and the local reverse proxy. After seeding,
+the parent demo account is `parent@example.com` with password `DemoLogin!2026` (development only).
+Run `pnpm lint`, `pnpm typecheck`, `pnpm test`, and `pnpm build` before submitting changes.
 
 ## Notable deviations from the literal task spec
 
@@ -95,8 +98,6 @@ back to `postgres://postgres:postgres@localhost:5432/app`.
   arrays; running an already-flat config through `FlatCompat` (which expects legacy
   `.eslintrc`-shaped input) throws a circular-JSON error inside `eslint-plugin-react`'s config
   object.
-- **No `docker-compose.yml`.** Not in this task's allowed file list, even though the stack
-  description mentions Docker Compose / MinIO. Left for a follow-up infra task.
 - **No `rootDir` in any package/app `tsconfig.json`.** Don't add one. Packages export raw
   `.ts` from `src/`, so the moment one package imports another (e.g. `apps/worker` importing
   `@app/domain`), `tsc` pulls the imported package's source into the compiling program — and
@@ -104,11 +105,3 @@ back to `postgres://postgres:postgres@localhost:5432/app`.
   first thing you'd reach for) makes any real cross-package import fail with `TS6059` the
   moment it's written. Caught by a throwaway smoke-import test during scaffolding, not by the
   empty-skeleton build.
-
-## Repository note
-
-This checkout's git root is the user's home directory (`~`), not this project folder — an
-existing, unrelated setup from a separate academic-capstone repository. Nothing here changes
-that; `apps/web/next.config.mjs` explicitly pins `turbopack.root` to this directory so Next's
-workspace-root inference doesn't get confused by files elsewhere in the home directory.
-# 2tor

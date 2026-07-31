@@ -1,0 +1,18 @@
+{
+  "common": {
+    "actions": {
+      "cancel": "Cancel",
+      "save": "Save",
+      "close": "Close"
+    },
+    "language": {
+      "label": "Language",
+      "english": "English",
+      "armenian": "Armenian"
+    },
+    "status": {
+      "loading": "Loading…",
+      "error": "Something went wrong."
+    }
+  }
+}

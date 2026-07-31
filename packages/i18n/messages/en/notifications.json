@@ -1,0 +1,21 @@
+{
+  "notifications": {
+    "title": "Notifications",
+    "markAllRead": "Mark all as read",
+    "preferences": "Notification preferences",
+    "channels": {
+      "email": "Email",
+      "push": "Web push",
+      "inbox": "In-app inbox"
+    },
+    "categories": {
+      "account": "Account and security",
+      "schedule": "Schedule",
+      "payment": "Payments",
+      "privacy": "Privacy",
+      "safety": "Safety",
+      "updates": "Updates",
+      "promotional": "News and offers"
+    }
+  }
+}

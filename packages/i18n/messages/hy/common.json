@@ -1,0 +1,18 @@
+{
+  "common": {
+    "actions": {
+      "cancel": "Չեղարկել",
+      "save": "Պահպանել",
+      "close": "Փակել"
+    },
+    "language": {
+      "label": "Լեզու",
+      "english": "Անգլերեն",
+      "armenian": "Հայերեն"
+    },
+    "status": {
+      "loading": "Բեռնվում է…",
+      "error": "Ինչ-որ բան սխալ գնաց։"
+    }
+  }
+}

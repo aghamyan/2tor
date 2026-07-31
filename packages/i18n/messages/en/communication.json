@@ -1,0 +1,70 @@
+{
+  "communication": {
+    "nav": { "label": "Messages" },
+    "eyebrow": "Family communication",
+    "title": "The shared room",
+    "intro": "Messages, files, and read receipts stay visible to the family members responsible for the learning relationship.",
+    "parentVisible": "Parent-visible by design",
+    "audited": "Staff access is reason-logged",
+    "conversationList": "Conversations",
+    "inbox": "Inbox",
+    "empty": "No shared conversations yet.",
+    "untitled": "Shared conversation",
+    "selectTitle": "Choose a conversation",
+    "selectBody": "Select a shared room to read its transcript.",
+    "loading": "Opening the shared room…",
+    "sharedRoom": "Shared transcript",
+    "participants": "Active participants",
+    "participant": "Participant",
+    "you": "You",
+    "noMessages": "No messages yet. Start the shared conversation below.",
+    "redacted": "This message was redacted by staff. Its audit record is preserved.",
+    "seen": "Seen by {count, plural, =0 {no one yet} =1 {1 participant} other {# participants}}",
+    "sending": "Sending…",
+    "sendFailed": "Not sent. Copy the text and try again.",
+    "dismiss": "Dismiss",
+    "cancel": "Cancel",
+    "roles": {
+      "parent": "Parent",
+      "student": "Student",
+      "tutor": "Tutor",
+      "staff": "Staff"
+    },
+    "connection": {
+      "connecting": "Connecting",
+      "live": "Live updates",
+      "polling": "Polling fallback"
+    },
+    "scan": {
+      "pending": "Scanning",
+      "clean": "Ready",
+      "infected": "Blocked",
+      "error": "Scan failed"
+    },
+    "staffAccess": {
+      "eyebrow": "Audited access",
+      "title": "Record why you need access",
+      "body": "Your reason is written to the staff-access log and audit trail before any message is shown.",
+      "label": "Operational or safety reason",
+      "open": "Record reason and open"
+    },
+    "composer": {
+      "label": "Message everyone in this room",
+      "placeholder": "Write a clear update for the parent, student, tutor, and staff participants…",
+      "attach": "Attach files",
+      "send": "Send to everyone"
+    },
+    "report": {
+      "action": "Report",
+      "label": "What makes this message unsafe or inappropriate?",
+      "send": "Send report",
+      "sent": "Reported"
+    },
+    "errors": {
+      "load": "Conversations could not be loaded. Refresh and try again.",
+      "send": "The message was not sent. Try again.",
+      "report": "The report was not sent. Try again.",
+      "download": "The attachment could not be downloaded."
+    }
+  }
+}

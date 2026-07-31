@@ -1,0 +1,243 @@
+{
+  "admin": {
+    "nav": {
+      "label": "Admin"
+    },
+    "dashboard": {
+      "title": "Administration",
+      "intro": "Review approvals, verification, disputes, and other high-risk operations queues.",
+      "cards": {
+        "users": "Pending user approvals",
+        "verifications": "Pending tutor verifications",
+        "disputes": "Open disputes",
+        "moderation": "Content moderation queue",
+        "support": "Open support tickets",
+        "exports": "Pending export approvals",
+        "deletions": "Pending deletion approvals",
+        "privacyRequests": "Open privacy requests"
+      },
+      "moreLinks": "More admin tools",
+      "links": {
+        "matchingQueue": "Matching queue",
+        "suspensions": "Tutor suspensions",
+        "discounts": "Discounts",
+        "roles": "Role elevation",
+        "security": "Security settings",
+        "auditLog": "Audit log"
+      }
+    },
+    "exports": {
+      "title": "Data exports",
+      "intro": "Bulk exports require step-up MFA and approval from a second administrator before they run.",
+      "requestTitle": "Request an export",
+      "requestSubmit": "Request export",
+      "requesting": "Requesting…",
+      "typeLabel": "Export type",
+      "reasonLabel": "Reason",
+      "empty": "No exports yet.",
+      "status": {
+        "pending": "Pending approval",
+        "processing": "Processing",
+        "completed": "Completed",
+        "failed": "Failed or rejected"
+      },
+      "requestedBy": "Requested by",
+      "cannotSelfApprove": "You requested this export — a different administrator must approve it.",
+      "approve": "Approve",
+      "reject": "Reject",
+      "deciding": "Saving…"
+    },
+    "users": {
+      "title": "User approvals",
+      "intro": "New accounts waiting for staff approval.",
+      "empty": "No accounts are pending approval.",
+      "approve": "Approve",
+      "approving": "Approving…"
+    },
+    "verifications": {
+      "title": "Tutor verification review",
+      "intro": "Review pending tutor verifications and uploaded documents.",
+      "verificationsTitle": "Pending verifications",
+      "documentsTitle": "Pending documents",
+      "empty": "Nothing is pending review.",
+      "pass": "Pass",
+      "fail": "Fail",
+      "approve": "Approve",
+      "reject": "Reject",
+      "deciding": "Saving…"
+    },
+    "disputes": {
+      "title": "Disputes",
+      "intro": "Abuse reports awaiting staff review.",
+      "empty": "No open disputes.",
+      "resolve": "Resolve",
+      "dismiss": "Dismiss",
+      "deciding": "Saving…"
+    },
+    "moderation": {
+      "title": "Content moderation",
+      "intro": "Reported resources awaiting review.",
+      "empty": "No open content reports.",
+      "resolve": "Resolve",
+      "dismiss": "Dismiss",
+      "deciding": "Saving…"
+    },
+    "support": {
+      "title": "Support tickets",
+      "intro": "Open support tickets across the platform.",
+      "empty": "No open support tickets.",
+      "resolve": "Mark resolved",
+      "deciding": "Saving…",
+      "status": {
+        "open": "Open",
+        "in_progress": "In progress",
+        "waiting_on_customer": "Waiting on customer",
+        "resolved": "Resolved",
+        "closed": "Closed"
+      },
+      "priority": {
+        "low": "Low",
+        "normal": "Normal",
+        "high": "High",
+        "urgent": "Urgent"
+      }
+    },
+    "suspensions": {
+      "title": "Tutor suspensions",
+      "intro": "Active tutor suspensions and the ability to create or lift one.",
+      "createTitle": "Suspend a tutor",
+      "suspend": "Suspend",
+      "suspending": "Suspending…",
+      "tutorProfileIdLabel": "Tutor profile ID",
+      "reasonLabel": "Reason",
+      "empty": "No active suspensions.",
+      "lift": "Lift suspension",
+      "lifting": "Saving…"
+    },
+    "discounts": {
+      "title": "Discounts",
+      "intro": "Create and manage promotional and manual discounts.",
+      "createTitle": "Create a discount",
+      "create": "Create",
+      "creating": "Creating…",
+      "codeLabel": "Code (optional)",
+      "percentOffLabel": "Percent off (optional)",
+      "reasonLabel": "Reason",
+      "empty": "No discounts yet.",
+      "active": "Active",
+      "inactive": "Inactive",
+      "deactivate": "Deactivate",
+      "deactivating": "Saving…"
+    },
+    "deletions": {
+      "title": "Deletions & privacy requests",
+      "intro": "Mass deletion jobs require step-up MFA and a second administrator's approval. Legal-retention records are never deleted by this workflow.",
+      "requestTitle": "Request a deletion job",
+      "requestSubmit": "Request deletion",
+      "requesting": "Requesting…",
+      "targetEntityTypeLabel": "Entity type",
+      "targetEntityIdLabel": "Entity ID",
+      "scopeLabel": "Scope",
+      "scopeFullErase": "Full erase",
+      "scopeAnonymize": "Anonymize",
+      "reasonLabel": "Reason",
+      "jobsTitle": "Deletion jobs",
+      "empty": "Nothing here yet.",
+      "status": {
+        "scheduled": "Scheduled",
+        "running": "Running",
+        "completed": "Completed",
+        "failed": "Failed",
+        "blocked": "Blocked"
+      },
+      "cannotSelfApprove": "You requested this deletion job — a different administrator must approve it.",
+      "approve": "Approve",
+      "reject": "Reject",
+      "deciding": "Saving…",
+      "privacyRequestsTitle": "Privacy requests",
+      "privacyStatus": {
+        "received": "Received",
+        "in_review": "In review",
+        "approved": "Approved",
+        "rejected": "Rejected",
+        "completed": "Completed"
+      },
+      "markCompleted": "Mark completed"
+    },
+    "roles": {
+      "title": "Role elevation",
+      "intro": "Role elevation requires step-up MFA and approval from a different super-administrator.",
+      "requestTitle": "Request a role elevation",
+      "requestSubmit": "Request elevation",
+      "requesting": "Requesting…",
+      "targetUserIdLabel": "Target user ID",
+      "roleKeyLabel": "Role",
+      "reasonLabel": "Reason",
+      "empty": "No pending role elevation requests.",
+      "cannotSelfApprove": "You requested this role elevation — a different super-administrator must approve it.",
+      "approve": "Approve",
+      "reject": "Reject",
+      "deciding": "Saving…"
+    },
+    "security": {
+      "title": "Security settings",
+      "intro": "Disabling a security control requires step-up MFA and approval from a different super-administrator.",
+      "requestTitle": "Request a security setting change",
+      "requestSubmit": "Request change",
+      "requesting": "Requesting…",
+      "keyLabel": "Setting key",
+      "valueLabel": "New value",
+      "reasonLabel": "Reason",
+      "empty": "No pending security setting changes.",
+      "cannotSelfApprove": "You requested this change — a different super-administrator must approve it.",
+      "approve": "Approve",
+      "reject": "Reject",
+      "deciding": "Saving…"
+    },
+    "auditLog": {
+      "title": "Audit log",
+      "intro": "The append-only trail of every sensitive action taken on the platform.",
+      "stepUpRequired": "Re-verify with your authenticator app to view the audit log.",
+      "empty": "No audit events yet.",
+      "systemActor": "System"
+    },
+    "feedback": {
+      "userApproved": "Account approved.",
+      "userSuspended": "Account suspended.",
+      "userReinstated": "Account reinstated.",
+      "verificationDecided": "Verification decision saved.",
+      "documentDecided": "Document decision saved.",
+      "tutorSuspended": "Tutor suspended.",
+      "suspensionLifted": "Suspension lifted.",
+      "disputeDecided": "Dispute updated.",
+      "moderationDecided": "Report updated.",
+      "ticketResolved": "Ticket resolved.",
+      "exportRequested": "Export requested — awaiting a second administrator's approval.",
+      "exportDecided": "Export decision saved.",
+      "roleElevationRequested": "Role elevation requested — awaiting a second super-administrator's approval.",
+      "roleElevationDecided": "Role elevation decision saved.",
+      "deletionRequested": "Deletion job requested — awaiting a second administrator's approval.",
+      "deletionDecided": "Deletion job decision saved.",
+      "privacyRequestResolved": "Privacy request updated.",
+      "discountCreated": "Discount created.",
+      "discountDeactivated": "Discount deactivated.",
+      "securityChangeRequested": "Security setting change requested — awaiting a second super-administrator's approval.",
+      "securityChangeDecided": "Security setting change decision saved."
+    },
+    "errors": {
+      "invalid": "Check the highlighted information and try again.",
+      "generic": "The change could not be saved. Try again.",
+      "UNAUTHENTICATED": "Sign in again to continue.",
+      "FORBIDDEN": "You do not have permission to do that.",
+      "NOT_FOUND": "The requested record was not found.",
+      "INVALID_TRANSITION": "This record cannot be changed from its current state.",
+      "SELF_APPROVAL_FORBIDDEN": "You cannot approve your own request — a different staff member must decide it.",
+      "STEP_UP_REQUIRED": "Re-verify with your authenticator app before continuing.",
+      "APPROVAL_NOT_FOUND": "That approval request was not found.",
+      "APPROVAL_ALREADY_RESOLVED": "That approval request was already decided.",
+      "APPROVAL_ACTION_MISMATCH": "That approval request does not match this record.",
+      "SELF_VERIFICATION_FORBIDDEN": "A tutor cannot verify their own record.",
+      "INVALID_INPUT": "Check the highlighted information and try again."
+    }
+  }
+}

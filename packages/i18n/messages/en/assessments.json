@@ -1,0 +1,160 @@
+{
+  "assessments": {
+    "nav": {
+      "label": "Assessments"
+    },
+    "types": {
+      "diagnostic": "Diagnostic",
+      "quiz": "Quiz",
+      "exam": "Exam",
+      "practice": "Practice"
+    },
+    "statuses": {
+      "in_progress": "In progress",
+      "submitted": "Submitted",
+      "graded": "Graded",
+      "abandoned": "Closed after time elapsed"
+    },
+    "overview": {
+      "kicker": "Assessment workspace",
+      "title": "A clear view of what a learner knows",
+      "intro": "Tutors build versioned assessments from question pools. Students receive a timed, focused workspace. Families receive a tutor’s considered report after a conversation.",
+      "contract": {
+        "title": "Activity signals provide context, not proof",
+        "body": "The assessment can record timing, focus, fullscreen, connection, copy/paste, and answer-change events. A tutor reviews them alongside the work; the system does not make an accusation."
+      },
+      "prepare": {
+        "label": "Tutor",
+        "title": "Prepare",
+        "body": "Author versioned questions, choose pool sizes, and set time or fullscreen requirements."
+      },
+      "take": {
+        "label": "Student",
+        "title": "Take",
+        "body": "See the collection notice, work through a randomized paper, and confirm the honor statement."
+      },
+      "review": {
+        "label": "Tutor + family",
+        "title": "Understand",
+        "body": "Review answers and activity context, consult together, then release a tutor-written diagnostic."
+      },
+      "library": {
+        "kicker": "Assessment library",
+        "title": "Available assessments",
+        "loading": "Loading the assessment library…",
+        "empty": "No assessments are available yet. Tutors can create one through the assessment API.",
+        "noDescription": "Open the assessment brief and collection notice."
+      }
+    },
+    "entry": {
+      "loading": "Preparing the assessment brief…",
+      "back": "Assessment library",
+      "noDescription": "Review the details and activity notice before you begin.",
+      "questions": "Questions",
+      "time": "Time",
+      "minutes": "{count, plural, one {# minute} other {# minutes}}",
+      "untimed": "Untimed",
+      "version": "Version",
+      "notice": {
+        "label": "Before you begin",
+        "title": "This assessment records activity signals",
+        "body": "You will see the same kinds of activity a tutor may review after the assessment:",
+        "timing": "start, finish, and answer timestamps",
+        "focus": "tab or focus changes and fullscreen exits",
+        "connection": "connection interruptions and detectable copy/paste attempts",
+        "answers": "saved answers and answer changes",
+        "notProof": "These signals provide context only. They are not proof of misconduct and never produce an automatic accusation."
+      },
+      "ready": {
+        "title": "Ready to begin?",
+        "fullscreen": "Starting opens the focused fullscreen workspace. Leaving fullscreen is recorded as an activity signal.",
+        "standard": "The question order and values are fixed for this attempt once you start."
+      },
+      "cameraConsent": "I explicitly consent to the camera requirement described in policy {policy}. I understand this slice does not record video or analyze my face or emotions.",
+      "start": "Begin assessment",
+      "starting": "Opening assessment…"
+    },
+    "runner": {
+      "timeRemaining": "Assessment time remaining",
+      "inProgress": "Assessment in progress",
+      "remaining": "remaining",
+      "elapsed": "time elapsed",
+      "elapsedNotice": "Time has elapsed. Your saved answers remain available; accept the honor statement to submit them.",
+      "question": "Question {current} of {total}",
+      "points": "{count, plural, one {# point} other {# points}}",
+      "chooseAnswer": "Choose one answer",
+      "placeholders": {
+        "short_answer": "Write a concise answer",
+        "numeric": "Enter a number",
+        "essay": "Develop your answer",
+        "code": "Write your code"
+      },
+      "submit": {
+        "kicker": "Final check",
+        "title": "Submit your saved answers",
+        "body": "You can review your answers above. The honor statement is required before submission.",
+        "honor": "I confirm that this submission reflects my own work and that I followed the assessment instructions.",
+        "action": "Submit assessment",
+        "submitting": "Submitting…"
+      },
+      "complete": {
+        "kicker": "Submission received",
+        "title": "Your assessment is complete",
+        "body": "Your tutor can now review the answers and activity context. Any diagnostic report is written by the tutor and shared with your family after consultation.",
+        "back": "Return to assessments"
+      }
+    },
+    "signals": {
+      "tab_switch": "Tab changes",
+      "focus_loss": "Focus losses",
+      "fullscreen_exit": "Fullscreen exits",
+      "connectivity_interruption": "Connection interruptions",
+      "copy_attempt": "Copy attempts",
+      "paste_attempt": "Paste attempts",
+      "answer_change": "Answer changes"
+    },
+    "review": {
+      "loading": "Loading the attempt review…",
+      "back": "Assessment library",
+      "kicker": "Tutor review",
+      "signals": {
+        "kicker": "Activity context",
+        "title": "Recorded signals",
+        "contract": "Counts describe browser activity only. They do not establish intent or prove misconduct. Review them with the answers and speak with the learner when context is needed."
+      },
+      "answers": {
+        "kicker": "Response record",
+        "title": "Student answers",
+        "blank": "No answer saved",
+        "changes": "{count, plural, one {# saved change} other {# saved changes}}"
+      },
+      "report": {
+        "kicker": "Tutor-authored",
+        "title": "Diagnostic report",
+        "body": "Write the interpretation in your own words. Browser events are context, not a generated conclusion.",
+        "summary": "Summary",
+        "strengths": "Strengths",
+        "gaps": "Areas to develop",
+        "nextSteps": "Recommended next steps",
+        "save": "Save report draft"
+      },
+      "release": {
+        "kicker": "Family release",
+        "title": "Consult before sharing",
+        "waiting": "The report remains private to teaching staff until the parent consultation is recorded.",
+        "consulted": "Consultation recorded. Review the report once more before releasing it to the linked parent.",
+        "released": "The report has been released to the linked parent.",
+        "recordConsultation": "Record consultation",
+        "action": "Release to parent"
+      }
+    },
+    "errors": {
+      "load": "The assessment could not be loaded.",
+      "start": "The assessment could not be started.",
+      "save": "This answer could not be saved.",
+      "submit": "The assessment could not be submitted.",
+      "review": "The attempt review could not be loaded.",
+      "report": "The diagnostic report could not be updated."
+    }
+  }
+}

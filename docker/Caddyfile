@@ -1,0 +1,26 @@
+{
+	admin off
+	email {$CADDY_EMAIL:admin@example.com}
+}
+
+# Internal-only responder so Docker's healthcheck can prove Caddy itself is up
+# without depending on the web/worker app services (they only exist behind the
+# "app" compose profile — plain `docker compose up` never starts them).
+:2019 {
+	respond /healthz 200
+}
+
+{$SITE_ADDRESS:localhost} {
+	# Local/staging default: self-signed cert from Caddy's internal CA, since
+	# "localhost" and other non-public addresses can't get a Let's Encrypt
+	# cert. For a real staging/production domain, delete this line — Caddy
+	# then provisions a Let's Encrypt cert automatically for {$SITE_ADDRESS}
+	# using the `email` set above. No other change needed.
+	tls internal
+
+	encode zstd gzip
+
+	# Single upstream handles every path, including /_next static assets —
+	# Next.js serves both app routes and /_next from the same process/port.
+	reverse_proxy web:{$WEB_PORT:-3000}
+}

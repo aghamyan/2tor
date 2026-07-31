@@ -1,0 +1,125 @@
+{
+  "families": {
+    "nav": {
+      "label": "Family"
+    },
+    "overview": {
+      "eyebrow": "Family profiles",
+      "title": "The people behind the learning",
+      "intro": "Keep each learner’s profile accurate, useful, and limited to the information tutoring actually needs.",
+      "addStudent": "Add a student",
+      "parentTitle": "Your parent profile",
+      "parentIntro": "How tutors and the support team should reach you.",
+      "privacy": "We do not ask for a home address or an exact birth date. Student age is stored as a month and year or an age band.",
+      "studentsTitle": "Students in your family",
+      "studentsIntro": "Every minor stays connected to a parent account.",
+      "parentFirstTitle": "Start with your profile",
+      "parentFirstText": "Create the parent profile on the left before adding a student.",
+      "emptyTitle": "No student profiles yet",
+      "emptyText": "Create the first profile here. The student account cannot be created independently.",
+      "createFirst": "Create the first student"
+    },
+    "parentForm": {
+      "fullName": "Full name",
+      "phone": "Phone",
+      "contentLanguage": "Preferred language for tutor communication",
+      "noPreference": "No preference",
+      "english": "English",
+      "armenian": "Armenian",
+      "save": "Save profile",
+      "create": "Create parent profile",
+      "saving": "Saving…"
+    },
+    "studentCard": {
+      "birthMonth": "Born {value}",
+      "ageNotSet": "Age not set",
+      "gradeNotSet": "Grade not set",
+      "details": "@{username} · {grade} · {age}",
+      "active": "Active",
+      "awaitingActivation": "Awaiting activation"
+    },
+    "studentForm": {
+      "preferredName": "Preferred name",
+      "username": "Student username",
+      "usernameHint": "Use 4–40 lowercase letters, numbers, dots, dashes, or underscores.",
+      "grade": "Grade",
+      "state": "State or region",
+      "adultLearner": "This student is an adult learner",
+      "adultLearnerHint": "Adult learners do not need child age information.",
+      "birthMonth": "Birth month and year",
+      "birthMonthHint": "Use this or an age band, not both.",
+      "ageBand": "Age band",
+      "chooseAgeBand": "Choose an age band",
+      "ageBandHint": "Use this when month and year are not needed.",
+      "ageBands": {
+        "under8": "Under 8",
+        "8to10": "8–10",
+        "11to12": "11–12",
+        "13to15": "13–15",
+        "16to17": "16–17"
+      },
+      "timezone": "Time zone",
+      "timezoneHint": "Use an IANA time zone such as Asia/Yerevan.",
+      "interfaceLanguage": "Student interface language",
+      "english": "English",
+      "armenian": "Armenian",
+      "relationship": "Your relationship",
+      "parent": "Parent",
+      "guardian": "Guardian",
+      "correctionReason": "Reason for this correction",
+      "correctionReasonPlaceholder": "For example, updated grade for the new school year",
+      "saving": "Saving…",
+      "saveChanges": "Save corrections",
+      "createStudent": "Create student profile"
+    },
+    "newStudent": {
+      "back": "Back to family",
+      "eyebrow": "Parent-created account",
+      "title": "Add a learner to your family",
+      "intro": "Create the student identity with only the details needed to organize tutoring.",
+      "activationNote": "This creates an inactive student account linked to you. Consent and activation are completed in the separate activation flow."
+    },
+    "studentProfile": {
+      "back": "Back to family",
+      "eyebrow": "Student profile",
+      "account": "Account @{username}",
+      "informationTitle": "Review student information",
+      "informationIntro": "Correct identity details and leave an audit reason for the change.",
+      "interestsTitle": "Interests",
+      "interestsIntro": "A few genuine interests help tutors make examples feel relevant.",
+      "interestsLabel": "Interests, separated by commas",
+      "interestsHint": "Up to 12. Avoid sensitive or unrelated personal information.",
+      "preferencesTitle": "Learning preferences",
+      "preferencesIntro": "Share practical teaching and scheduling context.",
+      "lessonStyle": "Helpful lesson style",
+      "availability": "Availability notes",
+      "goals": "Learning goals and notes",
+      "reason": "Reason for this change",
+      "reasonPlaceholder": "Describe what you reviewed or corrected",
+      "saveInterests": "Save interests",
+      "savePreferences": "Save preferences",
+      "saving": "Saving…",
+      "linkTitle": "Family link",
+      "linkIntro": "Removing a link is blocked when it would leave a minor without a parent.",
+      "unlinkReasonPlaceholder": "Why should this family link be removed?",
+      "unlink": "Remove my family link",
+      "unlinking": "Removing…"
+    },
+    "feedback": {
+      "saved": "Changes saved.",
+      "studentCreated": "Student profile created and linked to your family.",
+      "unlinked": "Family link removed.",
+      "errors": {
+        "unauthenticated": "Sign in again to continue.",
+        "forbidden": "You do not have access to this student.",
+        "parentRequired": "Create your parent profile first.",
+        "usernameTaken": "That student username is unavailable.",
+        "lastParent": "A minor student must remain linked to a parent.",
+        "notFound": "The requested family record was not found.",
+        "invalid": "Check the highlighted information and try again.",
+        "invalidField": "Check this value.",
+        "generic": "The change could not be saved. Try again."
+      }
+    }
+  }
+}

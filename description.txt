@@ -1,0 +1,2186 @@
+TUTORING PLATFORM — FULL PRODUCT, TECHNICAL, PRIVACY, AND DELIVERY SPECIFICATION
+Version: 1.0
+Status: Product definition for validation, design, and implementation
+Prepared from founder requirements
+Primary launch market: Armenian-American families in selected U.S. states
+Primary delivery model: Managed online school
+Initial subjects: Mathematics, Armenian language and heritage, Programming
+Interface languages: English and Armenian
+
+======================================================================
+0. EXECUTIVE DECISION SUMMARY
+======================================================================
+
+This product will be a managed online tutoring school connecting students in the United States with tutors in Armenia. It is not an open marketplace at launch. The company controls tutor verification, student-tutor matching, pricing, quality standards, curriculum expectations, communications, academic reporting, and dispute handling.
+
+The platform’s strongest product promise is not “cheap tutoring.” Cheap tutoring alone is easy to copy and usually produces weak retention. The defensible promise is:
+
+“Structured online tutoring with verified Armenian educators, personalized learning plans, visible progress, and parent accountability.”
+
+The platform will initially focus on Armenian-American families because the founder has a credible cultural and operational advantage in that market. A nationwide, all-subject, all-age launch is rejected as unrealistic for a two-developer team. The platform may technically accept users from many locations, but initial marketing, tutor preparation, curriculum content, customer support, and operational processes should be concentrated.
+
+Recommended initial market:
+- California
+- Maryland
+- One additional test market selected from Oregon, Massachusetts, New York, or New Jersey based on customer interviews and Armenian-family concentration
+- English and Armenian interfaces
+- Mathematics, Armenian language/heritage, and beginner programming
+- Grades 4–9 as the operational focus, while allowing carefully approved exceptions for younger, older, and adult students
+
+The platform will use Zoom for live classes during the MVP. It will not build native video conferencing. The website will manage scheduling, Zoom links, assignments, submissions, whiteboard/resource links, learning plans, tutor feedback, milestones, messaging, billing records, and administration.
+
+The MVP will be a modular monolith, not microservices. It will use:
+- Next.js with TypeScript
+- PostgreSQL hosted on the company-controlled server
+- Docker Compose
+- Redis for queues, caching, rate limiting, and ephemeral real-time state
+- S3-compatible object storage, preferably AWS S3, for student files and exports
+- Nginx or Caddy as reverse proxy
+- Background worker process
+- Stripe for U.S. card payments
+- PayPal only after Stripe flow is stable
+- Web Push and email notifications
+- Automated off-site backups
+- AWS deployment with a documented path from one server to multiple application instances and managed database services
+
+The founder requested a “local database” and a “single server.” That is acceptable only for an early private beta. A single server is a single point of failure. Therefore:
+- The application and PostgreSQL may initially run in Docker on one AWS EC2 instance.
+- Backups must be encrypted and copied automatically to a separate AWS account or storage location.
+- Uploaded files must not live only on the server disk.
+- Database access must never be public.
+- The architecture must permit later migration to Amazon RDS without rewriting the application.
+- Production, staging, and development must remain separate even if the initial production system is small.
+
+======================================================================
+1. PRODUCT VISION
+======================================================================
+
+1.1 Mission
+
+Help children and adult learners receive high-quality, culturally connected, accountable online education from qualified Armenian tutors, while giving parents a transparent view of what is being taught, what the student has completed, where the student is struggling, and what should happen next.
+
+1.2 Problem
+
+Most private tutoring is fragmented:
+- Lessons happen in Zoom.
+- Homework is sent through WhatsApp.
+- Payments are tracked manually.
+- Parents receive vague feedback.
+- Learning plans live in the tutor’s head.
+- Progress is hard to measure.
+- Tutor quality is inconsistent.
+- Students lose motivation.
+- There is no reliable operational record when a tutor changes.
+- Messaging can move outside the company, allowing tutors and clients to bypass the platform.
+- Children may communicate privately with adults without adequate oversight.
+
+The platform solves the operational system around tutoring. It should not pretend that software replaces the tutor. Tutors remain responsible for educational judgment. The platform captures evidence, enforces workflow, gives structure, and makes progress visible.
+
+1.3 Product principles
+
+1. Human-led education
+The tutor is responsible for curriculum decisions, feedback, milestone evaluation, and adaptation. Software supports the tutor; it does not automatically make high-impact academic decisions in the MVP.
+
+2. Parent visibility
+Parents can see schedules, attendance, assignments, submissions, feedback, learning-plan progress, milestones, billing records, and relevant communications.
+
+3. Child safety by design
+No private tutor-child direct messaging. Communications are visible to the parent and auditable by authorized administrators. Minimum necessary data is collected.
+
+4. Measurable progress
+Each student has a baseline, goals, a learning plan, completed work, tutor feedback, milestone evidence, and periodic progress reviews.
+
+5. Operational control
+The company verifies tutors, controls matching, defines teaching standards, reviews performance, manages disputes, and can suspend access.
+
+6. Fast and simple
+The platform should feel faster and easier than using several disconnected tools. Core pages must load quickly and work well on weak connections.
+
+7. Honest claims
+The company must not guarantee grade improvement or “no cheating.” It can promise qualified tutoring processes, progress tracking, transparent reporting, and reasonable anti-cheating controls.
+
+======================================================================
+2. POSITIONING AND BUSINESS MODEL
+======================================================================
+
+2.1 Positioning
+
+Primary market:
+Armenian-American families seeking high-quality, flexible, online academic support and Armenian cultural education.
+
+Secondary market:
+Non-Armenian U.S. families seeking affordable, accountable tutoring after initial validation.
+
+Brand story:
+- Armenian tutors are publicly part of the brand.
+- Tutors are selected and verified by the school.
+- Tutors receive internal U.S.-curriculum training.
+- Lessons combine academic rigor, personal attention, cultural understanding, and modern digital workflows.
+
+2.2 Recommended homepage promise
+
+“Personalized online tutoring with verified Armenian educators—and progress parents can actually see.”
+
+Supporting copy:
+“Math, programming, and Armenian heritage lessons built around each learner’s goals, with structured feedback, milestones, projects, and support between classes.”
+
+2.3 Revenue model
+
+MVP:
+- One-time individual lessons
+- Free 30–45 minute consultation or trial
+- Postpaid or weekly invoicing only for a tightly controlled private beta
+- Recommended public launch model: payment authorization before service or prepaid balance, because pure postpaid tutoring creates collection risk
+- Company sets customer price
+- Tutor compensation is set separately
+- Group lessons priced per student
+- Sibling and referral discounts controlled by administrators
+
+Initial example economics:
+- Parent price: $18 per standard lesson
+- Tutor gross compensation: $12
+- Company gross margin before fees and expenses: $6
+
+This pricing is probably too low for a durable U.S.-facing business once card fees, refunds, customer support, software, tutor supervision, free trials, failed payments, taxes, and acquisition costs are included. It must be validated with a financial model before launch. The platform should support variable price rules even if one price is initially used.
+
+Phase 2:
+- Monthly lesson packages
+- Recurring subscriptions
+- Tiered tutor pricing
+- Group course packages
+- Premium outside-class support
+- Subject-specific pricing
+- SAT/AP premium pricing
+
+2.4 Tutor retention and anti-bypass strategy
+
+Punishing tutors is not enough. Tutors stay when the platform provides value:
+- Reliable student acquisition
+- Predictable monthly payouts
+- Scheduling and reminder tools
+- Curriculum resources
+- Homework and assessment workflows
+- Parent communication records
+- Tutor coaching
+- Performance profile and progression
+- Reduced administrative burden
+- Dispute protection
+- Group-course opportunities
+- Content library
+- Bonuses or better rates for reliability and quality
+
+Contracts may prohibit bypassing, but the business must make staying more attractive than leaving.
+
+======================================================================
+3. SCOPE AND RELEASE PHASES
+======================================================================
+
+3.1 MVP — required for launch
+
+Business and users:
+- Parent, student, tutor, finance, administrator, super-administrator roles
+- Admin-created or admin-approved accounts
+- One parent can manage multiple students
+- Every minor student is linked to a parent
+- Tutor verification records
+- Manual student-tutor matching
+- Tutor public profile with approved information only
+
+Scheduling:
+- Tutor availability
+- One-time and recurring lessons
+- Time-zone-safe calendar
+- Zoom meeting link and passcode
+- Cancellation/no-show status
+- Attendance
+- Lesson completion
+- Push/email reminders based on preferences
+
+Academic:
+- Student profile and interests
+- Initial assessment record
+- Tutor-written diagnostic report
+- Adjustable learning plan
+- Goals
+- Assignments
+- Secure student submissions
+- Tutor feedback after lessons
+- Progress indicators
+- Milestones
+- Project records
+- Resource library with approved external video links
+- Tutor-created quizzes and assessments
+- Basic anti-cheating signals
+
+Communication:
+- Parent-tutor-admin conversation
+- Student group/course discussions
+- No private adult-child chat
+- Attachments
+- Message audit trail
+- Report workflow
+
+Finance:
+- Lesson price
+- Payment records
+- Stripe card payment
+- Invoices and receipts
+- Tutor earnings ledger
+- Monthly payout export
+- Cancellation charges
+- Discounts
+- Financial reports
+
+Administration:
+- User management
+- Tutor verification
+- Student approval
+- Matching
+- Lesson management
+- Content moderation
+- Message review with permission and reason
+- Academic overview
+- Payment and payout records
+- Audit logs
+- Data export and deletion workflow
+- Support tickets
+- Incident reports
+
+Platform:
+- English and Armenian interface
+- Responsive web application
+- Accessibility baseline
+- Security controls
+- Backups
+- Monitoring
+- Staging and production environments
+- Automated deployment
+- Basic product analytics without advertising trackers in child areas
+
+3.2 Phase 2 — after validation
+
+- Academic manager role
+- Customer support role
+- Granular admin permissions
+- Tutor ratings and parent reviews
+- Tutor introduction videos
+- Group-course enrollment workflows
+- Subscription packages
+- Google/Apple login for parents
+- Passkeys
+- Google Calendar synchronization
+- PWA installation and limited offline behavior
+- Structured skill taxonomy and mastery levels
+- Question bank
+- Spaced review suggestions
+- Student portfolio
+- Public portfolio sharing with parental approval
+- Tutor curriculum certification tests
+- Better automated progress reporting
+- Advanced search
+- More structured gamification
+- Monthly challenges
+- Tutor content approval workflow
+- Parent-controlled competition settings
+- Spanish interface if justified by demand
+- Dedicated support team and richer ticket workflows
+
+3.3 Later
+
+- Native mobile apps
+- Native live video
+- Advanced AI tutor
+- AI-generated learning plans
+- Adaptive assessments
+- Automated exercise generation
+- Automated mistake classification
+- Marketplace-style tutor selection and pricing
+- School/organization accounts
+- Public API
+- External school integrations
+- Multiple legal entities and regional infrastructure
+- Sophisticated data warehouse
+- Large-scale competitions
+- Avatar economy
+- Real-time collaborative whiteboard built internally
+
+3.4 Explicitly rejected for MVP
+
+- Microservices
+- Native video conferencing
+- Facial-emotion analysis
+- AI reviewing full lesson recordings
+- Global public leaderboards for children
+- Unlimited unstructured student-to-student communication
+- Student accounts created without parent authorization
+- Public student profiles by default
+- Downloadable copyrighted teaching videos
+- Claims of guaranteed grades
+- Claims that cheating is impossible
+- Ten-year retention of ordinary child messages
+- Using “accept Terms” as the only parental verification method
+- A single administrator role with unrestricted invisible access
+- Production data copied into developer laptops or test environments
+
+======================================================================
+4. USER ROLES AND PERMISSIONS
+======================================================================
+
+4.1 Parent
+
+Can:
+- Manage own profile and notification preferences
+- Manage linked student accounts
+- Review and correct student information
+- View schedules, lessons, assignments, submissions, attendance, feedback, progress, learning plans, goals, milestones, projects, invoices, and receipts
+- Message tutor in monitored parent-inclusive conversations
+- Request rescheduling
+- Request tutor change
+- Approve material learning-plan changes
+- Manage privacy choices and consents
+- Request data export or deletion
+- Control optional promotional communication
+- Control optional competition/gamification features
+- Approve public portfolio sharing
+
+Cannot:
+- View unrelated students
+- View internal tutor notes marked staff-only
+- Modify completed lesson records directly
+- Access other families’ group data beyond what is necessary for group participation
+
+4.2 Student
+
+Can:
+- View next lessons, tasks, homework, goals, milestones, progress, resources, and feedback appropriate to age
+- Submit files and answers
+- Use quizzes and assessments
+- Participate in approved course discussions
+- Bookmark learning resources
+- Maintain notes and formula notebook
+- View rewards, points, levels, badges, and streaks
+- Ask academic questions in monitored spaces
+
+Cannot:
+- Create an account independently
+- Change billing
+- privately message an adult tutor
+- see sensitive parent information
+- publish a portfolio without parent approval
+- delete compliance records
+- disable mandatory safety notifications
+
+4.3 Tutor
+
+Can:
+- Manage availability
+- View assigned students
+- Accept or reject proposed assignments
+- View relevant academic history and parent goals
+- Create and adjust learning plans
+- Create assignments, quizzes, projects, resources, and milestones
+- Review submissions
+- Record attendance
+- Submit structured and written feedback
+- Participate in parent-visible communication
+- View own lesson and earnings records
+- Upload teaching resources subject to platform rules
+
+Cannot:
+- View unrelated students
+- change final customer pricing
+- directly access full payment-card information
+- privately message children
+- delete messages
+- access parent addresses
+- export bulk student data
+- modify audit logs
+- approve own verification
+- bypass the platform
+
+4.4 Finance
+
+Can:
+- View payment transactions, invoices, credits, refunds, cancellation charges, tutor earnings, and payout records
+- Generate payout exports and financial reports
+- Mark external payout completion with evidence
+
+Cannot:
+- View student academic details except minimal identifiers necessary for payment reconciliation
+- read student messages
+- change learning plans
+- impersonate students
+
+4.5 Administrator
+
+Can:
+- Approve users
+- match tutors and students
+- manage schedules when required
+- review disputes and reports
+- review tutor documents
+- manage content
+- handle support
+- access messages only for a valid operational or safety reason
+- process refunds within policy
+- export authorized data
+- suspend accounts
+- create discounts
+- view operational dashboards
+
+All sensitive actions must be logged.
+
+4.6 Super-administrator
+
+Can:
+- Manage administrator access
+- configure roles and permissions
+- manage security settings
+- approve high-risk exports
+- restore suspended administrator access
+- view audit and incident reports
+
+Super-administrator accounts require multi-factor authentication. At least two trusted super-administrators should exist before public launch to avoid business lockout, but one cannot silently approve their own high-risk action.
+
+4.7 Academic manager — Phase 2
+
+- Reviews assessments and learning plans
+- Handles academic disputes
+- evaluates tutors
+- audits feedback quality
+- approves curriculum standards
+- provides coaching
+- reviews progress-risk cases
+
+======================================================================
+5. CORE USER FLOWS
+======================================================================
+
+5.1 Lead to enrollment
+
+1. Parent visits subject or heritage-course page.
+2. Parent selects “Book a free consultation.”
+3. Parent enters minimum details:
+   - parent name
+   - email
+   - phone
+   - state/time zone
+   - student first name or preferred name
+   - student age/grade range
+   - subject
+   - goals
+4. Parent receives privacy notice and consent flow.
+5. Admin contacts family.
+6. Student may complete a free assessment.
+7. Tutor or academic reviewer prepares diagnostic notes.
+8. Admin selects tutor options.
+9. Parent approves schedule and price.
+10. Parent account and student account are activated.
+11. Zoom link and first lesson appear in dashboards.
+12. Tutor creates an initial learning plan after the first one or two sessions.
+
+The tutor should not be the sole creator of the customer record. That creates duplicates and weak consent evidence. Recommended rule:
+- Parent submits or confirms the family record.
+- Tutor may enter draft academic details.
+- Admin reviews and approves.
+- Parent confirms required child and consent information.
+
+5.2 Lesson flow
+
+Before:
+- Reminder sent according to preferences.
+- Tutor sees student goals, last feedback, unfinished assignments, and upcoming lesson plan.
+- Student can upload work.
+- Zoom link becomes clearly available.
+
+During:
+- Zoom is used for video.
+- External or integrated collaborative whiteboard is used.
+- Tutor can add lesson notes.
+- Live quiz may be launched.
+- Student can upload answers.
+- Platform may record lesson start/end status but does not record video.
+
+After:
+- Tutor marks attendance and completion.
+- Tutor submits structured feedback:
+  - topics covered
+  - student engagement
+  - assignment performance
+  - observed strengths
+  - skills to improve
+  - next steps
+  - homework
+  - milestone updates
+  - optional private staff note
+- Parent and student receive a summary.
+- Billing and tutor ledger entries are generated.
+- Admin is alerted if feedback is missing after the defined deadline.
+
+5.3 Assessment flow
+
+- Tutor creates or selects assessment.
+- Assessment may be timed.
+- Student enters assessment mode.
+- The platform records:
+  - start/end times
+  - answer timestamps
+  - focus loss events
+  - fullscreen exit events
+  - connectivity interruptions
+  - copy/paste attempts where technically detectable
+  - answer changes
+- Student is warned that these signals are collected.
+- The platform never claims cheating was proven solely from browser signals.
+- Tutor reviews answers and signals.
+- Tutor writes the diagnostic report.
+- Parent receives the report after consultation.
+
+5.4 Rescheduling and cancellation
+
+Recommended default:
+- More than 8 hours before lesson: no charge; reschedule permitted.
+- Less than 8 hours: 50% charge for individual lessons.
+- Student no-show: treated as late cancellation.
+- Group lesson absence: full charge.
+- Tutor cancellation: no student charge; replacement lesson or credit.
+- Tutor late arrival: recorded; repeated lateness affects quality review.
+- All exceptions require an administrator reason.
+
+Daylight saving time must be handled by IANA time zones in software, not manually by an administrator.
+
+5.5 Tutor payout
+
+- Every completed or chargeable lesson generates a tutor earning entry.
+- Trial lesson generates no tutor payout under current policy; this may hurt tutor recruitment and should be reconsidered.
+- Monthly payout report is generated in AMD.
+- Exchange rate source and conversion date are recorded.
+- Finance reviews and pays to bank account.
+- Payment confirmation is attached.
+- Tutor can see completed lesson count and expected monthly total, but not sensitive company margin data unless intentionally shown.
+
+======================================================================
+6. ACADEMIC MODEL
+======================================================================
+
+6.1 Student academic profile
+
+Fields:
+- current grade or adult
+- subject enrollment
+- school state
+- curriculum notes
+- textbook or syllabus
+- parent goals
+- student goals
+- interests
+- preferred lesson style
+- availability
+- assessment history
+- strengths
+- skills to improve
+- accommodations entered by parent
+- tutor observations
+- learning plan
+- milestones
+- projects
+- resources
+- attendance
+- assignment history
+- feedback history
+
+Health diagnoses should not be casually collected. Accommodations should be captured as practical teaching needs, with optional disclosure and strict access controls.
+
+6.2 Learning plan
+
+A learning plan contains:
+- title
+- subject
+- start date
+- review date
+- parent goal
+- student goal
+- tutor goal
+- current baseline
+- focus areas
+- modules/topics
+- target outcomes
+- expected lesson frequency
+- homework expectations
+- project work
+- milestones
+- status
+- revision history
+- author
+- parent approval status where required
+
+The tutor owns day-to-day adjustment. Major changes, such as changing the main goal or dropping an agreed exam-preparation objective, require parent visibility and acknowledgment.
+
+6.3 Feedback
+
+Feedback must be human-written in the MVP. The platform collects evidence and structures the workflow.
+
+Required feedback fields:
+- lesson date
+- attendance
+- topics covered
+- lesson objective met: yes/partly/no
+- assignment completion status
+- assignment accuracy or rubric result when applicable
+- effort/engagement using neutral, behavior-based wording
+- strengths demonstrated
+- skills to improve
+- next lesson focus
+- assigned homework
+- parent action needed
+- student action needed
+- milestone progress
+- tutor confidence in assessment
+- free-text comment
+
+Avoid permanent labels such as “lazy,” “weak,” or “bad at math.”
+
+6.4 Milestones
+
+Recommended milestone types:
+- Academic mastery
+- Assignment consistency
+- Attendance consistency
+- Independent problem solving
+- Project completion
+- Communication or presentation
+- Exam readiness
+- Armenian reading
+- Armenian speaking
+- Programming project
+- Personal confidence goal
+
+Each milestone includes:
+- objective
+- category
+- baseline
+- target
+- target date
+- progress percentage
+- evidence
+- tutor update
+- parent-visible status
+- completion date
+- optional reward
+
+Milestone completion should normally require evidence, but not necessarily a quiz. Evidence can include assignment results, project rubric, tutor observation, or assessment.
+
+6.5 Project-based learning examples
+
+Mathematics:
+- Build and compare household budgets
+- Analyze soccer statistics
+- Design a scale floor plan
+- Model a small business
+- Collect and visualize real data
+
+Programming:
+- Build a quiz game
+- Create a personal webpage
+- Make a soccer score tracker
+- Build a simple budget application
+- Create a small educational game
+
+Armenian language and heritage:
+- Interview a family member and present a heritage story
+- Create a bilingual family-history timeline
+- Read and discuss an Armenian story
+- Research an Armenian historical figure
+- Produce a short Armenian-language presentation or video
+
+6.6 Armenian heritage courses
+
+Course types:
+- Armenian reading and writing
+- Conversational Armenian
+- Armenian history
+- Armenian literature
+- Armenian culture and traditions
+- Family heritage projects
+- Group discussions
+- Age-specific reading circles
+
+The product should not treat heritage education as an extra checkbox. It can become the company’s strongest differentiated offering for Armenian-American families.
+
+======================================================================
+7. ENGAGEMENT AND “NO MORE BORING LESSONS”
+======================================================================
+
+The phrase must be converted into concrete teaching practices:
+
+MVP:
+- Student interest profile
+- Tutor selects examples connected to interests
+- Visible goals and progress
+- Short interactive checks
+- Real projects
+- Choice between assignment options
+- Points for productive actions
+- Levels and badges
+- Streaks with grace periods
+- Seasonal challenges
+- Celebration of milestones
+- Age-appropriate dashboard design
+
+Rules:
+- Points have no monetary value.
+- No global public leaderboard for children.
+- Competition is opt-in and can be disabled by parents.
+- Reward effort, consistency, improvement, and project completion—not only high scores.
+- Do not punish a child for missing a streak because of illness or travel.
+- Avoid manipulative infinite engagement patterns.
+
+Example point events:
+- Complete assignment on time
+- Improve from prior attempt
+- Ask a thoughtful question
+- Complete a milestone
+- Help another student with an approved answer
+- Finish a project
+- Maintain attendance
+
+A student answer in the discussion area may be praised or marked helpful by a tutor. It must not be presented as authoritative until reviewed.
+
+======================================================================
+8. GROUP LESSONS AND DISCUSSION
+======================================================================
+
+Recommended group size:
+- Minimum: 2
+- Ideal: 3–5
+- Maximum for academic tutoring: 6
+- Maximum for discussion-based heritage reading: 8, only with a trained tutor
+
+Group creation criteria:
+- age/grade compatibility
+- skill compatibility
+- shared goal
+- schedule compatibility
+- language level
+- parent consent
+- tutor capacity
+
+Group features:
+- fixed course dates
+- recurring schedule
+- roster
+- attendance
+- announcements
+- resources
+- assignments
+- discussion threads
+- tutor moderation
+- reports
+- mute/remove controls
+- incident reporting
+
+Students should not have unrestricted direct messages. Group conversations are retained, reportable, and visible to the tutor and authorized staff. Parent visibility should be age-sensitive, but for minors the parent must be able to access their child’s communication history.
+
+======================================================================
+9. STACK OVERFLOW–STYLE KNOWLEDGE AREA
+======================================================================
+
+Working name: Learning Questions
+
+Purpose:
+- Students ask academic questions outside class.
+- Tutors and approved students answer.
+- Tutors mark correct or helpful responses.
+- Useful answers become searchable knowledge.
+- Questions are scoped to a course, group, or subject.
+
+MVP rules:
+- No anonymous posting.
+- No public indexing of child content.
+- No private messaging from a question.
+- Student display names use first name plus controlled identifier, not full legal name.
+- Tutors moderate.
+- Admin can review reports.
+- Images and files are scanned.
+- Personally identifying information is automatically discouraged and can be flagged.
+- Answer voting is limited; no popularity competition.
+- A tutor can mark “verified answer.”
+- Questions can be private to the student, parent, tutor, and admin.
+- Course questions can be shared with the group.
+- Response target for the assigned tutor: within 12 hours during agreed service days, not literally 24/7.
+
+Unlimited messaging is financially dangerous. MVP should measure message volume and tutor time. After validation, outside-class support should have fair-use limits or a premium tier.
+
+======================================================================
+10. ANTI-CHEATING DESIGN
+======================================================================
+
+Browser-based anti-cheating can deter and document suspicious behavior, but it cannot guarantee that a student did not use another phone, another person, notes outside the camera, or a second computer.
+
+MVP controls:
+- Clear academic-integrity policy
+- Randomized question order
+- Randomized values where possible
+- Limited copy/paste
+- Fullscreen assessment mode
+- Visibility API focus-loss tracking
+- Fullscreen-exit tracking
+- Time-per-question logging
+- Answer-change history
+- Question pools
+- Optional camera requirement for selected assessments, only with explicit consent and policy
+- Tutor review of suspicious patterns
+- Honor statement before submission
+- Oral follow-up for high-stakes assessments
+- Similarity detection for text/code submissions
+- Programming tasks with individualized inputs and brief explanation requirement
+
+Never:
+- Automatically accuse a child
+- Treat tab switching as proof
+- secretly record camera or screen
+- install invasive monitoring software for ordinary tutoring
+- use facial recognition or emotion detection
+- make “no cheating” a marketing claim
+
+======================================================================
+11. PRIVACY, CHILD SAFETY, AND LEGAL REQUIREMENTS
+======================================================================
+
+This section is product guidance, not legal advice. A U.S. child-privacy attorney must review the final product before public launch.
+
+11.1 Critical correction
+
+For users under 13, checking a Terms box is not automatically sufficient as verifiable parental consent. The platform must provide direct notice and use a legally acceptable parental consent method before collecting covered child personal information.
+
+Recommended flow:
+1. Parent creates the family account.
+2. Parent verifies email and phone.
+3. Platform provides direct child-data notice.
+4. Parent completes verifiable consent using an approved method selected with counsel.
+5. Consent record stores version, timestamp, method, data categories, and identity evidence reference.
+6. Only then is the child account activated for covered features.
+
+11.2 Data minimization
+
+Collect:
+- parent name
+- parent email
+- parent phone
+- parent billing information through payment provider
+- student preferred name
+- exact birth date only if legally and operationally justified; otherwise store month/year or age band
+- grade
+- state/time zone
+- subject
+- goals
+- interests
+- academic work
+- feedback
+- attendance
+- communications
+- required consent records
+
+Do not collect by default:
+- home address
+- Social Security number
+- immigration status
+- precise location
+- school login credentials
+- unnecessary health diagnoses
+- biometric identifiers
+- facial recognition templates
+- contact lists
+- advertising identifiers
+- unrelated browsing history
+
+11.3 Audio and video
+
+The founder stated both that lesson recording is not required and that voice/video recordings may be collected. Resolve this as:
+- Zoom lessons are not recorded by the platform in the MVP.
+- Student-submitted audio/video assignments are permitted.
+- Each upload has a purpose, access rule, and retention category.
+- Public portfolio sharing requires explicit parent approval.
+- No background recording.
+- No reuse in marketing without separate written consent.
+
+11.4 AI
+
+Student data must not be retained by AI providers for their own model training.
+Contrary to the initial answer, allowing AI providers to retain child submissions is rejected.
+Before any AI feature launches:
+- Execute data processing agreements.
+- Confirm no-training terms.
+- Minimize and pseudonymize inputs.
+- Separate parent consent where required.
+- label AI output.
+- require human review for academic decisions.
+- provide opt-out where practical.
+- log prompts and outputs only when necessary and with strict retention.
+
+11.5 Retention
+
+Recommended default:
+- Unverified leads: 90 days
+- Failed/incomplete registration: 90 days
+- Active account academic data: while active and reasonably needed
+- Inactive academic data: 2 years, then delete or anonymize unless parent requests earlier deletion and no legal basis requires retention
+- Ordinary messages: 2 years after account inactivity, not 10 years
+- Safety/incident records: according to legal counsel and incident policy
+- Payment and tax records: legally required period, potentially up to 7–10 years depending on jurisdiction
+- Audit logs: 2 years minimum for ordinary operations; longer for security incidents
+- Deleted files: removed from active systems promptly and aged out of backups on a documented schedule
+- Consent records: retained as long as necessary to demonstrate compliance
+
+A blanket right to keep child data for one year after a parent deletion request is not acceptable without a defined lawful reason. The deletion workflow must distinguish legal records from optional educational content.
+
+11.6 Child safety
+
+Required:
+- Mandatory tutor safeguarding training
+- Identity verification
+- Strongly recommended criminal/background screening before public launch
+- No private tutor-child messaging
+- Parent-visible communication
+- Report button
+- Incident workflow
+- Emergency escalation policy
+- Tutor code of conduct
+- Boundaries on personal contact
+- Documented suspension process
+- Admin access logs
+- Regular tutor review
+- Parent complaint procedure
+
+Launching a child-focused platform with no background checks is a serious trust and safety weakness. At minimum, obtain professional legal advice on Armenian screening options and communicate exactly what “verified tutor” means. Never imply that verification includes a criminal background check unless it does.
+
+11.7 External communication
+
+The requirements conflict:
+- Outside-platform communication is prohibited.
+- Tutors may share WhatsApp phone numbers.
+
+Recommended resolution:
+- No direct one-to-one WhatsApp between tutor and minor.
+- For beta operations, a parent+tutor+official company WhatsApp group may be used only when necessary.
+- Academic files, assignments, feedback, and important decisions must be copied into the platform.
+- Public launch should make in-platform communication the default.
+- Phone numbers should not be exposed to students.
+- Company policies must state monitoring and retention clearly.
+
+11.8 Copyright
+
+Do not permit downloading or redistributing copyrighted textbook content or YouTube videos without authorization.
+For video resources:
+- Store YouTube links or embedded players.
+- Record metadata and educational tags.
+- Do not download videos to company servers.
+- Do not claim ownership.
+- Remove links when content disappears or is reported.
+- Prefer official, licensed, or tutor-created resources.
+- Tutors must confirm they have rights to uploaded material.
+
+======================================================================
+12. SECURITY REQUIREMENTS
+======================================================================
+
+12.1 Authentication
+
+MVP:
+- Email and password for parents and tutors
+- Username or controlled email login for students
+- Email verification
+- Strong password policy
+- Argon2id password hashing
+- Secure password reset
+- Multi-factor authentication required for administrators and finance
+- Multi-factor authentication strongly recommended for tutors
+- Parent MFA optional at launch
+- Session list and logout-all-devices
+- New-device alerts for staff
+- Shorter session lifetime for administrators
+- Secure, HttpOnly, SameSite cookies
+- CSRF protection
+
+Phase 2:
+- Passkeys
+- Google and Apple login for parents
+- risk-based login checks
+
+12.2 Authorization
+
+Use server-side role and relationship checks for every protected action.
+Do not rely on hidden buttons.
+Access examples:
+- Tutor can access a student only while assigned.
+- Parent can access only linked children.
+- Finance cannot read academic messages.
+- Admin message access requires permission and logged reason.
+- Super-admin cannot erase audit trails.
+
+12.3 Encryption
+
+- TLS 1.2+ for all network traffic
+- Database and backup encryption at rest
+- S3 bucket encryption
+- Field-level encryption for sensitive data such as phone number, exact birth date, and identity-document references where practical
+- Keys stored in AWS KMS or a secrets manager, not source code
+- Separate secrets by environment
+- Regular rotation
+
+12.4 Upload security
+
+- Allowlist MIME types
+- Verify file signature, not only extension
+- Maximum file size by category
+- Malware scanning using ClamAV or managed scanning
+- Private object storage
+- Signed, expiring download URLs
+- Image metadata stripping where appropriate
+- No executable uploads
+- Quarantine until scan completes
+- Virus-scan status stored
+
+Recommended limits:
+- Images: 15 MB
+- PDF/documents: 25 MB
+- Audio: 50 MB
+- Video assignment: 250 MB initially
+- Code archive: 20 MB with extraction disabled by default
+
+12.5 Audit logging
+
+Log:
+- login and failed login
+- password/MFA changes
+- role changes
+- student relationship changes
+- tutor assignment changes
+- consent changes
+- admin impersonation
+- message access by staff
+- exports
+- deletions
+- refunds and credits
+- lesson record edits
+- payout changes
+- tutor verification decisions
+- security-setting changes
+
+Audit logs are append-only to application users and protected from normal deletion.
+
+12.6 Infrastructure security
+
+- EC2 in a private network design where practical
+- Only reverse proxy exposed publicly
+- PostgreSQL and Redis not public
+- SSH disabled or restricted through AWS Systems Manager
+- Host firewall
+- Docker containers run as non-root where possible
+- Read-only filesystems where practical
+- Dependency scanning
+- Container image scanning
+- rate limiting
+- bot protection on public forms
+- WAF before broader launch
+- DDoS baseline via CloudFront and AWS protections
+- daily vulnerability alerts
+- annual penetration test before significant scale
+- incident response runbook
+
+12.7 Backups and recovery
+
+Private beta:
+- PostgreSQL encrypted backup every 6 hours
+- daily full backup
+- 30-day rolling retention
+- weekly long-term backup for 3 months
+- encrypted off-server copy
+- monthly restore test
+
+Targets:
+- Recovery point objective: 6 hours in beta, 1 hour after growth
+- Recovery time objective: 8 hours in beta, 2 hours after growth
+
+A backup that has never been restored is not a reliable backup.
+
+======================================================================
+13. PERFORMANCE AND SCALABILITY
+======================================================================
+
+13.1 Performance targets
+
+Public marketing pages:
+- Largest Contentful Paint under 2.5 seconds at the 75th percentile on typical mobile connections
+- Interaction to Next Paint under 200 milliseconds where practical
+- Cumulative Layout Shift under 0.1
+- Initial HTML response under 800 milliseconds from target U.S. regions
+
+Dashboard:
+- cached dashboard shell visible under 2 seconds
+- common API requests under 500 milliseconds at p95
+- search under 1 second for ordinary datasets
+- message send acknowledgment under 500 milliseconds
+- file upload progress immediately visible
+
+13.2 Initial capacity assumptions
+
+Design and test for:
+- 500 registered users
+- 100 daily active users
+- 50 concurrent active users
+- 20 simultaneous lessons, because Zoom handles video traffic
+- 10,000 messages per month
+- 5,000 file uploads per month
+- 100,000 academic records
+
+Load-test before launch at 5x expected concurrency.
+
+13.3 Scale path
+
+Stage 1: Private beta
+- One EC2 application server
+- Docker Compose
+- PostgreSQL
+- Redis
+- worker
+- reverse proxy
+- S3
+- CloudFront
+- external email
+- monitoring
+
+Stage 2: Initial growth
+- Separate database host or Amazon RDS
+- Separate worker instance
+- load balancer
+- two application instances
+- managed Redis or separate Redis
+- autoscaling
+- read replicas only if measured need exists
+
+Stage 3: Larger scale
+- ECS or Kubernetes only if team capability and scale justify it
+- managed PostgreSQL with multi-AZ
+- dedicated queue
+- search service if PostgreSQL search becomes insufficient
+- analytics warehouse
+- service extraction only for proven bottlenecks
+
+13.4 Weak-connection support
+
+- Server-render primary pages
+- keep JavaScript bundles small
+- lazy-load heavy dashboard modules
+- compress images
+- direct-to-S3 uploads
+- resumable multipart upload for larger files
+- optimistic messaging UI
+- draft autosave
+- retry failed requests safely
+- cache static resources
+- offer low-bandwidth mode
+- do not autoplay video
+- use YouTube adaptive streaming for linked videos
+
+======================================================================
+14. TECHNICAL ARCHITECTURE
+======================================================================
+
+14.1 Application pattern
+
+Modular monolith with clear domain modules:
+- Identity
+- Families
+- Tutors
+- Matching
+- Scheduling
+- Lessons
+- Academics
+- Assignments
+- Assessments
+- Milestones
+- Projects
+- Resources
+- Discussions
+- Messaging
+- Gamification
+- Payments
+- Payouts
+- Notifications
+- Support
+- Safety
+- Consent
+- Administration
+- Audit
+- Reporting
+
+This provides clean boundaries without microservice overhead.
+
+14.2 Recommended stack
+
+Frontend and server:
+- Next.js current stable release
+- TypeScript strict mode
+- React Server Components where appropriate
+- Tailwind CSS
+- accessible component library such as shadcn/ui with internal accessibility review
+- Zod for validation
+- React Hook Form for complex forms
+- next-intl or equivalent for English/Armenian
+- TanStack Query only where client-side server state is necessary
+
+Database:
+- PostgreSQL 16+
+- Prisma or Drizzle ORM
+- SQL migrations committed to repository
+- PostgreSQL full-text search initially
+- pg_trgm for fuzzy search
+- row identifiers as UUID/ULID
+- timestamps stored in UTC
+- IANA timezone stored per user
+
+Infrastructure:
+- Docker Compose
+- Nginx or Caddy
+- Redis
+- BullMQ for background jobs
+- AWS EC2
+- AWS S3
+- AWS CloudFront
+- AWS Route 53
+- AWS Certificate Manager where applicable
+- AWS KMS
+- AWS Systems Manager Parameter Store or Secrets Manager
+- AWS SES or Resend for email
+- Stripe
+- Zoom links initially entered or created through API after approval
+- Sentry or self-hosted error monitoring with strict PII filtering
+- OpenTelemetry-compatible metrics/logging
+
+14.3 Repository structure
+
+/apps/web
+/apps/worker
+/packages/db
+/packages/auth
+/packages/ui
+/packages/config
+/packages/i18n
+/packages/validation
+/packages/domain
+/packages/email
+/packages/observability
+/infrastructure
+/docker
+/docs
+
+A monorepo is appropriate for two developers.
+
+14.4 API style
+
+- Next.js route handlers/server actions for internal product operations
+- REST-style endpoints for webhooks and integrations
+- No GraphQL in MVP
+- Version externally consumed endpoints
+- Idempotency keys for payment and high-risk write operations
+- Pagination for all lists
+- consistent error model
+- request IDs
+- schema validation at boundaries
+
+14.5 Background jobs
+
+Use jobs for:
+- notifications
+- email delivery
+- report generation
+- file scanning
+- thumbnail creation
+- payment reconciliation
+- payout report generation
+- stale-assignment reminders
+- missed-feedback reminders
+- data retention deletion
+- analytics aggregation
+- backup verification alerts
+
+Jobs require retries, backoff, dead-letter handling, idempotency, and admin visibility.
+
+14.6 Real-time
+
+MVP:
+- Server-Sent Events or WebSockets for message updates and notifications
+- Redis pub/sub only where needed
+- polling fallback
+- no real-time requirement for ordinary dashboards
+
+14.7 Deployment
+
+- GitHub repository
+- pull-request review
+- CI runs lint, type-check, unit tests, integration tests, migration checks, dependency scan, and build
+- staging deploy after merge
+- production deploy through approval
+- rolling or blue/green strategy later
+- database migration backup before risky changes
+- migration rollback plan
+- feature flags for risky releases
+
+======================================================================
+15. DATABASE MODEL
+======================================================================
+
+Core tables/entities:
+
+Identity:
+- users
+- roles
+- user_roles
+- sessions
+- mfa_methods
+- login_events
+- password_reset_tokens
+
+Family:
+- parent_profiles
+- student_profiles
+- parent_student_links
+- student_interests
+- student_preferences
+- consent_records
+- privacy_requests
+
+Tutors:
+- tutor_profiles
+- tutor_subjects
+- tutor_grade_ranges
+- tutor_languages
+- tutor_availability
+- tutor_documents
+- tutor_verifications
+- tutor_evaluations
+- tutor_training_records
+- tutor_suspensions
+
+Matching:
+- tutor_student_assignments
+- assignment_requests
+- matching_notes
+
+Scheduling:
+- lesson_series
+- lessons
+- lesson_participants
+- availability_exceptions
+- cancellations
+- attendance
+- zoom_meetings
+
+Academic:
+- subjects
+- courses
+- enrollments
+- curriculum_frameworks
+- learning_plans
+- learning_plan_versions
+- learning_plan_items
+- goals
+- skills
+- student_skill_records
+- tutor_notes
+- lesson_feedback
+- progress_reviews
+
+Assignments:
+- assignments
+- assignment_questions
+- assignment_submissions
+- submission_answers
+- submission_files
+- grading_records
+- rubrics
+- rubric_scores
+
+Assessments:
+- assessments
+- assessment_versions
+- assessment_questions
+- assessment_attempts
+- assessment_answers
+- assessment_events
+- diagnostic_reports
+
+Milestones:
+- milestones
+- milestone_updates
+- milestone_evidence
+- rewards
+
+Projects:
+- projects
+- project_members
+- project_updates
+- project_files
+- project_rubrics
+- portfolio_items
+- portfolio_sharing_consents
+
+Content:
+- resources
+- resource_links
+- resource_tags
+- resource_assignments
+- bookmarks
+- tutor_content_uploads
+- content_reports
+
+Communication:
+- conversations
+- conversation_members
+- messages
+- message_attachments
+- message_reads
+- discussion_spaces
+- discussion_questions
+- discussion_answers
+- answer_reviews
+- abuse_reports
+
+Gamification:
+- point_events
+- student_point_balances
+- levels
+- badges
+- student_badges
+- streaks
+- challenges
+- challenge_participants
+
+Finance:
+- prices
+- lesson_charges
+- payment_customers
+- payment_methods_reference
+- payment_transactions
+- refunds
+- discounts
+- invoices
+- invoice_items
+- tutor_earning_entries
+- payout_batches
+- payout_items
+- exchange_rates
+
+Operations:
+- notifications
+- notification_preferences
+- support_tickets
+- support_comments
+- incidents
+- incident_actions
+- admin_access_reasons
+- audit_events
+- exports
+- deletion_jobs
+- feature_flags
+- system_settings
+
+Important database rules:
+- Soft deletion is not a substitute for privacy deletion.
+- Financial records use integer cents.
+- Tutor AMD payouts use integer luma where required by implementation.
+- Currency is always explicit.
+- Historical price and compensation are copied into lesson financial records.
+- Learning plans and feedback are versioned.
+- Parent-child relationship is enforced.
+- Tutor access expires when assignment ends.
+- Every admin override stores actor, reason, timestamp, and previous value.
+- No card numbers are stored.
+
+======================================================================
+16. DASHBOARD REQUIREMENTS
+======================================================================
+
+16.1 Parent dashboard
+
+Top section:
+- next lesson
+- student switcher
+- current learning goal
+- action needed
+- unread tutor message
+- unpaid or upcoming charge
+- progress summary
+
+Modules:
+- schedule
+- lesson history
+- attendance
+- assignments
+- feedback
+- strengths and skills to improve
+- learning plan
+- milestones
+- projects
+- assessment reports
+- discussion visibility
+- invoices and receipts
+- privacy and consent
+- tutor-change request
+- support
+
+Do not show fake “projected grades” without enough evidence. Use “progress trend” and explain the evidence.
+
+16.2 Student dashboard
+
+Younger version:
+- large next-lesson card
+- today’s tasks
+- visual progress path
+- points/badges
+- simple assignments
+- tutor message area
+- learning resources
+
+Older/adult version:
+- calendar
+- task list
+- learning plan
+- assessments
+- detailed feedback
+- projects
+- notes
+- formula notebook
+- discussions
+- resources
+- progress analytics
+
+16.3 Tutor dashboard
+
+- today and week calendar
+- students
+- action queue
+- missing feedback
+- submissions to review
+- upcoming lesson preparation
+- messages
+- learning plans needing review
+- milestone deadlines
+- availability
+- resources
+- earnings summary
+- training notices
+- performance feedback
+
+16.4 Admin dashboard
+
+Operational summary:
+- active students
+- active tutors
+- lessons today/week/month
+- trial conversion
+- attendance
+- cancellations
+- no-shows
+- missing feedback
+- unresolved support tickets
+- safety reports
+- payment failures
+- revenue
+- tutor payout liability
+- retention
+- tutor utilization
+
+Queues:
+- pending family approval
+- parental consent incomplete
+- tutor verification
+- matching required
+- tutor change requests
+- academic disputes
+- refunds
+- content reports
+- data requests
+- incidents
+
+High-risk actions require step-up authentication and, where possible, second-person approval:
+- bulk export
+- role elevation
+- audit access
+- mass deletion
+- large refund
+- changes to payment configuration
+- disabling security controls
+
+======================================================================
+17. NOTIFICATIONS
+======================================================================
+
+Channels:
+- Email: mandatory transactional communication
+- Web Push: reminders and timely actions
+- In-app inbox: persistent operational record
+- No SMS in MVP
+
+Mandatory notifications:
+- account verification
+- parental consent status
+- password/security change
+- lesson scheduled
+- lesson canceled/rescheduled
+- tutor no-show resolution
+- payment receipt
+- payment failure
+- refund
+- privacy request
+- safety or account restriction notice
+
+Configurable:
+- 24-hour reminder
+- 1-hour reminder
+- new assignment
+- assignment due
+- tutor feedback
+- new message
+- milestone achieved
+- weekly report
+- monthly report
+- progress concern
+- promotional email
+
+Child accounts cannot disable critical schedule, safety, or account notifications, but delivery to the child should be age-appropriate. Parents control promotional communication.
+
+Templates:
+- English and Armenian
+- versioned
+- editable by authorized admin
+- test-send support
+- variables validated
+- no sensitive academic details in email subject lines
+
+In-app notifications retained for 12 months unless attached to an enduring academic or financial record.
+
+======================================================================
+18. ACCESSIBILITY AND INTERNATIONALIZATION
+======================================================================
+
+Target:
+WCAG 2.2 AA for public pages and core workflows.
+
+Required:
+- keyboard navigation
+- visible focus
+- semantic headings
+- labels and error messages
+- screen-reader support
+- appropriate contrast
+- color not used as the only indicator
+- reduced-motion support
+- captions/transcripts for company-produced instructional videos before broad public launch
+- scalable text
+- responsive design
+- accessible math notation using MathML/KaTeX accessibility features
+- accessible PDF exports
+- Armenian font rendering tested on Windows, macOS, iOS, and Android
+
+English is primary. Armenian is available across tutor/admin and family interfaces. Content language is independent from interface language. Tutor feedback can be written in either approved language; manual translation is preferred initially. AI translation may be added later with original text always available.
+
+Dyslexia-friendly mode can be Phase 2, but good spacing, readable fonts, short paragraphs, and uncluttered layouts are MVP requirements.
+
+======================================================================
+19. MARKETING WEBSITE
+======================================================================
+
+MVP public pages:
+- Home
+- How It Works
+- Mathematics
+- Programming
+- Armenian Language and Heritage
+- Group Lessons
+- Project-Based Learning
+- For Parents
+- Tutors
+- Pricing
+- Free Assessment/Consultation
+- Safety
+- Privacy
+- FAQ
+- Contact
+- Terms
+- Tutor Application
+
+Primary call to action:
+“Book a free consultation”
+
+Secondary:
+“Take a free assessment”
+
+SEO:
+- fast server-rendered pages
+- unique subject pages
+- structured metadata
+- FAQ schema
+- tutor pages only with tutor consent and no sensitive data
+- no programmatic city pages until real local content exists
+- educational blog only if the company can publish useful expert content consistently
+
+Testimonials:
+- verified relationship
+- written parental consent
+- no full child name
+- no child photo by default
+- no fabricated results
+- specific, supportable claims
+
+Marketing tracking:
+- No ad trackers inside authenticated child areas.
+- Use privacy-preserving first-party analytics.
+- Consent management on marketing pages where required.
+- Do not combine child learning analytics with advertising profiles.
+
+======================================================================
+20. CUSTOMER SUPPORT AND OPERATIONS
+======================================================================
+
+MVP channels:
+- support ticket inside platform
+- support email
+- scheduled phone support for parents
+- urgent “lesson starting now” category
+
+Support hours:
+Define published hours covering after-school time in target U.S. states and reasonable Armenian operations. Do not promise 24/7 unless staffed.
+
+Recommended targets:
+- urgent lesson issue: 15 minutes during support hours
+- ordinary support: 1 business day
+- tutor academic question: 12 hours during agreed tutor support days
+- safety report: immediate queue priority
+
+Ticket categories:
+- account
+- scheduling
+- lesson
+- tutor
+- academic
+- payment
+- technical
+- privacy
+- safety
+- content
+
+Account recovery:
+- verified email
+- parent phone verification for sensitive child-account changes
+- step-up verification for billing or parent relationship changes
+- admin cannot change parent ownership without documented review
+
+AI support:
+Not in MVP. Later, AI may answer generic FAQs but must not access student records without an authorized, logged workflow.
+
+======================================================================
+21. ANALYTICS AND SUCCESS METRICS
+======================================================================
+
+Primary business metric:
+90-day paid student retention.
+
+Primary academic metric:
+Percentage of active students showing documented progress against personalized goals over a defined review period.
+
+MVP funnel:
+- visitor to consultation
+- consultation scheduled
+- consultation attended
+- trial completed
+- paid enrollment
+- 30-day retention
+- 90-day retention
+
+Operational:
+- tutor response time
+- tutor attendance
+- student attendance
+- canceled lessons
+- missing feedback rate
+- assignment completion
+- support resolution time
+- tutor utilization
+- gross margin per lesson
+- payment failure
+- refund rate
+- parent satisfaction
+- student satisfaction
+- tutor satisfaction
+
+Academic:
+- baseline versus follow-up assessment
+- milestone completion
+- learning-plan progress
+- assignment accuracy trend
+- project rubric improvement
+- parent-reported school performance, clearly marked as self-reported
+
+Do not collect:
+- advertising identifiers in child accounts
+- unrelated browsing
+- precise location
+- biometric engagement metrics
+- manipulative attention analytics
+- hidden webcam analysis
+
+Recommended private beta targets:
+- 10–20 tutors
+- 30–50 students
+- at least 70% trial-to-paid conversion among qualified leads
+- at least 75% 90-day retention
+- at least 90% tutor attendance
+- at least 85% student attendance
+- at least 90% lesson feedback submitted within 24 hours
+- parent satisfaction of 4.3/5 or better
+- no unresolved severe safety incident
+- positive contribution margin after direct tutor and payment costs
+
+These are proposed targets and must be revised after real data.
+
+======================================================================
+22. MVP DELIVERY PLAN
+======================================================================
+
+22.1 Recommended team
+
+Minimum:
+- Product owner/founder
+- Two full-stack developers
+- Part-time product designer
+- Curriculum lead
+- Tutor operations lead
+- U.S. child-privacy attorney
+- Security reviewer before public launch
+
+Without a designer, curriculum expert, and privacy review, the team can build software but not a trustworthy tutoring business.
+
+22.2 Development sequence
+
+Phase 0: Validation and legal foundation
+- Interview 20 parents
+- Interview 10 tutors
+- Run 5–10 tutoring relationships manually
+- Validate price
+- define tutor verification
+- define consent
+- define cancellation terms
+- test feedback templates
+- confirm subjects and age focus
+- conduct legal review
+
+Phase 1: Foundation
+- repository
+- CI/CD
+- Docker
+- environments
+- design system
+- authentication
+- roles
+- audit foundation
+- localization
+- security baseline
+
+Phase 2: People and matching
+- parent/student profiles
+- tutor profiles
+- verification
+- admin approval
+- matching
+- availability
+
+Phase 3: Scheduling and lessons
+- calendar
+- recurring lessons
+- Zoom link
+- attendance
+- cancellation
+- reminders
+
+Phase 4: Academic workflow
+- learning plans
+- assignments
+- submissions
+- feedback
+- milestones
+- resources
+- assessments
+
+Phase 5: Communication
+- parent-visible messaging
+- discussions
+- attachments
+- reporting
+- moderation
+
+Phase 6: Finance
+- pricing
+- Stripe
+- invoices
+- cancellation charges
+- tutor earnings
+- payout reports
+
+Phase 7: Hardening
+- accessibility
+- load test
+- penetration test
+- backup restore
+- privacy workflow
+- data deletion
+- incident simulation
+- beta fixes
+
+22.3 Testing
+
+Automated:
+- unit tests for domain rules
+- integration tests for database workflows
+- API authorization tests
+- end-to-end tests for enrollment, scheduling, feedback, payment, and deletion
+- payment webhook tests
+- migration tests
+- localization tests
+- accessibility checks
+- security dependency scans
+- backup verification
+
+Manual:
+- child and parent usability
+- tutor workflow
+- Armenian text
+- mobile devices
+- weak internet
+- timezone and daylight-saving transitions
+- cancellation edge cases
+- support and safety drills
+- account recovery
+- data export/deletion
+- payment disputes
+
+22.4 Launch gates
+
+Do not launch publicly until:
+- verifiable parental consent is implemented and reviewed
+- privacy policy and Terms are reviewed
+- tutor code of conduct exists
+- safeguarding training exists
+- incident reporting works
+- backups have been restored in a test
+- no critical authorization vulnerability remains
+- admin MFA is mandatory
+- payment webhooks are idempotent
+- all child-adult communications follow policy
+- core pages meet accessibility review
+- tutor verification claims are accurate
+- at least one full month of private beta operations is completed
+
+======================================================================
+23. STRATEGIC RISKS AND RESPONSES
+======================================================================
+
+Risk 1: Parents do not trust overseas tutors.
+Response:
+- rigorous verification
+- sample lessons
+- public tutor profiles
+- U.S. curriculum training
+- parent-visible progress
+- transparent complaint handling
+- cultural specialization
+- honest background-check disclosure
+- strong testimonials after validation
+
+Risk 2: Tutor quality varies.
+Response:
+- structured interview
+- sample lesson
+- identity and credential checks
+- internal training
+- probation
+- monthly review
+- feedback audit
+- coaching
+- suspension thresholds
+- standardized lesson and feedback expectations
+
+Risk 3: Low pricing produces no sustainable margin.
+Response:
+- test willingness to pay
+- measure full support cost
+- avoid unlimited labor promises
+- charge premium for advanced courses
+- introduce packages after validation
+- review tutor pay and acquisition cost
+- do not scale unprofitable lessons
+
+Risk 4: “All ages, all grades, all states” destroys focus.
+Response:
+- market broadly only after operational proof
+- launch primarily with grades 4–9
+- handle special cases manually
+- build curriculum depth before breadth
+
+Risk 5: Unlimited outside-class support overwhelms tutors.
+Response:
+- fair-use policy
+- response windows
+- office hours
+- group Q&A
+- track workload
+- premium support tier later
+
+Risk 6: Tutors bypass platform.
+Response:
+- platform value
+- contracts
+- parent-facing records
+- convenient billing
+- continued leads
+- reliable payouts
+- professional development
+- limit unnecessary phone exposure
+
+Risk 7: Child privacy failure.
+Response:
+- legal review
+- verifiable parental consent
+- data minimization
+- no ad tracking in child areas
+- retention automation
+- access logs
+- security testing
+- incident response
+
+Risk 8: Single-server outage.
+Response:
+- off-site backups
+- infrastructure automation
+- monitoring
+- tested recovery
+- quick migration path to managed database and multiple app instances
+
+======================================================================
+24. FINAL PRODUCT DECISIONS
+======================================================================
+
+1. The platform is a managed online school, not a marketplace.
+2. Armenian-American families are the initial niche.
+3. Math, Armenian heritage, and programming are the initial subjects.
+4. Grades 4–9 are the operational focus; other ages are exceptions.
+5. Tutors lead academic decisions.
+6. Software structures evidence, workflow, reporting, and accountability.
+7. Zoom handles live video.
+8. No lesson recording in MVP.
+9. No private tutor-child messaging.
+10. Parent accounts must confirm child accounts and consent.
+11. “Accept Terms” alone is not treated as verified parental consent.
+12. Tutor background screening must be investigated before public launch.
+13. Browser anti-cheating provides signals, not proof.
+14. AI is deferred.
+15. Native mobile apps are deferred.
+16. Microservices are rejected.
+17. Next.js, TypeScript, PostgreSQL, Docker, Redis, AWS, and Stripe form the core stack.
+18. One-server production is beta-only and requires off-site backups.
+19. Uploaded files use private object storage.
+20. Human tutor feedback is a core product differentiator.
+21. The primary CTA is a free consultation.
+22. The core success metric is 90-day paid student retention.
+23. The MVP succeeds only if families pay, remain active, report value, and the company can deliver safely with positive direct economics.
+
+======================================================================
+25. MVP SUCCESS DEFINITION
+======================================================================
+
+The MVP is validated when, during a controlled private beta:
+
+- At least 30 paying students have completed one month.
+- At least 20 students remain active through 90 days or the cohort retention rate reaches the agreed threshold.
+- Parents regularly use progress and feedback features.
+- Tutors submit feedback on time without excessive administrative burden.
+- Student-tutor matching works without frequent reassignment.
+- The business generates positive contribution margin before founder salary and general overhead.
+- No severe unresolved child-safety or privacy failure occurs.
+- At least 70% of surveyed parents say they would recommend the service.
+- The team can clearly identify which subject and age segment has the strongest demand.
+- The team can support operations without relying on uncontrolled WhatsApp records or spreadsheets.
+
+If these conditions are not met, adding AI, native video, mobile apps, or more subjects is a distraction.
+
+======================================================================
+26. OPEN ITEMS REQUIRING FOUNDER OR PROFESSIONAL DECISION
+======================================================================
+
+Business:
+- Final brand name
+- Legal company name
+- Exact launch states
+- Exact launch age/grade scope
+- Final customer pricing
+- Group pricing
+- tutor compensation and trial compensation
+- postpaid versus prepaid billing
+- subscription strategy
+- tax treatment
+
+Legal:
+- U.S. legal exposure of Armenian entity
+- COPPA consent method
+- state privacy requirements
+- tutor contractor agreements
+- child safeguarding rules
+- background screening method
+- payment and refund terms
+- marketing consent
+- content licensing
+- data residency
+- retention schedule
+- cross-border data transfers
+
+Product:
+- exact assessment report template
+- maximum group size by course
+- milestone evidence rules
+- certificates
+- leaderboards or group competition
+- question bank
+- practice mode
+- portfolio details
+- service hours
+- tutor message workload policy
+
+Technical:
+- exact AWS region
+- ORM selection
+- email provider
+- web push provider
+- error-monitoring provider
+- whiteboard provider
+- Zoom API integration timing
+- infrastructure budget
+- expected beta traffic
+- final backup retention
+- final recovery targets
+
+======================================================================
+27. CONCLUSION
+======================================================================
+
+The strongest version of this business is not a giant tutoring marketplace and not an AI education platform. It is a focused, managed Armenian-American online school with strong tutor operations, transparent progress, structured parent communication, useful learning tools, and trustworthy child-safety practices.
+
+The founder should resist feature inflation. The difficult part is not building a calendar, chat, or dashboard. The difficult part is proving:
+- parents trust the tutors,
+- tutors consistently produce quality,
+- progress is visible,
+- pricing is sustainable,
+- communication remains safe,
+- and families stay.
+
+Build the operational backbone first. Add automation only after the human process works.

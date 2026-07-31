@@ -1,0 +1,98 @@
+{
+  "payouts": {
+    "nav": {
+      "label": "Payouts"
+    },
+    "common": {
+      "none": "No earnings yet",
+      "missing": "Not recorded",
+      "saving": "Saving…"
+    },
+    "reason": {
+      "completed": "Completed lesson",
+      "chargeable": "Chargeable lesson"
+    },
+    "status": {
+      "pending": "Pending",
+      "approved": "Approved",
+      "paid": "Paid",
+      "voided": "Voided",
+      "draft": "Draft",
+      "processing": "Processing",
+      "completed": "Completed",
+      "failed": "Failed"
+    },
+    "tutor": {
+      "eyebrow": "Tutor earnings",
+      "title": "What you have earned",
+      "period": "{start} through {end}",
+      "summaryLabel": "Monthly earnings summary",
+      "completedLessons": "completed lessons",
+      "expectedTotal": "Expected total",
+      "chargeableCount": "{count, plural, one {# chargeable lesson} other {# chargeable lessons}} included",
+      "ledgerEyebrow": "Your ledger",
+      "ledgerTitle": "Lesson earnings",
+      "empty": "No completed or chargeable lessons have generated earnings in this period."
+    },
+    "finance": {
+      "eyebrow": "Finance operations",
+      "title": "Payout control book",
+      "intro": "Approve copied lesson earnings, lock the month to a recorded exchange rate, and leave evidence when the external transfer is complete.",
+      "batchEyebrow": "AMD settlement",
+      "batchesTitle": "Monthly batches",
+      "noBatches": "No monthly payout batch has been created yet.",
+      "batchTotal": "Batch total",
+      "itemTotal": "Payout items",
+      "reconciled": "Balanced to 0 luma",
+      "difference": "Difference: {amount}",
+      "fxRate": "Recorded rate",
+      "fxSource": "FX source",
+      "conversionDate": "Conversion date",
+      "items": "Items",
+      "exportCsv": "Export finance CSV",
+      "evidenceRef": "Evidence attachment reference",
+      "evidencePlaceholder": "drive://transfers/2026-07.pdf",
+      "markComplete": "Mark external payout complete",
+      "evidenceRecorded": "Evidence recorded: {reference}",
+      "approvalEyebrow": "Entry control",
+      "approvalTitle": "Approve copied earnings",
+      "approvalHelp": "{count, plural, one {# pending entry is ready for review.} other {# pending entries are ready for review.}}",
+      "approvePending": "Approve pending entries",
+      "newBatchEyebrow": "Month close",
+      "newBatchTitle": "Create AMD batch",
+      "periodStart": "Period start",
+      "periodEnd": "Period end",
+      "baseCurrency": "FX base currency",
+      "rate": "AMD per base unit",
+      "source": "FX source",
+      "sourcePlaceholder": "Central Bank of Armenia",
+      "createBatch": "Create reconciled batch",
+      "ledgerEyebrow": "Internal ledger",
+      "ledgerTitle": "Tutor earning entries",
+      "entryCount": "{count, plural, one {# entry} other {# entries}}",
+      "noEarnings": "No earning entries fall in this period.",
+      "tutor": "Tutor / lesson",
+      "earnedAt": "Earned",
+      "reason": "Reason",
+      "tutorEarning": "Tutor earning",
+      "companyPrice": "Company price",
+      "margin": "Margin",
+      "status": "Status"
+    },
+    "feedback": {
+      "earningsApproved": "Pending earnings approved.",
+      "batchCreated": "Monthly payout batch created and reconciled.",
+      "batchCompleted": "External payout marked complete with evidence.",
+      "errors": {
+        "unauthenticated": "Sign in again to continue.",
+        "forbidden": "Finance access is required for that action.",
+        "emptyBatch": "There are no approved, unbatched earnings for this month.",
+        "duplicateBatch": "A payout batch already exists for this month.",
+        "fxMismatch": "The recorded FX rate does not match an earning currency.",
+        "evidenceRequired": "Add an evidence attachment reference before completing the payout.",
+        "invalid": "Check the payout dates, rate, source, and evidence values.",
+        "generic": "The payout change could not be saved. Try again."
+      }
+    }
+  }
+}

@@ -1,0 +1,411 @@
+{
+  "marketing": {
+    "nav": {
+      "label": "Main navigation",
+      "howItWorks": "How it works",
+      "mathematics": "Subjects",
+      "parents": "For parents",
+      "pricing": "Pricing"
+    },
+    "cta": { "consultation": "Book a free consultation", "assessment": "Take a free assessment" },
+    "footer": {
+      "privacyFirst": "No ad trackers. Minimal information. Clear choices.",
+      "privacy": "Privacy",
+      "terms": "Terms",
+      "contact": "Contact"
+    },
+    "site": {
+      "nav": {
+        "ariaLabel": "Primary",
+        "howItWorks": "How it works",
+        "subjects": {
+          "label": "Subjects",
+          "mathematics": "Mathematics",
+          "programming": "Programming",
+          "heritage": "Armenian heritage"
+        },
+        "groupLessons": "Group lessons",
+        "forParents": "For parents",
+        "tutors": "Tutors",
+        "pricing": "Pricing",
+        "safety": "Safety"
+      },
+      "actions": {
+        "login": "Log in",
+        "consultation": "Book a free consultation",
+        "dashboard": "Dashboard"
+      },
+      "account": {
+        "menuLabel": "Account menu",
+        "settings": "Settings",
+        "logOut": "Log out",
+        "role": {
+          "parent": "Parent account",
+          "student": "Student account",
+          "tutor": "Tutor account",
+          "finance": "Finance account",
+          "administrator": "Administrator account",
+          "superAdministrator": "Administrator account"
+        }
+      },
+      "mobileNav": {
+        "openMenu": "Open menu",
+        "closeMenu": "Close menu",
+        "title": "Menu"
+      },
+      "languageSwitcher": {
+        "label": "Switch language",
+        "en": "English",
+        "hy": "Armenian"
+      },
+      "footer": {
+        "subjectsHeading": "Subjects",
+        "companyHeading": "About Loom",
+        "familiesHeading": "Families & tutors",
+        "legalHeading": "Legal",
+        "mathematics": "Mathematics",
+        "programming": "Programming",
+        "heritage": "Armenian heritage",
+        "howItWorks": "How it works",
+        "groupLessons": "Group lessons",
+        "pricing": "Pricing",
+        "safety": "Safety",
+        "forParents": "For parents",
+        "tutors": "Tutors",
+        "tutorApplication": "Apply to teach",
+        "privacy": "Privacy",
+        "terms": "Terms",
+        "contact": "Contact",
+        "copyright": "© {year} Loom կրթություն. All rights reserved."
+      }
+    },
+    "home": {
+      "meta": {
+        "title": "Personalized online tutoring with verified Armenian educators",
+        "description": "Math, programming, and Armenian heritage lessons built around each learner's goals, with structured feedback, milestones, projects, and support between classes."
+      },
+      "hero": {
+        "eyebrow": "A managed school, not a marketplace",
+        "title": "Personalized online tutoring with verified Armenian educators — and progress parents can actually see.",
+        "description": "Math, programming, and Armenian heritage lessons built around each learner's goals, with structured feedback, milestones, projects, and support between classes.",
+        "trust": {
+          "label": "Trust signals",
+          "verified": "Verified tutors",
+          "visible": "Parent-visible progress",
+          "safe": "Safe by design"
+        },
+        "visual": {
+          "label": "What a parent sees",
+          "headline": "Steady, visible progress",
+          "note": "A real trend from feedback after every lesson — not a guess."
+        }
+      },
+      "trustBar": {
+        "label": "Why families trust Loom",
+        "items": {
+          "verified": "Every tutor is hand-verified and trained on a U.S. curriculum",
+          "parentsSee": "Parents see schedules, feedback, and progress — always",
+          "noPrivateMessaging": "No private adult-child messaging, ever",
+          "feedback": "Structured feedback after every single lesson"
+        }
+      },
+      "howItWorks": {
+        "eyebrow": "How it works",
+        "title": "A clear path from first conversation to visible progress",
+        "description": "Four steps, the same for every family — no guesswork about what happens next.",
+        "steps": {
+          "one": {
+            "title": "Free consultation",
+            "body": "Tell us about your learner. We listen for goals, current level, and what hasn't worked before."
+          },
+          "two": {
+            "title": "Assessment & matched tutor",
+            "body": "A short, low-pressure assessment helps us match a verified tutor suited to your learner's subject and pace."
+          },
+          "three": {
+            "title": "A personalized learning plan",
+            "body": "Your tutor builds a plan around real goals — not a generic syllabus — with milestones you can see."
+          },
+          "four": {
+            "title": "Visible progress",
+            "body": "After every lesson: structured feedback, updated milestones, and a progress trend you can check anytime."
+          }
+        }
+      },
+      "subjects": {
+        "eyebrow": "Subjects",
+        "title": "Three subjects. One consistent standard.",
+        "description": "Every subject follows the same structure: clear goals, real feedback, and work your learner can point to.",
+        "items": {
+          "mathematics": {
+            "title": "Mathematics",
+            "body": "From foundations to advanced coursework, taught for understanding — with practice that builds real fluency, not just answers.",
+            "cta": "Explore mathematics"
+          },
+          "programming": {
+            "title": "Programming",
+            "body": "Learners build and ship real projects — websites, games, tools — while developing the habits of testing, debugging, and explaining their work.",
+            "cta": "Explore programming"
+          },
+          "heritage": {
+            "title": "Armenian language & heritage",
+            "body": "Reading, speaking, and writing Armenian alongside history and culture — taught by educators who carry the language as their own, not an afterthought subject.",
+            "cta": "Explore Armenian heritage"
+          }
+        }
+      },
+      "whyUs": {
+        "eyebrow": "Why families choose us",
+        "title": "Structure and visibility, not a marketplace gamble",
+        "description": "We built the parts a marketplace leaves out: a consistent standard for every tutor, and a clear view of what's actually happening in every lesson.",
+        "points": {
+          "structure": {
+            "title": "Structure",
+            "body": "Every learner follows a plan with defined goals and milestones — never an improvised lesson."
+          },
+          "visibility": {
+            "title": "Visibility",
+            "body": "Feedback after every lesson and a progress trend parents can check anytime, without asking."
+          },
+          "accountability": {
+            "title": "Accountability",
+            "body": "Tutors are trained, reviewed, and part of the Loom team — not independent contractors you vet yourself."
+          },
+          "safety": {
+            "title": "Child safety",
+            "body": "No private adult-child messaging. Every learning space is parent-visible and staff-auditable."
+          }
+        }
+      },
+      "projects": {
+        "eyebrow": "Project-based learning",
+        "title": "No more boring lessons",
+        "description": "Skills stick when learners use them to build something real. Two examples of what that looks like:",
+        "items": {
+          "budget": {
+            "label": "Programming + mathematics",
+            "title": "Build a personal budget app",
+            "body": "A hands-on project where learners apply arithmetic, logic, and code to something they'll actually use.",
+            "deliverables": [
+              "A working app that tracks income and expenses",
+              "Charts built from the learner's own data",
+              "A short walkthrough the learner presents themselves"
+            ]
+          },
+          "heritage": {
+            "label": "Armenian heritage",
+            "title": "A family-history timeline",
+            "body": "Learners research and document their own family's story, connecting language study to something personal and lasting.",
+            "deliverables": [
+              "An illustrated timeline of family milestones",
+              "Short written pieces in Armenian",
+              "A presentation shared with the family"
+            ]
+          }
+        }
+      },
+      "forParents": {
+        "eyebrow": "For parents",
+        "title": "Everything you need to know, without managing every lesson",
+        "description": "The parent dashboard keeps schedules, feedback, and milestones in one place — so you always know what's happening, without sitting in on class.",
+        "points": {
+          "schedule": {
+            "title": "Schedules",
+            "body": "See upcoming and past lessons at a glance, and reschedule without back-and-forth messages."
+          },
+          "feedback": {
+            "title": "Feedback",
+            "body": "Read what the tutor noted after every lesson — what was covered, what to practice next."
+          },
+          "milestones": {
+            "title": "Milestones",
+            "body": "Track the goals in your learner's plan as they're reached, not just a list of completed lessons."
+          },
+          "progressTrend": {
+            "title": "Progress trend",
+            "body": "A trend built from real lesson feedback over time — not a guess."
+          }
+        },
+        "preview": {
+          "label": "Parent dashboard preview",
+          "headline": "Progress trend, this term",
+          "caption": "Illustrative preview — built from structured feedback after each lesson."
+        }
+      },
+      "tutors": {
+        "eyebrow": "Our educators",
+        "title": "Educators who are part of our school, not strangers from a listing",
+        "description": "Every tutor is hand-verified, trained on a U.S. curriculum, and supported by our team — publicly part of the Loom name, not an anonymous profile.",
+        "cta": "Apply to teach with us"
+      },
+      "testimonials": {
+        "eyebrow": "Families' experience",
+        "title": "What families notice first",
+        "disclosure": "Sample testimonials shown for illustration. Real testimonials are published only with a verified parent relationship and written parental consent, and never name or picture a child.",
+        "items": {
+          "one": {
+            "quote": "We finally know what our son is working on and why it matters — not just that a lesson happened.",
+            "attribution": "— Parent of a Loom mathematics student"
+          },
+          "two": {
+            "quote": "The feedback after every class is specific enough that we can actually help at home.",
+            "attribution": "— Parent of a Loom Armenian heritage student"
+          }
+        }
+      },
+      "safety": {
+        "statement": "Child safety is built in, not bolted on: no private adult-child messaging, and every learning space is parent-visible and staff-auditable."
+      },
+      "finalCta": {
+        "title": "Ready to see what a structured plan looks like for your learner?",
+        "description": "Start with a free consultation — no pressure, no long form."
+      }
+    },
+    "testimonial": {
+      "quote": "We always knew what our child was working on, and why the next step mattered.",
+      "attribution": "Parent testimonial — relationship verified; published with parental consent; child not identified."
+    },
+    "aside": {
+      "title": "Start with a real conversation",
+      "body": "Tell us what you are noticing. We will help you choose a sensible next step — no pressure, no long form."
+    },
+    "form": {
+      "name": "Your name",
+      "email": "Email address",
+      "phone": "Phone (optional)",
+      "age": "Learner age range (optional)",
+      "notSpecified": "Prefer not to say",
+      "under8": "Under 8",
+      "adult": "Adult",
+      "interest": "What would you like help with?",
+      "message": "Anything else we should know?",
+      "consent": "I agree that Loom may use these details to respond to my request, as described in the Privacy page.",
+      "submit": "Send request",
+      "sending": "Sending…",
+      "success": "Thank you. Your request is with our team.",
+      "error": "We could not send your request. Please check the required fields and try again."
+    },
+    "faq": {
+      "one": {
+        "question": "How does learning start?",
+        "answer": "We begin with a free conversation and, when useful, a short assessment."
+      },
+      "two": {
+        "question": "Are groups large?",
+        "answer": "Groups stay small so each learner can receive clear feedback."
+      },
+      "three": {
+        "question": "What information do you collect?",
+        "answer": "Only what is needed to contact you and arrange the conversation."
+      },
+      "four": {
+        "question": "Can I ask a question before enrolling?",
+        "answer": "Yes. Send a message and the team will reply."
+      }
+    },
+    "pages": {
+      "howItWorks": {
+        "eyebrow": "A clear beginning",
+        "title": "How it works",
+        "description": "A calm, practical way to find the right learning format.",
+        "body": "First we listen: what is going well, where learning has become difficult, and what your family hopes for. Then we recommend a suitable next step, such as a free assessment, a group, or individual support. Learners leave each lesson knowing what to practise and why it matters."
+      },
+      "mathematics": {
+        "eyebrow": "Subject learning",
+        "title": "Mathematics",
+        "description": "Reasoning, not rushing.",
+        "body": "Mathematics lessons make thinking visible. Learners work with patterns, representations, explanations, and carefully chosen practice so fluency grows alongside understanding."
+      },
+      "programming": {
+        "eyebrow": "Subject learning",
+        "title": "Programming",
+        "description": "Make, test, explain, improve.",
+        "body": "Programming starts with purposeful projects. Learners explore logic, data, and design while developing the habit of testing an idea, describing what happened, and trying again."
+      },
+      "armenianHeritage": {
+        "eyebrow": "Subject learning",
+        "title": "Armenian language & heritage",
+        "description": "Language as a living connection.",
+        "body": "Lessons bring language, history, and creative expression together. Learners read, speak, write, and investigate cultural material in ways that invite genuine participation."
+      },
+      "groupLessons": {
+        "eyebrow": "Learning formats",
+        "title": "Group lessons",
+        "description": "Small groups, active attention.",
+        "body": "Groups are intentionally small and structured around participation. The tutor can see each learner’s thinking, and learners benefit from hearing more than one way to solve a problem."
+      },
+      "projectLearning": {
+        "eyebrow": "Learning formats",
+        "title": "Project-based learning",
+        "description": "Knowledge becomes useful when learners use it.",
+        "body": "Projects give a reason to bring skills together. Learners research, plan, build, revise, and share work that demonstrates understanding without reducing learning to a score."
+      },
+      "parents": {
+        "eyebrow": "For families",
+        "title": "For parents",
+        "description": "Understand the learning without having to manage every lesson.",
+        "body": "We communicate clearly about goals, participation, and next steps. You will see what the learner is practising and how you can support a steady routine without turning home into another classroom."
+      },
+      "tutors": {
+        "eyebrow": "Our educators",
+        "title": "Tutors",
+        "description": "Knowledgeable adults who listen closely.",
+        "body": "Tutors are selected for subject knowledge, communication, and respectful work with young people. Teaching is prepared, reflective, and built around helping each learner participate with confidence."
+      },
+      "pricing": {
+        "eyebrow": "Straightforward planning",
+        "title": "Pricing",
+        "description": "Choose a format after you understand the fit.",
+        "body": "We discuss the recommended format, frequency, and price before you commit. Your first consultation is free. There are no advertising profiles, lead resales, or surprise data uses behind the conversation."
+      },
+      "consultation": {
+        "eyebrow": "No-cost first step",
+        "title": "Free consultation",
+        "description": "Talk through what your learner needs.",
+        "body": "Share a few contact details and the area you are considering. We only use these details to respond to this request and mark the record for deletion after 90 days."
+      },
+      "assessment": {
+        "eyebrow": "Find a useful starting point",
+        "title": "Free assessment",
+        "description": "A short, low-pressure look at current understanding.",
+        "body": "An assessment is optional and never a label. It helps us choose appropriate material and gives the first conversation a concrete starting point."
+      },
+      "safety": {
+        "eyebrow": "Learner wellbeing",
+        "title": "Safety",
+        "description": "Respectful learning has clear boundaries.",
+        "body": "We use age-appropriate teaching practices, clear communication channels, and careful escalation when a concern is raised. Learners are never asked to publish personal details to participate."
+      },
+      "privacy": {
+        "eyebrow": "Privacy by default",
+        "title": "Privacy",
+        "description": "We collect less, not more.",
+        "body": "The public form collects only contact details and a short request. We do not run advertising trackers on these pages. Form records carry a 90-day retention deadline and should be deleted when that deadline is reached."
+      },
+      "faq": {
+        "eyebrow": "Helpful answers",
+        "title": "Frequently asked questions",
+        "description": "The essentials before you decide.",
+        "body": ""
+      },
+      "contact": {
+        "eyebrow": "Get in touch",
+        "title": "Contact",
+        "description": "Tell us what you are looking for.",
+        "body": "Use this form for a question about learning, a group, or a practical detail. Please do not include sensitive child information; we will ask only for what is needed if we speak."
+      },
+      "terms": {
+        "eyebrow": "Clear expectations",
+        "title": "Terms",
+        "description": "The practical agreement behind a respectful learning relationship.",
+        "body": "Lesson format, payment, attendance, and cancellation arrangements are confirmed before enrolment. The public site does not create an enrolment agreement by itself."
+      },
+      "tutorApplication": {
+        "eyebrow": "Teach with care",
+        "title": "Tutor application",
+        "description": "For educators who make thinking visible.",
+        "body": "Tell us how you teach and which subjects you know well. Please share only professional contact information here; detailed screening happens through a separate, secure process."
+      }
+    }
+  }
+}

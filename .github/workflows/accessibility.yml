@@ -1,0 +1,62 @@
+name: Accessibility
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "apps/web/**"
+      - "packages/**"
+      - "playwright.config.ts"
+      - ".github/workflows/accessibility.yml"
+  pull_request:
+    paths:
+      - "apps/web/**"
+      - "packages/**"
+      - "playwright.config.ts"
+      - ".github/workflows/accessibility.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: accessibility-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NEXT_TELEMETRY_DISABLED: "1"
+  TURBO_TELEMETRY_DISABLED: "1"
+
+jobs:
+  wcag-22-aa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Enable corepack
+        run: corepack enable
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Playwright Chromium
+        run: pnpm --filter web exec playwright install --with-deps chromium
+
+      - name: Run WCAG 2.2 AA sweep
+        run: pnpm --filter web exec playwright test --config tests/a11y/playwright.config.ts
+
+      - name: Upload accessibility evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: accessibility-${{ github.run_id }}
+          if-no-files-found: ignore
+          retention-days: 30
+          path: |
+            apps/web/tests/a11y/playwright-report
+            apps/web/tests/a11y/test-results

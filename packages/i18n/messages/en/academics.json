@@ -1,0 +1,23 @@
+{
+  "academics": {
+    "nav": { "label": "Learning" },
+    "overview": {
+      "kicker": "Learning record",
+      "title": "Progress, written with evidence",
+      "intro": "Review learning plans, lesson feedback, milestones, and progress reviews in one clear record.",
+      "plans": {
+        "title": "Learning plans",
+        "body": "Major goal changes wait for a parent acknowledgment before they become the active plan."
+      },
+      "feedback": {
+        "title": "Lesson feedback",
+        "body": "Tutors record structured, human-written notes after each lesson."
+      },
+      "milestones": {
+        "title": "Milestones",
+        "body": "Completion is tied to work, observation, rubric, or assessment evidence."
+      },
+      "privacy": "Internal staff notes are not shown to parents or students."
+    }
+  }
+}

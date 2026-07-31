@@ -1,0 +1,204 @@
+/*
+ * `@app/ui`'s components style themselves with semantic Tailwind utilities (`bg-primary`,
+ * `text-foreground`, `ring-ring`, …) that resolve against `packages/ui/src/theme/tokens.css` +
+ * `packages/ui/tailwind-preset.ts`. Neither is wired into apps/web's Tailwind build yet — confirmed
+ * empirically (`apps/web/app/globals.css` is a bare `@import "tailwindcss"`, no `@theme`/preset
+ * bridge, no other file imports `tokens.css`) and already flagged by
+ * `components/marketing/home/home.module.css`'s file header, which mirrors the same tokens locally
+ * for the same reason: wiring the bridge touches Tailwind build config used by every route,
+ * including `(app)/*`, which is out of this task's scope and file list. `--site-*` below copies
+ * `tokens.css`'s HSL triplets verbatim (light + `.dark`) so this chrome still renders with the
+ * real brand palette instead of unstyled/transparent `@app/ui` primitives, without editing any
+ * locked file. Structural utilities (layout, spacing, radius, shadow scale) are unaffected by the
+ * gap and are used directly as plain Tailwind classes throughout these components.
+ */
+.scope {
+  --site-background: 0 0% 100%;
+  --site-foreground: 222 47% 11%;
+  --site-popover: 0 0% 100%;
+  --site-popover-foreground: 222 47% 11%;
+  --site-primary: 221 83% 35%;
+  --site-primary-foreground: 210 40% 98%;
+  --site-secondary: 213 33% 95%;
+  --site-secondary-foreground: 222 47% 17%;
+  --site-muted: 214 32% 96%;
+  --site-muted-foreground: 215 16% 35%;
+  --site-accent: 191 85% 31%;
+  --site-accent-foreground: 210 40% 98%;
+  --site-border: 214 24% 83%;
+  --site-ring: 221 83% 35%;
+}
+:global(.dark) .scope {
+  --site-background: 222 47% 8%;
+  --site-foreground: 210 40% 98%;
+  --site-popover: 222 42% 11%;
+  --site-popover-foreground: 210 40% 98%;
+  --site-primary: 213 94% 72%;
+  --site-primary-foreground: 222 47% 11%;
+  --site-secondary: 217 33% 17%;
+  --site-secondary-foreground: 210 40% 98%;
+  --site-muted: 217 33% 17%;
+  --site-muted-foreground: 215 20% 75%;
+  --site-accent: 188 78% 48%;
+  --site-accent-foreground: 222 47% 11%;
+  --site-border: 217 25% 28%;
+  --site-ring: 213 94% 72%;
+}
+.scope :focus-visible {
+  outline: 2px solid hsl(var(--site-ring));
+  outline-offset: 2px;
+}
+
+/* Header */
+.header {
+  background: hsl(var(--site-background) / 92%);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid hsl(var(--site-border));
+}
+@supports (animation-timeline: scroll()) {
+  .header {
+    animation: site-header-elevate linear both;
+    animation-timeline: scroll(root);
+    animation-range: 0 96px;
+  }
+}
+@keyframes site-header-elevate {
+  from {
+    box-shadow: 0 1px 0 transparent;
+  }
+  to {
+    box-shadow: 0 8px 24px hsl(var(--site-foreground) / 10%);
+  }
+}
+.brand {
+  color: hsl(var(--site-foreground));
+}
+.navLink {
+  color: hsl(var(--site-foreground) / 80%);
+}
+.navLink:hover {
+  color: hsl(var(--site-primary));
+}
+
+/* Dropdown (Subjects nav menu + account menu) */
+.dropdownTrigger {
+  color: hsl(var(--site-foreground) / 80%);
+}
+.dropdownTrigger:hover,
+.dropdownTrigger[aria-expanded="true"] {
+  color: hsl(var(--site-primary));
+}
+.dropdownPanel {
+  background: hsl(var(--site-popover));
+  color: hsl(var(--site-popover-foreground));
+  border: 1px solid hsl(var(--site-border));
+  box-shadow: 0 12px 32px hsl(var(--site-foreground) / 14%);
+}
+.dropdownItem {
+  color: hsl(var(--site-popover-foreground));
+}
+.dropdownItem:hover,
+.dropdownItem:focus-visible {
+  background: hsl(var(--site-muted));
+}
+.dropdownSeparator {
+  background: hsl(var(--site-border));
+}
+.dropdownMeta {
+  color: hsl(var(--site-muted-foreground));
+}
+
+/* Buttons (composed on top of @app/ui's <Button>, whose own color utilities don't resolve — see
+   file header) */
+.buttonPrimary {
+  background: hsl(var(--site-primary));
+  color: hsl(var(--site-primary-foreground));
+  border: 1px solid hsl(var(--site-primary));
+}
+.buttonPrimary:hover {
+  background: hsl(var(--site-primary) / 88%);
+}
+.buttonSecondary {
+  background: transparent;
+  color: hsl(var(--site-foreground));
+  border: 1px solid hsl(var(--site-border));
+}
+.buttonSecondary:hover {
+  background: hsl(var(--site-secondary));
+}
+
+/* Account trigger / avatar */
+.accountTrigger {
+  color: hsl(var(--site-foreground));
+}
+.accountTrigger:hover,
+.accountTrigger[aria-expanded="true"] {
+  background: hsl(var(--site-secondary));
+}
+.avatarFallback {
+  background: hsl(var(--site-secondary));
+  color: hsl(var(--site-secondary-foreground));
+}
+
+/* Mobile drawer */
+.drawerContent {
+  background: hsl(var(--site-background));
+  color: hsl(var(--site-foreground));
+  border-top: 1px solid hsl(var(--site-border));
+}
+.drawerSectionHeading {
+  color: hsl(var(--site-muted-foreground));
+}
+.drawerLink {
+  color: hsl(var(--site-foreground));
+}
+.drawerLink:hover {
+  color: hsl(var(--site-primary));
+}
+.drawerDivider {
+  background: hsl(var(--site-border));
+}
+.hamburgerButton {
+  color: hsl(var(--site-foreground));
+}
+.hamburgerButton:hover {
+  background: hsl(var(--site-secondary));
+}
+
+/* Footer */
+.footer {
+  background: hsl(var(--site-secondary) / 45%);
+  color: hsl(var(--site-foreground));
+  border-top: 1px solid hsl(var(--site-border));
+}
+.footerHeading {
+  color: hsl(var(--site-muted-foreground));
+}
+.footerLink {
+  color: hsl(var(--site-foreground) / 85%);
+}
+.footerLink:hover {
+  color: hsl(var(--site-primary));
+}
+.footerBottom {
+  border-top: 1px solid hsl(var(--site-border));
+  color: hsl(var(--site-muted-foreground));
+}
+.languageSwitcherLink {
+  color: hsl(var(--site-foreground) / 85%);
+  border: 1px solid hsl(var(--site-border));
+}
+.languageSwitcherLink:hover {
+  color: hsl(var(--site-primary));
+}
+.languageSwitcherLinkActive {
+  background: hsl(var(--site-secondary));
+  color: hsl(var(--site-foreground));
+  font-weight: 600;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .header {
+    animation: none;
+  }
+}

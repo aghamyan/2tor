@@ -1,0 +1,380 @@
+{
+  "dashboards": {
+    "common": {
+      "dashboardSections": "Dashboard sections",
+      "signals": "Signals",
+      "workspace": "Workspace",
+      "nextAction": "Next action",
+      "now": "Now",
+      "moduleSurfaces": "Module surfaces",
+      "open": "Open module"
+    },
+    "modules": {
+      "academics": "Academics",
+      "administration": "Administration",
+      "assessments": "Assessments",
+      "assignments": "Assignments",
+      "communication": "Messages",
+      "consent": "Privacy & consent",
+      "content": "Resources",
+      "discussions": "Discussions",
+      "families": "Family",
+      "gamification": "Points & badges",
+      "matching": "Matching",
+      "payments": "Payments",
+      "payouts": "Payouts",
+      "projects": "Projects",
+      "reporting": "Reporting",
+      "scheduling": "Schedule",
+      "support": "Support",
+      "tutors": "Tutor profile"
+    },
+    "parent": {
+      "eyebrow": "Family learning view",
+      "title": "The next step, with the evidence behind it",
+      "mark": "Parent",
+      "intro": "Move from the next lesson to the wider learning story without losing sight of messages, consent, or charges that need attention.",
+      "signalsTitle": "What needs your attention",
+      "workspaceTitle": "Your child’s learning, connected",
+      "workspaceIntro": "Each panel opens the module that owns the record. Progress is described from completed work, feedback, and milestones."
+    },
+    "studentYounger": {
+      "eyebrow": "My learning path",
+      "title": "Ready for your next step?",
+      "personalTitle": "Ready for your next step, {name}?",
+      "mark": "Student",
+      "intro": "See what is happening next, finish today’s work, and follow the path you have already made.",
+      "signalsTitle": "Your day at a glance",
+      "workspaceTitle": "Pick where to go next",
+      "workspaceIntro": "Big, simple choices keep lessons, tasks, progress, and help easy to find."
+    },
+    "studentOlder": {
+      "eyebrow": "Independent learning view",
+      "title": "Plan the work. See the evidence.",
+      "personalTitle": "{name}, plan the work and see the evidence",
+      "mark": "Student",
+      "intro": "A detailed view of your calendar, learning plan, feedback, projects, and the records that show how your work is changing.",
+      "signalsTitle": "Your current workload",
+      "workspaceTitle": "Your complete learning workspace",
+      "workspaceIntro": "Use the detailed module surfaces for planning, practice, reflection, and evidence-backed progress analytics."
+    },
+    "tutor": {
+      "eyebrow": "Teaching operations",
+      "title": "Teach the lesson. Close the loop.",
+      "mark": "Tutor",
+      "intro": "Today’s teaching load, the work waiting after each lesson, and the student records that need a thoughtful next action.",
+      "signalsTitle": "Today and the week ahead",
+      "workspaceTitle": "Your teaching workbench",
+      "workspaceIntro": "Student records remain relationship-scoped; finance stays limited to your own earnings summary."
+    },
+    "admin": {
+      "eyebrow": "Platform operations",
+      "title": "See the system. Work the queue.",
+      "mark": "Admin",
+      "intro": "Service health, learning delivery, and the queues where a timely decision keeps students, families, and tutors moving.",
+      "signalsTitle": "Open operational work",
+      "workspaceTitle": "Operations by accountable owner",
+      "workspaceIntro": "High-risk actions remain behind fresh step-up authentication and second-person approval."
+    },
+    "finance": {
+      "eyebrow": "Financial operations",
+      "title": "Settle, reconcile, account.",
+      "mark": "Finance",
+      "intro": "Revenue, payment exceptions, tutor liabilities, and payout evidence in a workspace that contains no academic records.",
+      "signalsTitle": "Current financial signals",
+      "workspaceTitle": "The settlement workbench",
+      "workspaceIntro": "Amounts remain currency-explicit and every refund or payout action stays in its owning finance module."
+    },
+    "summary": {
+      "common": {
+        "noneScheduled": "Nothing scheduled",
+        "noBalance": "No balance"
+      },
+      "parent": {
+        "nextLesson": "Next lesson",
+        "nextLessonDetail": "Shown in the time zone recorded at booking.",
+        "students": "Students",
+        "studentsDetail": "Switch students from the family workspace.",
+        "actionNeeded": "Action needed",
+        "actionNeededDetail": "Overdue invoices and incomplete consent records.",
+        "upcomingCharges": "Open charges",
+        "upcomingChargesDetail": "Unpaid invoices in the billing workspace."
+      },
+      "student": {
+        "nextLesson": "Next lesson",
+        "nextLessonDetail": "Your next scheduled learning session.",
+        "today": "Lessons today",
+        "todayDetail": "Scheduled in each lesson’s booking time zone.",
+        "nextSevenDays": "Next 7 days",
+        "nextSevenDaysDetail": "Scheduled lessons in the week ahead.",
+        "nextStep": "Next step",
+        "openTasks": "Open tasks",
+        "nextStepDetail": "Review the assignment list and choose one task."
+      },
+      "tutor": {
+        "nextLesson": "Next lesson",
+        "nextLessonDetail": "Open the schedule for preparation and meeting details.",
+        "today": "Lessons today",
+        "todayDetail": "Scheduled teaching sessions today.",
+        "nextSevenDays": "Next 7 days",
+        "nextSevenDaysDetail": "Scheduled sessions across the coming week.",
+        "expectedEarnings": "Expected earnings",
+        "expectedEarningsDetail": "Your own current-period earning summary."
+      },
+      "admin": {
+        "pendingFamilies": "Pending accounts",
+        "pendingFamiliesDetail": "Family accounts awaiting an approval decision.",
+        "tutorVerification": "Tutor verification",
+        "tutorVerificationDetail": "Tutor verification records awaiting review.",
+        "learningSafety": "Learning & safety",
+        "learningSafetyDetail": "Open academic disputes and content reports.",
+        "supportPrivacy": "Support & privacy",
+        "supportPrivacyDetail": "Open support tickets and data requests."
+      },
+      "finance": {
+        "revenue": "30-day revenue",
+        "revenueDetail": "Captured revenue remains separated by currency.",
+        "paymentFailures": "Payment failures",
+        "paymentFailuresDetail": "Failed transactions in the current ledger view.",
+        "pendingPayouts": "Pending earnings",
+        "pendingPayoutsDetail": "Tutor earning entries awaiting payout processing.",
+        "reconciliation": "Reconciliation gaps",
+        "reconciliationDetail": "Payout batches whose items do not balance."
+      }
+    },
+    "panels": {
+      "parent": {
+        "schedule": {
+          "title": "Next lesson, history & attendance",
+          "body": "Open upcoming sessions, Zoom details, lesson history, attendance, cancellations, and no-shows."
+        },
+        "family": {
+          "title": "Student switcher",
+          "body": "Choose the student whose learning records you want to review."
+        },
+        "assignments": {
+          "title": "Assignments",
+          "body": "Review assigned work, submission status, due dates, and released grading feedback."
+        },
+        "progress": {
+          "title": "Progress trend & learning plan",
+          "body": "Read the current goal, structured feedback, strengths, skills to improve, milestones, and the evidence behind the progress trend."
+        },
+        "projects": {
+          "title": "Projects",
+          "body": "Follow project work, rubric evidence, updates, and approved portfolio items."
+        },
+        "assessments": {
+          "title": "Assessment reports",
+          "body": "Read released diagnostic and assessment evidence with recommended next steps."
+        },
+        "discussions": {
+          "title": "Discussion visibility",
+          "body": "See the learning discussions that are available within the student’s permitted scope."
+        },
+        "payments": {
+          "title": "Invoices & receipts",
+          "body": "Review unpaid charges, completed payments, discounts, invoices, and receipts."
+        },
+        "consent": {
+          "title": "Privacy & consent",
+          "body": "Review consent status and the privacy controls attached to each child account."
+        },
+        "tutorChange": {
+          "title": "Tutor-change request",
+          "body": "Open a supported request so the operations team can review a change of tutor."
+        },
+        "support": {
+          "title": "Support",
+          "body": "Get help with account, lesson, billing, privacy, technical, or safety concerns."
+        }
+      },
+      "studentYounger": {
+        "nextLesson": {
+          "title": "Your next lesson",
+          "body": "A large, clear route to the time and joining details for your next session."
+        },
+        "tasks": {
+          "title": "Today’s tasks",
+          "body": "See the small set of assignment actions to work on now."
+        },
+        "progress": {
+          "title": "Your progress path",
+          "body": "Follow completed steps, current goals, and evidence-backed milestones."
+        },
+        "rewards": {
+          "title": "Points & badges",
+          "body": "See personal points, streaks, badges, and challenges without public ranking."
+        },
+        "message": {
+          "title": "Tutor messages",
+          "body": "Open the monitored learning conversation that includes your approved adults."
+        },
+        "resources": {
+          "title": "Learning resources",
+          "body": "Find the videos, materials, and practice resources chosen for learning."
+        }
+      },
+      "studentOlder": {
+        "calendar": {
+          "title": "Calendar",
+          "body": "Review upcoming lessons, session details, attendance, and schedule changes."
+        },
+        "tasks": {
+          "title": "Task list",
+          "body": "Work from assignment due dates, submission states, and returned feedback."
+        },
+        "plan": {
+          "title": "Learning plan",
+          "body": "Keep the current goal, plan items, milestones, and review dates in view."
+        },
+        "assessments": {
+          "title": "Assessments",
+          "body": "Take available assessments and review released diagnostic evidence."
+        },
+        "feedback": {
+          "title": "Detailed feedback",
+          "body": "Read lesson evidence, strengths, skills to improve, next focus, and assigned work."
+        },
+        "projects": {
+          "title": "Projects",
+          "body": "Manage project work, evidence, rubric criteria, and private portfolio items."
+        },
+        "notes": {
+          "title": "Notes",
+          "body": "Return to academic records and keep useful lesson observations close to the plan."
+        },
+        "formulas": {
+          "title": "Formula notebook",
+          "body": "Open saved learning resources and maintain a practical reference for recurring formulas."
+        },
+        "discussions": {
+          "title": "Discussions",
+          "body": "Ask and answer scoped learning questions in the moderated community."
+        },
+        "resources": {
+          "title": "Resources",
+          "body": "Browse assigned and published videos, documents, links, and practice materials."
+        },
+        "analytics": {
+          "title": "Progress analytics",
+          "body": "Use completed assessments, feedback, plan items, and milestones to understand your observed progress trend."
+        }
+      },
+      "tutor": {
+        "calendar": {
+          "title": "Today & week calendar",
+          "body": "Move from today’s sessions to the full week, with preparation and meeting details."
+        },
+        "students": {
+          "title": "Students",
+          "body": "Open relationship-scoped learning plans, feedback, and milestones for active assignments."
+        },
+        "actionQueue": {
+          "title": "Action queue",
+          "body": "Close missing feedback, submissions to review, lesson preparation, and milestone deadlines."
+        },
+        "messages": {
+          "title": "Messages",
+          "body": "Reply in monitored family-inclusive learning conversations."
+        },
+        "plans": {
+          "title": "Plans needing review",
+          "body": "Review learning plans, upcoming review dates, milestone evidence, and next focus."
+        },
+        "availability": {
+          "title": "Availability",
+          "body": "Maintain the weekly availability used by scheduling and matching."
+        },
+        "resources": {
+          "title": "Teaching resources",
+          "body": "Find, assign, and manage the resources used in lesson preparation."
+        },
+        "earnings": {
+          "title": "Earnings summary",
+          "body": "Review only your completed lessons, expected totals, and earning entries."
+        },
+        "development": {
+          "title": "Training & performance feedback",
+          "body": "Review training notices, verification status, evaluations, and account restrictions."
+        }
+      },
+      "admin": {
+        "enrollment": {
+          "title": "Students, tutors & lesson volume",
+          "body": "Review active accounts and lessons today, this week, and this month from the owning operational records."
+        },
+        "delivery": {
+          "title": "Attendance & service delivery",
+          "body": "Track attendance, cancellations, no-shows, missing feedback, support resolution, and trial conversion."
+        },
+        "financeHealth": {
+          "title": "Revenue & financial exceptions",
+          "body": "Review revenue, payment failures, refunds, and tutor payout liability without mixing currencies."
+        },
+        "capacity": {
+          "title": "Retention & tutor utilization",
+          "body": "Use cohort-safe retention and recorded availability to understand capacity."
+        },
+        "familyQueue": {
+          "title": "Family approval & consent",
+          "body": "Work pending family approval and incomplete parental consent."
+        },
+        "tutorQueue": {
+          "title": "Tutor verification",
+          "body": "Review tutor verification records, documents, training status, and restrictions."
+        },
+        "matchingQueue": {
+          "title": "Matching & tutor changes",
+          "body": "Resolve students needing a tutor match and supported tutor-change requests."
+        },
+        "learningSafety": {
+          "title": "Learning, content & incidents",
+          "body": "Work academic disputes, content reports, safety reports, and incident follow-up."
+        },
+        "refunds": {
+          "title": "Refund queue",
+          "body": "Review payment evidence and route large refunds through step-up controls."
+        },
+        "dataRequests": {
+          "title": "Data requests",
+          "body": "Track exports, corrections, privacy requests, and deletion jobs with retention holds."
+        },
+        "highRisk": {
+          "title": "High-risk controls",
+          "body": "Bulk exports, role elevation, audit access, mass deletion, large refunds, payment configuration, and security-control changes require stronger verification."
+        }
+      },
+      "finance": {
+        "settlement": {
+          "title": "Revenue settlement",
+          "body": "Review captured revenue, refunds, and net totals in separate USD and AMD ledgers."
+        },
+        "invoices": {
+          "title": "Invoices & transactions",
+          "body": "Trace invoice state, payment attempts, transaction evidence, and receipts."
+        },
+        "failures": {
+          "title": "Payment failures",
+          "body": "Find failed transactions that need operational follow-up."
+        },
+        "refunds": {
+          "title": "Refunds",
+          "body": "Request evidence-backed refunds while large amounts remain step-up protected."
+        },
+        "liability": {
+          "title": "Tutor payout liability",
+          "body": "Review approved and pending tutor earning entries without exposing academic detail."
+        },
+        "batches": {
+          "title": "Payout batches & FX",
+          "body": "Build monthly AMD batches with recorded exchange-rate source and conversion date."
+        },
+        "reconciliation": {
+          "title": "Reconciliation",
+          "body": "Resolve any difference between a payout batch total and its item-level evidence."
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,70 @@
+# Example override for local development. `docker-compose.override.yml`
+# (without ".example") is auto-loaded by `docker compose` alongside
+# docker-compose.yml, so:
+#
+#   cp docker-compose.override.example.yml docker-compose.override.yml
+#
+# gives you live-reloading web/worker containers running `next dev` / `tsx
+# watch` against your bind-mounted working tree, instead of the production
+# build docker-compose.yml's web/worker services run. Only takes effect for
+# services started with `--profile app`; the infra services
+# (postgres/redis/minio/caddy) are unaffected.
+#
+# In practice, most day-to-day work happens by running `pnpm dev` on the host
+# against `docker compose up`'s infra services — this override exists for
+# when you specifically want the app itself running inside a container too
+# (closer to staging). It intentionally skips read_only/tmpfs/non-root
+# hardening, which gets in the way of watchers writing to .next/node_modules.
+#
+# The node_modules bind-mount shadowing trick below (one anonymous volume per
+# package) needs a new line whenever a new package is added under packages/.
+
+services:
+  web:
+    build:
+      target: deps
+    command: ["pnpm", "--filter", "web", "dev"]
+    environment:
+      NODE_ENV: development
+    read_only: false
+    tmpfs: !reset []
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/apps/web/node_modules
+      - /app/apps/web/.next
+      - /app/packages/auth/node_modules
+      - /app/packages/config/node_modules
+      - /app/packages/db/node_modules
+      - /app/packages/domain/node_modules
+      - /app/packages/email/node_modules
+      - /app/packages/i18n/node_modules
+      - /app/packages/notifications/node_modules
+      - /app/packages/observability/node_modules
+      - /app/packages/ui/node_modules
+      - /app/packages/validation/node_modules
+    ports:
+      - "127.0.0.1:${WEB_PORT:-3000}:3000"
+
+  worker:
+    build:
+      target: builder
+    command: ["pnpm", "--filter", "worker", "dev"]
+    environment:
+      NODE_ENV: development
+    read_only: false
+    tmpfs: !reset []
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/apps/worker/node_modules
+      - /app/packages/auth/node_modules
+      - /app/packages/config/node_modules
+      - /app/packages/db/node_modules
+      - /app/packages/domain/node_modules
+      - /app/packages/email/node_modules
+      - /app/packages/i18n/node_modules
+      - /app/packages/notifications/node_modules
+      - /app/packages/observability/node_modules
+      - /app/packages/ui/node_modules
+      - /app/packages/validation/node_modules

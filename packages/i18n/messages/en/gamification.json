@@ -1,0 +1,35 @@
+{
+  "gamification": {
+    "nav": { "label": "Progress" },
+    "overview": {
+      "kicker": "Learning rhythm",
+      "title": "Small steps count here",
+      "intro": "Points recognize effort, consistency, improvement, and finishing meaningful work. They have no cash or purchase value.",
+      "progress": {
+        "label": "Your path",
+        "title": "Build your next learning habit",
+        "body": "Progress is personal: return to your goals, notice what changed, and take the next useful step.",
+        "points": "Your points",
+        "pointsLabel": "personal points"
+      },
+      "streaks": {
+        "title": "Streaks with room to breathe",
+        "body": "Approved illness and travel absences protect a streak. Taking care of yourself never counts against you."
+      },
+      "badges": {
+        "title": "Badges for real learning",
+        "body": "Badges celebrate asking, improving, helping, and completing—not just getting the highest score."
+      },
+      "challenges": {
+        "title": "Seasonal challenges",
+        "body": "Choose a short, meaningful challenge when it fits your learning plan. You can opt in; there is no endless feed."
+      },
+      "community": {
+        "kicker": "Optional",
+        "title": "Seasonal community challenge",
+        "body": "This parent-enabled space lets you take part in a shared seasonal activity. Your progress stays personal; no child leaderboard is shown."
+      },
+      "privacy": "There are no global public leaderboards for children. A parent can turn off optional competition for this learner at any time."
+    }
+  }
+}

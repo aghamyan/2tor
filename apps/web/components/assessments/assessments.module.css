@@ -1,0 +1,744 @@
+.shell,
+.reviewShell,
+.runner {
+  --ink: #172033;
+  --muted: #5e687a;
+  --line: #d8e0eb;
+  --mist: #eef3fa;
+  --cobalt: #274cdb;
+  --cobalt-dark: #1837a8;
+  --teal: #0b6b68;
+  --amber: #a35c00;
+  color: var(--ink);
+  margin: 0 auto;
+  max-width: 72rem;
+}
+
+.shell,
+.reviewShell {
+  padding: 1rem 0 4rem;
+}
+
+.overviewHeader {
+  border-bottom: 1px solid var(--line);
+  max-width: 50rem;
+  padding: 2rem 0 2.5rem;
+}
+
+.overviewHeader h1,
+.entryHeader h1,
+.reviewHeader h1,
+.runnerHeader h1,
+.completion h1 {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(2.5rem, 7vw, 5.4rem);
+  font-weight: 500;
+  letter-spacing: -0.055em;
+  line-height: 0.96;
+  margin: 0;
+}
+
+.eyebrow {
+  color: var(--cobalt);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  margin: 0 0 0.75rem;
+  text-transform: uppercase;
+}
+
+.lede {
+  color: var(--muted);
+  font-size: 1.15rem;
+  line-height: 1.7;
+  margin: 1.5rem 0 0;
+  max-width: 42rem;
+}
+
+.contract {
+  align-items: flex-start;
+  background: #e8f5f3;
+  border-left: 4px solid var(--teal);
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: auto 1fr;
+  margin: 2rem 0;
+  padding: 1.25rem 1.4rem;
+}
+
+.contractMark {
+  align-items: center;
+  border: 1px solid var(--teal);
+  border-radius: 50%;
+  color: var(--teal);
+  display: flex;
+  font-family: Georgia, serif;
+  font-style: italic;
+  height: 1.8rem;
+  justify-content: center;
+  width: 1.8rem;
+}
+
+.contract h2,
+.workflowCard h2,
+.startPanel h2,
+.submitPanel h2,
+.releasePanel h2,
+.sectionHeading h2 {
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+.contract p,
+.workflowCard p,
+.startPanel p,
+.submitPanel p,
+.releasePanel p {
+  color: var(--muted);
+  line-height: 1.6;
+  margin: 0.4rem 0 0;
+}
+
+.workflowGrid {
+  display: grid;
+  gap: 1px;
+  grid-template-columns: repeat(3, 1fr);
+  margin: 3rem 0;
+}
+
+.workflowCard {
+  border-top: 1px solid var(--line);
+  padding: 1.4rem 2rem 1.4rem 0;
+}
+
+.workflowCard + .workflowCard {
+  border-left: 1px solid var(--line);
+  padding-left: 2rem;
+}
+
+.workflowCard > span,
+.typeTag,
+.statusTag {
+  color: var(--cobalt);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.workflowCard h2 {
+  margin-top: 1.5rem;
+}
+
+.assessmentList,
+.signalReview,
+.answerReview,
+.reportForm {
+  border-top: 2px solid var(--ink);
+  margin-top: 4rem;
+  padding-top: 1.25rem;
+}
+
+.sectionHeading {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+
+.sectionHeading .eyebrow {
+  margin-bottom: 0.3rem;
+}
+
+.count {
+  align-items: center;
+  background: var(--ink);
+  border-radius: 50%;
+  color: white;
+  display: flex;
+  font-family: ui-monospace, monospace;
+  height: 2.2rem;
+  justify-content: center;
+  width: 2.2rem;
+}
+
+.assessmentList ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.assessmentLink {
+  align-items: center;
+  border-top: 1px solid var(--line);
+  color: inherit;
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: 8rem 1fr 1.5fr auto;
+  padding: 1.25rem 0;
+  text-decoration: none;
+  transition:
+    color 160ms ease,
+    padding 160ms ease;
+}
+
+.assessmentLink:hover {
+  color: var(--cobalt);
+  padding-left: 0.5rem;
+}
+
+.assessmentLink > span:nth-of-type(2) {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.assessmentLink b {
+  font-size: 1.3rem;
+}
+
+.empty,
+.statePanel,
+.errorPanel {
+  background: var(--mist);
+  color: var(--muted);
+  margin: 1rem auto;
+  max-width: 72rem;
+  padding: 1.25rem;
+}
+
+.errorPanel,
+.inlineError {
+  background: #fff3e1;
+  border-left: 3px solid var(--amber);
+  color: #754300;
+}
+
+.backLink {
+  color: var(--cobalt);
+  display: inline-block;
+  font-size: 0.9rem;
+  margin: 0 0 2rem;
+  text-decoration: none;
+}
+
+.entryHeader {
+  align-items: end;
+  display: grid;
+  gap: 4rem;
+  grid-template-columns: 1fr auto;
+  margin-bottom: 3rem;
+}
+
+.entryHeader h1 {
+  font-size: clamp(2.5rem, 6vw, 4.7rem);
+}
+
+.entryHeader > div > p:last-child {
+  color: var(--muted);
+  line-height: 1.6;
+  max-width: 42rem;
+}
+
+.brief {
+  border-bottom: 1px solid var(--line);
+  margin: 0;
+  min-width: 16rem;
+}
+
+.brief div {
+  border-top: 1px solid var(--line);
+  display: flex;
+  justify-content: space-between;
+  padding: 0.65rem 0;
+}
+
+.brief dt {
+  color: var(--muted);
+}
+
+.brief dd {
+  font-family: ui-monospace, monospace;
+  font-weight: 700;
+  margin: 0;
+}
+
+.notice {
+  background: #fff7e8;
+  border: 1px solid #e8c68c;
+  padding: clamp(1.25rem, 4vw, 2.5rem);
+}
+
+.noticeLabel {
+  color: var(--amber);
+  font-family: ui-monospace, monospace;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.notice h2 {
+  font-family: Georgia, serif;
+  font-size: 1.8rem;
+  font-weight: 500;
+  margin: 0.5rem 0;
+}
+
+.notice > p,
+.notice li {
+  color: #65491e;
+  line-height: 1.6;
+}
+
+.notice ul {
+  columns: 2;
+  padding-left: 1.2rem;
+}
+
+.notice .notProof {
+  border-top: 1px solid #e8c68c;
+  color: #50350e;
+  font-weight: 700;
+  margin: 1.5rem 0 0;
+  padding-top: 1rem;
+}
+
+.startPanel,
+.submitPanel,
+.releasePanel {
+  align-items: center;
+  background: var(--mist);
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: 1fr auto;
+  margin-top: 1.5rem;
+  padding: 1.5rem;
+}
+
+.consentCheck,
+.honorCheck {
+  align-items: flex-start;
+  cursor: pointer;
+  display: flex;
+  gap: 0.75rem;
+  grid-column: 1 / -1;
+  line-height: 1.5;
+}
+
+.consentCheck input,
+.honorCheck input {
+  accent-color: var(--cobalt);
+  height: 1.15rem;
+  margin-top: 0.15rem;
+  width: 1.15rem;
+}
+
+.primaryButton,
+.secondaryButton {
+  align-items: center;
+  border: 0;
+  cursor: pointer;
+  display: inline-flex;
+  font: inherit;
+  font-weight: 700;
+  justify-content: center;
+  min-height: 2.9rem;
+  padding: 0.75rem 1.2rem;
+  text-decoration: none;
+}
+
+.primaryButton {
+  background: var(--cobalt);
+  color: white;
+}
+
+.primaryButton:hover {
+  background: var(--cobalt-dark);
+}
+
+.secondaryButton {
+  background: var(--ink);
+  color: white;
+  justify-self: start;
+}
+
+.primaryButton:disabled,
+.secondaryButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.inlineError {
+  grid-column: 1 / -1;
+  margin: 0;
+  padding: 0.75rem 1rem;
+}
+
+.runner {
+  max-width: 62rem;
+  padding: 1rem 2rem 5rem;
+  position: relative;
+}
+
+.timeRail {
+  background: #dfe6f0;
+  bottom: 2rem;
+  left: 0;
+  overflow: hidden;
+  position: fixed;
+  top: 2rem;
+  width: 0.35rem;
+}
+
+.timeRail div {
+  background: var(--cobalt);
+  height: 100%;
+  transform-origin: bottom;
+  transition: transform 1s linear;
+}
+
+.runnerHeader,
+.reviewHeader {
+  align-items: end;
+  border-bottom: 2px solid var(--ink);
+  display: flex;
+  justify-content: space-between;
+  padding: 1.5rem 0;
+}
+
+.runnerHeader h1,
+.reviewHeader h1 {
+  font-size: clamp(2.1rem, 5vw, 3.8rem);
+}
+
+.timer,
+.timerElapsed {
+  text-align: right;
+}
+
+.timer span,
+.timerElapsed span {
+  display: block;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 1.7rem;
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+}
+
+.timer small,
+.timerElapsed small {
+  color: var(--muted);
+}
+
+.timerElapsed {
+  color: var(--amber);
+}
+
+.elapsedNotice {
+  background: #fff3e1;
+  border-left: 3px solid var(--amber);
+  color: #754300;
+  padding: 0.85rem 1rem;
+}
+
+.questionStack {
+  counter-reset: question;
+}
+
+.questionCard {
+  border-bottom: 1px solid var(--line);
+  padding: 3rem 0;
+}
+
+.questionCard > header {
+  color: var(--muted);
+  display: flex;
+  font-family: ui-monospace, monospace;
+  font-size: 0.72rem;
+  justify-content: space-between;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.questionCard h2 {
+  font-family: Georgia, serif;
+  font-size: clamp(1.3rem, 3vw, 1.8rem);
+  font-weight: 500;
+  line-height: 1.35;
+  margin: 1.2rem 0 1.5rem;
+}
+
+.questionCard fieldset {
+  border: 0;
+  display: grid;
+  gap: 0.6rem;
+  margin: 0;
+  padding: 0;
+}
+
+.choice {
+  align-items: center;
+  border: 1px solid var(--line);
+  cursor: pointer;
+  display: flex;
+  gap: 0.8rem;
+  padding: 0.9rem 1rem;
+}
+
+.choice:has(input:checked) {
+  background: #edf1ff;
+  border-color: var(--cobalt);
+}
+
+.choice input {
+  accent-color: var(--cobalt);
+}
+
+.shortAnswer,
+.longAnswer,
+.codeAnswer,
+.reportForm textarea {
+  background: white;
+  border: 1px solid #aeb9c8;
+  border-radius: 0;
+  color: var(--ink);
+  font: inherit;
+  padding: 0.85rem 1rem;
+  width: 100%;
+}
+
+.shortAnswer {
+  min-height: 3rem;
+}
+
+.longAnswer,
+.codeAnswer {
+  min-height: 11rem;
+  resize: vertical;
+}
+
+.codeAnswer {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.9rem;
+}
+
+.shortAnswer:focus,
+.longAnswer:focus,
+.codeAnswer:focus,
+.reportForm textarea:focus,
+.primaryButton:focus-visible,
+.secondaryButton:focus-visible,
+.assessmentLink:focus-visible,
+.backLink:focus-visible {
+  outline: 3px solid #8ea4ff;
+  outline-offset: 2px;
+}
+
+.submitPanel {
+  border-top: 4px solid var(--cobalt);
+  margin-top: 3rem;
+}
+
+.completion {
+  color: #172033;
+  margin: 10vh auto;
+  max-width: 44rem;
+  text-align: center;
+}
+
+.completion > span {
+  align-items: center;
+  background: #e8f5f3;
+  border: 1px solid #0b6b68;
+  border-radius: 50%;
+  color: #0b6b68;
+  display: inline-flex;
+  font-size: 1.5rem;
+  height: 3.5rem;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+  width: 3.5rem;
+}
+
+.completion p:not(.eyebrow) {
+  color: #5e687a;
+  line-height: 1.6;
+  margin: 1.5rem auto;
+}
+
+.reviewHeader {
+  margin-bottom: 3rem;
+}
+
+.statusTag {
+  background: var(--mist);
+  padding: 0.5rem 0.7rem;
+}
+
+.signalContract {
+  background: #e8f5f3;
+  border-left: 3px solid var(--teal);
+  color: #174f4c;
+  line-height: 1.6;
+  padding: 0.85rem 1rem;
+}
+
+.signalGrid {
+  display: grid;
+  gap: 1px;
+  grid-template-columns: repeat(4, 1fr);
+  margin-top: 1.5rem;
+}
+
+.signalGrid article {
+  border: 1px solid var(--line);
+  min-height: 7rem;
+  padding: 1rem;
+}
+
+.signalGrid strong {
+  display: block;
+  font-family: Georgia, serif;
+  font-size: 2.2rem;
+  font-weight: 500;
+}
+
+.signalGrid span {
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
+.answerReview ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.answerReview li {
+  border-top: 1px solid var(--line);
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: 1.2fr 1fr auto;
+  padding: 1.2rem 0;
+}
+
+.answerReview h3,
+.answerReview p {
+  font-size: 0.95rem;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.answerReview p {
+  background: var(--mist);
+  padding: 0.7rem;
+}
+
+.answerReview small {
+  color: var(--muted);
+}
+
+.reportForm {
+  display: grid;
+  gap: 1.2rem;
+}
+
+.reportForm > div:first-child p:last-child {
+  color: var(--muted);
+}
+
+.reportForm label {
+  display: grid;
+  font-size: 0.85rem;
+  font-weight: 700;
+  gap: 0.45rem;
+}
+
+.reportForm textarea {
+  min-height: 7rem;
+  resize: vertical;
+}
+
+.reportColumns {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: 1fr 1fr;
+}
+
+.releasePanel {
+  border-left: 4px solid var(--teal);
+}
+
+.srOnly {
+  clip: rect(0, 0, 0, 0);
+  clip-path: inset(50%);
+  height: 1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
+}
+
+@media (max-width: 760px) {
+  .workflowGrid,
+  .entryHeader,
+  .reportColumns {
+    grid-template-columns: 1fr;
+  }
+
+  .workflowCard + .workflowCard {
+    border-left: 0;
+    padding-left: 0;
+  }
+
+  .assessmentLink {
+    align-items: start;
+    grid-template-columns: 1fr auto;
+  }
+
+  .assessmentLink > span:nth-of-type(2) {
+    grid-column: 1 / -1;
+  }
+
+  .entryHeader {
+    gap: 1.5rem;
+  }
+
+  .notice ul {
+    columns: 1;
+  }
+
+  .startPanel,
+  .submitPanel,
+  .releasePanel {
+    align-items: stretch;
+    grid-template-columns: 1fr;
+  }
+
+  .runner {
+    padding-left: 1rem;
+    padding-right: 0.25rem;
+  }
+
+  .runnerHeader {
+    align-items: start;
+    gap: 1rem;
+  }
+
+  .signalGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .answerReview li {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .assessmentLink,
+  .timeRail div {
+    transition: none;
+  }
+}

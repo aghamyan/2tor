@@ -1,0 +1,26 @@
+{
+  "name": "worker",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc --noEmit",
+    "start": "tsx src/index.ts",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --passWithNoTests"
+  },
+  "dependencies": {
+    "@app/config": "workspace:*",
+    "@app/db": "workspace:*",
+    "@app/domain": "workspace:*",
+    "@app/email": "workspace:*",
+    "@app/i18n": "workspace:*",
+    "@app/notifications": "workspace:*",
+    "@app/observability": "workspace:*",
+    "@app/validation": "workspace:*",
+    "bullmq": "catalog:",
+    "ioredis": "catalog:"
+  }
+}

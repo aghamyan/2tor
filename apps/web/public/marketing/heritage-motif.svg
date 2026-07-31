@@ -1,0 +1,13 @@
+<!-- Decorative rosette used as a low-opacity background accent on the heritage subject card.
+     #99520a is the exact hex for packages/ui/src/theme/tokens.css's `--warning` HSL triplet
+     (30 88% 32%), reused here as the "heritage" accent — an external SVG file can't reference a
+     CSS custom property, so this is a literal, computed-not-guessed copy of that token's value. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="presentation" aria-hidden="true">
+  <title>Abstract eight-point rosette motif</title>
+  <g fill="none" stroke="#99520a" stroke-width="1.75" stroke-linejoin="round">
+    <circle cx="100" cy="100" r="92" opacity="0.35" />
+    <path d="M100 24 L152.7 47.3 L176 100 L152.7 152.7 L100 176 L47.3 152.7 L24 100 L47.3 47.3 Z" opacity="0.55" />
+    <path d="M100 44 L142.7 57.3 L156 100 L142.7 142.7 L100 156 L57.3 142.7 L44 100 L57.3 57.3 Z" opacity="0.75" />
+    <circle cx="100" cy="100" r="14" opacity="0.9" />
+  </g>
+</svg>

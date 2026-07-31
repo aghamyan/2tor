@@ -1,0 +1,85 @@
+@layer base {
+  :root {
+    /* Deep ink + mineral blue: a high-contrast, calm foundation for dense work. */
+    --background: 0 0% 100%;
+    --foreground: 222 47% 11%;
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+    --primary: 221 83% 35%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 213 33% 95%;
+    --secondary-foreground: 222 47% 17%;
+    --muted: 214 32% 96%;
+    --muted-foreground: 215 16% 35%;
+    --accent: 191 85% 31%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 72% 39%;
+    --destructive-foreground: 0 0% 100%;
+    --success: 154 65% 28%;
+    --success-foreground: 0 0% 100%;
+    --warning: 30 88% 32%;
+    --warning-foreground: 0 0% 100%;
+    --border: 214 24% 83%;
+    --input: 214 24% 83%;
+    --ring: 221 83% 35%;
+    --radius: 0.5rem;
+    --font-sans: Inter, "Noto Sans Armenian", "DejaVu Sans", ui-sans-serif, system-ui, sans-serif;
+    --font-mono: "IBM Plex Mono", "Noto Sans Armenian", ui-monospace, SFMono-Regular, monospace;
+  }
+
+  .dark {
+    --background: 222 47% 8%;
+    --foreground: 210 40% 98%;
+    --card: 222 42% 11%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222 42% 11%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 213 94% 72%;
+    --primary-foreground: 222 47% 11%;
+    --secondary: 217 33% 17%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217 33% 17%;
+    --muted-foreground: 215 20% 75%;
+    --accent: 188 78% 48%;
+    --accent-foreground: 222 47% 11%;
+    --destructive: 0 82% 65%;
+    --destructive-foreground: 222 47% 11%;
+    --success: 152 62% 52%;
+    --success-foreground: 222 47% 11%;
+    --warning: 35 92% 62%;
+    --warning-foreground: 222 47% 11%;
+    --border: 217 25% 28%;
+    --input: 217 25% 28%;
+    --ring: 213 94% 72%;
+  }
+
+  * {
+    border-color: hsl(var(--border));
+  }
+
+  body {
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  :focus-visible {
+    outline: 2px solid hsl(var(--ring));
+    outline-offset: 2px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}
