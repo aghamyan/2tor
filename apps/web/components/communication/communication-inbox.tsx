@@ -1,6 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
+import { ArrowLeft, ChevronRight, MessageSquareText, Paperclip, Send, ShieldCheck } from "lucide-react";
+import Link from "next/link";
 import { useTranslations } from "next-intl";
 
 import styles from "./communication.module.css";
@@ -54,7 +56,7 @@ function mergeMessages(current: Message[], incoming: Message[]): Message[] {
   );
 }
 
-export function CommunicationInbox() {
+export function CommunicationInbox({ viewerUserId }: { viewerUserId: string | null }) {
   const t = useTranslations("communication");
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [activeId, setActiveId] = useState<string | null>(null);
@@ -69,6 +71,7 @@ export function CommunicationInbox() {
   const [reportingId, setReportingId] = useState<string | null>(null);
   const [reportReason, setReportReason] = useState("");
   const [reportSent, setReportSent] = useState<string | null>(null);
+  const [mobileThreadVisible, setMobileThreadVisible] = useState(false);
   const cursorRef = useRef<string | null>(null);
   const accessVersionRef = useRef(0);
 
@@ -191,6 +194,7 @@ export function CommunicationInbox() {
     setDetail(null);
     setReasonRequired(false);
     setReportingId(null);
+    setMobileThreadVisible(true);
     void openConversation(conversationId, "");
   }
 
@@ -311,7 +315,7 @@ export function CommunicationInbox() {
           <p>{t("intro")}</p>
         </div>
         <div className={styles.safetySeal}>
-          <span aria-hidden="true">◉</span>
+          <ShieldCheck aria-hidden="true" size={20} />
           <strong>{t("parentVisible")}</strong>
           <small>{t("audited")}</small>
         </div>
@@ -326,14 +330,19 @@ export function CommunicationInbox() {
         </div>
       ) : null}
 
-      <div className={styles.workspace}>
+      <div className={styles.workspace} data-mobile-view={mobileThreadVisible ? "thread" : "list"}>
         <aside className={styles.inbox} aria-label={t("conversationList")}>
           <div className={styles.inboxHeading}>
             <h2>{t("inbox")}</h2>
             <span>{conversations.length}</span>
           </div>
           {conversations.length === 0 ? (
-            <p className={styles.empty}>{t("empty")}</p>
+            <div className={styles.inboxEmpty}>
+              <span><MessageSquareText aria-hidden="true" size={21} /></span>
+              <strong>{t("empty")}</strong>
+              <p>{t("emptyBody")}</p>
+              <Link href="/support">{t("emptyAction")}</Link>
+            </div>
           ) : (
             <ul>
               {conversations.map((conversation) => (
@@ -343,13 +352,19 @@ export function CommunicationInbox() {
                     type="button"
                     onClick={() => selectConversation(conversation.id)}
                   >
-                    <strong>{conversation.title ?? t("untitled")}</strong>
-                    <span>
-                      {conversation.members
-                        .filter((member) => member.leftAt === null)
-                        .map((member) => t(`roles.${member.role}`))
-                        .join(" · ")}
+                    <span className={styles.conversationAvatar} aria-hidden="true">
+                      {(conversation.title ?? t("untitled")).slice(0, 1).toUpperCase()}
                     </span>
+                    <span className={styles.conversationCopy}>
+                      <strong>{conversation.title ?? t("untitled")}</strong>
+                      <small>
+                        {conversation.members
+                          .filter((member) => member.leftAt === null)
+                          .map((member) => t(`roles.${member.role}`))
+                          .join(" · ")}
+                      </small>
+                    </span>
+                    <ChevronRight className={styles.conversationChevron} aria-hidden="true" size={16} />
                   </button>
                 </li>
               ))}
@@ -392,6 +407,13 @@ export function CommunicationInbox() {
           ) : (
             <>
               <header className={styles.threadHeader}>
+                <button
+                  className={styles.mobileBack}
+                  type="button"
+                  onClick={() => setMobileThreadVisible(false)}
+                >
+                  <ArrowLeft aria-hidden="true" size={17} /> {t("backToInbox")}
+                </button>
                 <div>
                   <p className={styles.eyebrow}>{t("sharedRoom")}</p>
                   <h2>{detail.title ?? t("untitled")}</h2>
@@ -417,6 +439,10 @@ export function CommunicationInbox() {
                   detail.messages.map((message) => (
                     <li
                       className={`${styles.message} ${message.optimistic ? styles.optimistic : ""} ${message.failed ? styles.failed : ""}`}
+                      data-self={
+                        message.senderUserId === "__optimistic_self__" ||
+                        message.senderUserId === viewerUserId
+                      }
                       key={message.id}
                     >
                       <div className={styles.messageMeta}>
@@ -521,7 +547,7 @@ export function CommunicationInbox() {
                 />
                 <div className={styles.composerActions}>
                   <label className={styles.filePicker}>
-                    {t("composer.attach")}
+                    <Paperclip aria-hidden="true" size={15} /> {t("composer.attach")}
                     <input
                       type="file"
                       multiple
@@ -530,7 +556,7 @@ export function CommunicationInbox() {
                   </label>
                   <span>{files.map((file) => file.name).join(", ")}</span>
                   <button type="submit" disabled={sending || !draft.trim()}>
-                    {sending ? t("sending") : t("composer.send")}
+                    {sending ? t("sending") : t("composer.send")} <Send aria-hidden="true" size={15} />
                   </button>
                 </div>
               </form>

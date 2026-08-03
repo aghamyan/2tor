@@ -88,7 +88,8 @@
     "summary": {
       "common": {
         "noneScheduled": "Nothing scheduled",
-        "noBalance": "No balance"
+        "noBalance": "No balance",
+        "joinLesson": "Join lesson"
       },
       "parent": {
         "nextLesson": "Next lesson",
@@ -142,6 +143,119 @@
         "reconciliationDetail": "Payout batches whose items do not balance."
       }
     },
+    "learning": {
+      "common": {
+        "tools": "Useful shortcuts",
+        "scheduled": "Scheduled",
+        "clear": "All clear",
+        "join": "Join class",
+        "goalMet": "Goal met",
+        "inProgress": "In progress",
+        "needsPractice": "Needs practice",
+        "none": "None",
+        "noBalance": "No balance"
+      },
+      "modules": {
+        "scheduling": "Schedule",
+        "communication": "Messages",
+        "assignments": "Assignments",
+        "payments": "Payments",
+        "payouts": "Earnings"
+      },
+      "parent": {
+        "eyebrow": "Your child’s learning",
+        "title": "Know what they learned, not just when they logged in.",
+        "intro": "Classes, topics, tutor notes, and the next focus — together in one calm view.",
+        "quickTitle": "Everything else, close at hand",
+        "quickIntro": "The everyday tools are still here when you need them, without taking over the learning story.",
+        "emptyTitle": "Add your child to begin",
+        "emptyBody": "Once a student is linked, completed classes and tutor recaps will appear here.",
+        "addChild": "Add a child",
+        "overviewLabel": "Family learning overview",
+        "learningNow": "Learning now",
+        "gradeNotSet": "Grade not set",
+        "classesFinished": "Classes finished",
+        "tutorRecaps": "Tutor recaps",
+        "needsAttention": "Needs attention",
+        "upNext": "Up next",
+        "nextLessonBody": "The joining link appears here when the class is ready.",
+        "viewSchedule": "View class details",
+        "noLesson": "No class scheduled",
+        "noLessonBody": "Enjoy the clear space, or open the schedule to plan ahead.",
+        "openSchedule": "Open schedule",
+        "recentLearning": "Recent learning",
+        "storyTitle": "{name}’s class story",
+        "allProgress": "See all progress",
+        "strength": "What clicked",
+        "nextFocus": "Up next",
+        "practice": "Practice",
+        "noRecapsTitle": "The first class recap will appear here",
+        "noRecapsBody": "After a tutor completes a class and publishes feedback, you will see the topic, strengths, and next focus."
+      },
+      "tutor": {
+        "eyebrow": "Teaching desk",
+        "title": "Finish the class. Make the learning visible.",
+        "intro": "See what is next, then close each completed class with a clear recap for the family.",
+        "quickTitle": "Your teaching tools",
+        "quickIntro": "Calendar, student work, messages, and earnings stay one tap away.",
+        "todayLabel": "Tutor day overview",
+        "nextClass": "Next class",
+        "nextClassBody": "Open the class for joining details and preparation.",
+        "openLesson": "Open class",
+        "noUpcoming": "No upcoming class",
+        "noUpcomingBody": "Your calendar is clear for now.",
+        "viewCalendar": "View calendar",
+        "todayClasses": "Classes today",
+        "todayClassesHint": "On your teaching calendar",
+        "recapsDue": "Recaps due",
+        "recapsDueHint": "Families are waiting",
+        "weekClasses": "Next 7 days",
+        "weekClassesHint": "Scheduled classes",
+        "expected": "Expected",
+        "expectedHint": "Current earnings period",
+        "closeLoop": "Close the loop",
+        "queueTitle": "Completed classes need a recap",
+        "queueIntro": "A concise, specific note helps parents understand progress and gives the next class a useful starting point.",
+        "feedbackNeeded": "Feedback needed",
+        "queueClearTitle": "Every class is wrapped up",
+        "queueClearBody": "There are no completed classes waiting for feedback.",
+        "form": {
+          "title": "Share {name}’s class recap",
+          "intro": "Keep it specific and based on what you observed today.",
+          "outcome": "How did the class go?",
+          "outcomes": {
+            "great": "Goal met",
+            "good": "Good progress",
+            "support": "Needs support"
+          },
+          "topic": "Main topic",
+          "topicPlaceholder": "e.g. Fractions",
+          "subtopic": "Subtopic",
+          "subtopicPlaceholder": "e.g. Unlike denominators",
+          "engagement": "Engagement note",
+          "engagementPlaceholder": "What you observed during the class",
+          "strength": "What clicked",
+          "strengthPlaceholder": "A specific strength demonstrated today",
+          "improve": "Still developing",
+          "improvePlaceholder": "One skill to keep practicing",
+          "nextFocus": "Next class focus",
+          "nextFocusPlaceholder": "What you will work on next",
+          "homework": "Practice or homework",
+          "homeworkPlaceholder": "Optional practice before the next class",
+          "comment": "Note for the family",
+          "commentPlaceholder": "A warm, concise summary of today’s class",
+          "noneAssigned": "No additional practice assigned.",
+          "noParentAction": "No parent action needed.",
+          "progressReviewed": "Progress reviewed during this class.",
+          "visibility": "This recap will be visible to the student and linked parent.",
+          "saving": "Publishing recap…",
+          "saved": "Recap published.",
+          "error": "The recap could not be published. Check the fields and try again.",
+          "savingButton": "Publishing…",
+          "publish": "Publish recap"
+        }
+      }
+    },
     "panels": {
       "parent": {
         "schedule": {
@@ -151,6 +265,10 @@
         "family": {
           "title": "Student switcher",
           "body": "Choose the student whose learning records you want to review."
+        },
+        "message": {
+          "title": "Tutor messages",
+          "body": "Open the monitored learning conversation to read and reply to your child’s tutor."
         },
         "assignments": {
           "title": "Assignments",

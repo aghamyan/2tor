@@ -26,7 +26,17 @@ export default defineJob({
     const databaseUrl = process.env.DATABASE_URL;
     const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
     if (!databaseUrl) throw new Error("DATABASE_URL is required for payment reconciliation.");
-    if (!stripeSecretKey) throw new Error("STRIPE_SECRET_KEY is required for payment capture.");
+    if (!stripeSecretKey) {
+      if (process.env.NODE_ENV !== "production") {
+        context.log.warn(
+          { environment: process.env.NODE_ENV ?? "development" },
+          "payment capture skipped because STRIPE_SECRET_KEY is not configured",
+        );
+        return;
+      }
+
+      throw new Error("STRIPE_SECRET_KEY is required for payment capture.");
+    }
     const result = await reconcileAuthorizedPayments(
       createDrizzlePaymentDatabase(createDb(databaseUrl)),
       createStripePaymentGateway(stripeSecretKey),

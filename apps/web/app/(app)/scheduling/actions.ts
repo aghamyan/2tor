@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
+import { redirect, unstable_rethrow } from "next/navigation";
 import { z } from "zod";
 
 import { SchedulingError } from "../../../../../packages/domain/scheduling/errors";
@@ -94,6 +94,9 @@ export async function createOneTimeLessonAction(
     revalidatePath("/scheduling");
     redirect(`/scheduling/${lesson.id}`);
   } catch (error: unknown) {
+    // Must run before errorState(): redirect() throws a NEXT_REDIRECT signal that this catch
+    // would otherwise swallow, turning a successful create/reschedule into a false error.
+    unstable_rethrow(error);
     return errorState(error);
   }
 }
@@ -125,6 +128,9 @@ export async function createLessonSeriesAction(
     revalidatePath("/scheduling");
     redirect(`/scheduling?series=${series.id}`);
   } catch (error: unknown) {
+    // Must run before errorState(): redirect() throws a NEXT_REDIRECT signal that this catch
+    // would otherwise swallow, turning a successful create/reschedule into a false error.
+    unstable_rethrow(error);
     return errorState(error);
   }
 }
@@ -145,6 +151,9 @@ export async function cancelLessonAction(
     revalidatePath(`/scheduling/${lessonId}`);
     return { status: "success", message: "canceled", fieldErrors: {} };
   } catch (error: unknown) {
+    // Must run before errorState(): redirect() throws a NEXT_REDIRECT signal that this catch
+    // would otherwise swallow, turning a successful create/reschedule into a false error.
+    unstable_rethrow(error);
     return errorState(error);
   }
 }
@@ -166,6 +175,9 @@ export async function rescheduleLessonAction(
     revalidatePath(`/scheduling/${lessonId}`);
     redirect(`/scheduling/${next.id}`);
   } catch (error: unknown) {
+    // Must run before errorState(): redirect() throws a NEXT_REDIRECT signal that this catch
+    // would otherwise swallow, turning a successful create/reschedule into a false error.
+    unstable_rethrow(error);
     return errorState(error);
   }
 }
@@ -184,6 +196,9 @@ export async function recordNoShowAction(
     revalidatePath(`/scheduling/${lessonId}`);
     return { status: "success", message: "noShowRecorded", fieldErrors: {} };
   } catch (error: unknown) {
+    // Must run before errorState(): redirect() throws a NEXT_REDIRECT signal that this catch
+    // would otherwise swallow, turning a successful create/reschedule into a false error.
+    unstable_rethrow(error);
     return errorState(error);
   }
 }
@@ -203,6 +218,9 @@ export async function recordAttendanceAction(
     revalidatePath(`/scheduling/${lessonId}`);
     return { status: "success", message: "attendanceRecorded", fieldErrors: {} };
   } catch (error: unknown) {
+    // Must run before errorState(): redirect() throws a NEXT_REDIRECT signal that this catch
+    // would otherwise swallow, turning a successful create/reschedule into a false error.
+    unstable_rethrow(error);
     return errorState(error);
   }
 }
@@ -218,6 +236,9 @@ export async function completeLessonAction(
     revalidatePath(`/scheduling/${lessonId}`);
     return { status: "success", message: "completed", fieldErrors: {} };
   } catch (error: unknown) {
+    // Must run before errorState(): redirect() throws a NEXT_REDIRECT signal that this catch
+    // would otherwise swallow, turning a successful create/reschedule into a false error.
+    unstable_rethrow(error);
     return errorState(error);
   }
 }
@@ -238,6 +259,9 @@ export async function setZoomMeetingAction(
     revalidatePath(`/scheduling/${lessonId}`);
     return { status: "success", message: "zoomSaved", fieldErrors: {} };
   } catch (error: unknown) {
+    // Must run before errorState(): redirect() throws a NEXT_REDIRECT signal that this catch
+    // would otherwise swallow, turning a successful create/reschedule into a false error.
+    unstable_rethrow(error);
     return errorState(error);
   }
 }

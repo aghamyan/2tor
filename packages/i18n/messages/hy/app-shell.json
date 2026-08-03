@@ -1,0 +1,109 @@
+{
+  "appShell": {
+    "skipToContent": "Անցնել բովանդակությանը",
+    "nav": {
+      "ariaLabel": "Հիմնական",
+      "home": "Գլխավոր",
+      "empty": "Ձեր հաշվի համար դեռ մոդուլներ հասանելի չեն։",
+      "groups": {
+        "learning": "Ուսուցում",
+        "schedule": "Ժամանակացույց",
+        "coursework": "Առաջադրանքներ",
+        "progress": "Առաջընթաց",
+        "resources": "Պաշարներ",
+        "communication": "Հաղորդակցություն",
+        "family": "Ընտանիք և գաղտնիություն",
+        "billing": "Վճարումներ",
+        "profile": "Պրոֆիլ",
+        "admin": "Կառավարում",
+        "support": "Աջակցություն",
+        "more": "Այլ"
+      }
+    },
+    "sidebar": {
+      "brandCaption": "Ուսումնական հարթակ",
+      "studentLevel": "Ակտիվ սովորող",
+      "collapse": "Ծալել կողային վահանակը",
+      "expand": "Ընդարձակել կողային վահանակը"
+    },
+    "studentNav": {
+      "groups": {
+        "learning": "Ուսուցում",
+        "progress": "Առաջընթաց",
+        "resources": "Պաշարներ",
+        "communication": "Հաղորդակցություն",
+        "help": "Օգնություն"
+      },
+      "items": {
+        "scheduling_overview": "Դասեր",
+        "assignments_overview": "Տնային աշխատանք",
+        "assessments_overview": "Գնահատումներ",
+        "projects_overview": "Նախագծեր",
+        "academics_overview": "Ուսուցման ուղի",
+        "gamification_overview": "Առաջընթացի հաշվետվություն",
+        "content_overview": "Պաշարների գրադարան",
+        "discussions_overview": "Հարցեր",
+        "communication_inbox": "Հաղորդագրություններ",
+        "support_queue": "Աջակցություն"
+      }
+    },
+    "tutorNav": {
+      "groups": {
+        "teaching": "Դասավանդում",
+        "progress": "Առաջընթաց",
+        "resources": "Ուսումնական գործիքներ",
+        "communication": "Հաղորդակցություն",
+        "workspace": "Դասավանդողի կառավարում",
+        "finance": "Ֆինանսներ",
+        "help": "Օգնություն"
+      },
+      "items": {
+        "scheduling_overview": "Դասեր",
+        "tutors_students": "Սովորողներ",
+        "assignments_overview": "Տնային աշխատանք",
+        "assessments_overview": "Գնահատումներ",
+        "projects_overview": "Նախագծեր",
+        "academics_overview": "Սովորողների առաջընթաց",
+        "gamification_overview": "Նվաճումներ",
+        "content_overview": "Ռեսուրսներ",
+        "discussions_overview": "Հարցեր",
+        "communication_inbox": "Հաղորդագրություններ",
+        "tutors_profile": "Դասավանդողի պրոֆիլ",
+        "payouts_overview": "Եկամուտներ",
+        "support_queue": "Աջակցություն"
+      }
+    },
+    "mobileNav": {
+      "open": "Բացել ցանկը",
+      "close": "Փակել ցանկը",
+      "title": "Նավարկություն"
+    },
+    "topbar": {
+      "breadcrumbs": {
+        "ariaLabel": "Էջի ուղին"
+      },
+      "search": {
+        "label": "Փնտրել",
+        "placeholder": "Փնտրել դասեր, տնային աշխատանք, պաշարներ…"
+      },
+      "messages": "Բացել հաղորդագրությունները",
+      "notifications": {
+        "unread": "{count} չկարդացած ծանուցում",
+        "empty": "Նոր ծանուցումներ չկան"
+      }
+    },
+    "userMenu": {
+      "label": "Հաշվի ցանկ",
+      "settings": "Հաշիվ և աշխատաշրջաններ",
+      "logOut": "Դուրս գալ",
+      "roles": {
+        "parent": "Ծնող",
+        "student": "Աշակերտ",
+        "tutor": "Դասավանդող",
+        "finance": "Ֆինանսներ",
+        "administrator": "Ադմինիստրատոր",
+        "super_administrator": "Սուպեր-ադմինիստրատոր"
+      }
+    }
+  }
+}

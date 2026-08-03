@@ -17,6 +17,10 @@ describe("dashboard composition catalog", () => {
     );
   });
 
+  it("gives parents a route to unread tutor messages", () => {
+    expect(panelsForDashboard("parent").map((panel) => panel.module)).toContain("communication");
+  });
+
   it("uses a simple younger composition and a detailed older composition", () => {
     const younger = panelsForDashboard("student-younger");
     const older = panelsForDashboard("student-older");

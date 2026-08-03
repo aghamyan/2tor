@@ -1,34 +1,19 @@
-import { Noto_Sans_Armenian, Noto_Serif_Armenian } from "next/font/google";
-import { useTranslations } from "next-intl";
+import { Noto_Sans_Armenian, Plus_Jakarta_Sans } from "next/font/google";
 import type { Locale } from "@app/i18n/config";
+import { localHref } from "./content";
 import {
-  FOR_PARENTS_POINT_KEYS,
-  HOW_IT_WORKS_STEP_KEYS,
-  PROJECT_KEYS,
-  SUBJECT_HREFS,
-  SUBJECT_KEYS,
-  TESTIMONIAL_KEYS,
-  WHY_US_POINT_KEYS,
-  localHref,
-  type SafeHomeTestimonial,
-} from "./content";
+  LearningBenefits,
+  SubjectExplorer,
+  type BenefitsCopy,
+  type ClassroomCopy,
+  type SubjectCopy,
+} from "./compact-home";
 import { Hero } from "./hero";
-import { TrustBar } from "./trust-bar";
-import { HowItWorks } from "./how-it-works";
-import { Subjects, type SubjectCard } from "./subjects";
-import { WhyChooseUs } from "./why-choose-us";
-import { ProjectBasedLearning } from "./project-based-learning";
-import { ForParents, type ForParentsPoint } from "./for-parents";
-import { Tutors } from "./tutors";
-import { Testimonials } from "./testimonials";
-import { SafetyStrip } from "./safety-strip";
-import { FinalCta } from "./final-cta";
-import { ScrollReveal, ScrollRevealNoScriptFallback } from "./scroll-reveal";
-import styles from "./home.module.css";
+import styles from "./compact-home.module.css";
 
-const displayFont = Noto_Serif_Armenian({
-  subsets: ["armenian", "latin"],
-  weight: "variable",
+const displayFont = Plus_Jakarta_Sans({
+  subsets: ["latin"],
+  weight: ["500", "600", "700", "800"],
   display: "swap",
   variable: "--home-font-display",
 });
@@ -40,147 +25,237 @@ const bodyFont = Noto_Sans_Armenian({
   variable: "--home-font-body",
 });
 
+interface HomeCopy {
+  hero: {
+    eyebrow: string;
+    titleLead: string;
+    titleAccent: string;
+    description: string;
+    primary: string;
+    secondary: string;
+    trust: readonly string[];
+    socialProof: string;
+  };
+  classroom: ClassroomCopy;
+  subjects: Omit<SubjectCopy, "items"> & {
+    items: readonly Omit<SubjectCopy["items"][number], "href">[];
+  };
+  benefits: BenefitsCopy;
+}
+
+const copy: Record<Locale, HomeCopy> = {
+  en: {
+    hero: {
+      eyebrow: "Personal online learning",
+      titleLead: "Big goals start with",
+      titleAccent: "one good lesson.",
+      description:
+        "Live, personalized classes with tutors who notice where your child gets stuck, adapt in real time, and keep parents informed after every lesson.",
+      primary: "Find my tutor",
+      secondary: "Take a free assessment",
+      trust: [
+        "Verified expert tutors",
+        "Parent-visible progress",
+        "US-aligned curriculum",
+        "Safe by design",
+      ],
+      socialProof: "Trusted by families learning across the US",
+    },
+    classroom: {
+      ariaLabel:
+        "Interactive 2tor classroom preview showing a live algebra lesson and parent progress tools",
+      live: "Live lesson",
+      lesson: "Algebra: Visual equations",
+      tutor: "Anna · Today at 4:00 PM",
+      topic: "Visual equations",
+      prompt: "Balance both sides",
+      feedback: "Tutor feedback",
+      feedbackBody: "Maya explained why the equation stays balanced.",
+      parentReady: "Parent summary ready",
+      wins: "3 learning wins this week",
+      confidence: "Confidence improved by 18%",
+      streak: "4 week streak",
+      homework: "Mini project",
+      homeworkStatus: "Equation explorer · Complete",
+    },
+    subjects: {
+      eyebrow: "Find the right starting point",
+      title: "Explore a subject",
+      hint: "Swipe to explore",
+      items: [
+        {
+          key: "math",
+          name: "Mathematics",
+          description: "Build confidence through visual problem solving",
+        },
+        {
+          key: "code",
+          name: "Programming",
+          description: "Learn by creating real projects",
+        },
+        {
+          key: "armenian",
+          name: "Armenian",
+          description: "Language, culture, and heritage",
+        },
+        {
+          key: "sat",
+          name: "SAT Prep",
+          description: "Focused preparation with measurable progress",
+        },
+        {
+          key: "toefl",
+          name: "TOEFL",
+          description: "Structured practice for academic English",
+        },
+      ],
+    },
+    benefits: {
+      eyebrow: "The complete learning loop",
+      title: "Everything around the lesson matters.",
+      description:
+        "A good class creates momentum. 2tor carries that momentum from the live explanation to the parent update and the next practice session.",
+      items: [
+        {
+          key: "adaptive",
+          signal: "During class",
+          title: "Adaptive live teaching",
+          body: "Tutors adjust explanations as soon as a student gets stuck.",
+        },
+        {
+          key: "parents",
+          signal: "After every lesson",
+          title: "Parent-visible progress",
+          body: "Parents receive clear feedback and can track results after every class.",
+        },
+        {
+          key: "practice",
+          signal: "Between classes",
+          title: "Practice that continues after class",
+          body: "Homework, projects, and weekly problem-solving sessions reinforce learning.",
+        },
+      ],
+    },
+  },
+  hy: {
+    hero: {
+      eyebrow: "Անհատական առցանց ուսուցում",
+      titleLead: "Մեծ նպատակները սկսվում են",
+      titleAccent: "մեկ լավ դասից։",
+      description:
+        "Անհատական ուղիղ դասեր ուսուցիչների հետ, որոնք նկատում են դժվարությունը, անմիջապես փոխում բացատրությունը և յուրաքանչյուր դասից հետո տեղեկացնում ծնողներին։",
+      primary: "Գտնել իմ ուսուցչին",
+      secondary: "Անցնել անվճար գնահատում",
+      trust: [
+        "Ստուգված մասնագետներ",
+        "Ծնողին տեսանելի առաջընթաց",
+        "ԱՄՆ ծրագրին համապատասխան",
+        "Անվտանգ միջավայր",
+      ],
+      socialProof: "ԱՄՆ-ում սովորող ընտանիքների վստահելի ընտրությունը",
+    },
+    classroom: {
+      ariaLabel:
+        "2tor-ի ինտերակտիվ դասասենյակի օրինակ՝ հանրահաշվի ուղիղ դասով և առաջընթացի գործիքներով",
+      live: "Ուղիղ դաս",
+      lesson: "Հանրահաշիվ․ տեսողական հավասարումներ",
+      tutor: "Աննա · Այսօր՝ 16։00",
+      topic: "Տեսողական հավասարումներ",
+      prompt: "Հավասարակշռիր երկու կողմերը",
+      feedback: "Ուսուցչի արձագանք",
+      feedbackBody: "Մայան բացատրեց, թե ինչու է հավասարումը մնում հավասարակշռված։",
+      parentReady: "Ծնողի ամփոփումը պատրաստ է",
+      wins: "3 ուսումնական հաջողություն այս շաբաթ",
+      confidence: "Վստահությունն աճել է 18%-ով",
+      streak: "4 շաբաթ անընդմեջ",
+      homework: "Փոքր նախագիծ",
+      homeworkStatus: "Հավասարումների հետազոտող · Ավարտված",
+    },
+    subjects: {
+      eyebrow: "Գտեք ճիշտ մեկնարկը",
+      title: "Ընտրեք առարկան",
+      hint: "Սահեցրեք՝ տեսնելու համար",
+      items: [
+        {
+          key: "math",
+          name: "Մաթեմատիկա",
+          description: "Վստահություն՝ տեսողական խնդիրների միջոցով",
+        },
+        { key: "code", name: "Ծրագրավորում", description: "Սովորել՝ ստեղծելով իրական նախագծեր" },
+        { key: "armenian", name: "Հայոց լեզու", description: "Լեզու, մշակույթ և ժառանգություն" },
+        { key: "sat", name: "SAT պատրաստում", description: "Նպատակային և չափելի պատրաստություն" },
+        {
+          key: "toefl",
+          name: "TOEFL",
+          description: "Կառուցված վարժանք ակադեմիական անգլերենի համար",
+        },
+      ],
+    },
+    benefits: {
+      eyebrow: "Ուսուցման ամբողջական շղթա",
+      title: "Դասի շուրջ ամեն ինչ կարևոր է։",
+      description:
+        "Լավ դասը շարժում է ստեղծում։ 2tor-ը պահպանում է այն բացատրությունից մինչև ծնողի ամփոփում և հաջորդ վարժանք։",
+      items: [
+        {
+          key: "adaptive",
+          signal: "Դասի ընթացքում",
+          title: "Հարմարվող ուղիղ ուսուցում",
+          body: "Ուսուցիչները փոխում են բացատրությունը հենց որ սովորողը դժվարանում է։",
+        },
+        {
+          key: "parents",
+          signal: "Յուրաքանչյուր դասից հետո",
+          title: "Ծնողին տեսանելի առաջընթաց",
+          body: "Ծնողները ստանում են հստակ արձագանք և հետևում արդյունքներին։",
+        },
+        {
+          key: "practice",
+          signal: "Դասերի միջև",
+          title: "Շարունակվող վարժանք",
+          body: "Տնային աշխատանքը, նախագծերը և շաբաթական հանդիպումները ամրապնդում են գիտելիքը։",
+        },
+      ],
+    },
+  },
+};
+
+const subjectPaths: Record<HomeCopy["subjects"]["items"][number]["key"], string> = {
+  math: "/mathematics",
+  code: "/programming",
+  armenian: "/armenian-language-heritage",
+  sat: "/sat",
+  toefl: "/toefl",
+};
+
 export function HomePageContent({ locale }: { locale: Locale }) {
-  const t = useTranslations("marketing");
-  const href = (path: string) => localHref(locale, path);
-  const primaryCta = { label: t("cta.consultation"), href: href("/consultation") };
-  const secondaryCta = { label: t("cta.assessment"), href: href("/free-assessment") };
-
-  const steps = HOW_IT_WORKS_STEP_KEYS.map((key) => ({
-    title: t(`home.howItWorks.steps.${key}.title`),
-    body: t(`home.howItWorks.steps.${key}.body`),
-  }));
-
-  const subjects: SubjectCard[] = SUBJECT_KEYS.map((key) => ({
-    key,
-    title: t(`home.subjects.items.${key}.title`),
-    body: t(`home.subjects.items.${key}.body`),
-    cta: { label: t(`home.subjects.items.${key}.cta`), href: href(SUBJECT_HREFS[key]) },
-  }));
-
-  const whyUsPoints = WHY_US_POINT_KEYS.map((key) => ({
-    title: t(`home.whyUs.points.${key}.title`),
-    body: t(`home.whyUs.points.${key}.body`),
-  }));
-
-  const projects = PROJECT_KEYS.map((key) => ({
-    label: t(`home.projects.items.${key}.label`),
-    title: t(`home.projects.items.${key}.title`),
-    body: t(`home.projects.items.${key}.body`),
-    deliverables: t.raw(`home.projects.items.${key}.deliverables`) as string[],
-  }));
-
-  const forParentsPoints: ForParentsPoint[] = FOR_PARENTS_POINT_KEYS.map((key) => ({
-    key,
-    title: t(`home.forParents.points.${key}.title`),
-    body: t(`home.forParents.points.${key}.body`),
-  }));
-
-  const testimonials: SafeHomeTestimonial[] = TESTIMONIAL_KEYS.map((key) => ({
-    quote: t(`home.testimonials.items.${key}.quote`),
-    attribution: t(`home.testimonials.items.${key}.attribution`),
-    relationshipVerified: true,
-    parentalConsent: true,
-    studentIdentifiable: false,
-  }));
+  const content = copy[locale];
+  const subjects: SubjectCopy = {
+    ...content.subjects,
+    items: content.subjects.items.map((item) => ({
+      ...item,
+      href: localHref(locale, subjectPaths[item.key]),
+    })),
+  };
 
   return (
     <div className={`${styles.page} ${displayFont.variable} ${bodyFont.variable}`}>
-      <ScrollRevealNoScriptFallback />
       <Hero
-        eyebrow={t("home.hero.eyebrow")}
-        title={t("home.hero.title")}
-        description={t("home.hero.description")}
-        primaryCta={primaryCta}
-        secondaryCta={secondaryCta}
-        trustLabel={t("home.hero.trust.label")}
-        trustVerified={t("home.hero.trust.verified")}
-        trustVisible={t("home.hero.trust.visible")}
-        trustSafe={t("home.hero.trust.safe")}
-        visualLabel={t("home.hero.visual.label")}
-        visualHeadline={t("home.hero.visual.headline")}
-        visualNote={t("home.hero.visual.note")}
+        eyebrow={content.hero.eyebrow}
+        titleLead={content.hero.titleLead}
+        titleAccent={content.hero.titleAccent}
+        description={content.hero.description}
+        primaryCta={{ label: content.hero.primary, href: localHref(locale, "/consultation") }}
+        secondaryCta={{
+          label: content.hero.secondary,
+          href: localHref(locale, "/free-assessment"),
+        }}
+        trust={content.hero.trust}
+        socialProof={content.hero.socialProof}
+        classroom={content.classroom}
       />
-      <TrustBar
-        label={t("home.trustBar.label")}
-        verified={t("home.trustBar.items.verified")}
-        parentsSee={t("home.trustBar.items.parentsSee")}
-        noPrivateMessaging={t("home.trustBar.items.noPrivateMessaging")}
-        feedback={t("home.trustBar.items.feedback")}
-      />
-      <ScrollReveal>
-        <HowItWorks
-          eyebrow={t("home.howItWorks.eyebrow")}
-          title={t("home.howItWorks.title")}
-          description={t("home.howItWorks.description")}
-          steps={steps}
-        />
-      </ScrollReveal>
-      <ScrollReveal>
-        <Subjects
-          eyebrow={t("home.subjects.eyebrow")}
-          title={t("home.subjects.title")}
-          description={t("home.subjects.description")}
-          subjects={subjects}
-        />
-      </ScrollReveal>
-      <ScrollReveal>
-        <WhyChooseUs
-          eyebrow={t("home.whyUs.eyebrow")}
-          title={t("home.whyUs.title")}
-          description={t("home.whyUs.description")}
-          points={whyUsPoints}
-        />
-      </ScrollReveal>
-      <ScrollReveal>
-        <ProjectBasedLearning
-          eyebrow={t("home.projects.eyebrow")}
-          title={t("home.projects.title")}
-          description={t("home.projects.description")}
-          projects={projects}
-        />
-      </ScrollReveal>
-      <ScrollReveal>
-        <ForParents
-          eyebrow={t("home.forParents.eyebrow")}
-          title={t("home.forParents.title")}
-          description={t("home.forParents.description")}
-          points={forParentsPoints}
-          cta={primaryCta}
-          previewLabel={t("home.forParents.preview.label")}
-          previewHeadline={t("home.forParents.preview.headline")}
-          previewCaption={t("home.forParents.preview.caption")}
-        />
-      </ScrollReveal>
-      <ScrollReveal>
-        <Tutors
-          eyebrow={t("home.tutors.eyebrow")}
-          title={t("home.tutors.title")}
-          description={t("home.tutors.description")}
-          cta={{ label: t("home.tutors.cta"), href: href("/tutor-application") }}
-        />
-      </ScrollReveal>
-      <ScrollReveal>
-        <Testimonials
-          eyebrow={t("home.testimonials.eyebrow")}
-          title={t("home.testimonials.title")}
-          disclosure={t("home.testimonials.disclosure")}
-          testimonials={testimonials}
-        />
-      </ScrollReveal>
-      <SafetyStrip
-        statement={t("home.safety.statement")}
-        safetyLink={{ label: t("pages.safety.title"), href: href("/safety") }}
-        privacyLink={{ label: t("footer.privacy"), href: href("/privacy") }}
-      />
-      <ScrollReveal>
-        <FinalCta
-          title={t("home.finalCta.title")}
-          description={t("home.finalCta.description")}
-          primaryCta={primaryCta}
-          secondaryCta={secondaryCta}
-        />
-      </ScrollReveal>
+      <SubjectExplorer copy={subjects} />
+      <LearningBenefits copy={content.benefits} />
     </div>
   );
 }

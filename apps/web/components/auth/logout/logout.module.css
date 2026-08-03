@@ -1,0 +1,83 @@
+/*
+ * `@app/ui`'s `Dialog*` components style themselves with Tailwind utilities that only resolve
+ * once `packages/ui/src/theme/tokens.css` and its Tailwind preset are wired into a consuming
+ * app's build — `apps/web/app/globals.css` doesn't do that wiring (see
+ * `apps/web/components/assignments/assignments.module.css`'s identical file-level note, the same
+ * gap this module works around the same way). `--lo-*` copies `tokens.css`'s real HSL triplets
+ * (light + `.dark`) so this renders with the actual brand palette without editing any locked file.
+ */
+.root {
+  --lo-background: 0 0% 100%;
+  --lo-foreground: 222 47% 11%;
+  --lo-primary: 221 83% 35%;
+  --lo-primary-foreground: 210 40% 98%;
+  --lo-secondary: 213 33% 95%;
+  --lo-secondary-foreground: 222 47% 17%;
+  --lo-muted-foreground: 215 16% 35%;
+  --lo-destructive: 0 72% 39%;
+  --lo-destructive-foreground: 0 0% 100%;
+  --lo-border: 214 24% 83%;
+  --lo-ring: 221 83% 35%;
+}
+:global(.dark) .root {
+  --lo-background: 222 42% 11%;
+  --lo-foreground: 210 40% 98%;
+  --lo-primary: 213 94% 72%;
+  --lo-primary-foreground: 222 47% 11%;
+  --lo-secondary: 217 33% 17%;
+  --lo-secondary-foreground: 210 40% 98%;
+  --lo-muted-foreground: 215 20% 75%;
+  --lo-destructive: 0 82% 65%;
+  --lo-destructive-foreground: 222 47% 11%;
+  --lo-border: 217 25% 28%;
+  --lo-ring: 213 94% 72%;
+}
+
+.dialogContent {
+  background: hsl(var(--lo-background));
+  border: 1px solid hsl(var(--lo-border));
+  color: hsl(var(--lo-foreground));
+}
+.dialogContent :focus-visible {
+  border-radius: 4px;
+  outline: 2px solid hsl(var(--lo-ring));
+  outline-offset: 2px;
+}
+.dialogDescription {
+  color: hsl(var(--lo-muted-foreground));
+}
+
+.button {
+  background: hsl(var(--lo-secondary));
+  border: none;
+  border-radius: 0.55rem;
+  color: hsl(var(--lo-secondary-foreground));
+  cursor: pointer;
+  font: inherit;
+  font-weight: 600;
+  padding: 0.6rem 1.1rem;
+  transition: opacity 120ms ease-out;
+}
+.button:hover {
+  opacity: 0.88;
+}
+.button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+.buttonDanger {
+  background: hsl(var(--lo-destructive));
+  color: hsl(var(--lo-destructive-foreground));
+}
+@media (prefers-reduced-motion: reduce) {
+  .button {
+    transition: none;
+  }
+}
+
+.menuItem {
+  align-items: center;
+  display: flex;
+  gap: 0.5rem;
+  width: 100%;
+}

@@ -3,21 +3,25 @@ import {
   assignments,
   assignmentSubmissions,
   gradingRecords,
+  parentProfiles,
+  parentStudentLinks,
   rubricScores,
   rubrics,
   studentProfiles,
   submissionAnswers,
   submissionFiles,
+  subjects,
   tutorProfiles,
   tutorStudentAssignments,
   type Database,
   type Transaction,
 } from "@app/db";
-import { and, asc, eq, inArray, lt } from "drizzle-orm";
+import { and, asc, desc, eq, inArray, lt } from "drizzle-orm";
 import type {
   AssignmentDatabase,
   AssignmentQuestionRecord,
   AssignmentRecord,
+  AssignmentSummaryRecord,
   GradingRecord,
   SubmissionAnswerRecord,
   SubmissionRecord,
@@ -118,6 +122,57 @@ function repository(
         updatedAt: row.updatedAt,
       } satisfies AssignmentRecord;
     },
+    async listAssignments(filter): Promise<AssignmentSummaryRecord[]> {
+      const conditions = [
+        filter.studentProfileIds === null
+          ? undefined
+          : inArray(assignments.studentProfileId, filter.studentProfileIds),
+        filter.status ? eq(assignments.status, filter.status) : undefined,
+        filter.subjectId ? eq(assignments.subjectId, filter.subjectId) : undefined,
+        filter.cursor ? lt(assignments.id, filter.cursor) : undefined,
+      ].filter((condition) => condition !== undefined);
+      const rows = await executor
+        .select({
+          id: assignments.id,
+          title: assignments.title,
+          status: assignments.status,
+          dueAt: assignments.dueAt,
+          maxScore: assignments.maxScore,
+          studentProfileId: assignments.studentProfileId,
+          studentName: studentProfiles.preferredName,
+          subjectId: assignments.subjectId,
+          subjectName: subjects.name,
+          submissionStatus: assignmentSubmissions.status,
+          score: gradingRecords.score,
+          createdAt: assignments.createdAt,
+        })
+        .from(assignments)
+        .innerJoin(studentProfiles, eq(studentProfiles.id, assignments.studentProfileId))
+        .leftJoin(subjects, eq(subjects.id, assignments.subjectId))
+        .leftJoin(
+          assignmentSubmissions,
+          and(
+            eq(assignmentSubmissions.assignmentId, assignments.id),
+            eq(assignmentSubmissions.studentProfileId, assignments.studentProfileId),
+          ),
+        )
+        .leftJoin(gradingRecords, eq(gradingRecords.submissionId, assignmentSubmissions.id))
+        .where(conditions.length ? and(...conditions) : undefined)
+        .orderBy(desc(assignments.id))
+        .limit(filter.limit);
+      return rows.map((row) => ({
+        ...row,
+        maxScore: numeric(row.maxScore),
+        score: numeric(row.score),
+        submissionStatus: row.submissionStatus ?? null,
+      }));
+    },
+    async updateAssignmentStatus(assignmentId, status, updatedAt) {
+      await executor
+        .update(assignments)
+        .set({ status, updatedAt })
+        .where(eq(assignments.id, assignmentId));
+    },
     async saveSubmission(submission) {
       const [existing] = await executor
         .select({ id: assignmentSubmissions.id })
@@ -215,6 +270,23 @@ function repository(
           }
         : null;
     },
+    async listSubmissionFiles(submissionId) {
+      const rows = await executor
+        .select()
+        .from(submissionFiles)
+        .where(eq(submissionFiles.submissionId, submissionId))
+        .orderBy(asc(submissionFiles.uploadedAt));
+      return rows.map((row) => ({
+        id: row.id,
+        submissionId: row.submissionId,
+        fileKey: row.fileKey,
+        fileName: row.fileName,
+        mimeType: row.mimeType,
+        sizeBytes: row.sizeBytes,
+        virusScanStatus: row.virusScanStatus,
+        uploadedAt: row.uploadedAt,
+      }));
+    },
     async updateSubmissionFileScanStatus(fileId, status: VirusScanStatus) {
       await executor
         .update(submissionFiles)
@@ -241,6 +313,27 @@ function repository(
           },
         });
     },
+    async getGradingForSubmission(submissionId) {
+      const [row] = await executor
+        .select()
+        .from(gradingRecords)
+        .where(eq(gradingRecords.submissionId, submissionId))
+        .limit(1);
+      return row ? { ...row, score: numeric(row.score), maxScore: numeric(row.maxScore) } : null;
+    },
+    async listRubricScoresForSubmission(submissionId) {
+      const rows = await executor
+        .select()
+        .from(rubricScores)
+        .where(eq(rubricScores.submissionId, submissionId))
+        .orderBy(asc(rubricScores.scoredAt));
+      return rows.map((row) => ({
+        ...row,
+        submissionId: row.submissionId ?? submissionId,
+        scoreValue: Number(row.scoreValue),
+        maxValue: Number(row.maxValue),
+      }));
+    },
     async replaceRubricScores(submissionId, scores) {
       await executor.delete(rubricScores).where(eq(rubricScores.submissionId, submissionId));
       if (scores.length)
@@ -259,6 +352,13 @@ function repository(
       const [row] = await executor.select().from(rubrics).where(eq(rubrics.id, rubricId)).limit(1);
       return row ? { ...row, description: row.description, subjectId: row.subjectId } : null;
     },
+    async listAssignmentRubrics() {
+      return executor
+        .select()
+        .from(rubrics)
+        .where(eq(rubrics.scope, "assignment"))
+        .orderBy(asc(rubrics.title));
+    },
     async findStudentProfileIdByUserId(userId) {
       const [row] = await executor
         .select({ id: studentProfiles.id })
@@ -266,6 +366,14 @@ function repository(
         .where(eq(studentProfiles.userId, userId))
         .limit(1);
       return row?.id ?? null;
+    },
+    async getStudentDisplayName(studentProfileId) {
+      const [row] = await executor
+        .select({ preferredName: studentProfiles.preferredName })
+        .from(studentProfiles)
+        .where(eq(studentProfiles.id, studentProfileId))
+        .limit(1);
+      return row?.preferredName ?? null;
     },
     async isTutorAssignedToStudent(tutorUserId, studentProfileId) {
       const [row] = await executor
@@ -281,6 +389,65 @@ function repository(
         )
         .limit(1);
       return Boolean(row);
+    },
+    async getTutorAssignmentFact(tutorUserId, studentProfileId) {
+      const [row] = await executor
+        .select({ status: tutorStudentAssignments.status, endAt: tutorStudentAssignments.endAt })
+        .from(tutorStudentAssignments)
+        .innerJoin(tutorProfiles, eq(tutorProfiles.id, tutorStudentAssignments.tutorProfileId))
+        .where(
+          and(
+            eq(tutorProfiles.userId, tutorUserId),
+            eq(tutorStudentAssignments.studentProfileId, studentProfileId),
+          ),
+        )
+        .orderBy(desc(tutorStudentAssignments.startAt))
+        .limit(1);
+      return row ?? null;
+    },
+    async isParentLinkedToStudent(parentUserId, studentProfileId) {
+      const [row] = await executor
+        .select({ id: parentStudentLinks.id })
+        .from(parentStudentLinks)
+        .innerJoin(parentProfiles, eq(parentProfiles.id, parentStudentLinks.parentProfileId))
+        .where(
+          and(
+            eq(parentProfiles.userId, parentUserId),
+            eq(parentStudentLinks.studentProfileId, studentProfileId),
+          ),
+        )
+        .limit(1);
+      return Boolean(row);
+    },
+    async listActiveStudentsForTutor(tutorUserId) {
+      const rows = await executor
+        .select({
+          studentProfileId: tutorStudentAssignments.studentProfileId,
+          studentName: studentProfiles.preferredName,
+        })
+        .from(tutorStudentAssignments)
+        .innerJoin(tutorProfiles, eq(tutorProfiles.id, tutorStudentAssignments.tutorProfileId))
+        .innerJoin(
+          studentProfiles,
+          eq(studentProfiles.id, tutorStudentAssignments.studentProfileId),
+        )
+        .where(
+          and(eq(tutorProfiles.userId, tutorUserId), eq(tutorStudentAssignments.status, "active")),
+        )
+        .orderBy(asc(studentProfiles.preferredName));
+      const byStudentId = new Map(rows.map((row) => [row.studentProfileId, row.studentName]));
+      return [...byStudentId.entries()].map(([studentProfileId, studentName]) => ({
+        studentProfileId,
+        studentName,
+      }));
+    },
+    async listLinkedStudentProfileIdsForParent(parentUserId) {
+      const rows = await executor
+        .select({ studentProfileId: parentStudentLinks.studentProfileId })
+        .from(parentStudentLinks)
+        .innerJoin(parentProfiles, eq(parentProfiles.id, parentStudentLinks.parentProfileId))
+        .where(eq(parentProfiles.userId, parentUserId));
+      return rows.map((row) => row.studentProfileId);
     },
     async listStaleAssignmentReminders(before, limit) {
       const overdue = await executor

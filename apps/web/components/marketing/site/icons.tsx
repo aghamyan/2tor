@@ -43,6 +43,14 @@ export function CloseIcon(props: SVGProps<SVGSVGElement>) {
   );
 }
 
+export function ArrowUpRightIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg {...baseProps(props)}>
+      <path d="M7 17 17 7M7 7h10v10" />
+    </svg>
+  );
+}
+
 export function UserIcon(props: SVGProps<SVGSVGElement>) {
   return (
     <svg {...baseProps(props)}>

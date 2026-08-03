@@ -5,6 +5,7 @@ import {
   isPublishableTestimonial,
   localHref,
   SUBJECT_HREFS,
+  SUBJECT_IMAGE_SOURCES,
   SUBJECT_KEYS,
   TRUST_BAR_ITEM_KEYS,
   WHY_US_POINT_KEYS,
@@ -27,11 +28,23 @@ describe("homepage structural content", () => {
   });
 
   it("links every subject to an already-public marketing route", () => {
-    // Mirrors apps/web/proxy.ts's PUBLIC_PATHS allowlist — these three must stay in sync with it.
-    const publicPaths = new Set(["/mathematics", "/programming", "/armenian-language-heritage"]);
-    expect(SUBJECT_KEYS).toHaveLength(3);
+    // Mirrors apps/web/proxy.ts's PUBLIC_PATHS allowlist — these must stay in sync with it.
+    const publicPaths = new Set([
+      "/mathematics",
+      "/programming",
+      "/armenian-language-heritage",
+      "/sat",
+      "/toefl",
+    ]);
+    expect(SUBJECT_KEYS).toHaveLength(5);
     for (const key of SUBJECT_KEYS) {
       expect(publicPaths.has(SUBJECT_HREFS[key])).toBe(true);
+    }
+  });
+
+  it("gives every subject a local course photograph", () => {
+    for (const key of SUBJECT_KEYS) {
+      expect(SUBJECT_IMAGE_SOURCES[key]).toMatch(/^\/marketing\/courses\/.+\.jpg$/);
     }
   });
 

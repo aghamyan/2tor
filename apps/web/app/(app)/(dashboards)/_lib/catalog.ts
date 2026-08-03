@@ -69,6 +69,14 @@ export const DASHBOARD_PANELS: Readonly<Record<DashboardKind, readonly Dashboard
       bodyKey: "panels.parent.family.body",
     }),
     panel({
+      id: "parent.message",
+      module: "communication",
+      href: "/communication",
+      roles: parentRoles,
+      titleKey: "panels.parent.message.title",
+      bodyKey: "panels.parent.message.body",
+    }),
+    panel({
       id: "parent.assignments",
       module: "assignments",
       href: "/assignments",

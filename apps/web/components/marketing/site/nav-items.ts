@@ -36,7 +36,6 @@ export const primaryNav: PrimaryNavEntry[] = [
     labelKey: "site.nav.subjects.label",
     items: [
       { id: "mathematics", labelKey: "site.nav.subjects.mathematics", href: "/mathematics" },
-      { id: "programming", labelKey: "site.nav.subjects.programming", href: "/programming" },
       {
         id: "heritage",
         labelKey: "site.nav.subjects.heritage",
@@ -47,8 +46,6 @@ export const primaryNav: PrimaryNavEntry[] = [
   { type: "link", id: "group-lessons", labelKey: "site.nav.groupLessons", href: "/group-lessons" },
   { type: "link", id: "for-parents", labelKey: "site.nav.forParents", href: "/parents" },
   { type: "link", id: "tutors", labelKey: "site.nav.tutors", href: "/tutors" },
-  { type: "link", id: "pricing", labelKey: "site.nav.pricing", href: "/pricing" },
-  { type: "link", id: "safety", labelKey: "site.nav.safety", href: "/safety" },
 ];
 
 export interface FooterGroup {
@@ -63,7 +60,6 @@ export const footerGroups: FooterGroup[] = [
     headingKey: "site.footer.subjectsHeading",
     links: [
       { id: "mathematics", labelKey: "site.footer.mathematics", href: "/mathematics" },
-      { id: "programming", labelKey: "site.footer.programming", href: "/programming" },
       {
         id: "heritage",
         labelKey: "site.footer.heritage",

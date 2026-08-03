@@ -9,6 +9,8 @@ describe("marketing SEO", () => {
         "mathematics",
         "programming",
         "armenian-language-heritage",
+        "sat",
+        "toefl",
         "group-lessons",
         "project-based-learning",
         "parents",

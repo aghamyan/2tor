@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
+import Link from "next/link";
 import { useTranslations } from "next-intl";
 
 import type { LessonDetail } from "../../../../packages/domain/scheduling/models";
@@ -270,10 +271,12 @@ function AttendanceSection({
   lessonId,
   studentProfileIds,
   attendance,
+  canManage,
 }: {
   lessonId: string;
   studentProfileIds: string[];
   attendance: LessonDetail["attendance"];
+  canManage: boolean;
 }) {
   const t = useTranslations("scheduling.detail");
   const [state, action, pending] = useActionState(
@@ -297,49 +300,53 @@ function AttendanceSection({
       ) : (
         <p className={styles.hint}>{t("attendanceEmpty")}</p>
       )}
-      <ActionFeedback state={state} />
-      <form action={action} className={styles.form}>
-        <input type="hidden" name="lessonId" value={lessonId} />
-        <div className={styles.formGrid}>
-          <div className={styles.field}>
-            <label className={styles.label} htmlFor="attendance-student">
-              {t("student")}
-            </label>
-            <select
-              className={styles.select}
-              id="attendance-student"
-              name="studentProfileId"
-              required
-            >
-              {studentProfileIds.map((id) => (
-                <option key={id} value={id}>
-                  {id}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className={styles.field}>
-            <label className={styles.label} htmlFor="attendance-status">
-              {t("status")}
-            </label>
-            <select className={styles.select} id="attendance-status" name="status" required>
-              <option value="present">{t("attendanceStatus.present")}</option>
-              <option value="absent">{t("attendanceStatus.absent")}</option>
-              <option value="late">{t("attendanceStatus.late")}</option>
-              <option value="excused">{t("attendanceStatus.excused")}</option>
-            </select>
-          </div>
-        </div>
-        <div className={styles.field}>
-          <label className={styles.label} htmlFor="attendance-notes">
-            {t("notes")}
-          </label>
-          <textarea className={styles.textarea} id="attendance-notes" name="notes" />
-        </div>
-        <button className={styles.button} type="submit" disabled={pending}>
-          {t("attendanceSubmit")}
-        </button>
-      </form>
+      {canManage ? (
+        <>
+          <ActionFeedback state={state} />
+          <form action={action} className={styles.form}>
+            <input type="hidden" name="lessonId" value={lessonId} />
+            <div className={styles.formGrid}>
+              <div className={styles.field}>
+                <label className={styles.label} htmlFor="attendance-student">
+                  {t("student")}
+                </label>
+                <select
+                  className={styles.select}
+                  id="attendance-student"
+                  name="studentProfileId"
+                  required
+                >
+                  {studentProfileIds.map((id) => (
+                    <option key={id} value={id}>
+                      {id}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className={styles.field}>
+                <label className={styles.label} htmlFor="attendance-status">
+                  {t("status")}
+                </label>
+                <select className={styles.select} id="attendance-status" name="status" required>
+                  <option value="present">{t("attendanceStatus.present")}</option>
+                  <option value="absent">{t("attendanceStatus.absent")}</option>
+                  <option value="late">{t("attendanceStatus.late")}</option>
+                  <option value="excused">{t("attendanceStatus.excused")}</option>
+                </select>
+              </div>
+            </div>
+            <div className={styles.field}>
+              <label className={styles.label} htmlFor="attendance-notes">
+                {t("notes")}
+              </label>
+              <textarea className={styles.textarea} id="attendance-notes" name="notes" />
+            </div>
+            <button className={styles.button} type="submit" disabled={pending}>
+              {t("attendanceSubmit")}
+            </button>
+          </form>
+        </>
+      ) : null}
     </section>
   );
 }
@@ -385,19 +392,35 @@ export function LessonDetailView({
     ...new Set(participants.filter((p) => p.role === "student").map((p) => p.userId)),
   ];
   const isScheduled = lesson.status === "scheduled";
+  const duration = Math.round(
+    (lesson.scheduledEndAt.getTime() - lesson.scheduledStartAt.getTime()) / 60_000,
+  );
 
   return (
     <div className={styles.shell}>
       <header className={styles.masthead}>
         <div>
           <p className={styles.eyebrow}>{t("eyebrow")}</p>
-          <h1 className={styles.title}>{formatDateTime(lesson.scheduledStartAt)}</h1>
+          <h1 className={styles.title}>{t("classDetails")}</h1>
           <p className={styles.lede}>{tStatus(`status.${lesson.status}`)}</p>
         </div>
       </header>
 
       <section className={styles.panel}>
+        <h2 className={styles.sectionTitle}>{t("classInformation")}</h2>
         <dl className={styles.detailGrid}>
+          <div className={styles.detailItem}>
+            <dt>{t("subject")}</dt>
+            <dd>{lesson.subjectId}</dd>
+          </div>
+          <div className={styles.detailItem}>
+            <dt>{t("dateAndTime")}</dt>
+            <dd>{formatDateTime(lesson.scheduledStartAt)}</dd>
+          </div>
+          <div className={styles.detailItem}>
+            <dt>{t("duration")}</dt>
+            <dd>{t("minutes", { minutes: duration })}</dd>
+          </div>
           <div className={styles.detailItem}>
             <dt>{t("timezone")}</dt>
             <dd>{lesson.timezoneAtBooking}</dd>
@@ -415,6 +438,25 @@ export function LessonDetailView({
         </dl>
       </section>
 
+      <section className={styles.panel}>
+        <h2 className={styles.sectionTitle}>{t("learningRecord")}</h2>
+        <p className={styles.hint}>{t("learningRecordHint")}</p>
+        <details className={styles.classDisclosure}>
+          <summary>{t("materials")}</summary>
+          <p>{t("materialsHint")}</p>
+        </details>
+      </section>
+
+      <section className={`${styles.panel} ${styles.homeworkHub}`}>
+        <div>
+          <h2 className={styles.sectionTitle}>{t("homework")}</h2>
+          <p className={styles.hint}>{t("homeworkHint")}</p>
+        </div>
+        <Link className={styles.button} href="/assignments">
+          {t("openHomework")}
+        </Link>
+      </section>
+
       <ZoomSection
         lesson={lesson}
         canManage={canManage}
@@ -424,18 +466,17 @@ export function LessonDetailView({
         startUrl={zoom?.startUrl ?? null}
       />
 
-      {isScheduled ? (
+      {canManage && isScheduled ? (
         <RescheduleSection lessonId={lesson.id} timezone={lesson.timezoneAtBooking} />
       ) : null}
-      {isScheduled ? <CancelSection lessonId={lesson.id} /> : null}
+      {canManage && isScheduled ? <CancelSection lessonId={lesson.id} /> : null}
       {canManage && isScheduled ? <NoShowSection lessonId={lesson.id} /> : null}
-      {canManage ? (
-        <AttendanceSection
-          lessonId={lesson.id}
-          studentProfileIds={studentProfileIds}
-          attendance={attendance}
-        />
-      ) : null}
+      <AttendanceSection
+        lessonId={lesson.id}
+        studentProfileIds={studentProfileIds}
+        attendance={attendance}
+        canManage={canManage}
+      />
       {canManage && isScheduled ? <CompleteButton lessonId={lesson.id} /> : null}
     </div>
   );

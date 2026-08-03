@@ -1,86 +1,96 @@
-import type { Cta } from "./content";
-import styles from "./home.module.css";
+import Link from "next/link";
+import { ArrowRight, Check, ClipboardCheck, GraduationCap, ShieldCheck } from "lucide-react";
+import { ClassroomPreview, type ClassroomCopy } from "./compact-home";
+import styles from "./compact-home.module.css";
 
 export interface HeroProps {
   eyebrow: string;
-  title: string;
+  titleLead: string;
+  titleAccent: string;
   description: string;
-  primaryCta: Cta;
-  secondaryCta: Cta;
-  trustLabel: string;
-  trustVerified: string;
-  trustVisible: string;
-  trustSafe: string;
-  visualLabel: string;
-  visualHeadline: string;
-  visualNote: string;
+  primaryCta: { label: string; href: string };
+  secondaryCta: { label: string; href: string };
+  trust: readonly string[];
+  socialProof: string;
+  classroom: ClassroomCopy;
 }
 
-/** Above-the-fold: renders synchronously, no client JS, no `ScrollReveal` wrapper — protects LCP. */
+/** The headline and primary actions stay server-rendered; only the product demo hydrates. */
 export function Hero({
   eyebrow,
-  title,
+  titleLead,
+  titleAccent,
   description,
   primaryCta,
   secondaryCta,
-  trustLabel,
-  trustVerified,
-  trustVisible,
-  trustSafe,
-  visualLabel,
-  visualHeadline,
-  visualNote,
+  trust,
+  socialProof,
+  classroom,
 }: HeroProps) {
   return (
-    <section className={styles.hero}>
-      <div className={styles.inner}>
-        <div className={styles.heroInner}>
+    <section className={styles.hero} aria-labelledby="home-title">
+      <div className={styles.heroBackdrop} aria-hidden="true">
+        <span className={styles.heroGrid} />
+        <span className={styles.pathLine} />
+        <span className={styles.armenianGlyph}>Ա</span>
+        <span className={styles.codeGlyph}>&#123; &#125;</span>
+      </div>
+
+      <div className={styles.heroShell}>
+        <div className={styles.heroLayout}>
           <div className={styles.heroCopy}>
-            <p className={styles.eyebrow}>{eyebrow}</p>
-            <h1 className={styles.heroTitle}>{title}</h1>
-            <p className={styles.heroLede}>{description}</p>
-            <div className={styles.ctaRow}>
-              <a className={styles.ctaPrimary} href={primaryCta.href}>
+            <p className={styles.heroEyebrow}>
+              <span aria-hidden="true" />
+              {eyebrow}
+            </p>
+            <h1 id="home-title" className={styles.heroTitle}>
+              {titleLead}{" "}
+              <span>
+                {titleAccent}
+                <i aria-hidden="true" />
+              </span>
+            </h1>
+            <p className={styles.heroDescription}>{description}</p>
+
+            <div className={styles.heroActions}>
+              <Link href={primaryCta.href} className={styles.primaryAction}>
                 {primaryCta.label}
-              </a>
-              <a className={styles.ctaSecondary} href={secondaryCta.href}>
+                <span>
+                  <ArrowRight size={18} aria-hidden="true" />
+                </span>
+              </Link>
+              <Link href={secondaryCta.href} className={styles.secondaryAction}>
+                <GraduationCap size={18} aria-hidden="true" />
                 {secondaryCta.label}
-              </a>
+              </Link>
             </div>
-            <ul className={styles.heroTrust} aria-label={trustLabel}>
-              <li>{trustVerified}</li>
-              <li>{trustVisible}</li>
-              <li>{trustSafe}</li>
-            </ul>
-          </div>
-          <aside className={styles.heroVisual} aria-hidden="true">
-            <p className={styles.heroVisualLabel}>{visualLabel}</p>
-            <p className={styles.heroVisualHeadline}>{visualHeadline}</p>
-            <svg
-              className={styles.heroTrail}
-              viewBox="0 0 320 120"
-              width="320"
-              height="120"
-              role="presentation"
-            >
-              <path
-                d="M8 96 C 60 96, 60 70, 100 66 S 160 40, 190 42 S 250 14, 312 12"
-                fill="none"
-                stroke="hsl(var(--home-accent))"
-                strokeWidth="3"
-                strokeLinecap="round"
-              />
-              {[
-                [8, 96],
-                [100, 66],
-                [190, 42],
-                [312, 12],
-              ].map(([cx, cy]) => (
-                <circle key={`${cx}-${cy}`} cx={cx} cy={cy} r={5} fill="hsl(var(--home-accent))" />
+
+            <ul className={styles.trustList} aria-label="Why families choose 2tor">
+              {trust.map((item, index) => (
+                <li key={item}>
+                  {index === 1 ? (
+                    <ClipboardCheck size={15} aria-hidden="true" />
+                  ) : index === 3 ? (
+                    <ShieldCheck size={15} aria-hidden="true" />
+                  ) : (
+                    <Check size={15} aria-hidden="true" />
+                  )}
+                  {item}
+                </li>
               ))}
-            </svg>
-            <p className={styles.heroVisualNote}>{visualNote}</p>
-          </aside>
+            </ul>
+
+            <div className={styles.socialProof}>
+              <div className={styles.avatarStack} aria-hidden="true">
+                <span>MK</span>
+                <span>AS</span>
+                <span>NV</span>
+              </div>
+              <p>{socialProof}</p>
+            </div>
+          </div>
+
+          <ClassroomPreview copy={classroom} />
         </div>
       </div>
     </section>

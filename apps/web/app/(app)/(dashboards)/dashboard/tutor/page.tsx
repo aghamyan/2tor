@@ -1,8 +1,8 @@
 import { Suspense } from "react";
 
-import { DashboardSummaryFallback } from "../../../../../components/dashboards/dashboard-summary";
 import {
   TutorDashboard,
+  TutorDashboardFallback,
   TutorDashboardSignals,
 } from "../../../../../components/dashboards/tutor-dashboard";
 import { loadDashboardViewer } from "../../_lib/viewer";
@@ -15,7 +15,7 @@ export default async function TutorDashboardPage() {
     <TutorDashboard
       panels={panels}
       summary={
-        <Suspense fallback={<DashboardSummaryFallback />}>
+        <Suspense fallback={<TutorDashboardFallback />}>
           <TutorDashboardSignals />
         </Suspense>
       }

@@ -36,8 +36,9 @@ export function DashboardShell({ kind, panels, summary, viewerName }: DashboardS
           <p className={styles.intro}>{t(`${dashboardKey}.intro`)}</p>
         </div>
         <div className={styles.roleMark} aria-hidden="true">
-          <span>16</span>
+          <span>2tor</span>
           <strong>{t(`${dashboardKey}.mark`)}</strong>
+          <i>↗</i>
         </div>
       </header>
 
@@ -76,7 +77,7 @@ export function DashboardShell({ kind, panels, summary, viewerName }: DashboardS
         </div>
 
         <div className={styles.panelGrid}>
-          {panels.map((panel) => (
+          {panels.map((panel, index) => (
             <Link
               className={styles.panel}
               data-span={panel.span}
@@ -86,7 +87,10 @@ export function DashboardShell({ kind, panels, summary, viewerName }: DashboardS
               href={panel.href}
               key={panel.id}
             >
-              <span className={styles.moduleLabel}>{t(`modules.${panel.module}`)}</span>
+              <span className={styles.panelTopline}>
+                <span className={styles.moduleLabel}>{t(`modules.${panel.module}`)}</span>
+                <span aria-hidden="true">{String(index + 1).padStart(2, "0")}</span>
+              </span>
               <h3>{t(panel.titleKey)}</h3>
               <p>{t(panel.bodyKey)}</p>
               <span className={styles.openLabel}>

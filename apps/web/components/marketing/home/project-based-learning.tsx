@@ -33,14 +33,22 @@ export function ProjectBasedLearning({
         <div className={styles.projectsGrid}>
           {projects.map((project) => (
             <article className={styles.projectCard} key={project.title}>
-              <p className={styles.projectLabel}>{project.label}</p>
-              <h3 className={styles.projectTitle}>{project.title}</h3>
-              <p className={styles.projectBody}>{project.body}</p>
-              <ul className={styles.projectDeliverables}>
-                {project.deliverables.map((deliverable) => (
-                  <li key={deliverable}>{deliverable}</li>
-                ))}
-              </ul>
+              <div className={styles.projectVisual} aria-hidden="true">
+                <span className={styles.projectWindowDot} />
+                <span className={styles.projectWindowDot} />
+                <span className={styles.projectWindowDot} />
+                <div className={styles.projectShape} />
+              </div>
+              <div className={styles.projectContent}>
+                <p className={styles.projectLabel}>{project.label}</p>
+                <h3 className={styles.projectTitle}>{project.title}</h3>
+                <p className={styles.projectBody}>{project.body}</p>
+                <ul className={styles.projectDeliverables}>
+                  {project.deliverables.slice(0, 2).map((deliverable) => (
+                    <li key={deliverable}>{deliverable}</li>
+                  ))}
+                </ul>
+              </div>
             </article>
           ))}
         </div>

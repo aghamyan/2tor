@@ -6,12 +6,13 @@ import { Drawer, DrawerClose, DrawerContent, DrawerTitle, DrawerTrigger } from "
 import type { Locale } from "@app/i18n/config";
 
 import type { HeaderAuthState } from "./header-actions";
-import { MenuIcon } from "./icons";
+import { ArrowUpRightIcon, MenuIcon } from "./icons";
 import { LanguageSwitcher } from "./language-switcher";
 import { localizedHref, primaryNav } from "./nav-items";
 import styles from "./site.module.css";
 
-const actionButtonClass = "inline-flex min-h-11 items-center justify-center rounded-md px-4 text-sm font-semibold";
+const actionButtonClass =
+  "inline-flex min-h-12 items-center justify-center rounded-xl px-4 text-sm font-semibold";
 
 /**
  * `Drawer` is `@app/ui`'s Radix-Dialog-based sheet (`packages/ui/src/components/overlays.tsx`) —
@@ -48,7 +49,7 @@ export function MobileNav({ locale, authState }: { locale: Locale; authState: He
         <button
           type="button"
           aria-label={t("site.mobileNav.openMenu")}
-          className={`${styles.hamburgerButton} inline-flex size-11 items-center justify-center rounded-md 2xl:hidden`}
+          className={`${styles.hamburgerButton} inline-flex size-11 items-center justify-center rounded-md xl:hidden`}
         >
           <MenuIcon className="size-6" />
         </button>
@@ -109,6 +110,7 @@ export function MobileNav({ locale, authState }: { locale: Locale; authState: He
                   className={`${styles.buttonPrimary} ${actionButtonClass}`}
                 >
                   {t("site.actions.consultation")}
+                  <ArrowUpRightIcon className={styles.buttonIcon} />
                 </Link>
               </DrawerClose>
             </>
@@ -120,6 +122,7 @@ export function MobileNav({ locale, authState }: { locale: Locale; authState: He
                   className={`${styles.buttonPrimary} ${actionButtonClass}`}
                 >
                   {t("site.actions.dashboard")}
+                  <ArrowUpRightIcon className={styles.buttonIcon} />
                 </Link>
               </DrawerClose>
               <DrawerClose asChild>
@@ -131,7 +134,10 @@ export function MobileNav({ locale, authState }: { locale: Locale; authState: He
                 </Link>
               </DrawerClose>
               <form action="/api/auth/logout" method="post">
-                <button type="submit" className={`${styles.buttonSecondary} ${actionButtonClass} w-full`}>
+                <button
+                  type="submit"
+                  className={`${styles.buttonSecondary} ${actionButtonClass} w-full`}
+                >
                   {t("site.account.logOut")}
                 </button>
               </form>

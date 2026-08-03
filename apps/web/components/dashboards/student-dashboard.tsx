@@ -1,10 +1,13 @@
 import type { ReactNode } from "react";
 
+import { getTranslations } from "next-intl/server";
+
 import type { DashboardPanel } from "../../app/(app)/(dashboards)/_lib/catalog";
 import { currentDashboardLocale } from "../../app/(app)/(dashboards)/_lib/locale";
 import { loadStudentDashboardSummary } from "../../app/(app)/(dashboards)/_lib/summaries";
 import { DashboardShell } from "./dashboard-shell";
 import { LocalizedDashboardSummary } from "./dashboard-summary";
+import { LessonCountdown } from "./lesson-countdown";
 
 export function YoungerStudentDashboard({
   panels,
@@ -45,9 +48,10 @@ export function OlderStudentDashboard({
 }
 
 export async function StudentDashboardSignals() {
-  const [summary, locale] = await Promise.all([
+  const [summary, locale, t] = await Promise.all([
     loadStudentDashboardSummary(),
     currentDashboardLocale(),
+    getTranslations("dashboards"),
   ]);
   const nextLesson = summary.nextLesson;
   const nextLessonValue = nextLesson
@@ -68,6 +72,15 @@ export async function StudentDashboardSignals() {
             : { valueKey: "summary.common.noneScheduled" }),
           detailKey: "summary.student.nextLessonDetail",
           href: "/scheduling",
+          extra: nextLesson ? (
+            <LessonCountdown
+              startAt={nextLesson.scheduledStartAt.toISOString()}
+              endAt={nextLesson.scheduledEndAt.toISOString()}
+              joinUrl={summary.nextLessonJoinUrl}
+              joinLabel={t("summary.common.joinLesson")}
+              locale={locale}
+            />
+          ) : undefined,
         },
         {
           labelKey: "summary.student.today",

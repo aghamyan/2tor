@@ -13,14 +13,31 @@ export interface Cta {
 export const HOW_IT_WORKS_STEP_KEYS = ["one", "two", "three", "four"] as const;
 export type HowItWorksStepKey = (typeof HOW_IT_WORKS_STEP_KEYS)[number];
 
-export const SUBJECT_KEYS = ["mathematics", "programming", "heritage"] as const;
+/**
+ * `heritage` is listed first so it lands top-left as the 2x2 featured card in `home.module.css`'s
+ * `.subjectsGrid` (4 columns x 2 rows): CSS grid auto-placement fills cells in DOM order, so the
+ * featured item must come first for the remaining four 1x1 cards to tile the rest of the grid
+ * cleanly. See `subjects.tsx`'s `featured` check.
+ */
+export const SUBJECT_KEYS = ["heritage", "mathematics", "programming", "sat", "toefl"] as const;
 export type SubjectKey = (typeof SUBJECT_KEYS)[number];
 
 /** Public marketing paths each subject links to — already allowlisted in `apps/web/proxy.ts`. */
 export const SUBJECT_HREFS: Record<SubjectKey, string> = {
+  heritage: "/armenian-language-heritage",
   mathematics: "/mathematics",
   programming: "/programming",
-  heritage: "/armenian-language-heritage",
+  sat: "/sat",
+  toefl: "/toefl",
+};
+
+/** Local, first-party photography used by the homepage course cards. */
+export const SUBJECT_IMAGE_SOURCES: Record<SubjectKey, string> = {
+  heritage: "/marketing/courses/armenian-heritage.jpg",
+  mathematics: "/marketing/courses/mathematics.jpg",
+  programming: "/marketing/courses/programming.jpg",
+  sat: "/marketing/courses/sat.jpg",
+  toefl: "/marketing/courses/toefl.jpg",
 };
 
 export const WHY_US_POINT_KEYS = ["structure", "visibility", "accountability", "safety"] as const;

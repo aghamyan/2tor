@@ -24,31 +24,19 @@ export function HowItWorks({ eyebrow, title, description, steps }: HowItWorksPro
           </h2>
           <p className={styles.sectionLede}>{description}</p>
         </div>
-        <svg
-          className={styles.stepTrail}
-          viewBox="0 0 400 8"
-          preserveAspectRatio="none"
-          aria-hidden="true"
-        >
-          <line
-            x1="0"
-            y1="4"
-            x2="400"
-            y2="4"
-            stroke="hsl(var(--home-border))"
-            strokeWidth="2"
-            strokeDasharray="1 9"
-            strokeLinecap="round"
-          />
-        </svg>
         <ol className={styles.steps}>
           {steps.map((step, index) => (
             <li className={styles.step} key={step.title}>
-              <span className={styles.stepNumber} aria-hidden="true">
-                {index + 1}
-              </span>
-              <h3 className={styles.stepTitle}>{step.title}</h3>
-              <p className={styles.stepBody}>{step.body}</p>
+              <div className={styles.stepTopline}>
+                <span className={styles.stepNumber} aria-hidden="true">
+                  0{index + 1}
+                </span>
+                <span className={styles.stepDot} aria-hidden="true" />
+              </div>
+              <div>
+                <h3 className={styles.stepTitle}>{step.title}</h3>
+                <p className={styles.stepBody}>{step.body}</p>
+              </div>
             </li>
           ))}
         </ol>

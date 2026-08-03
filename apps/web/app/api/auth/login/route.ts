@@ -4,6 +4,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { z } from "zod";
 
 import { webRedis } from "../../../../lib/current-session";
+import { postLoginDestination } from "../../../../lib/post-login-destination";
 
 const loginSchema = z.object({
   identifier: z.string().trim().min(1).max(254),
@@ -128,7 +129,7 @@ export async function POST(request: NextRequest) {
   });
 
   const response = NextResponse.json({
-    data: { next: parsed.data.next ?? "/dashboard" },
+    data: { next: postLoginDestination(parsed.data.next, result.roles) },
   });
   response.cookies.set(created.cookie.name, created.cookie.value, {
     httpOnly: true,

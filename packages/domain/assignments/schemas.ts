@@ -106,6 +106,10 @@ export const gradeSubmissionSchema = z
     });
   });
 
+export const setAssignmentStatusSchema = z
+  .object({ status: z.enum(["published", "closed"]) })
+  .strict();
+
 export const createRubricSchema = z
   .object({
     title: requiredText(240),
@@ -118,7 +122,28 @@ export const fileScanCallbackSchema = z
   .object({ status: z.enum(["clean", "infected", "error"]) })
   .strict();
 
+export const assignmentListQuerySchema = z
+  .object({
+    cursor: z.string().trim().min(1).max(100).nullable().default(null),
+    limit: z.coerce.number().int().min(1).max(100).default(20),
+    status: z.enum(["draft", "published", "closed"]).optional(),
+    studentProfileId: z.string().trim().min(1).max(100).optional(),
+    subjectId: z.string().trim().min(1).max(100).optional(),
+  })
+  .strict();
+
+/** The pre-validation shape callers pass in — URL search params and `searchParams` props are always strings. `assignmentListQuerySchema` coerces/validates from here. */
+export interface AssignmentListRawInput {
+  cursor?: string | null;
+  limit?: string | number | null;
+  status?: string | null;
+  studentProfileId?: string | null;
+  subjectId?: string | null;
+}
+
 export type CreateAssignmentInput = z.infer<typeof createAssignmentSchema>;
 export type SubmissionAnswersInput = z.infer<typeof submissionAnswersSchema>;
 export type GradeSubmissionInput = z.infer<typeof gradeSubmissionSchema>;
 export type CreateRubricInput = z.infer<typeof createRubricSchema>;
+export type SetAssignmentStatusInput = z.infer<typeof setAssignmentStatusSchema>;
+export type AssignmentListQuery = z.infer<typeof assignmentListQuerySchema>;

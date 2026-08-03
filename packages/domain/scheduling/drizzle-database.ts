@@ -8,13 +8,15 @@ import {
   parentProfiles,
   parentStudentLinks,
   studentProfiles,
+  subjects,
   tutorProfiles,
   tutorStudentAssignments,
+  tutorSubjects,
   zoomMeetings,
   type Database,
   type Transaction,
 } from "@app/db";
-import { and, asc, desc, eq, gte, lte } from "drizzle-orm";
+import { and, asc, desc, eq, gt, gte, isNull, lte, or } from "drizzle-orm";
 
 import type {
   AssignmentFact,
@@ -32,7 +34,9 @@ import type {
   NewLessonSeriesValues,
   NewLessonValues,
   NewZoomMeetingValues,
+  SchedulableAssignmentOption,
   SchedulingDatabase,
+  SubjectOption,
   ZoomMeetingRecord,
 } from "./models";
 
@@ -203,6 +207,57 @@ function repository(
         )
         .limit(1);
       return row !== undefined;
+    },
+
+    async listSchedulableAssignments(tutorProfileId): Promise<SchedulableAssignmentOption[]> {
+      const conditions = [
+        eq(tutorStudentAssignments.status, "active"),
+        or(isNull(tutorStudentAssignments.endAt), gt(tutorStudentAssignments.endAt, new Date())),
+      ];
+      if (tutorProfileId) conditions.push(eq(tutorStudentAssignments.tutorProfileId, tutorProfileId));
+
+      const rows = await executor
+        .select({
+          id: tutorStudentAssignments.id,
+          studentProfileId: tutorStudentAssignments.studentProfileId,
+          studentName: studentProfiles.preferredName,
+          subjectId: subjects.id,
+          subjectName: subjects.name,
+        })
+        .from(tutorStudentAssignments)
+        .innerJoin(
+          studentProfiles,
+          eq(studentProfiles.id, tutorStudentAssignments.studentProfileId),
+        )
+        .leftJoin(subjects, eq(subjects.id, tutorStudentAssignments.subjectId))
+        .where(and(...conditions))
+        .orderBy(asc(studentProfiles.preferredName));
+
+      return rows.map((row) => ({
+        id: row.id,
+        studentProfileId: row.studentProfileId,
+        studentName: row.studentName,
+        subjectId: row.subjectId ?? null,
+        subjectName: row.subjectName ?? null,
+      }));
+    },
+
+    async listSchedulableSubjects(tutorProfileId): Promise<SubjectOption[]> {
+      if (tutorProfileId) {
+        return executor
+          .select({ id: subjects.id, name: subjects.name })
+          .from(tutorSubjects)
+          .innerJoin(subjects, eq(subjects.id, tutorSubjects.subjectId))
+          .where(
+            and(eq(tutorSubjects.tutorProfileId, tutorProfileId), eq(subjects.isActive, true)),
+          )
+          .orderBy(asc(subjects.name));
+      }
+      return executor
+        .select({ id: subjects.id, name: subjects.name })
+        .from(subjects)
+        .where(eq(subjects.isActive, true))
+        .orderBy(asc(subjects.name));
     },
 
     async createLessonSeries(values: NewLessonSeriesValues) {

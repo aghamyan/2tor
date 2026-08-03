@@ -17,6 +17,10 @@ export interface ForParentsProps {
   previewLabel: string;
   previewHeadline: string;
   previewCaption: string;
+  previewWeek: string;
+  previewLessons: string;
+  previewMilestones: string;
+  previewProjects: string;
 }
 
 const ICON_BY_KEY = {
@@ -35,6 +39,10 @@ export function ForParents({
   previewLabel,
   previewHeadline,
   previewCaption,
+  previewWeek,
+  previewLessons,
+  previewMilestones,
+  previewProjects,
 }: ForParentsProps) {
   return (
     <section
@@ -55,11 +63,7 @@ export function ForParents({
                 return (
                   <li className={styles.parentsPoint} key={point.key}>
                     <Icon width={20} height={20} />
-                    <span>
-                      <span className={styles.parentsPointTitle}>{point.title}</span>
-                      <br />
-                      <span className={styles.parentsPointBody}>{point.body}</span>
-                    </span>
+                    <span className={styles.parentsPointTitle}>{point.title}</span>
                   </li>
                 );
               })}
@@ -73,31 +77,49 @@ export function ForParents({
           <div className={styles.dashboardPreview} aria-hidden="true">
             <div className={styles.dashboardPreviewHeader}>
               <span>{previewLabel}</span>
+              <span className={styles.previewWeek}>{previewWeek}</span>
             </div>
-            <p className={styles.heroVisualHeadline}>{previewHeadline}</p>
-            <svg
-              className={styles.dashboardTrend}
-              viewBox="0 0 320 110"
-              width="320"
-              height="110"
-              role="presentation"
-            >
-              <path
-                d="M8 90 C 55 90, 55 68, 92 64 S 150 44, 180 46 S 240 22, 312 16"
-                fill="none"
-                stroke="hsl(var(--home-accent))"
-                strokeWidth="3"
-                strokeLinecap="round"
-              />
-              {[
-                [8, 90],
-                [92, 64],
-                [180, 46],
-                [312, 16],
-              ].map(([cx, cy]) => (
-                <circle key={`${cx}-${cy}`} cx={cx} cy={cy} r={5} fill="hsl(var(--home-accent))" />
-              ))}
-            </svg>
+            <div className={styles.dashboardMetric}>
+              <div>
+                <p className={styles.heroVisualHeadline}>{previewHeadline}</p>
+                <strong>78%</strong>
+              </div>
+              <span>↗ 12%</span>
+            </div>
+            <div className={styles.chartShell}>
+              <span className={styles.chartLine} />
+              <svg className={styles.dashboardTrend} viewBox="0 0 360 140" role="presentation">
+                <defs>
+                  <linearGradient id="dashboard-fill" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0" stopColor="hsl(var(--home-blue))" stopOpacity=".24" />
+                    <stop offset="1" stopColor="hsl(var(--home-blue))" stopOpacity="0" />
+                  </linearGradient>
+                </defs>
+                <path
+                  d="M3 122 C 52 118, 55 97, 94 100 S 147 62, 185 72 S 245 52, 276 47 S 323 21, 357 17 L357 140 L3 140 Z"
+                  fill="url(#dashboard-fill)"
+                />
+                <path
+                  d="M3 122 C 52 118, 55 97, 94 100 S 147 62, 185 72 S 245 52, 276 47 S 323 21, 357 17"
+                  fill="none"
+                  stroke="hsl(var(--home-blue))"
+                  strokeWidth="4"
+                  strokeLinecap="round"
+                />
+                <circle cx="357" cy="17" r="6" fill="hsl(var(--home-blue))" />
+              </svg>
+            </div>
+            <div className={styles.previewStats}>
+              <span>
+                <b>12</b> {previewLessons}
+              </span>
+              <span>
+                <b>4</b> {previewMilestones}
+              </span>
+              <span>
+                <b>2</b> {previewProjects}
+              </span>
+            </div>
             <p className={styles.dashboardPreviewCaption}>{previewCaption}</p>
           </div>
         </div>

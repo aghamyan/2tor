@@ -1,4 +1,9 @@
-export type LeadKind = "consultation" | "assessment" | "contact" | "tutor_application";
+export type LeadKind =
+  | "consultation"
+  | "assessment"
+  | "contact"
+  | "tutor_application"
+  | "trial_class";
 
 /**
  * Deliberately small public-contact record. Child names, dates of birth, and learning

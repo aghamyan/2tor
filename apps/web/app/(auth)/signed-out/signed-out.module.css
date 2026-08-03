@@ -1,0 +1,73 @@
+/*
+ * Local copy of `packages/ui/src/theme/tokens.css`'s HSL triplets — same reason and same values as
+ * `apps/web/components/assignments/assignments.module.css`'s file-level note: this app's Tailwind
+ * build isn't wired to `@app/ui`'s preset, so a bare `bg-primary`-style utility class would resolve
+ * to nothing here.
+ */
+.wrap {
+  --so-background: 0 0% 100%;
+  --so-foreground: 222 47% 11%;
+  --so-primary: 221 83% 35%;
+  --so-primary-foreground: 210 40% 98%;
+  --so-muted-foreground: 215 16% 35%;
+  --so-border: 214 24% 83%;
+  --so-ring: 221 83% 35%;
+  align-items: center;
+  background: hsl(var(--so-background));
+  color: hsl(var(--so-foreground));
+  display: flex;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 2rem;
+}
+:global(.dark) .wrap {
+  --so-background: 222 47% 8%;
+  --so-foreground: 210 40% 98%;
+  --so-primary: 213 94% 72%;
+  --so-primary-foreground: 222 47% 11%;
+  --so-muted-foreground: 215 20% 75%;
+  --so-border: 217 25% 28%;
+  --so-ring: 213 94% 72%;
+}
+.wrap :focus-visible {
+  border-radius: 4px;
+  outline: 2px solid hsl(var(--so-ring));
+  outline-offset: 2px;
+}
+
+.card {
+  max-width: 28rem;
+  text-align: center;
+}
+.title {
+  font-size: clamp(1.6rem, 3.4vw, 2.2rem);
+  font-weight: 650;
+  letter-spacing: -0.02em;
+  margin: 0 0 0.75rem;
+}
+.description {
+  color: hsl(var(--so-muted-foreground));
+  margin: 0 0 2rem;
+}
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+.primaryLink {
+  background: hsl(var(--so-primary));
+  border-radius: 0.55rem;
+  color: hsl(var(--so-primary-foreground));
+  display: inline-block;
+  font-weight: 600;
+  padding: 0.7rem 1.25rem;
+  text-decoration: none;
+}
+.primaryLink:hover {
+  opacity: 0.9;
+}
+.secondaryLink {
+  color: hsl(var(--so-primary));
+  font-weight: 600;
+  text-decoration: underline;
+}

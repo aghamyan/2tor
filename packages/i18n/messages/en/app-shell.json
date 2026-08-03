@@ -1,0 +1,109 @@
+{
+  "appShell": {
+    "skipToContent": "Skip to content",
+    "nav": {
+      "ariaLabel": "Primary",
+      "home": "Overview",
+      "empty": "No modules are available for your account yet.",
+      "groups": {
+        "learning": "Learning",
+        "schedule": "Schedule",
+        "coursework": "Coursework",
+        "progress": "Progress",
+        "resources": "Resources",
+        "communication": "Communication",
+        "family": "Family & privacy",
+        "billing": "Billing",
+        "profile": "Profile",
+        "admin": "Admin",
+        "support": "Support",
+        "more": "More"
+      }
+    },
+    "sidebar": {
+      "brandCaption": "Learning workspace",
+      "studentLevel": "Active learner",
+      "collapse": "Collapse sidebar",
+      "expand": "Expand sidebar"
+    },
+    "studentNav": {
+      "groups": {
+        "learning": "Learning",
+        "progress": "Progress",
+        "resources": "Resources",
+        "communication": "Communication",
+        "help": "Help"
+      },
+      "items": {
+        "scheduling_overview": "Classes",
+        "assignments_overview": "Homework",
+        "assessments_overview": "Assessments",
+        "projects_overview": "Projects",
+        "academics_overview": "Learning journey",
+        "gamification_overview": "Progress report",
+        "content_overview": "Resource library",
+        "discussions_overview": "Questions",
+        "communication_inbox": "Messages",
+        "support_queue": "Support"
+      }
+    },
+    "tutorNav": {
+      "groups": {
+        "teaching": "Teaching",
+        "progress": "Progress",
+        "resources": "Learning tools",
+        "communication": "Communication",
+        "workspace": "Tutor management",
+        "finance": "Finance",
+        "help": "Help"
+      },
+      "items": {
+        "scheduling_overview": "Classes",
+        "tutors_students": "Students",
+        "assignments_overview": "Homework",
+        "assessments_overview": "Assessments",
+        "projects_overview": "Projects",
+        "academics_overview": "Student progress",
+        "gamification_overview": "Achievements",
+        "content_overview": "Resources",
+        "discussions_overview": "Questions",
+        "communication_inbox": "Messages",
+        "tutors_profile": "Teaching profile",
+        "payouts_overview": "Earnings",
+        "support_queue": "Support"
+      }
+    },
+    "mobileNav": {
+      "open": "Open menu",
+      "close": "Close menu",
+      "title": "Navigation"
+    },
+    "topbar": {
+      "breadcrumbs": {
+        "ariaLabel": "Breadcrumb"
+      },
+      "search": {
+        "label": "Search",
+        "placeholder": "Search classes, homework, resources…"
+      },
+      "messages": "Open messages",
+      "notifications": {
+        "unread": "{count, plural, one {# unread notification} other {# unread notifications}}",
+        "empty": "No new notifications"
+      }
+    },
+    "userMenu": {
+      "label": "Account menu",
+      "settings": "Account and sessions",
+      "logOut": "Log out",
+      "roles": {
+        "parent": "Parent",
+        "student": "Student",
+        "tutor": "Tutor",
+        "finance": "Finance",
+        "administrator": "Administrator",
+        "super_administrator": "Super administrator"
+      }
+    }
+  }
+}

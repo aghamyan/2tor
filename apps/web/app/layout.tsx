@@ -16,8 +16,8 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: {
-    default: "Loom կրթություն",
-    template: "%s | Loom կրթություն",
+    default: "2tor",
+    template: "%s | 2tor",
   },
 };
 

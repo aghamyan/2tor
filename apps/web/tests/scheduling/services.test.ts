@@ -7,6 +7,8 @@ import {
   completeLesson,
   createLessonSeries,
   listLessonsForActor,
+  listSchedulableAssignments,
+  listSchedulableSubjects,
   recordAttendance,
   recordNoShow,
   rescheduleLesson,
@@ -389,6 +391,65 @@ describe("listLessonsForActor", () => {
 
     const tutorView = await listLessonsForActor(db, tutorActor, range);
     expect(tutorView.map((l) => l.id)).toEqual([lesson.id]);
+  });
+});
+
+describe("listSchedulableAssignments / listSchedulableSubjects", () => {
+  it("scopes a tutor to their own active assignments and taught subjects", async () => {
+    const db = database();
+    db.seedSchedulableAssignment("tutor-profile-1", {
+      id: assignment.id,
+      studentProfileId: assignment.studentProfileId,
+      studentName: "Ava Student",
+      subjectId: "subject-math",
+      subjectName: "Math",
+    });
+    db.seedSchedulableSubject("tutor-profile-1", { id: "subject-math", name: "Math" });
+    // A second tutor's roster must never leak into the first tutor's picker.
+    db.seedSchedulableAssignment("tutor-profile-2", {
+      id: "assignment-2",
+      studentProfileId: "student-profile-2",
+      studentName: "Other Student",
+      subjectId: null,
+      subjectName: null,
+    });
+
+    const assignments = await listSchedulableAssignments(db, tutorActor);
+    expect(assignments).toEqual([
+      {
+        id: assignment.id,
+        studentProfileId: assignment.studentProfileId,
+        studentName: "Ava Student",
+        subjectId: "subject-math",
+        subjectName: "Math",
+      },
+    ]);
+
+    const subjects = await listSchedulableSubjects(db, tutorActor);
+    expect(subjects).toEqual([{ id: "subject-math", name: "Math" }]);
+  });
+
+  it("lets staff see every tutor's assignments and subjects", async () => {
+    const db = database();
+    db.seedSchedulableAssignment("tutor-profile-1", {
+      id: assignment.id,
+      studentProfileId: assignment.studentProfileId,
+      studentName: "Ava Student",
+      subjectId: "subject-math",
+      subjectName: "Math",
+    });
+    db.seedSchedulableSubject("tutor-profile-1", { id: "subject-math", name: "Math" });
+
+    const assignments = await listSchedulableAssignments(db, adminActor);
+    expect(assignments.map((a) => a.id)).toEqual([assignment.id]);
+    const subjects = await listSchedulableSubjects(db, adminActor);
+    expect(subjects).toEqual([{ id: "subject-math", name: "Math" }]);
+  });
+
+  it("denies a parent or student — only tutors and staff can schedule", async () => {
+    const db = database();
+    await expect(listSchedulableAssignments(db, parentActor)).rejects.toThrow(SchedulingError);
+    await expect(listSchedulableSubjects(db, studentActor)).rejects.toThrow(SchedulingError);
   });
 });
 

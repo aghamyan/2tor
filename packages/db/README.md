@@ -27,7 +27,7 @@ src/
     finance.ts                       prices, charges, invoices, payouts, exchange rates
     operations.ts                     notifications, support, incidents, audit, exports, deletion, flags
     index.ts                          barrel — re-exports every table/enum from every file above
-  client.ts             `createDb(connectionString)` factory + `withTransaction` helper
+  client.ts             process-wide `createDb(connectionString)` pool + transaction helper
   seed.ts                idempotent dev seed
 drizzle.config.ts        points drizzle-kit at src/schema/index.ts, outputs to ./migrations
 migrations/               generated SQL + one hand-written custom migration (audit_events trigger)

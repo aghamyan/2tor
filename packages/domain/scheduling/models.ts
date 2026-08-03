@@ -32,6 +32,25 @@ export interface AssignmentFact {
   endAt: Date | null;
 }
 
+/**
+ * One active tutor-student assignment a lesson can be booked against — the source for the
+ * new-lesson form's student picker, so a tutor selects a real assignment instead of hand-typing
+ * an id the student/parent side may never resolve to a visible lesson.
+ */
+export interface SchedulableAssignmentOption {
+  id: string;
+  studentProfileId: string;
+  studentName: string;
+  subjectId: string | null;
+  subjectName: string | null;
+}
+
+/** A subject selectable when scheduling a lesson, by display name rather than raw id. */
+export interface SubjectOption {
+  id: string;
+  name: string;
+}
+
 export interface LessonSeriesRecord {
   id: string;
   tutorStudentAssignmentId: string;
@@ -199,6 +218,11 @@ export interface SchedulingDatabase {
   resolveStudentProfileIdForUser(userId: string): Promise<string | null>;
   resolveParentProfileIdForUser(userId: string): Promise<string | null>;
   isParentLinkedToStudent(parentUserId: string, studentProfileId: string): Promise<boolean>;
+
+  /** Active assignments to offer in the new-lesson student picker; `null` (staff) returns every tutor's. */
+  listSchedulableAssignments(tutorProfileId: string | null): Promise<SchedulableAssignmentOption[]>;
+  /** Subjects to offer in the new-lesson subject picker; a tutor sees only what they teach, `null` (staff) sees the full active catalog. */
+  listSchedulableSubjects(tutorProfileId: string | null): Promise<SubjectOption[]>;
 
   createLessonSeries(values: NewLessonSeriesValues): Promise<LessonSeriesRecord>;
   findLessonSeriesById(id: string): Promise<LessonSeriesRecord | null>;

@@ -3,6 +3,7 @@ import { AssignmentError } from "./errors";
 import type {
   AssignmentActor,
   AssignmentDatabase,
+  AssignmentPage,
   AssignmentQuestionRecord,
   AssignmentRecord,
   GradingRecord,
@@ -13,13 +14,17 @@ import type {
   VirusScanStatus,
 } from "./models";
 import {
+  assignmentListQuerySchema,
   createAssignmentSchema,
   createRubricSchema,
   gradeSubmissionSchema,
+  setAssignmentStatusSchema,
   submissionAnswersSchema,
+  type AssignmentListRawInput,
   type CreateAssignmentInput,
   type CreateRubricInput,
   type GradeSubmissionInput,
+  type SetAssignmentStatusInput,
   type SubmissionAnswersInput,
 } from "./schemas";
 import type { SubmissionStorage } from "./storage";
@@ -76,6 +81,21 @@ async function requireAssignedTutor(
       "Only the tutor assigned to this student may access this submission.",
       403,
     );
+}
+/** Read-only relationship gate: staff, the owning student, a linked parent, or the assigned tutor. Parents never reach write paths (create/submit/grade) — those keep their own, narrower checks. */
+async function requireViewerRelationship(
+  database: AssignmentDatabase,
+  actor: AssignmentActor,
+  studentProfileId: string,
+): Promise<void> {
+  if (isStaff(actor)) return;
+  if (hasRole(actor, "student") && actor.studentProfileId === studentProfileId) return;
+  if (
+    hasRole(actor, "parent") &&
+    (await database.isParentLinkedToStudent(actor.userId, studentProfileId))
+  )
+    return;
+  await requireAssignedTutor(database, actor, studentProfileId);
 }
 function requireStudentOwner(actor: AssignmentActor, studentProfileId: string) {
   if (!hasRole(actor, "student") || actor.studentProfileId !== studentProfileId)
@@ -283,11 +303,91 @@ export async function getAssignmentForActor(
   const assignment = await database.getAssignment(assignmentId);
   if (!assignment)
     throw new AssignmentError("ASSIGNMENT_NOT_FOUND", "Assignment was not found.", 404);
-  if (isStaff(actor)) return assignment;
-  if (hasRole(actor, "student") && actor.studentProfileId === assignment.studentProfileId)
-    return assignment;
-  await requireAssignedTutor(database, actor, assignment.studentProfileId);
+  await requireViewerRelationship(database, actor, assignment.studentProfileId);
   return assignment;
+}
+
+const ALLOWED_STATUS_TRANSITIONS: Record<AssignmentRecord["status"], AssignmentRecord["status"][]> =
+  {
+    draft: ["published"],
+    published: ["closed"],
+    closed: [],
+  };
+
+/** A draft must become `published` before a student can see or submit to it; `published` may later be `closed`. Only staff or the actively assigned tutor may transition it. */
+export async function setAssignmentStatus(
+  database: AssignmentDatabase,
+  actor: AssignmentActor | null | undefined,
+  assignmentId: string,
+  input: SetAssignmentStatusInput,
+): Promise<AssignmentRecord> {
+  requireActor(actor);
+  const values = setAssignmentStatusSchema.parse(input);
+  const assignment = await database.getAssignment(assignmentId);
+  if (!assignment)
+    throw new AssignmentError("ASSIGNMENT_NOT_FOUND", "Assignment was not found.", 404);
+  await requireAssignedTutor(database, actor, assignment.studentProfileId);
+  if (!ALLOWED_STATUS_TRANSITIONS[assignment.status].includes(values.status))
+    throw new AssignmentError(
+      "ASSIGNMENT_NOT_OPEN",
+      `An assignment cannot move from "${assignment.status}" to "${values.status}".`,
+      409,
+    );
+  const updatedAt = new Date();
+  await database.updateAssignmentStatus(assignmentId, values.status, updatedAt);
+  return { ...assignment, status: values.status, updatedAt };
+}
+
+export async function listAssignmentsForActor(
+  database: AssignmentDatabase,
+  actor: AssignmentActor | null | undefined,
+  input: AssignmentListRawInput = {},
+): Promise<AssignmentPage> {
+  requireActor(actor);
+  const query = assignmentListQuerySchema.parse({
+    cursor: input.cursor ?? null,
+    limit: input.limit ?? 20,
+    status: input.status ?? undefined,
+    studentProfileId: input.studentProfileId ?? undefined,
+    subjectId: input.subjectId ?? undefined,
+  });
+
+  let studentProfileIds: string[] | null = null;
+  if (isStaff(actor)) {
+    // No restriction — `studentProfileIds` stays `null`.
+  } else if (hasRole(actor, "student")) {
+    if (!actor.studentProfileId) return { items: [], nextCursor: null };
+    studentProfileIds = [actor.studentProfileId];
+  } else if (hasRole(actor, "parent")) {
+    studentProfileIds = await database.listLinkedStudentProfileIdsForParent(actor.userId);
+  } else if (hasRole(actor, "tutor")) {
+    const students = await database.listActiveStudentsForTutor(actor.userId);
+    studentProfileIds = students.map((student) => student.studentProfileId);
+  } else {
+    return { items: [], nextCursor: null };
+  }
+
+  if (query.studentProfileId) {
+    if (studentProfileIds !== null && !studentProfileIds.includes(query.studentProfileId))
+      return { items: [], nextCursor: null };
+    studentProfileIds = [query.studentProfileId];
+  }
+
+  // An empty (not null) scope means the actor legitimately has zero related students — return
+  // empty rather than querying, since an unguarded `IN ()` must never be read as "unfiltered".
+  if (studentProfileIds !== null && studentProfileIds.length === 0)
+    return { items: [], nextCursor: null };
+
+  const rows = await database.listAssignments({
+    studentProfileIds,
+    status: query.status,
+    subjectId: query.subjectId,
+    cursor: query.cursor,
+    limit: query.limit + 1,
+  });
+  const hasMore = rows.length > query.limit;
+  const items = hasMore ? rows.slice(0, query.limit) : rows;
+  return { items, nextCursor: hasMore ? (items.at(-1)?.id ?? null) : null };
 }
 
 export async function saveSubmissionAnswers(
@@ -378,10 +478,7 @@ export async function getSubmissionForActor(
   const submission = await database.getSubmission(submissionId);
   if (!submission)
     throw new AssignmentError("SUBMISSION_NOT_FOUND", "Submission was not found.", 404);
-  if (isStaff(actor)) return submission;
-  if (hasRole(actor, "student") && actor.studentProfileId === submission.studentProfileId)
-    return submission;
-  await requireAssignedTutor(database, actor, submission.studentProfileId);
+  await requireViewerRelationship(database, actor, submission.studentProfileId);
   return submission;
 }
 
@@ -443,11 +540,7 @@ export async function getDownloadableSubmissionFile(
 ): Promise<SubmissionFileRecord> {
   requireActor(actor);
   const { file, submission } = await fileAndSubmission(database, fileId);
-  if (isStaff(actor)) {
-    /* staff follows session/signed-URL checks at route boundary */
-  } else if (hasRole(actor, "student") && actor.studentProfileId === submission.studentProfileId) {
-    /* owner */
-  } else await requireAssignedTutor(database, actor, submission.studentProfileId);
+  await requireViewerRelationship(database, actor, submission.studentProfileId);
   if (file.virusScanStatus !== "clean")
     throw new AssignmentError(
       "FILE_NOT_READY",
@@ -536,6 +629,28 @@ export async function createAssignmentRubric(
   };
   await database.saveRubric(rubric);
   return rubric;
+}
+
+/** Rubrics are reusable grading templates, not student-linked records, so any teaching-staff actor may browse the full set to attach to a grade. */
+export async function listAssignmentRubrics(
+  database: AssignmentDatabase,
+  actor: AssignmentActor | null | undefined,
+) {
+  requireActor(actor);
+  if (!isStaff(actor) && !hasRole(actor, "tutor"))
+    throw new AssignmentError("FORBIDDEN", "Only teaching staff can view rubrics.", 403);
+  return database.listAssignmentRubrics();
+}
+
+/** Active students assigned to a tutor, for the "create assignment" student picker. */
+export async function listActiveStudentsForTutor(
+  database: AssignmentDatabase,
+  actor: AssignmentActor | null | undefined,
+) {
+  requireActor(actor);
+  if (!hasRole(actor, "tutor"))
+    throw new AssignmentError("FORBIDDEN", "Only tutors have assigned students.", 403);
+  return database.listActiveStudentsForTutor(actor.userId);
 }
 
 export async function findStaleAssignmentReminders(

@@ -1,0 +1,144 @@
+/*
+ * Local copy of `packages/ui/src/theme/tokens.css`'s HSL triplets — same reason and same values as
+ * `apps/web/components/assignments/assignments.module.css`'s file-level note.
+ */
+.shell {
+  --ss-background: 0 0% 100%;
+  --ss-foreground: 222 47% 11%;
+  --ss-card: 0 0% 100%;
+  --ss-primary: 221 83% 35%;
+  --ss-primary-foreground: 210 40% 98%;
+  --ss-secondary: 213 33% 95%;
+  --ss-secondary-foreground: 222 47% 17%;
+  --ss-muted-foreground: 215 16% 35%;
+  --ss-destructive: 0 72% 39%;
+  --ss-destructive-foreground: 0 0% 100%;
+  --ss-success: 154 65% 28%;
+  --ss-success-foreground: 0 0% 100%;
+  --ss-border: 214 24% 83%;
+  --ss-ring: 221 83% 35%;
+  color: hsl(var(--ss-foreground));
+  margin: 0 auto;
+  max-width: 42rem;
+  padding: 2rem 1.25rem;
+}
+:global(.dark) .shell {
+  --ss-background: 222 47% 8%;
+  --ss-foreground: 210 40% 98%;
+  --ss-card: 222 42% 11%;
+  --ss-primary: 213 94% 72%;
+  --ss-primary-foreground: 222 47% 11%;
+  --ss-secondary: 217 33% 17%;
+  --ss-secondary-foreground: 210 40% 98%;
+  --ss-muted-foreground: 215 20% 75%;
+  --ss-destructive: 0 82% 65%;
+  --ss-destructive-foreground: 222 47% 11%;
+  --ss-success: 152 62% 52%;
+  --ss-success-foreground: 222 47% 11%;
+  --ss-border: 217 25% 28%;
+  --ss-ring: 213 94% 72%;
+}
+.shell :focus-visible {
+  border-radius: 4px;
+  outline: 2px solid hsl(var(--ss-ring));
+  outline-offset: 2px;
+}
+
+.title {
+  font-size: clamp(1.6rem, 3.4vw, 2.1rem);
+  font-weight: 650;
+  letter-spacing: -0.03em;
+  margin: 0 0 0.4rem;
+}
+.description {
+  color: hsl(var(--ss-muted-foreground));
+  margin: 0 0 1.5rem;
+}
+
+.topActions {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 1rem;
+}
+
+.list {
+  display: grid;
+  gap: 0.85rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.row {
+  align-items: center;
+  background: hsl(var(--ss-card));
+  border: 1px solid hsl(var(--ss-border));
+  border-radius: 0.65rem;
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: minmax(0, 1fr) auto;
+  padding: 1rem 1.1rem;
+}
+.rowMeta p {
+  margin: 0.1rem 0;
+}
+.device {
+  font-weight: 600;
+}
+.detail {
+  color: hsl(var(--ss-muted-foreground));
+  font-size: 0.85rem;
+}
+
+.badge {
+  background: hsl(var(--ss-secondary));
+  border-radius: 999px;
+  color: hsl(var(--ss-secondary-foreground));
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 0.3rem 0.7rem;
+  white-space: nowrap;
+}
+
+.button {
+  background: hsl(var(--ss-secondary));
+  border: none;
+  border-radius: 0.5rem;
+  color: hsl(var(--ss-secondary-foreground));
+  cursor: pointer;
+  font: inherit;
+  font-weight: 600;
+  padding: 0.5rem 0.9rem;
+  transition: opacity 120ms ease-out;
+  white-space: nowrap;
+}
+.button:hover {
+  opacity: 0.88;
+}
+.button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+.buttonDanger {
+  background: hsl(var(--ss-destructive));
+  color: hsl(var(--ss-destructive-foreground));
+}
+@media (prefers-reduced-motion: reduce) {
+  .button {
+    transition: none;
+  }
+}
+
+.feedback {
+  font-size: 0.85rem;
+  margin: 0.5rem 0 0;
+}
+.feedbackSuccess {
+  color: hsl(var(--ss-success));
+}
+.feedbackError {
+  color: hsl(var(--ss-destructive));
+}
+
+.empty {
+  color: hsl(var(--ss-muted-foreground));
+}

@@ -77,8 +77,10 @@ export default async function AdminDashboardPage() {
   try {
     cards = await loadDashboard();
   } catch (error: unknown) {
-    if (error instanceof AdministrationError && error.code === "UNAUTHENTICATED")
-      redirect("/login");
+    if (error instanceof AdministrationError) {
+      if (error.code === "UNAUTHENTICATED") redirect("/login");
+      if (error.code === "FORBIDDEN") redirect("/dashboard");
+    }
     throw error;
   }
 

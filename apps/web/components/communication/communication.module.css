@@ -1,7 +1,7 @@
 .shell {
-  --comm-ink: #172731;
-  --comm-muted: #61727a;
-  --comm-mist: #f2f7f7;
+  --comm-ink: #14263a;
+  --comm-muted: #58697d;
+  --comm-mist: #f3f6f5;
   --comm-paper: #ffffff;
   --comm-line: #d8e2e2;
   --comm-sea: #246d68;
@@ -10,23 +10,25 @@
   --comm-gold: #d9aa45;
   color: var(--comm-ink);
   margin: 0 auto;
-  max-width: 78rem;
+  max-width: 85rem;
+  padding: clamp(1rem, 2.5vw, 2.25rem) clamp(1rem, 3vw, 2.5rem) 6rem;
 }
 
 .masthead {
   align-items: end;
+  border-bottom: 1px solid var(--comm-line);
   display: grid;
   gap: 2rem;
   grid-template-columns: minmax(0, 1fr) auto;
-  padding: 1.25rem 0 2rem;
+  padding: 0.65rem 0 1.55rem;
 }
 
 .masthead h1 {
-  font-family: "Iowan Old Style", "Palatino Linotype", Georgia, serif;
-  font-size: clamp(2.2rem, 5vw, 4rem);
-  font-weight: 500;
-  letter-spacing: -0.045em;
-  line-height: 0.98;
+  font-family: inherit;
+  font-size: clamp(2rem, 4vw, 3.25rem);
+  font-weight: 720;
+  letter-spacing: -0.052em;
+  line-height: 1.02;
   margin: 0;
 }
 
@@ -91,9 +93,11 @@
 .workspace {
   background: var(--comm-paper);
   border: 1px solid var(--comm-line);
+  border-radius: 0.9rem;
   display: grid;
   grid-template-columns: minmax(15rem, 0.34fr) minmax(0, 1fr);
   min-height: 42rem;
+  overflow: hidden;
 }
 
 .inbox {
@@ -110,9 +114,9 @@
 }
 
 .inboxHeading h2 {
-  font-family: "Iowan Old Style", Georgia, serif;
-  font-size: 1.45rem;
-  font-weight: 500;
+  font-family: inherit;
+  font-size: 1.05rem;
+  font-weight: 750;
   margin: 0;
 }
 
@@ -139,10 +143,13 @@
 }
 
 .inbox li button {
+  align-items: center;
   border-left: 4px solid transparent;
   color: inherit;
   display: grid;
-  gap: 0.35rem;
+  gap: 0.7rem;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  min-height: 4.8rem;
   padding: 1rem 1.25rem;
   text-align: left;
   width: 100%;
@@ -155,9 +162,76 @@
   border-left-color: var(--comm-sea);
 }
 
-.inbox li button span {
+.conversationCopy {
+  display: grid;
+  gap: 0.3rem;
+  min-width: 0;
+}
+
+.conversationCopy strong,
+.conversationCopy small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.conversationCopy small {
   color: var(--comm-muted);
   font-size: 0.75rem;
+}
+
+.conversationAvatar {
+  align-items: center;
+  background: #e3f2ee;
+  border: 1px solid #cae2dd;
+  border-radius: 50%;
+  color: var(--comm-sea-dark);
+  display: flex;
+  flex: none;
+  font-size: 0.74rem;
+  font-weight: 800;
+  height: 2.35rem;
+  justify-content: center;
+  width: 2.35rem;
+}
+
+.conversationChevron {
+  color: var(--comm-muted);
+}
+
+.inboxEmpty {
+  align-items: start;
+  display: grid;
+  gap: 0.55rem;
+  padding: 1.5rem 1.25rem;
+}
+
+.inboxEmpty > span {
+  align-items: center;
+  background: #e3f2ee;
+  border-radius: 0.65rem;
+  color: var(--comm-sea);
+  display: flex;
+  height: 2.5rem;
+  justify-content: center;
+  width: 2.5rem;
+}
+
+.inboxEmpty strong {
+  font-size: 0.85rem;
+}
+
+.inboxEmpty p {
+  color: var(--comm-muted);
+  font-size: 0.72rem;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.inboxEmpty a {
+  color: var(--comm-sea-dark);
+  font-size: 0.74rem;
+  font-weight: 750;
 }
 
 .thread {
@@ -175,10 +249,22 @@
   padding: 1.1rem 1.5rem 0;
 }
 
+.mobileBack {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  color: var(--comm-sea-dark);
+  display: none;
+  font-size: 0.74rem;
+  font-weight: 750;
+  gap: 0.35rem;
+  justify-self: start;
+}
+
 .threadHeader h2 {
-  font-family: "Iowan Old Style", Georgia, serif;
-  font-size: 1.7rem;
-  font-weight: 500;
+  font-family: inherit;
+  font-size: 1.15rem;
+  font-weight: 750;
   margin: 0;
 }
 
@@ -270,9 +356,18 @@
 }
 
 .messageBody > p {
+  background: #f8faf9;
+  border: 1px solid var(--comm-line);
+  border-radius: 0.7rem;
   line-height: 1.6;
   margin: 0;
+  padding: 0.8rem 0.9rem;
   white-space: pre-wrap;
+}
+
+.message[data-self="true"] .messageBody > p {
+  background: #e6f3f0;
+  border-color: #c8dfda;
 }
 
 .messageActions {
@@ -362,6 +457,7 @@
   border: 1px solid #b9c9c9;
   color: var(--comm-ink);
   min-height: 5.5rem;
+  border-radius: 0.6rem;
   padding: 0.75rem;
   resize: vertical;
 }
@@ -385,8 +481,13 @@
 .reasonGate > button,
 .reportPanel div button:first-child {
   background: var(--comm-sea);
+  border-radius: 0.6rem;
   color: white;
   font-weight: 700;
+  align-items: center;
+  display: inline-flex;
+  gap: 0.4rem;
+  justify-content: center;
   padding: 0.62rem 1.05rem;
 }
 
@@ -403,8 +504,12 @@
 }
 
 .filePicker {
+  align-items: center;
   border: 1px solid #a8bcbc;
+  border-radius: 0.6rem;
   cursor: pointer;
+  display: inline-flex;
+  gap: 0.4rem;
   padding: 0.55rem 0.8rem;
 }
 
@@ -453,7 +558,7 @@
 
 .reasonGate h2,
 .blankState h2 {
-  font-family: "Iowan Old Style", Georgia, serif;
+  font-family: inherit;
   font-size: 2rem;
   font-weight: 500;
   margin: 0;
@@ -481,6 +586,7 @@ textarea:focus-visible,
 }
 
 @media (max-width: 760px) {
+  .shell { padding: 0.8rem 0.8rem 6.5rem; }
   .masthead {
     align-items: start;
     grid-template-columns: 1fr;
@@ -492,22 +598,42 @@ textarea:focus-visible,
 
   .workspace {
     grid-template-columns: 1fr;
+    min-height: calc(100dvh - 12rem);
   }
 
   .inbox {
-    border-bottom: 1px solid var(--comm-line);
     border-right: 0;
-    max-height: 13rem;
+    max-height: none;
     overflow-y: auto;
   }
 
   .thread {
-    min-height: 34rem;
+    min-height: calc(100dvh - 12rem);
+  }
+
+  .workspace[data-mobile-view="list"] .thread,
+  .workspace[data-mobile-view="thread"] .inbox {
+    display: none;
+  }
+
+  .mobileBack {
+    display: inline-flex;
+    grid-column: 1 / -1;
+  }
+
+  .threadHeader {
+    align-items: start;
+    padding-top: 0.85rem;
   }
 
   .message {
     gap: 0.35rem;
     grid-template-columns: 1fr;
+  }
+
+  .message[data-self="true"] .messageMeta,
+  .message[data-self="true"] .messageBody {
+    margin-left: min(2.5rem, 10vw);
   }
 
   .messageMeta {

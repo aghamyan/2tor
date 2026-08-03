@@ -1,11 +1,260 @@
 {
   "tutors": {
-    "nav": { "label": "Tutor profile" },
-    "overview": {
-      "title": "Tutor workspace",
-      "availability": "Weekly availability",
-      "documents": "Verification documents",
-      "quarantine": "Documents remain private while pending review."
+    "nav": { "label": "Teaching profile", "studentsLabel": "Students" },
+    "workspace": {
+      "breadcrumbLabel": "Breadcrumb",
+      "breadcrumbOverview": "Overview",
+      "breadcrumbCurrent": "Teaching profile",
+      "eyebrow": "Tutor workspace",
+      "title": "Teaching profile",
+      "subtitle": "Complete your profile, availability, and verification details so families can be matched with you.",
+      "viewStudents": "View students",
+      "helpTitle": "Need help?",
+      "helpBody": "Our support team can help with anything you can't complete here yet, including adding a new subject.",
+      "helpCta": "Contact support"
+    },
+    "completion": {
+      "noProfileYet": "New tutor",
+      "noSubject": "No subject yet",
+      "percentComplete": "{percent}% profile complete",
+      "stepComplete": "Complete",
+      "stepMissing": "Missing",
+      "gatingNote": "Complete the required steps before your profile can be matched with students.",
+      "allSet": "Your profile is complete. New steps will appear here if anything changes.",
+      "steps": {
+        "basicInfo": "Basic information",
+        "subjects": "Teaching subjects",
+        "languages": "Languages",
+        "gradeLevels": "Grade levels",
+        "availability": "Availability",
+        "documents": "Verification documents",
+        "evaluation": "Evaluation",
+        "verification": "Verification"
+      },
+      "cta": {
+        "basicInfo": "Add basic information",
+        "subjects": "Add teaching subjects",
+        "languages": "Add teaching languages",
+        "gradeLevels": "Add grade levels",
+        "availability": "Set availability",
+        "documents": "Upload documents",
+        "evaluation": "View evaluation status"
+      },
+      "verificationStatus": {
+        "restricted": "Restricted",
+        "notStarted": "Not started",
+        "actionRequired": "Action required",
+        "inProgress": "In progress",
+        "verified": "Verified"
+      }
+    },
+    "profile": {
+      "title": "Teaching profile",
+      "description": "Tell families who you are and how you teach.",
+      "displayName": "Display name",
+      "yearsExperience": "Years of experience",
+      "headline": "Professional headline",
+      "headlinePlaceholder": "e.g. Mathematics tutor specializing in Algebra and Precalculus",
+      "bio": "Biography",
+      "bioHelper": "Tell families about your teaching experience, approach, and the students you work best with.",
+      "country": "Country",
+      "education": "Education",
+      "educationHelper": "A short summary of your degrees or qualifications.",
+      "save": "Save changes",
+      "create": "Create profile",
+      "saving": "Saving…",
+      "saved": "Saved.",
+      "saveError": "We could not save your changes. Your entries are still here. Try again."
+    },
+    "capabilities": {
+      "subjectsTitle": "Subjects and levels",
+      "subjectsDescription": "The subjects you teach, and the grade levels you're qualified for.",
+      "lockedTitle": "Save your basic information first",
+      "lockedBody": "Subjects, grade levels, and languages become editable once your teaching profile exists.",
+      "lockedCta": "Go to teaching profile",
+      "noSubjectsTitle": "No subjects yet",
+      "noSubjectsBody": "Your teaching subjects are set up by the 2tor team when you join. Contact support if a subject is missing or incorrect.",
+      "noSubjectsCta": "Contact support",
+      "addSubjectHint": "Adding a new subject isn't available here yet — contact support to add one.",
+      "primary": "Primary",
+      "makePrimary": "Make primary",
+      "remove": "Remove",
+      "levelsTitle": "Grade levels",
+      "levelsDescription": "Choose the grade levels and courses you are qualified to teach.",
+      "groups": {
+        "elementary": "Elementary",
+        "middle": "Middle school",
+        "high": "High school"
+      },
+      "groupSelectedCount": "{count}/{total} selected",
+      "selectAll": "Select all",
+      "clear": "Clear",
+      "grade": "Grade {label}",
+      "adultLearners": "Adult learners",
+      "levelsSelected": "{count} levels selected",
+      "preservedRanges": "{count, plural, one {# additional grade range is} other {# additional grade ranges are}} on file but can't be shown here. Contact support to review them.",
+      "languagesTitle": "Teaching languages",
+      "languagesDescription": "Choose the languages you can confidently use during lessons.",
+      "noLanguagesTitle": "No teaching languages yet",
+      "noLanguagesBody": "Add at least one language so families know what to expect during lessons.",
+      "proficiency": "Proficiency",
+      "proficiencies": {
+        "native": "Native",
+        "fluent": "Fluent",
+        "conversational": "Conversational"
+      },
+      "chooseLanguage": "Choose a language",
+      "addLanguage": "Add teaching language",
+      "needsBoth": "At least one subject and one language are required.",
+      "save": "Save changes",
+      "saving": "Saving…",
+      "saved": "Saved.",
+      "saveError": "We could not save your changes. Your entries are still here. Try again."
+    },
+    "availability": {
+      "title": "Weekly availability",
+      "description": "Set the times when students can request lessons.",
+      "lockedTitle": "Save your basic information first",
+      "lockedBody": "Weekly availability becomes editable once your teaching profile exists.",
+      "lockedCta": "Go to teaching profile",
+      "timeZoneLabel": "Availability time zone:",
+      "emptyTitle": "No availability added yet",
+      "emptyBody": "Add at least one weekly time range so students can request lessons.",
+      "weekday": {
+        "sunday": "Sunday",
+        "monday": "Monday",
+        "tuesday": "Tuesday",
+        "wednesday": "Wednesday",
+        "thursday": "Thursday",
+        "friday": "Friday",
+        "saturday": "Saturday"
+      },
+      "available": "Available",
+      "unavailable": "Unavailable",
+      "startTime": "Start time",
+      "endTime": "End time",
+      "rangeInvalid": "End must be after start",
+      "fixInvalidRanges": "Fix the highlighted time range before saving.",
+      "addTime": "Add time",
+      "removeTime": "Remove",
+      "copyMonday": "Copy Monday to weekdays",
+      "clearWeek": "Clear week",
+      "previewTitle": "Schedule preview",
+      "save": "Save changes",
+      "saving": "Saving…",
+      "saved": "Saved.",
+      "saveError": "We could not save your changes. Your entries are still here. Try again."
+    },
+    "documents": {
+      "title": "Verification documents",
+      "description": "Upload the documents required to verify your identity and qualifications.",
+      "lockedTitle": "Save your basic information first",
+      "lockedBody": "Document upload becomes available once your teaching profile exists.",
+      "type": {
+        "identity": "Identity document",
+        "education": "Degree or diploma",
+        "certification": "Teaching certificate",
+        "background_check": "Background check",
+        "other": "Additional supporting documents"
+      },
+      "statusMissing": "Not uploaded",
+      "status": {
+        "pending": "Pending review",
+        "approved": "Approved",
+        "rejected": "Rejected"
+      },
+      "submitted": "Submitted {date}",
+      "upload": "Upload",
+      "replace": "Replace document",
+      "dropzoneLabel": "Drag a file here, or click to browse",
+      "formatsHint": "PDF, JPG, or PNG · up to 10 MB",
+      "uploading": "Uploading…",
+      "uploadError": "We could not upload this file. Try again.",
+      "invalidType": "That file type isn't supported. Use PDF, JPG, or PNG.",
+      "tooLarge": "That file is larger than 10 MB."
+    },
+    "verification": {
+      "title": "Verification status",
+      "description": "Track your identity and qualification checks.",
+      "overall": {
+        "restricted": "Restricted",
+        "notStarted": "Not started",
+        "actionRequired": "Action required",
+        "inProgress": "In progress",
+        "verified": "Verified"
+      },
+      "emptyTitle": "Verification hasn't started",
+      "emptyBody": "Upload your verification documents to begin the review process.",
+      "type": {
+        "identity": "Identity",
+        "education": "Education",
+        "background_check": "Background check",
+        "reference": "Reference",
+        "safeguarding_training": "Safeguarding training"
+      },
+      "status": {
+        "pending": "Pending review",
+        "passed": "Passed",
+        "failed": "Action required",
+        "waived": "Waived",
+        "expired": "Expired"
+      },
+      "statusPending": "Awaiting review"
+    },
+    "training": {
+      "title": "Evaluations and training",
+      "description": "Track the evaluations and training assigned to you.",
+      "emptyTitle": "Nothing assigned yet",
+      "emptyBody": "Evaluations and training assigned to you by the 2tor team will appear here.",
+      "progress": "{complete} of {total} requirements complete",
+      "evaluationFallback": "Evaluation",
+      "score": "Score: {score}",
+      "status": {
+        "completed": "Complete",
+        "assigned": "Not started",
+        "in_progress": "In progress",
+        "expired": "Expired"
+      },
+      "type": {
+        "safeguarding": "Child safety training",
+        "platform_onboarding": "Platform orientation",
+        "subject_specific": "Subject training",
+        "other": "Training"
+      },
+      "completedOn": "Completed {date}",
+      "expiresOn": "Expires {date}"
+    },
+    "preview": {
+      "title": "Family profile preview",
+      "verified": "Verified",
+      "noHeadline": "Add a headline to introduce yourself to families.",
+      "noDetails": "Add subjects, languages, and grade levels to complete your preview.",
+      "notPublishable": "Your profile will become visible after verification."
+    },
+    "students": {
+      "breadcrumbLabel": "Breadcrumb",
+      "breadcrumbOverview": "Overview",
+      "breadcrumbCurrent": "Students",
+      "eyebrow": "Tutor workspace",
+      "title": "Students",
+      "subtitle": "The students matched to you, active and past.",
+      "activeTitle": "Active students",
+      "activeDescription": "Students you are currently teaching.",
+      "noActiveTitle": "No active students yet",
+      "noActiveBody": "Once you're matched with a family, they'll appear here.",
+      "pastTitle": "Past students",
+      "pastDescription": "Students you previously taught.",
+      "endedOn": "Ended {date}",
+      "nextClass": "Next class {date}",
+      "noNextClass": "No class scheduled",
+      "feedbackCount": "{count, plural, one {# feedback note} other {# feedback notes}}",
+      "noDetails": "No subject on file",
+      "viewLearningPlan": "Open learning plan",
+      "message": "Message",
+      "emptyTitle": "You do not have assigned students yet.",
+      "emptyBody": "Complete your profile and availability so we can match you with suitable learners.",
+      "emptyPrimaryCta": "Complete teaching profile",
+      "emptySecondaryCta": "Review availability"
     }
   }
 }

@@ -51,48 +51,104 @@
 
 /* Header */
 .header {
-  background: hsl(var(--site-background) / 92%);
-  backdrop-filter: blur(8px);
-  border-bottom: 1px solid hsl(var(--site-border));
+  background: hsl(228 33% 98%);
+  transition: background 200ms ease;
 }
-@supports (animation-timeline: scroll()) {
-  .header {
-    animation: site-header-elevate linear both;
-    animation-timeline: scroll(root);
-    animation-range: 0 96px;
-  }
+.headerFrame {
+  background: transparent;
+  border-bottom: 1px solid transparent;
+  min-height: 4.75rem;
+  transition:
+    backdrop-filter 220ms ease,
+    background 220ms ease,
+    border-color 220ms ease,
+    min-height 220ms ease,
+    box-shadow 220ms ease;
 }
-@keyframes site-header-elevate {
-  from {
-    box-shadow: 0 1px 0 transparent;
-  }
-  to {
-    box-shadow: 0 8px 24px hsl(var(--site-foreground) / 10%);
-  }
+.header:has(.headerFrame[data-scrolled="true"]) {
+  backdrop-filter: blur(18px) saturate(145%);
+  background: hsl(var(--site-background) / 86%);
+}
+.headerFrame[data-scrolled="true"] {
+  border-color: hsl(var(--site-border) / 76%);
+  box-shadow: 0 0.75rem 1.8rem hsl(var(--site-foreground) / 6%);
+  min-height: 4.2rem;
 }
 .brand {
+  align-items: center;
   color: hsl(var(--site-foreground));
+  display: inline-flex;
+  gap: 0.08rem;
+  padding-right: 0.45rem;
+}
+.brandMark {
+  align-items: center;
+  background: hsl(234 68% 55%);
+  border: 1px solid hsl(234 60% 45%);
+  border-radius: 50% 50% 50% 0.48rem;
+  box-shadow: 0 0.45rem 1rem hsl(234 68% 45% / 18%);
+  color: hsl(0 0% 100%);
+  display: inline-flex;
+  font-size: 1rem;
+  height: 2.15rem;
+  justify-content: center;
+  width: 2.15rem;
+  transform: rotate(-5deg);
+}
+.brandWord {
+  font-size: 1.2rem;
+  letter-spacing: -0.065em;
+  margin-left: 0.08rem;
+}
+.navRail {
+  background: transparent;
+  border: 0;
+  padding: 0;
 }
 .navLink {
+  border-bottom: 1px solid transparent;
   color: hsl(var(--site-foreground) / 80%);
+  transition:
+    background 180ms ease,
+    box-shadow 180ms ease,
+    color 180ms ease,
+    transform 180ms ease;
 }
 .navLink:hover {
+  background: hsl(var(--site-background) / 66%);
+  border-bottom-color: hsl(var(--site-primary) / 38%);
+  box-shadow: none;
   color: hsl(var(--site-primary));
+  transform: translateY(-1px);
 }
 
 /* Dropdown (Subjects nav menu + account menu) */
 .dropdownTrigger {
   color: hsl(var(--site-foreground) / 80%);
+  transition:
+    background 180ms ease,
+    box-shadow 180ms ease,
+    color 180ms ease;
 }
 .dropdownTrigger:hover,
 .dropdownTrigger[aria-expanded="true"] {
+  background: hsl(var(--site-background) / 66%);
+  box-shadow: none;
   color: hsl(var(--site-primary));
+}
+.dropdownTrigger svg {
+  transition: transform 180ms ease;
+}
+.dropdownTrigger[aria-expanded="true"] svg {
+  transform: rotate(180deg);
 }
 .dropdownPanel {
   background: hsl(var(--site-popover));
   color: hsl(var(--site-popover-foreground));
-  border: 1px solid hsl(var(--site-border));
-  box-shadow: 0 12px 32px hsl(var(--site-foreground) / 14%);
+  border: 1px solid hsl(var(--site-border) / 86%);
+  box-shadow:
+    0 1.5rem 3.8rem hsl(var(--site-foreground) / 16%),
+    inset 0 1px hsl(var(--site-background));
 }
 .dropdownItem {
   color: hsl(var(--site-popover-foreground));
@@ -100,6 +156,54 @@
 .dropdownItem:hover,
 .dropdownItem:focus-visible {
   background: hsl(var(--site-muted));
+}
+.subjectsPanel {
+  border-radius: 1rem !important;
+  min-width: 20rem !important;
+  padding: 0.5rem !important;
+}
+.subjectMenuItem {
+  align-items: center;
+  border: 1px solid transparent;
+  border-radius: 0.75rem !important;
+  display: grid !important;
+  font-weight: 650;
+  gap: 0.7rem;
+  grid-template-columns: 2.55rem 1fr auto;
+  min-height: 4rem;
+  padding: 0.55rem !important;
+  transition:
+    border-color 180ms ease,
+    transform 180ms ease;
+}
+.subjectMenuItem:hover,
+.subjectMenuItem:focus-visible {
+  border-color: hsl(var(--site-border) / 80%);
+  transform: translateX(2px);
+}
+.subjectMenuIcon {
+  align-items: center;
+  background: hsl(221 83% 96%);
+  border: 1px solid hsl(221 70% 88%);
+  border-radius: 0.65rem;
+  color: hsl(var(--site-primary));
+  display: inline-flex;
+  font-family: Georgia, serif;
+  font-size: 1.05rem;
+  height: 2.55rem;
+  justify-content: center;
+  width: 2.55rem;
+}
+.subjectMenuIconHeritage {
+  background: hsl(158 48% 94%);
+  border-color: hsl(158 35% 83%);
+  color: hsl(161 76% 30%);
+  font-family: "Noto Serif Armenian", Georgia, serif;
+}
+.subjectMenuArrow {
+  color: hsl(var(--site-muted-foreground));
+  height: 1rem;
+  width: 1rem;
 }
 .dropdownSeparator {
   background: hsl(var(--site-border));
@@ -111,12 +215,34 @@
 /* Buttons (composed on top of @app/ui's <Button>, whose own color utilities don't resolve — see
    file header) */
 .buttonPrimary {
-  background: hsl(var(--site-primary));
+  background: linear-gradient(135deg, hsl(221 88% 55%), hsl(var(--site-primary)));
+  box-shadow:
+    0 0.65rem 1.5rem hsl(221 83% 35% / 20%),
+    inset 0 1px hsl(0 0% 100% / 22%);
   color: hsl(var(--site-primary-foreground));
   border: 1px solid hsl(var(--site-primary));
+  gap: 0.55rem;
+  padding-left: 1rem !important;
+  padding-right: 0.55rem !important;
+  transition:
+    box-shadow 200ms ease,
+    transform 200ms ease;
 }
 .buttonPrimary:hover {
   background: hsl(var(--site-primary) / 88%);
+  box-shadow:
+    0 0.85rem 1.9rem hsl(221 83% 35% / 27%),
+    0 0 0 4px hsl(221 83% 55% / 8%);
+  transform: translateY(-2px);
+}
+.buttonIcon {
+  background: hsl(0 0% 100% / 14%);
+  border: 1px solid hsl(0 0% 100% / 13%);
+  border-radius: 50%;
+  box-sizing: content-box;
+  height: 0.9rem;
+  padding: 0.32rem;
+  width: 0.9rem;
 }
 .buttonSecondary {
   background: transparent;
@@ -125,6 +251,7 @@
 }
 .buttonSecondary:hover {
   background: hsl(var(--site-secondary));
+  border-color: hsl(var(--site-border));
 }
 
 /* Account trigger / avatar */
@@ -145,21 +272,31 @@
   background: hsl(var(--site-background));
   color: hsl(var(--site-foreground));
   border-top: 1px solid hsl(var(--site-border));
+  border-radius: 1.4rem 1.4rem 0 0;
+  box-shadow: 0 -1.5rem 4rem hsl(var(--site-foreground) / 16%);
 }
 .drawerSectionHeading {
   color: hsl(var(--site-muted-foreground));
 }
 .drawerLink {
   color: hsl(var(--site-foreground));
+  transition:
+    background 180ms ease,
+    color 180ms ease,
+    transform 180ms ease;
 }
 .drawerLink:hover {
+  background: hsl(var(--site-muted));
   color: hsl(var(--site-primary));
+  transform: translateX(3px);
 }
 .drawerDivider {
   background: hsl(var(--site-border));
 }
 .hamburgerButton {
   color: hsl(var(--site-foreground));
+  border: 1px solid hsl(var(--site-border) / 80%);
+  border-radius: 0.75rem !important;
 }
 .hamburgerButton:hover {
   background: hsl(var(--site-secondary));
@@ -198,7 +335,8 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .header {
-    animation: none;
+  .header,
+  .headerFrame {
+    transition: none;
   }
 }

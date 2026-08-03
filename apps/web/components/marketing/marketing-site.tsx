@@ -6,13 +6,16 @@ import { LeadForm } from "./lead-form";
 import styles from "./marketing.module.css";
 import { Testimonial } from "./testimonial";
 import type { MarketingSlug } from "./seo";
+import { isSubjectCurriculumSlug, SubjectCurriculumPage } from "./subjects/subject-curriculum-page";
 export { pageSlugs, faqJsonLd, type MarketingSlug } from "./seo";
 
-const pageKey: Record<MarketingSlug, string> = {
+export const pageKey: Record<MarketingSlug, string> = {
   "how-it-works": "howItWorks",
   mathematics: "mathematics",
   programming: "programming",
   "armenian-language-heritage": "armenianHeritage",
+  sat: "sat",
+  toefl: "toefl",
   "group-lessons": "groupLessons",
   "project-based-learning": "projectLearning",
   parents: "parents",
@@ -57,10 +60,17 @@ function formKind(
  * `--sea`, …), global `box-sizing`, and focus-visible styling every homepage/standard-page section
  * still depends on via `var(--ink)` etc., so it stays — only the header/nav/footer markup is gone.
  */
-export function MarketingChrome({ children }: { locale: Locale; children: ReactNode }) {
+export function MarketingChrome({
+  children,
+  fullBleed = false,
+}: {
+  locale: Locale;
+  children: ReactNode;
+  fullBleed?: boolean;
+}) {
   return (
     <div className={styles.site}>
-      <main className={styles.main}>{children}</main>
+      <main className={fullBleed ? styles.mainFull : styles.main}>{children}</main>
     </div>
   );
 }
@@ -124,6 +134,13 @@ export function StandardPage({ locale, slug }: { locale: Locale; slug: Marketing
   const t = useTranslations("marketing");
   const key = pageKey[slug];
   const faq = slug === "faq";
+  if (isSubjectCurriculumSlug(slug)) {
+    return (
+      <MarketingChrome locale={locale} fullBleed={slug === "mathematics"}>
+        <SubjectCurriculumPage slug={slug} />
+      </MarketingChrome>
+    );
+  }
   return (
     <MarketingChrome locale={locale}>
       <section className={styles.pageHero}>

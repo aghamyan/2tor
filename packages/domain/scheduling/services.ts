@@ -18,8 +18,10 @@ import type {
   LessonListScope,
   LessonRecord,
   LessonSeriesRecord,
+  SchedulableAssignmentOption,
   SchedulingActor,
   SchedulingDatabase,
+  SubjectOption,
   ZoomMeetingRecord,
 } from "./models";
 import {
@@ -756,4 +758,37 @@ export async function listLessonsForActor(
     to: range.to,
     limit: range.limit ?? 100,
   });
+}
+
+/** Resolves to the same `tutorProfileId | null` (`null` = staff, sees everyone's) `requireCanSchedule` implicitly grants access under — mirrors `resolveScope` above but narrowed to the two roles that can actually schedule a lesson. */
+async function resolveSchedulingTutorScope(
+  database: SchedulingDatabase,
+  actor: SchedulingActor,
+): Promise<string | null> {
+  if (isStaff(actor)) return null;
+  if (actor.roles.includes("tutor")) {
+    const tutorProfileId = await database.resolveTutorProfileIdForUser(actor.userId);
+    if (tutorProfileId) return tutorProfileId;
+  }
+  throw new SchedulingError("FORBIDDEN", "Only tutors and staff can schedule lessons.", 403);
+}
+
+/** Active assignments the actor may schedule a lesson against — the new-lesson form's student picker. */
+export async function listSchedulableAssignments(
+  database: SchedulingDatabase,
+  actor: SchedulingActor | null | undefined,
+): Promise<SchedulableAssignmentOption[]> {
+  requireAuthenticated(actor);
+  const tutorProfileId = await resolveSchedulingTutorScope(database, actor);
+  return database.listSchedulableAssignments(tutorProfileId);
+}
+
+/** Subjects the actor may pick when scheduling a lesson — the new-lesson form's subject picker. */
+export async function listSchedulableSubjects(
+  database: SchedulingDatabase,
+  actor: SchedulingActor | null | undefined,
+): Promise<SubjectOption[]> {
+  requireAuthenticated(actor);
+  const tutorProfileId = await resolveSchedulingTutorScope(database, actor);
+  return database.listSchedulableSubjects(tutorProfileId);
 }

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useTranslations } from "next-intl";
+import type { ReactNode } from "react";
 
 import styles from "./dashboard.module.css";
 
@@ -11,6 +12,12 @@ export interface DashboardSummaryItem {
   detail: string;
   href?: string;
   emphasis?: "default" | "attention";
+  /**
+   * Extra interactive content (e.g. a join-lesson link) rendered as a sibling of the card's own
+   * link, never nested inside it — a link inside a link is invalid HTML and breaks keyboard/
+   * screen-reader navigation.
+   */
+  extra?: ReactNode;
 }
 
 function SummaryItem({ item }: { item: DashboardSummaryItem }) {
@@ -21,15 +28,17 @@ function SummaryItem({ item }: { item: DashboardSummaryItem }) {
       <span className={styles.summaryDetail}>{item.detail}</span>
     </>
   );
-  const className = styles.summaryItem;
 
-  return item.href ? (
-    <Link className={className} data-emphasis={item.emphasis ?? "default"} href={item.href}>
-      {content}
-    </Link>
-  ) : (
-    <div className={className} data-emphasis={item.emphasis ?? "default"}>
-      {content}
+  return (
+    <div className={styles.summaryItem} data-emphasis={item.emphasis ?? "default"}>
+      {item.href ? (
+        <Link className={styles.summaryItemBody} href={item.href}>
+          {content}
+        </Link>
+      ) : (
+        <div className={styles.summaryItemBody}>{content}</div>
+      )}
+      {item.extra}
     </div>
   );
 }
@@ -68,6 +77,7 @@ export function LocalizedDashboardSummary({
         detail: t(item.detailKey),
         href: item.href,
         emphasis: item.emphasis,
+        extra: item.extra,
       }))}
     />
   );

@@ -17,14 +17,14 @@ export async function DesktopNav({ locale }: { locale: Locale }) {
   return (
     <nav
       aria-label={t("site.nav.ariaLabel")}
-      className="hidden shrink-0 items-center gap-0.5 2xl:flex"
+      className={`${styles.navRail} hidden shrink-0 items-center gap-0.5 xl:flex`}
     >
       {primaryNav.map((entry) =>
         entry.type === "link" ? (
           <Link
             key={entry.id}
             href={localizedHref(locale, entry.href)}
-            className={`${styles.navLink} shrink-0 whitespace-nowrap rounded-md px-2 py-2 text-sm font-medium`}
+            className={`${styles.navLink} shrink-0 whitespace-nowrap rounded-lg px-3 py-2 text-sm font-medium`}
           >
             {t(entry.labelKey)}
           </Link>

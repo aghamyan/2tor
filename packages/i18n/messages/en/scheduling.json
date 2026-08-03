@@ -1,12 +1,29 @@
 {
   "scheduling": {
     "nav": {
-      "label": "Schedule"
+      "label": "Classes"
     },
     "overview": {
       "eyebrow": "Lessons",
       "title": "Your schedule",
+      "classesTitle": "Classes",
       "intro": "Upcoming and recent lessons, with Zoom links, attendance, and cancellation status in one place.",
+      "roleIntro": {
+        "student": "Everything for each lesson lives here — join your class, revisit the details, and find its homework.",
+        "parent": "Follow every class in one clear timeline, including attendance, learning updates, and homework progress.",
+        "tutor": "Run your teaching day from one place. Open a class to take attendance, share its learning record, and manage homework."
+      },
+      "upcoming": "Upcoming classes",
+      "completed": "Completed classes",
+      "missed": "Missed classes",
+      "subject": "Subject {subject}",
+      "openClass": "Open class",
+      "joinClass": "Join class",
+      "cardAudience": {
+        "student": "Your tutor",
+        "parent": "Child's class",
+        "tutor": "Teaching session"
+      },
       "scheduleLesson": "Schedule a lesson",
       "empty": "No lessons on the calendar yet.",
       "duration": "{minutes}-minute lesson",
@@ -22,6 +39,19 @@
     },
     "detail": {
       "eyebrow": "Lesson",
+      "classDetails": "Class details",
+      "classInformation": "Class information",
+      "subject": "Subject",
+      "dateAndTime": "Date & time",
+      "duration": "Duration",
+      "minutes": "{minutes} minutes",
+      "learningRecord": "Lesson record",
+      "learningRecordHint": "Your tutor's lesson summary and covered topics appear here after class.",
+      "materials": "Materials & attachments",
+      "materialsHint": "Slides, worksheets, recordings, and other shared materials will appear here when they are available.",
+      "homework": "Homework",
+      "homeworkHint": "Homework from this class is always available in the central homework workspace.",
+      "openHomework": "Open homework",
       "timezone": "Time zone",
       "isTrial": "Trial lesson",
       "yes": "Yes",
@@ -73,8 +103,12 @@
       "title": "Schedule a lesson",
       "intro": "Book a one-time lesson, or set up a weekly recurring series for an active tutor-student assignment.",
       "repeatsWeekly": "This lesson repeats weekly",
-      "assignmentId": "Tutor-student assignment ID",
-      "subjectId": "Subject ID",
+      "student": "Student",
+      "selectStudent": "Select a student",
+      "noAssignments": "You have no active students assigned to you yet.",
+      "subject": "Subject",
+      "selectSubject": "Select a subject",
+      "noSubjects": "No subjects are set up for you yet. Contact an administrator.",
       "durationMinutes": "Duration (minutes)",
       "startDate": "Start date",
       "endDate": "End date",
@@ -84,7 +118,7 @@
       "hour": "Hour (0-23)",
       "minute": "Minute (0-59)",
       "timezone": "Time zone",
-      "timezoneHint": "Use an IANA time zone such as America/Los_Angeles.",
+      "selectTimezone": "Select a time zone",
       "weekdays": "Days of the week",
       "weekday": {
         "SU": "Sun",

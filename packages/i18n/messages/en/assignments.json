@@ -1,22 +1,185 @@
 {
   "assignments": {
-    "nav": { "label": "Assignments" },
+    "nav": { "label": "Homework" },
+    "status": {
+      "draft": "Draft",
+      "published": "Published",
+      "closed": "Closed"
+    },
+    "submissionStatus": {
+      "not_started": "Not started",
+      "in_progress": "In progress",
+      "submitted": "Submitted",
+      "graded": "Graded",
+      "returned": "Returned"
+    },
+    "card": {
+      "student": "Student",
+      "subject": "Subject",
+      "dueOn": "Due {date}",
+      "noDueDate": "No due date",
+      "score": "{score} / {maxScore}"
+    },
     "overview": {
-      "kicker": "Coursework",
-      "title": "Assignments and feedback",
-      "intro": "Keep questions, submissions, protected files, and rubric-based feedback together.",
-      "security": "Uploaded files remain quarantined until malware scanning clears them.",
-      "create": {
-        "title": "Create an assignment",
-        "body": "Tutors can set questions, due dates, and scoring guidance for their assigned students."
+      "eyebrow": "Coursework",
+      "title": "Assignments",
+      "homeworkTitle": "Homework",
+      "intro": "Track questions, submissions, protected files, and rubric-based feedback in one place.",
+      "roleIntro": {
+        "student": "Every task from every class, organized by what needs your attention.",
+        "parent": "Keep up with assigned work, deadlines, completion, and tutor feedback — view only.",
+        "tutor": "Create, review, and return work without leaving the teaching workflow."
       },
-      "submit": {
-        "title": "Submit work",
-        "body": "Students can save answers and securely attach their work."
+      "homeworkStates": "Homework status",
+      "filterHomework": "Filter homework management view",
+      "groups": {
+        "pending": "Pending",
+        "submitted": "Submitted",
+        "reviewed": "Reviewed",
+        "overdue": "Overdue"
       },
-      "grade": {
-        "title": "Grade with a rubric",
-        "body": "Assigned tutors record scores and useful written feedback."
+      "createAssignment": "Create assignment",
+      "filtersLabel": "Filter assignments",
+      "statusFilter": "Status",
+      "allStatuses": "All statuses",
+      "applyFilters": "Apply filters",
+      "clearFilters": "Clear filters",
+      "emptyTitle": "No assignments yet",
+      "emptyBodyTutor": "Create your first assignment for one of your students to get started.",
+      "emptyBodyOther": "Nothing here yet. Assignments will appear once one is created.",
+      "paginationLabel": "Assignment pages",
+      "nextPage": "Next page"
+    },
+    "detail": {
+      "eyebrow": "Assignment",
+      "backToList": "Back to assignments",
+      "forStudent": "For {name}",
+      "dueDate": "Due date",
+      "noDueDate": "No due date",
+      "maxScore": "Max score",
+      "notSet": "Not set",
+      "submissionStatus": "Submission status",
+      "instructions": "Instructions",
+      "notPublishedYet": "This assignment hasn't been published yet. Check back once your tutor makes it available.",
+      "submissionReview": "Submission",
+      "noAnswerYet": "No answer yet",
+      "noSubmissionYet": "No submission yet.",
+      "publishAssignment": "Publish assignment",
+      "closeAssignment": "Close assignment",
+      "draftHint": "Publish this assignment so the student can see and submit it.",
+      "submission": {
+        "title": "Your work",
+        "locked": "This assignment is no longer open for submissions.",
+        "alreadyGradedNote": "This submission has already been graded. Saving changes will not remove the existing grade.",
+        "yourAnswer": "Your answer",
+        "fileUploadNote": "Attach your file in the Files section below.",
+        "saveDraft": "Save draft",
+        "submitFinal": "Submit final answer",
+        "points": "{points} pts",
+        "questionType": {
+          "short_answer": "Short answer",
+          "multiple_choice": "Multiple choice",
+          "file_upload": "File upload",
+          "essay": "Essay",
+          "code": "Code"
+        }
+      },
+      "files": {
+        "title": "Files",
+        "intro": "Uploaded files remain quarantined until malware scanning clears them.",
+        "empty": "No files uploaded yet.",
+        "download": "Download",
+        "preparingDownload": "Preparing…",
+        "chooseFile": "Choose a file",
+        "securityNote": "Files are scanned before they can be downloaded.",
+        "upload": "Upload",
+        "uploading": "Uploading…",
+        "scanStatus": {
+          "pending": "Scanning",
+          "clean": "Clean",
+          "infected": "Blocked",
+          "error": "Scan error"
+        },
+        "errors": {
+          "uploadFailed": "The file could not be uploaded. Please try again.",
+          "downloadFailed": "The download link could not be created. Please try again."
+        }
+      },
+      "grading": {
+        "title": "Grade",
+        "score": "Score",
+        "maxScore": "Max score",
+        "feedback": "Feedback",
+        "rubricScores": "Rubric scores",
+        "noCriteria": "No rubric criteria added yet.",
+        "rubric": "Rubric",
+        "selectRubric": "Select a rubric",
+        "criterion": "Criterion",
+        "criterionScore": "Score",
+        "criterionMax": "Max",
+        "removeCriterion": "Remove",
+        "removeCriterionFor": "Remove {criterion}",
+        "addCriterion": "Add criterion",
+        "noRubricsYet": "Create a rubric first to add scored criteria.",
+        "submitting": "Saving…",
+        "submitGrade": "Save grade",
+        "newRubricTitle": "Rubric title",
+        "newRubricDescription": "Description",
+        "createRubric": "Create rubric",
+        "cancel": "Cancel",
+        "newRubricPrompt": "+ Create a new rubric"
+      }
+    },
+    "newAssignment": {
+      "eyebrow": "Coursework",
+      "title": "Create an assignment",
+      "intro": "Set questions, a due date, and scoring guidance for one of your students.",
+      "student": "Student",
+      "selectStudent": "Select a student",
+      "noStudents": "You have no actively assigned students yet.",
+      "assignmentTitle": "Title",
+      "dueDate": "Due date",
+      "maxScore": "Max score",
+      "instructions": "Instructions",
+      "publishNow": "Publish immediately",
+      "publishHint": "Leave unchecked to save as a draft only you can see. You can publish it later.",
+      "questions": "Questions",
+      "questionType": "Question type",
+      "questionTypeOption": {
+        "short_answer": "Short answer",
+        "essay": "Essay",
+        "multiple_choice": "Multiple choice",
+        "file_upload": "File upload",
+        "code": "Code"
+      },
+      "points": "Points",
+      "prompt": "Prompt",
+      "options": "Answer options",
+      "optionKey": "Key",
+      "optionLabel": "Label",
+      "removeOption": "Remove option",
+      "addOption": "Add option",
+      "removeQuestion": "Remove question",
+      "addQuestion": "Add question",
+      "creating": "Creating…",
+      "create": "Create assignment"
+    },
+    "feedback": {
+      "assignmentCreated": "Assignment created.",
+      "assignmentPublished": "Assignment published.",
+      "assignmentClosed": "Assignment closed.",
+      "saved": "Saved.",
+      "submitted": "Submitted.",
+      "graded": "Grade saved.",
+      "rubricCreated": "Rubric created.",
+      "errors": {
+        "unauthenticated": "Please sign in again.",
+        "forbidden": "You do not have permission to do that.",
+        "notFound": "That item could not be found.",
+        "conflict": "This action could not be completed right now.",
+        "invalid": "Please check the form and try again.",
+        "invalidField": "This field needs attention.",
+        "generic": "Something went wrong. Please try again."
       }
     }
   }

@@ -5,6 +5,7 @@ export type AssignmentQuestionType =
   "short_answer" | "multiple_choice" | "file_upload" | "essay" | "code";
 export type SubmissionStatus = "not_started" | "in_progress" | "submitted" | "graded" | "returned";
 export type VirusScanStatus = "pending" | "clean" | "infected" | "error";
+export type TutorAssignmentRelationStatus = "proposed" | "active" | "ended" | "rejected";
 
 export interface AssignmentActor {
   userId: string;
@@ -111,10 +112,50 @@ export interface RubricScoreRecord {
   createdAt: Date;
 }
 
+export interface AssignmentListFilter {
+  /** `null` means no student restriction (staff, sees every assignment). Never `[]` reaching the DB — callers short-circuit an empty scope before querying. */
+  studentProfileIds: string[] | null;
+  status?: AssignmentStatus;
+  subjectId?: string;
+  cursor?: string | null;
+  limit: number;
+}
+
+export interface AssignmentSummaryRecord {
+  id: string;
+  title: string;
+  status: AssignmentStatus;
+  dueAt: Date | null;
+  maxScore: number | null;
+  studentProfileId: string;
+  studentName: string;
+  subjectId: string | null;
+  subjectName: string | null;
+  submissionStatus: SubmissionStatus | null;
+  score: number | null;
+  createdAt: Date;
+}
+
+export interface AssignmentPage {
+  items: AssignmentSummaryRecord[];
+  nextCursor: string | null;
+}
+
+export interface TutorAssignmentFact {
+  status: TutorAssignmentRelationStatus;
+  endAt: Date | null;
+}
+
 export interface AssignmentDatabase {
   transaction<T>(operation: (database: AssignmentDatabase) => Promise<T>): Promise<T>;
   saveAssignment(assignment: AssignmentRecord): Promise<void>;
   getAssignment(assignmentId: string): Promise<AssignmentRecord | null>;
+  listAssignments(filter: AssignmentListFilter): Promise<AssignmentSummaryRecord[]>;
+  updateAssignmentStatus(
+    assignmentId: string,
+    status: AssignmentStatus,
+    updatedAt: Date,
+  ): Promise<void>;
   saveSubmission(submission: SubmissionRecord): Promise<void>;
   getSubmission(submissionId: string): Promise<SubmissionRecord | null>;
   getSubmissionForAssignmentStudent(
@@ -124,13 +165,29 @@ export interface AssignmentDatabase {
   replaceSubmissionAnswers(submissionId: string, answers: SubmissionAnswerRecord[]): Promise<void>;
   saveSubmissionFile(file: SubmissionFileRecord): Promise<void>;
   getSubmissionFile(fileId: string): Promise<SubmissionFileRecord | null>;
+  listSubmissionFiles(submissionId: string): Promise<SubmissionFileRecord[]>;
   updateSubmissionFileScanStatus(fileId: string, status: VirusScanStatus): Promise<void>;
   saveGrading(grading: GradingRecord): Promise<void>;
+  getGradingForSubmission(submissionId: string): Promise<GradingRecord | null>;
   replaceRubricScores(submissionId: string, scores: RubricScoreRecord[]): Promise<void>;
+  listRubricScoresForSubmission(submissionId: string): Promise<RubricScoreRecord[]>;
   saveRubric(rubric: RubricRecord): Promise<void>;
   getRubric(rubricId: string): Promise<RubricRecord | null>;
+  listAssignmentRubrics(): Promise<RubricRecord[]>;
   findStudentProfileIdByUserId(userId: string): Promise<string | null>;
+  getStudentDisplayName(studentProfileId: string): Promise<string | null>;
   isTutorAssignedToStudent(tutorUserId: string, studentProfileId: string): Promise<boolean>;
+  /** The raw relationship fact, for the web-boundary `@app/auth` `authorize()` gate — see `apps/web/app/(app)/assignments/authorization.ts`. */
+  getTutorAssignmentFact(
+    tutorUserId: string,
+    studentProfileId: string,
+  ): Promise<TutorAssignmentFact | null>;
+  isParentLinkedToStudent(parentUserId: string, studentProfileId: string): Promise<boolean>;
+  /** Also powers the "create assignment" student picker, hence the display name alongside each id. */
+  listActiveStudentsForTutor(
+    tutorUserId: string,
+  ): Promise<{ studentProfileId: string; studentName: string }[]>;
+  listLinkedStudentProfileIdsForParent(parentUserId: string): Promise<string[]>;
   listStaleAssignmentReminders(
     before: Date,
     limit: number,

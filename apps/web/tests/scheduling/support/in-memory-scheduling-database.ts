@@ -14,7 +14,9 @@ import type {
   NewLessonSeriesValues,
   NewLessonValues,
   NewZoomMeetingValues,
+  SchedulableAssignmentOption,
   SchedulingDatabase,
+  SubjectOption,
   ZoomMeetingRecord,
 } from "../../../../../packages/domain/scheduling/models";
 
@@ -42,6 +44,9 @@ export class InMemorySchedulingDatabase implements SchedulingDatabase {
   readonly studentProfileIdByUserId = new Map<string, string>();
   readonly parentProfileIdByUserId = new Map<string, string>();
   readonly parentLinks = new Map<string, Set<string>>();
+
+  readonly schedulableAssignmentsByTutor = new Map<string, SchedulableAssignmentOption[]>();
+  readonly schedulableSubjectsByTutor = new Map<string, SubjectOption[]>();
 
   async transaction<T>(operation: (database: SchedulingDatabase) => Promise<T>): Promise<T> {
     return operation(this);
@@ -80,6 +85,28 @@ export class InMemorySchedulingDatabase implements SchedulingDatabase {
     const parentProfileId = this.parentProfileIdByUserId.get(parentUserId);
     if (!parentProfileId) return false;
     return this.parentLinks.get(parentProfileId)?.has(studentProfileId) ?? false;
+  }
+
+  seedSchedulableAssignment(tutorProfileId: string, option: SchedulableAssignmentOption): void {
+    const list = this.schedulableAssignmentsByTutor.get(tutorProfileId) ?? [];
+    list.push(option);
+    this.schedulableAssignmentsByTutor.set(tutorProfileId, list);
+  }
+
+  seedSchedulableSubject(tutorProfileId: string, option: SubjectOption): void {
+    const list = this.schedulableSubjectsByTutor.get(tutorProfileId) ?? [];
+    list.push(option);
+    this.schedulableSubjectsByTutor.set(tutorProfileId, list);
+  }
+
+  async listSchedulableAssignments(tutorProfileId: string | null) {
+    if (tutorProfileId) return [...(this.schedulableAssignmentsByTutor.get(tutorProfileId) ?? [])];
+    return [...this.schedulableAssignmentsByTutor.values()].flat();
+  }
+
+  async listSchedulableSubjects(tutorProfileId: string | null) {
+    if (tutorProfileId) return [...(this.schedulableSubjectsByTutor.get(tutorProfileId) ?? [])];
+    return [...this.schedulableSubjectsByTutor.values()].flat();
   }
 
   async createLessonSeries(values: NewLessonSeriesValues) {

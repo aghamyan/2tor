@@ -29,7 +29,7 @@ export async function generateMetadata(): Promise<Metadata> {
       description,
       type: "website",
       locale,
-      siteName: "Loom կրթություն",
+      siteName: "2tor",
     },
   };
 }
@@ -45,7 +45,7 @@ function organizationJsonLd(locale: "en" | "hy", description: string) {
   return {
     "@context": "https://schema.org",
     "@type": "EducationalOrganization",
-    name: "Loom կրթություն",
+    name: "2tor",
     description,
     inLanguage: locale,
   };
@@ -55,7 +55,7 @@ export default async function Page() {
   const locale = resolveLocale((await headers()).get("x-locale"));
   const t = await getTranslations({ locale, namespace: "marketing" });
   return (
-    <MarketingChrome locale={locale}>
+    <MarketingChrome locale={locale} fullBleed>
       <HomePageContent locale={locale} />
       <script
         type="application/ld+json"

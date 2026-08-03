@@ -8,7 +8,7 @@ import { MarketingChrome } from "../../../components/marketing/marketing-site";
 import styles from "../../../components/marketing/marketing.module.css";
 
 export const metadata: Metadata = {
-  title: "Sign in | Loom կրթություն",
+  title: "Sign in | 2tor",
 };
 
 export default async function LoginPage({

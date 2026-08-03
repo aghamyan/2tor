@@ -29,3 +29,7 @@ test-results/
 *.log
 npm-debug.log*
 pnpm-debug.log*
+
+# python (skill scripts)
+__pycache__/
+*.pyc

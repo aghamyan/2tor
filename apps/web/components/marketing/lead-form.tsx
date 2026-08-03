@@ -6,8 +6,10 @@ import styles from "./marketing.module.css";
 
 export function LeadForm({
   kind = "consultation",
+  defaultInterest,
 }: {
-  kind?: "consultation" | "assessment" | "contact" | "tutor_application";
+  kind?: "consultation" | "assessment" | "contact" | "tutor_application" | "trial_class";
+  defaultInterest?: string;
 }) {
   const t = useTranslations("marketing.form");
   const locale = useLocale();
@@ -69,7 +71,12 @@ export function LeadForm({
       </div>
       <div className={styles.field}>
         <label htmlFor="lead-interest">{t("interest")}</label>
-        <input id="lead-interest" name="interest" maxLength={160} />
+        <input
+          id="lead-interest"
+          name="interest"
+          maxLength={160}
+          defaultValue={defaultInterest}
+        />
       </div>
       <div className={styles.field}>
         <label htmlFor="lead-message">{t("message")}</label>

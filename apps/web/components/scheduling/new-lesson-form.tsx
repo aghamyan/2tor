@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 
 import {
@@ -8,13 +8,36 @@ import {
   createOneTimeLessonAction,
 } from "../../app/(app)/scheduling/actions";
 import { initialSchedulingActionState } from "../../app/(app)/scheduling/action-state";
+import type {
+  SchedulableAssignmentOption,
+  SubjectOption,
+} from "../../../../packages/domain/scheduling/models";
 import { WEEKDAYS } from "../../../../packages/domain/scheduling/recurrence";
 import { ActionFeedback, FieldError } from "./action-feedback";
+import { detectBrowserTimezone, getTimezoneOptions } from "./timezones";
 import styles from "./scheduling.module.css";
 
-export function NewLessonForm() {
+function assignmentLabel(assignment: SchedulableAssignmentOption): string {
+  return assignment.subjectName
+    ? `${assignment.studentName} — ${assignment.subjectName}`
+    : assignment.studentName;
+}
+
+export function NewLessonForm({
+  assignments,
+  subjects,
+}: {
+  assignments: SchedulableAssignmentOption[];
+  subjects: SubjectOption[];
+}) {
   const t = useTranslations("scheduling.newLesson");
+  const timezoneOptions = useMemo(() => getTimezoneOptions(), []);
   const [recurring, setRecurring] = useState(false);
+  const [assignmentId, setAssignmentId] = useState("");
+  const [subjectId, setSubjectId] = useState("");
+  const [timezone, setTimezone] = useState(() =>
+    typeof window === "undefined" ? "" : detectBrowserTimezone(),
+  );
   const [oneTimeState, oneTimeAction, oneTimePending] = useActionState(
     createOneTimeLessonAction,
     initialSchedulingActionState,
@@ -27,6 +50,13 @@ export function NewLessonForm() {
   const state = recurring ? seriesState : oneTimeState;
   const action = recurring ? seriesAction : oneTimeAction;
   const pending = recurring ? seriesPending : oneTimePending;
+  const canSchedule = assignments.length > 0 && subjects.length > 0;
+
+  function handleAssignmentChange(id: string) {
+    setAssignmentId(id);
+    const match = assignments.find((assignment) => assignment.id === id);
+    if (match?.subjectId) setSubjectId(match.subjectId);
+  }
 
   return (
     <div className={styles.shell}>
@@ -39,6 +69,11 @@ export function NewLessonForm() {
       </header>
 
       <section className={styles.panel}>
+        {assignments.length === 0 ? <p className={styles.hint}>{t("noAssignments")}</p> : null}
+        {assignments.length > 0 && subjects.length === 0 ? (
+          <p className={styles.hint}>{t("noSubjects")}</p>
+        ) : null}
+
         <div className={styles.checkboxRow}>
           <input
             id="recurring-toggle"
@@ -55,21 +90,48 @@ export function NewLessonForm() {
           <div className={styles.formGrid}>
             <div className={styles.field}>
               <label className={styles.label} htmlFor="assignment-id">
-                {t("assignmentId")}
+                {t("student")}
               </label>
-              <input
-                className={styles.input}
+              <select
+                className={styles.select}
                 id="assignment-id"
                 name="tutorStudentAssignmentId"
+                value={assignmentId}
+                onChange={(event) => handleAssignmentChange(event.target.value)}
                 required
-              />
+              >
+                <option value="" disabled>
+                  {t("selectStudent")}
+                </option>
+                {assignments.map((assignment) => (
+                  <option key={assignment.id} value={assignment.id}>
+                    {assignmentLabel(assignment)}
+                  </option>
+                ))}
+              </select>
               <FieldError state={state} name="tutorStudentAssignmentId" />
             </div>
             <div className={styles.field}>
               <label className={styles.label} htmlFor="subject-id">
-                {t("subjectId")}
+                {t("subject")}
               </label>
-              <input className={styles.input} id="subject-id" name="subjectId" required />
+              <select
+                className={styles.select}
+                id="subject-id"
+                name="subjectId"
+                value={subjectId}
+                onChange={(event) => setSubjectId(event.target.value)}
+                required
+              >
+                <option value="" disabled>
+                  {t("selectSubject")}
+                </option>
+                {subjects.map((subject) => (
+                  <option key={subject.id} value={subject.id}>
+                    {subject.name}
+                  </option>
+                ))}
+              </select>
               <FieldError state={state} name="subjectId" />
             </div>
             <div className={styles.field}>
@@ -160,14 +222,23 @@ export function NewLessonForm() {
                   <label className={styles.label} htmlFor="series-timezone">
                     {t("timezone")}
                   </label>
-                  <input
-                    className={styles.input}
+                  <select
+                    className={styles.select}
                     id="series-timezone"
                     name="timezone"
-                    placeholder="America/Los_Angeles"
+                    value={timezone}
+                    onChange={(event) => setTimezone(event.target.value)}
                     required
-                  />
-                  <p className={styles.hint}>{t("timezoneHint")}</p>
+                  >
+                    <option value="" disabled>
+                      {t("selectTimezone")}
+                    </option>
+                    {timezoneOptions.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
                 </div>
               </div>
               <fieldset className={styles.field}>
@@ -212,13 +283,23 @@ export function NewLessonForm() {
                 <label className={styles.label} htmlFor="one-time-timezone">
                   {t("timezone")}
                 </label>
-                <input
-                  className={styles.input}
+                <select
+                  className={styles.select}
                   id="one-time-timezone"
                   name="timezoneAtBooking"
-                  placeholder="America/Los_Angeles"
+                  value={timezone}
+                  onChange={(event) => setTimezone(event.target.value)}
                   required
-                />
+                >
+                  <option value="" disabled>
+                    {t("selectTimezone")}
+                  </option>
+                  {timezoneOptions.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
               </div>
               <div className={styles.checkboxRow}>
                 <input id="is-trial" type="checkbox" name="isTrial" />
@@ -227,7 +308,7 @@ export function NewLessonForm() {
             </div>
           )}
 
-          <button className={styles.button} type="submit" disabled={pending}>
+          <button className={styles.button} type="submit" disabled={pending || !canSchedule}>
             {recurring ? t("createSeries") : t("createLesson")}
           </button>
         </form>

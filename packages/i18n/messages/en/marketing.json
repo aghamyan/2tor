@@ -22,7 +22,9 @@
           "label": "Subjects",
           "mathematics": "Mathematics",
           "programming": "Programming",
-          "heritage": "Armenian heritage"
+          "heritage": "Armenian language & culture",
+          "sat": "SAT",
+          "toefl": "TOEFL"
         },
         "groupLessons": "Group lessons",
         "forParents": "For parents",
@@ -60,12 +62,14 @@
       },
       "footer": {
         "subjectsHeading": "Subjects",
-        "companyHeading": "About Loom",
+        "companyHeading": "About 2tor",
         "familiesHeading": "Families & tutors",
         "legalHeading": "Legal",
         "mathematics": "Mathematics",
         "programming": "Programming",
-        "heritage": "Armenian heritage",
+        "heritage": "Armenian language & culture",
+        "sat": "SAT",
+        "toefl": "TOEFL",
         "howItWorks": "How it works",
         "groupLessons": "Group lessons",
         "pricing": "Pricing",
@@ -76,13 +80,13 @@
         "privacy": "Privacy",
         "terms": "Terms",
         "contact": "Contact",
-        "copyright": "© {year} Loom կրթություն. All rights reserved."
+        "copyright": "© {year} 2tor. All rights reserved."
       }
     },
     "home": {
       "meta": {
-        "title": "Personalized online tutoring with verified Armenian educators",
-        "description": "Math, programming, and Armenian heritage lessons built around each learner's goals, with structured feedback, milestones, projects, and support between classes."
+        "title": "A complete learning system parents can trust",
+        "description": "Structured mathematics and Armenian Heritage learning with verified tutors, lesson-by-lesson feedback, parent-visible progress, and free weekly problem solving."
       },
       "hero": {
         "eyebrow": "A managed school, not a marketplace",
@@ -101,12 +105,12 @@
         }
       },
       "trustBar": {
-        "label": "Why families trust Loom",
+        "label": "Why families trust 2tor",
         "items": {
-          "verified": "Every tutor is hand-verified and trained on a U.S. curriculum",
-          "parentsSee": "Parents see schedules, feedback, and progress — always",
-          "noPrivateMessaging": "No private adult-child messaging, ever",
-          "feedback": "Structured feedback after every single lesson"
+          "verified": "Hand-verified educators",
+          "parentsSee": "Progress parents can see",
+          "noPrivateMessaging": "No private adult-child messaging",
+          "feedback": "Feedback after every lesson"
         }
       },
       "howItWorks": {
@@ -134,23 +138,54 @@
       },
       "subjects": {
         "eyebrow": "Subjects",
-        "title": "Three subjects. One consistent standard.",
-        "description": "Every subject follows the same structure: clear goals, real feedback, and work your learner can point to.",
+        "title": "Every subject, one consistent standard.",
+        "description": "From core subjects to test prep, every course follows the same structure: clear goals, real feedback, and work your learner can point to.",
         "items": {
+          "heritage": {
+            "title": "Armenian language & culture",
+            "body": "Reading, speaking, and writing Armenian alongside history and culture — taught by educators who carry the language as their own, not an afterthought subject.",
+            "cta": "Explore the curriculum",
+            "highlights": ["Reading & writing", "Conversational speaking", "History & culture"]
+          },
           "mathematics": {
             "title": "Mathematics",
             "body": "From foundations to advanced coursework, taught for understanding — with practice that builds real fluency, not just answers.",
-            "cta": "Explore mathematics"
+            "cta": "Explore the curriculum",
+            "highlights": [
+              "Foundations & number sense",
+              "Algebra & functions",
+              "Geometry & trigonometry"
+            ]
           },
           "programming": {
             "title": "Programming",
             "body": "Learners build and ship real projects — websites, games, tools — while developing the habits of testing, debugging, and explaining their work.",
-            "cta": "Explore programming"
+            "cta": "Explore the curriculum",
+            "highlights": [
+              "Web & app projects",
+              "Games & creative coding",
+              "Testing & debugging habits"
+            ]
           },
-          "heritage": {
-            "title": "Armenian language & heritage",
-            "body": "Reading, speaking, and writing Armenian alongside history and culture — taught by educators who carry the language as their own, not an afterthought subject.",
-            "cta": "Explore Armenian heritage"
+          "sat": {
+            "title": "SAT",
+            "body": "Focused preparation across Reading & Writing and Math, with full-length practice tests and pacing strategy built around your learner's target score.",
+            "cta": "Explore the curriculum",
+            "highlights": [
+              "Reading & writing",
+              "Math & data analysis",
+              "Full-length practice tests"
+            ]
+          },
+          "toefl": {
+            "title": "TOEFL",
+            "body": "Reading, listening, speaking, and writing preparation for learners aiming to demonstrate academic English proficiency with confidence.",
+            "cta": "Explore the curriculum",
+            "highlights": [
+              "Reading & listening",
+              "Speaking & writing",
+              "Full-length practice tests"
+            ]
           }
         }
       },
@@ -169,7 +204,7 @@
           },
           "accountability": {
             "title": "Accountability",
-            "body": "Tutors are trained, reviewed, and part of the Loom team — not independent contractors you vet yourself."
+            "body": "Tutors are trained, reviewed, and part of the 2tor team — not independent contractors you vet yourself."
           },
           "safety": {
             "title": "Child safety",
@@ -193,7 +228,7 @@
             ]
           },
           "heritage": {
-            "label": "Armenian heritage",
+            "label": "Armenian language & culture",
             "title": "A family-history timeline",
             "body": "Learners research and document their own family's story, connecting language study to something personal and lasting.",
             "deliverables": [
@@ -229,13 +264,17 @@
         "preview": {
           "label": "Parent dashboard preview",
           "headline": "Progress trend, this term",
-          "caption": "Illustrative preview — built from structured feedback after each lesson."
+          "caption": "Illustrative preview — built from structured feedback after each lesson.",
+          "week": "Week 08",
+          "lessons": "Lessons",
+          "milestones": "Milestones",
+          "projects": "Projects"
         }
       },
       "tutors": {
         "eyebrow": "Our educators",
         "title": "Educators who are part of our school, not strangers from a listing",
-        "description": "Every tutor is hand-verified, trained on a U.S. curriculum, and supported by our team — publicly part of the Loom name, not an anonymous profile.",
+        "description": "Every tutor is hand-verified, trained on a U.S. curriculum, and supported by our team — publicly part of the 2tor name, not an anonymous profile.",
         "cta": "Apply to teach with us"
       },
       "testimonials": {
@@ -245,11 +284,11 @@
         "items": {
           "one": {
             "quote": "We finally know what our son is working on and why it matters — not just that a lesson happened.",
-            "attribution": "— Parent of a Loom mathematics student"
+            "attribution": "— Parent of a 2tor mathematics student"
           },
           "two": {
             "quote": "The feedback after every class is specific enough that we can actually help at home.",
-            "attribution": "— Parent of a Loom Armenian heritage student"
+            "attribution": "— Parent of a 2tor Armenian language & culture student"
           }
         }
       },
@@ -279,7 +318,7 @@
       "adult": "Adult",
       "interest": "What would you like help with?",
       "message": "Anything else we should know?",
-      "consent": "I agree that Loom may use these details to respond to my request, as described in the Privacy page.",
+      "consent": "I agree that 2tor may use these details to respond to my request, as described in the Privacy page.",
       "submit": "Send request",
       "sending": "Sending…",
       "success": "Thank you. Your request is with our team.",
@@ -314,7 +353,35 @@
         "eyebrow": "Subject learning",
         "title": "Mathematics",
         "description": "Reasoning, not rushing.",
-        "body": "Mathematics lessons make thinking visible. Learners work with patterns, representations, explanations, and carefully chosen practice so fluency grows alongside understanding."
+        "body": "Mathematics lessons make thinking visible. Learners work with patterns, representations, explanations, and carefully chosen practice so fluency grows alongside understanding.",
+        "audienceLabel": "Who this is for",
+        "audience": "Learners from early number sense through pre-calculus — whether catching up, keeping pace, or reaching ahead of grade level.",
+        "curriculumHeading": "What your child will learn",
+        "curriculumIntro": "A structured path through five areas, adapted to your learner's current level and goals.",
+        "modules": [
+          {
+            "title": "Foundations & number sense",
+            "body": "Arithmetic fluency, ratios, and proportional reasoning built for real understanding, not memorized steps."
+          },
+          {
+            "title": "Algebra & functions",
+            "body": "Equations, graphing, and functions as tools for modeling real situations, not abstract symbol pushing."
+          },
+          {
+            "title": "Geometry & trigonometry",
+            "body": "Shapes, proof, and spatial reasoning, connected to visual intuition and step-by-step justification."
+          },
+          {
+            "title": "Advanced topics & calculus prep",
+            "body": "Pre-calculus and introductory calculus for learners moving toward higher-level coursework."
+          },
+          {
+            "title": "Problem-solving practice",
+            "body": "Non-routine problems that build the stamina and reasoning both coursework and competitions reward."
+          }
+        ],
+        "ctaHeading": "Request a free 30-minute class",
+        "ctaBody": "See how a lesson works before you commit to anything. Share a few details and we will schedule a free 30-minute mathematics class."
       },
       "programming": {
         "eyebrow": "Subject learning",
@@ -324,9 +391,105 @@
       },
       "armenianHeritage": {
         "eyebrow": "Subject learning",
-        "title": "Armenian language & heritage",
+        "title": "Armenian language & culture",
         "description": "Language as a living connection.",
-        "body": "Lessons bring language, history, and creative expression together. Learners read, speak, write, and investigate cultural material in ways that invite genuine participation."
+        "body": "Lessons bring language, history, and creative expression together. Learners read, speak, write, and investigate cultural material in ways that invite genuine participation.",
+        "audienceLabel": "Who this is for",
+        "audience": "Learners at any starting point — from a first introduction to the Armenian alphabet through advanced reading, writing, and conversation.",
+        "curriculumHeading": "What your child will learn",
+        "curriculumIntro": "A structured path through five areas, adapted to your learner's current level and goals.",
+        "modules": [
+          {
+            "title": "Reading & writing",
+            "body": "The Armenian alphabet, phonics, and composition, from first letters to fluent, confident writing."
+          },
+          {
+            "title": "Conversational speaking",
+            "body": "Everyday conversation and listening practice with a tutor who speaks Armenian as a first language."
+          },
+          {
+            "title": "Grammar & structure",
+            "body": "The grammar patterns that turn vocabulary into correct, natural sentences."
+          },
+          {
+            "title": "History & culture",
+            "body": "The people, events, and traditions that give the language its context and meaning."
+          },
+          {
+            "title": "Literature & storytelling",
+            "body": "Armenian stories, poetry, and folk tales, read and discussed together."
+          }
+        ],
+        "ctaHeading": "Request a free 30-minute class",
+        "ctaBody": "See how a lesson works before you commit to anything. Share a few details and we will schedule a free 30-minute Armenian language & culture class."
+      },
+      "sat": {
+        "eyebrow": "Test preparation",
+        "title": "SAT",
+        "description": "Focused preparation, not generic drilling.",
+        "body": "SAT preparation is built around your learner's actual gaps, using official-style questions and honest, specific feedback so practice time is never wasted on material they have already mastered.",
+        "audienceLabel": "Who this is for",
+        "audience": "Students preparing for an upcoming SAT who want a structured plan rather than scattered practice books.",
+        "curriculumHeading": "What your child will learn",
+        "curriculumIntro": "A structured path through five areas, paced against your learner's test date.",
+        "modules": [
+          {
+            "title": "Reading & writing",
+            "body": "Evidence-based reading, grammar, and rhetoric across the digital SAT's Reading & Writing module."
+          },
+          {
+            "title": "Algebra & functions",
+            "body": "Linear and nonlinear equations, systems, and function reasoning, the backbone of the Math section."
+          },
+          {
+            "title": "Problem-solving & data analysis",
+            "body": "Ratios, percentages, and interpreting real data sets and graphs under timed conditions."
+          },
+          {
+            "title": "Geometry & trigonometry",
+            "body": "The geometry and trigonometry topics the SAT tests most often, with efficient solving methods."
+          },
+          {
+            "title": "Full-length practice & strategy",
+            "body": "Timed practice tests, pacing, and section-specific strategy review before test day."
+          }
+        ],
+        "ctaHeading": "Request a free 30-minute class",
+        "ctaBody": "See how a lesson works before you commit to anything. Share a few details and we will schedule a free 30-minute SAT class."
+      },
+      "toefl": {
+        "eyebrow": "Test preparation",
+        "title": "TOEFL",
+        "description": "Confident academic English, section by section.",
+        "body": "TOEFL preparation combines academic vocabulary, exam-specific technique, and structured feedback on speaking and writing, so learners walk into the test knowing exactly what each section expects of them.",
+        "audienceLabel": "Who this is for",
+        "audience": "Students preparing to study or work in an English-language academic environment and needing a target TOEFL score.",
+        "curriculumHeading": "What your child will learn",
+        "curriculumIntro": "A structured path through five areas, paced against your learner's test date.",
+        "modules": [
+          {
+            "title": "Reading",
+            "body": "Academic passages, vocabulary in context, and efficient reading strategy under time pressure."
+          },
+          {
+            "title": "Listening",
+            "body": "Lectures and conversations, note-taking technique, and comprehension practice."
+          },
+          {
+            "title": "Speaking",
+            "body": "Structured practice for independent and integrated speaking tasks, with feedback on fluency and clarity."
+          },
+          {
+            "title": "Writing",
+            "body": "Integrated and independent writing tasks, from outlining to a polished academic paragraph."
+          },
+          {
+            "title": "Full-length practice & strategy",
+            "body": "Timed practice sections and section-specific strategy review before test day."
+          }
+        ],
+        "ctaHeading": "Request a free 30-minute class",
+        "ctaBody": "See how a lesson works before you commit to anything. Share a few details and we will schedule a free 30-minute TOEFL class."
       },
       "groupLessons": {
         "eyebrow": "Learning formats",

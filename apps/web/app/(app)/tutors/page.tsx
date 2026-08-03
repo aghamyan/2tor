@@ -1,4 +1,4 @@
-import { TutorOverview } from "../../../components/tutors/tutor-overview";
+import { TutorWorkspace } from "../../../components/tutors/tutor-workspace";
 import { currentTutorContext } from "./context";
 
 export default async function TutorsPage() {
@@ -28,7 +28,7 @@ export default async function TutorsPage() {
       ])
     : [[], [], [], [], [], [], [], [], []];
   return (
-    <TutorOverview
+    <TutorWorkspace
       profile={profile}
       subjects={subjects}
       gradeRanges={gradeRanges}

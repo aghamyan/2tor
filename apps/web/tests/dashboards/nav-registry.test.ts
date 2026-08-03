@@ -23,6 +23,7 @@ const productionModuleIds = [
   "scheduling.overview",
   "support.queue",
   "tutors.profile",
+  "tutors.students",
 ] as const;
 
 describe("authenticated module nav aggregation", () => {

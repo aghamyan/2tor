@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { AssignmentError } from "../../../../packages/domain/assignments/errors";
 import {
   createAssignment,
+  getAssignmentForActor,
   getDownloadableSubmissionFile,
   getSubmissionForActor,
   gradeSubmission,
@@ -106,6 +107,44 @@ describe("assignment submission security", () => {
         score: 8,
         maxScore: 10,
         feedback: "Good method.",
+        rubricScores: [],
+      }),
+    ).rejects.toMatchObject({ code: "FORBIDDEN" } satisfies Partial<AssignmentError>);
+  });
+});
+
+describe("parent read access", () => {
+  const linkedParent = { userId: "parent-linked", roles: ["parent"] as const };
+  const unrelatedParent = { userId: "parent-unrelated", roles: ["parent"] as const };
+
+  it("lets a linked parent view the assignment and submission, but denies an unrelated parent", async () => {
+    const { database, assignment, submission } = await setup();
+    database.parentLinks.add("parent-linked:student-1");
+
+    await expect(
+      getAssignmentForActor(database, linkedParent, assignment.id),
+    ).resolves.toMatchObject({ id: assignment.id });
+    await expect(
+      getSubmissionForActor(database, linkedParent, submission.id),
+    ).resolves.toMatchObject({ id: submission.id });
+
+    await expect(
+      getAssignmentForActor(database, unrelatedParent, assignment.id),
+    ).rejects.toMatchObject({ code: "FORBIDDEN" } satisfies Partial<AssignmentError>);
+    await expect(
+      getSubmissionForActor(database, unrelatedParent, submission.id),
+    ).rejects.toMatchObject({ code: "FORBIDDEN" } satisfies Partial<AssignmentError>);
+  });
+
+  it("never lets a parent grade a submission, even when linked", async () => {
+    const { database, submission } = await setup();
+    database.parentLinks.add("parent-linked:student-1");
+
+    await expect(
+      gradeSubmission(database, linkedParent, submission.id, {
+        score: 9,
+        maxScore: 10,
+        feedback: "Nice work.",
         rubricScores: [],
       }),
     ).rejects.toMatchObject({ code: "FORBIDDEN" } satisfies Partial<AssignmentError>);
