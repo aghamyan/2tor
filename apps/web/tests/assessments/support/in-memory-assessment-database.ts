@@ -147,6 +147,12 @@ export class InMemoryAssessmentDatabase implements AssessmentDatabase {
     return this.tutorAssignments.has(`${tutorUserId}:${studentProfileId}`);
   }
 
+  async listAssignedTutorUserIds(studentProfileId: string) {
+    return [...this.tutorAssignments]
+      .filter((key) => key.endsWith(`:${studentProfileId}`))
+      .map((key) => key.slice(0, key.length - studentProfileId.length - 1));
+  }
+
   async isParentLinkedToStudent(parentUserId: string, studentProfileId: string) {
     return this.parentLinks.has(`${parentUserId}:${studentProfileId}`);
   }

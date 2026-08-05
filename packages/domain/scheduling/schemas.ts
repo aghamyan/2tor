@@ -70,6 +70,9 @@ export const rescheduleLessonInputSchema = z
     newScheduledStartAt: z.coerce.date(),
     durationMinutes: durationMinutesSchema,
     reason: reasonSchema,
+    scope: z
+      .enum(["this_lesson", "this_and_future", "entire_series"])
+      .default("this_lesson"),
   })
   .strict();
 

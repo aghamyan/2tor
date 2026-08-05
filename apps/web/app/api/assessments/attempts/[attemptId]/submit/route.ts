@@ -1,7 +1,11 @@
+import { notify } from "@app/notifications/dispatch";
 import { NextResponse, type NextRequest } from "next/server";
+import type { AssessmentNotifier } from "../../../../../../../../packages/domain/assessments/models";
 import { submitAssessmentAttempt } from "../../../../../../../../packages/domain/assessments/services";
 import { apiAssessmentContext } from "../../../_context";
 import { assessmentApiError, assessmentRequestId } from "../../../_response";
+
+const notifier: AssessmentNotifier = { notify };
 
 export async function POST(
   request: NextRequest,
@@ -16,6 +20,7 @@ export async function POST(
       context.actor,
       attemptId,
       await request.json(),
+      notifier,
     );
     return NextResponse.json({ data: attempt, requestId });
   } catch (error) {

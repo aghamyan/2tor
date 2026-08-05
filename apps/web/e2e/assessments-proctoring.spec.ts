@@ -74,14 +74,32 @@ test("exam mode blocks the context menu and clipboard, intercepts shortcuts, and
   const startResponse = page.waitForResponse(
     (response) => response.url().includes(`/api/assessments/${assessmentId}/attempts`) && response.request().method() === "POST",
   );
+  // Starting the attempt opens the exam in a new tab (`window.open` from AssessmentEntry) — the
+  // original tab only ever shows a "opened in a new tab" confirmation after this.
+  const popupPromise = page.waitForEvent("popup");
   await page.getByRole("button", { name: /begin assessment/i }).click();
   const started = (await (await startResponse).json()) as DataEnvelope<StartedAttempt>;
   const attemptId = started.data.attempt.id;
-  await expect(page.getByRole("heading", { name: "E2E proctoring check" })).toBeVisible();
+  const examPage = await popupPromise;
+  await examPage.waitForLoadState();
+
+  // No camera required in this fixture, so the exam tab's "ready" screen only needs the
+  // fullscreen-gated "Begin exam" click before the guarded question view renders.
+  await examPage.getByRole("button", { name: /begin exam/i }).click();
+  await expect(examPage.getByRole("heading", { name: "E2E proctoring check" })).toBeVisible();
+  // The heading paints as soon as ExamRunner's JSX commits; the clipboard/shortcut guards install
+  // in that same component's useEffect, which React runs asynchronously just after — give it a
+  // moment to settle before probing for guard behavior below.
+  await examPage.waitForTimeout(300);
 
   // Right-click is intercepted — the browser's native context menu never opens.
-  const contextMenuPrevented = await page.evaluate(() => {
-    const target = document.querySelector("main") ?? document.body;
+  const contextMenuPrevented = await examPage.evaluate(() => {
+    // The app shell renders its own <main id="app-shell-content"> around every routed page, so
+    // the assessment runner's own <main> is the innermost (last) one in document order, not the
+    // only one — targeting the outer shell main would dispatch the event outside the guarded
+    // container entirely, since events only bubble up to ancestors.
+    const mains = document.querySelectorAll("main");
+    const target = mains[mains.length - 1] ?? document.body;
     const menuEvent = new MouseEvent("contextmenu", { bubbles: true, cancelable: true });
     target.dispatchEvent(menuEvent);
     return menuEvent.defaultPrevented;
@@ -89,22 +107,34 @@ test("exam mode blocks the context menu and clipboard, intercepts shortcuts, and
   expect(contextMenuPrevented).toBe(true);
 
   // A paste into the page is blocked at the clipboard event itself, not just logged afterward.
-  const pastePrevented = await page.evaluate(() => {
-    const target = document.querySelector("main") ?? document.body;
+  const pastePrevented = await examPage.evaluate(() => {
+    // The app shell renders its own <main id="app-shell-content"> around every routed page, so
+    // the assessment runner's own <main> is the innermost (last) one in document order, not the
+    // only one — targeting the outer shell main would dispatch the event outside the guarded
+    // container entirely, since events only bubble up to ancestors.
+    const mains = document.querySelectorAll("main");
+    const target = mains[mains.length - 1] ?? document.body;
     const pasteEvent = new ClipboardEvent("paste", { bubbles: true, cancelable: true });
     target.dispatchEvent(pasteEvent);
     return pasteEvent.defaultPrevented;
   });
   expect(pastePrevented).toBe(true);
 
-  // Ctrl+S (save page) is intercepted at the keyboard layer — no native save dialog opens.
-  await page.keyboard.down("Control");
-  await page.keyboard.press("KeyS");
-  await page.keyboard.up("Control");
+  // The signal bus batches and flushes every ~2s from a background popup tab, which some browsers
+  // throttle — wait for the actual flush response rather than a fixed delay, so this isn't flaky
+  // under that throttling and doesn't wait longer than it has to when the flush is prompt.
+  const eventsFlushed = examPage.waitForResponse(
+    (response) =>
+      response.url().includes(`/api/assessments/attempts/${encodeURIComponent(attemptId)}/events`) &&
+      response.request().method() === "POST",
+  );
 
-  // The signal bus batches and flushes every ~2s; give the last batch time to land, then confirm
-  // the attempt's own event log — not just the in-page reaction — recorded each intercepted attempt.
-  await page.waitForTimeout(2_500);
+  // Ctrl+S (save page) is intercepted at the keyboard layer — no native save dialog opens.
+  await examPage.keyboard.down("Control");
+  await examPage.keyboard.press("KeyS");
+  await examPage.keyboard.up("Control");
+
+  await eventsFlushed;
 
   const review = await expectJson<DataEnvelope<AttemptReview>>(
     await actors.tutor.get(`/api/assessments/attempts/${encodeURIComponent(attemptId)}?view=review`),

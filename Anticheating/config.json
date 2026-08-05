@@ -1,0 +1,55 @@
+{
+  "camera_index": 0,
+  "preferred_camera_name": "FaceTime HD Camera",
+  "blocked_camera_name_terms": [
+    "iphone",
+    "continuity"
+  ],
+  "camera_width": 1280,
+  "camera_height": 720,
+  "object_detection_every_n_frames": 5,
+  "yolo_model": "yolov8n.pt",
+  "exam_duration_minutes": 60,
+  "database_path": "data/proctoring.db",
+  "evidence_directory": "data/evidence",
+  "score_decay_per_second": 0.12,
+  "enable_voice_detection": true,
+  "preferred_microphone_name": "MacBook Pro Microphone",
+  "blocked_microphone_name_terms": [
+    "iphone",
+    "continuity"
+  ],
+  "audio_sample_rate": 16000,
+  "audio_block_ms": 100,
+  "voice_energy_threshold": 0.008,
+  "voice_silence_seconds": 0.6,
+  "voice_min_segment_seconds": 0.8,
+  "voice_max_segment_seconds": 8.0,
+  "speaker_distance_threshold": 0.22,
+  "speaker_confirmation_segments": 2,
+  "voice_event_cooldown_seconds": 30.0,
+  "weights": {
+    "face_missing": 15,
+    "phone_detected": 20,
+    "multiple_faces": 30,
+    "looking_away": 10,
+    "looking_away_repeated": 20,
+    "face_covered": 15,
+    "camera_disconnected": 40,
+    "eyes_closed_long": 10,
+    "multiple_voice_signatures": 20
+  },
+  "thresholds": {
+    "face_missing_seconds": 2.0,
+    "looking_away_seconds": 5.0,
+    "writing_grace_seconds": 8.0,
+    "eyes_closed_seconds": 2.0,
+    "event_cooldown_seconds": 8.0,
+    "repeated_away_window_seconds": 90.0,
+    "repeated_away_count": 3,
+    "yaw_degrees": 24.0,
+    "pitch_up_degrees": 18.0,
+    "pitch_down_degrees": 20.0,
+    "object_confidence": 0.45
+  }
+}

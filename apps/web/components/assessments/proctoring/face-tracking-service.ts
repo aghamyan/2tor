@@ -1,6 +1,10 @@
 "use client";
 
-import { headPoseFromColumnMajor4x4 } from "../../../../../packages/domain/assessments/head-pose";
+import {
+  classifyHeadDirection,
+  headPoseFromColumnMajor4x4,
+  type HeadDirection,
+} from "../../../../../packages/domain/assessments/head-pose";
 import type { AssessmentEventType } from "../../../../../packages/domain/assessments/models";
 import type { ProctoringMetadata } from "./signal-bus";
 
@@ -12,6 +16,44 @@ export type FaceTrackingSignalHandler = (
   eventType: AssessmentEventType,
   metadata: ProctoringMetadata | null,
 ) => void;
+
+/** Normalized [0,1] box relative to the source video frame, top-left origin — see `startFaceTracking`. */
+export interface FaceTrackingBox {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
+/**
+ * A per-tick snapshot for a live monitoring console (not gated by grace periods or cooldowns, so
+ * it can flicker where the debounced `onSignal` events deliberately don't) — see the "primary"
+ * face's pose is whichever face MediaPipe lists first, generally the largest/most centered.
+ */
+export interface FaceTrackingFrame {
+  faceCount: number;
+  faces: readonly FaceTrackingBox[];
+  yawDeg: number | null;
+  pitchDeg: number | null;
+  headDirection: HeadDirection | null;
+  gazeDirection: "center" | "left" | "right" | null;
+}
+
+export type FaceTrackingFrameHandler = (frame: FaceTrackingFrame) => void;
+
+function landmarksBoundingBox(landmarks: readonly { x: number; y: number }[]): FaceTrackingBox {
+  let minX = 1;
+  let minY = 1;
+  let maxX = 0;
+  let maxY = 0;
+  for (const point of landmarks) {
+    if (point.x < minX) minX = point.x;
+    if (point.y < minY) minY = point.y;
+    if (point.x > maxX) maxX = point.x;
+    if (point.y > maxY) maxY = point.y;
+  }
+  return { x: minX, y: minY, width: Math.max(0, maxX - minX), height: Math.max(0, maxY - minY) };
+}
 
 const DETECTION_INTERVAL_MS = 250; // ~4Hz: enough to catch sustained state, light on CPU/battery.
 const FACE_MISSING_GRACE_MS = 4_000; // tolerates looking down to write or brief occlusion.
@@ -25,6 +67,13 @@ const GLANCE_YAW_THRESHOLD_DEG = 15;
 const GLANCE_WINDOW_MS = 45_000;
 const GLANCE_COUNT_THRESHOLD = 4;
 const EXTERNAL_DEVICE_COOLDOWN_MS = 60_000;
+// A normal blink is ~100-400ms and MediaPipe's eyeBlinkLeft/Right blendshapes also spike on a
+// heavily angled or partly-occluded face — a short sustain would flag constantly on nothing.
+// Requiring several seconds and both eyes together is deliberately conservative; see suspicion.ts
+// for why this signal carries zero score weight until it's been tuned against real footage.
+const EYES_CLOSED_BLINK_THRESHOLD = 0.65;
+const EYES_CLOSED_SUSTAIN_MS = 6_000;
+const EYES_CLOSED_COOLDOWN_MS = 60_000;
 
 // Self-hosted from apps/web/public/mediapipe/ (see scripts/prepare-mediapipe-assets.mjs) rather
 // than fetched from a third-party CDN at exam time. A CDN dependency here is a single point of
@@ -83,6 +132,7 @@ export async function startFaceTracking(
   video: HTMLVideoElement,
   onSignal: FaceTrackingSignalHandler,
   onCapabilityUnavailable?: (reason: string) => void,
+  onFrame?: FaceTrackingFrameHandler,
 ): Promise<FaceTrackingHandle> {
   let landmarker: Awaited<ReturnType<typeof import("@mediapipe/tasks-vision").FaceLandmarker.createFromOptions>> | null =
     null;
@@ -93,7 +143,7 @@ export async function startFaceTracking(
       runningMode: "VIDEO" as const,
       numFaces: 2,
       outputFacialTransformationMatrixes: true,
-      outputFaceBlendshapes: false,
+      outputFaceBlendshapes: true,
     };
     try {
       // GPU is faster but needs a WebGL context; that's unavailable in a lot of real-world
@@ -127,6 +177,8 @@ export async function startFaceTracking(
   let lastGazeDirection: "left" | "right" | null = null;
   const glanceTimestamps: number[] = [];
   let lastExternalDeviceFlagAt = 0;
+  let eyesClosedSince: number | null = null;
+  let lastEyesClosedFlagAt = 0;
 
   function tick() {
     if (stopped || !landmarker || video.readyState < video.HAVE_CURRENT_DATA) return;
@@ -163,9 +215,47 @@ export async function startFaceTracking(
       multipleFacesSince = null;
     }
 
+    const blendshapes = result.faceBlendshapes[0]?.categories;
+    const eyeBlinkLeft = blendshapes?.find((item) => item.categoryName === "eyeBlinkLeft")?.score ?? 0;
+    const eyeBlinkRight = blendshapes?.find((item) => item.categoryName === "eyeBlinkRight")?.score ?? 0;
+    const eyesClosedNow =
+      faceCount === 1 &&
+      eyeBlinkLeft >= EYES_CLOSED_BLINK_THRESHOLD &&
+      eyeBlinkRight >= EYES_CLOSED_BLINK_THRESHOLD;
+    if (eyesClosedNow) {
+      eyesClosedSince ??= now;
+      if (
+        now - eyesClosedSince >= EYES_CLOSED_SUSTAIN_MS &&
+        now - lastEyesClosedFlagAt >= EYES_CLOSED_COOLDOWN_MS
+      ) {
+        lastEyesClosedFlagAt = now;
+        onSignal("eyes_closed", null);
+      }
+    } else {
+      eyesClosedSince = null;
+    }
+
     const matrix = result.facialTransformationMatrixes[0]?.data;
-    if (faceCount === 1 && matrix && matrix.length === 16) {
-      const { yawDeg, pitchDeg } = headPoseFromColumnMajor4x4(matrix);
+    const pose =
+      faceCount >= 1 && matrix && matrix.length === 16 ? headPoseFromColumnMajor4x4(matrix) : null;
+
+    onFrame?.({
+      faceCount,
+      faces: result.faceLandmarks.map(landmarksBoundingBox),
+      yawDeg: pose?.yawDeg ?? null,
+      pitchDeg: pose?.pitchDeg ?? null,
+      headDirection: pose ? classifyHeadDirection(pose.yawDeg, pose.pitchDeg) : null,
+      gazeDirection: pose
+        ? Math.abs(pose.yawDeg) < GAZE_AWAY_YAW_THRESHOLD_DEG
+          ? "center"
+          : pose.yawDeg > 0
+            ? "left"
+            : "right"
+        : null,
+    });
+
+    if (faceCount === 1 && pose) {
+      const { yawDeg, pitchDeg } = pose;
 
       if (Math.abs(yawDeg) >= GAZE_AWAY_YAW_THRESHOLD_DEG) {
         const direction: "left" | "right" = yawDeg > 0 ? "left" : "right";
