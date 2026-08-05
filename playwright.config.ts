@@ -9,8 +9,6 @@ const databaseURL =
 // The web server receives these values explicitly below. Setting them on the runner as well lets
 // the retention-worker harness exercise the same isolated database from a Playwright test.
 process.env.DATABASE_URL = databaseURL;
-process.env.STRIPE_WEBHOOK_SECRET ??= "whsec_e2e_only";
-process.env.STRIPE_SECRET_KEY ??= "sk_test_e2e_only";
 
 export default defineConfig({
   testDir: "./apps/web/e2e",
@@ -58,8 +56,6 @@ export default defineConfig({
       E2E_WEB_PORT: new URL(baseURL).port || "3100",
       DATABASE_URL: databaseURL,
       REDIS_URL: process.env.E2E_REDIS_URL ?? "redis://127.0.0.1:6389",
-      STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET,
-      STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY,
       NEXT_TELEMETRY_DISABLED: "1",
     },
   },

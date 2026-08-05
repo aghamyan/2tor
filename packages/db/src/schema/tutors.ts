@@ -82,6 +82,8 @@ export const tutorProfiles = pgTable("tutor_profiles", {
   country: text("country"),
   yearsExperience: integer("years_experience"),
   educationSummary: text("education_summary"),
+  /** E.164, plaintext (see `parentProfiles.phone`'s equivalent note in families.ts). Optional — only needed for WhatsApp group membership. */
+  phone: text("phone"),
   status: tutorProfileStatusEnum("status").notNull().default("pending"),
   publicProfileApprovedAt: utcTimestamp("public_profile_approved_at"),
   ...timestamps,

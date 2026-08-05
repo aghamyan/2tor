@@ -1,9 +1,12 @@
 import type {
   AssessmentAnswerRecord,
+  AssessmentAttemptListItem,
   AssessmentAttemptRecord,
   AssessmentDatabase,
   AssessmentEventRecord,
   AssessmentRecord,
+  AssessmentStudentOption,
+  AssessmentSubjectOption,
   AssessmentVersionRecord,
   DiagnosticReportRecord,
 } from "../../../../../packages/domain/assessments/models";
@@ -19,6 +22,9 @@ export class InMemoryAssessmentDatabase implements AssessmentDatabase {
   readonly tutorAssignments = new Set<string>();
   readonly parentLinks = new Set<string>();
   readonly studentProfiles = new Map<string, string>();
+  readonly studentNames = new Map<string, string>();
+  readonly activeSubjects: AssessmentSubjectOption[] = [];
+  readonly activeStudents: AssessmentStudentOption[] = [];
 
   async transaction<T>(operation: (database: AssessmentDatabase) => Promise<T>): Promise<T> {
     return operation(this);
@@ -81,6 +87,38 @@ export class InMemoryAssessmentDatabase implements AssessmentDatabase {
     return expired.slice(0, limit);
   }
 
+  async listAttemptsForAssessment(
+    assessmentId: string,
+    options: { tutorUserId: string | null; cursor: string | null; limit: number },
+  ): Promise<AssessmentAttemptListItem[]> {
+    const versionIds = new Set(
+      [...this.versions.values()]
+        .filter((version) => version.assessmentId === assessmentId)
+        .map((version) => version.id),
+    );
+    let attempts = [...this.attempts.values()].filter((attempt) =>
+      versionIds.has(attempt.assessmentVersionId),
+    );
+    if (options.tutorUserId) {
+      attempts = attempts.filter((attempt) =>
+        this.tutorAssignments.has(`${options.tutorUserId}:${attempt.studentProfileId}`),
+      );
+    }
+    attempts = attempts.sort((left, right) => (left.id < right.id ? 1 : -1));
+    if (options.cursor) attempts = attempts.filter((attempt) => attempt.id < options.cursor!);
+    return attempts.slice(0, options.limit).map((attempt) => ({
+      id: attempt.id,
+      studentProfileId: attempt.studentProfileId,
+      studentName: this.studentNames.get(attempt.studentProfileId) ?? attempt.studentProfileId,
+      status: attempt.status,
+      startedAt: attempt.startedAt,
+      submittedAt: attempt.submittedAt,
+      score: attempt.score,
+      maxScore: attempt.maxScore,
+      proctorMode: attempt.proctorMode,
+    }));
+  }
+
   async saveAnswer(answer: AssessmentAnswerRecord) {
     this.answers.set(`${answer.attemptId}:${answer.questionId}`, answer);
   }
@@ -129,5 +167,37 @@ export class InMemoryAssessmentDatabase implements AssessmentDatabase {
     return (
       [...this.reports.values()].find((report) => report.assessmentAttemptId === attemptId) ?? null
     );
+  }
+
+  async listActiveSubjects() {
+    return [...this.activeSubjects];
+  }
+
+  async listActiveStudentsForTutor(tutorUserId: string): Promise<AssessmentStudentOption[]> {
+    return [...this.tutorAssignments]
+      .filter((key) => key.startsWith(`${tutorUserId}:`))
+      .map((key) => key.slice(tutorUserId.length + 1))
+      .map((studentProfileId) => ({
+        studentProfileId,
+        studentName: this.studentNames.get(studentProfileId) ?? studentProfileId,
+      }));
+  }
+
+  async listAllActiveStudents(): Promise<AssessmentStudentOption[]> {
+    return [...this.activeStudents];
+  }
+
+  async countCompletedAttemptsForStudent(assessmentId: string, studentProfileId: string) {
+    const versionIds = new Set(
+      [...this.versions.values()]
+        .filter((version) => version.assessmentId === assessmentId)
+        .map((version) => version.id),
+    );
+    return [...this.attempts.values()].filter(
+      (attempt) =>
+        versionIds.has(attempt.assessmentVersionId) &&
+        attempt.studentProfileId === studentProfileId &&
+        (attempt.status === "submitted" || attempt.status === "graded"),
+    ).length;
   }
 }

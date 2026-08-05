@@ -7,7 +7,6 @@ import {
   lessons,
   parentProfiles,
   parentStudentLinks,
-  paymentCustomers,
   paymentTransactions,
   prices,
   refunds,
@@ -23,11 +22,9 @@ import type {
   InvoiceItemRecord,
   InvoiceRecord,
   LessonChargeRecord,
-  PaymentCustomerRecord,
   PaymentDatabase,
   PaymentTransactionRecord,
   PriceRecord,
-  RefundRecord,
 } from "./models";
 
 type Executor = Database | Transaction;
@@ -117,16 +114,6 @@ function discountFromRow(row: typeof discounts.$inferSelect): DiscountRecord {
   };
 }
 
-function customerFromRow(row: typeof paymentCustomers.$inferSelect): PaymentCustomerRecord {
-  return {
-    id: row.id,
-    parentProfileId: row.parentProfileId,
-    stripeCustomerId: row.stripeCustomerId,
-    createdAt: row.createdAt,
-    updatedAt: row.updatedAt,
-  };
-}
-
 function transactionFromRow(
   row: typeof paymentTransactions.$inferSelect,
 ): PaymentTransactionRecord {
@@ -135,27 +122,10 @@ function transactionFromRow(
     lessonChargeId: row.lessonChargeId,
     invoiceId: row.invoiceId,
     parentProfileId: row.parentProfileId,
-    stripePaymentIntentId: row.stripePaymentIntentId,
     type: row.type,
     amountMinor: row.amountMinor,
     currency: row.currency,
     status: row.status,
-    processedAt: row.processedAt,
-    createdAt: row.createdAt,
-    updatedAt: row.updatedAt,
-  };
-}
-
-function refundFromRow(row: typeof refunds.$inferSelect): RefundRecord {
-  return {
-    id: row.id,
-    paymentTransactionId: row.paymentTransactionId,
-    amountMinor: row.amountMinor,
-    currency: row.currency,
-    reason: row.reason,
-    status: row.status,
-    requestedByUserId: row.requestedByUserId,
-    approvedByUserId: row.approvedByUserId,
     processedAt: row.processedAt,
     createdAt: row.createdAt,
     updatedAt: row.updatedAt,
@@ -387,52 +357,6 @@ function repository(
       await executor.update(discounts).set({ isActive, updatedAt }).where(eq(discounts.id, id));
     },
 
-    async getPaymentCustomer(parentProfileId) {
-      const [row] = await executor
-        .select()
-        .from(paymentCustomers)
-        .where(eq(paymentCustomers.parentProfileId, parentProfileId))
-        .limit(1);
-      return row ? customerFromRow(row) : null;
-    },
-
-    async savePaymentCustomer(customer) {
-      await executor.insert(paymentCustomers).values(customer).onConflictDoNothing();
-    },
-
-    async savePaymentTransaction(transaction) {
-      await executor.insert(paymentTransactions).values(transaction).onConflictDoNothing();
-    },
-
-    async getPaymentTransaction(id) {
-      const [row] = await executor
-        .select()
-        .from(paymentTransactions)
-        .where(eq(paymentTransactions.id, id))
-        .limit(1);
-      return row ? transactionFromRow(row) : null;
-    },
-
-    async getPaymentTransactionForUpdate(id) {
-      const [row] = await executor
-        .select()
-        .from(paymentTransactions)
-        .where(eq(paymentTransactions.id, id))
-        .limit(1)
-        .for("update");
-      return row ? transactionFromRow(row) : null;
-    },
-
-    async getPaymentTransactionByStripeIntent(stripePaymentIntentId) {
-      const [row] = await executor
-        .select()
-        .from(paymentTransactions)
-        .where(eq(paymentTransactions.stripePaymentIntentId, stripePaymentIntentId))
-        .orderBy(desc(paymentTransactions.createdAt))
-        .limit(1);
-      return row ? transactionFromRow(row) : null;
-    },
-
     async listPaymentTransactions(parentProfileId, cursor, limit) {
       const conditions = [];
       if (parentProfileId) {
@@ -446,66 +370,6 @@ function repository(
         .orderBy(desc(paymentTransactions.id))
         .limit(limit);
       return rows.map(transactionFromRow);
-    },
-
-    async listAuthorizedTransactions(limit) {
-      const rows = await executor
-        .select({ transaction: paymentTransactions })
-        .from(paymentTransactions)
-        .innerJoin(lessonCharges, eq(lessonCharges.id, paymentTransactions.lessonChargeId))
-        .where(
-          and(
-            eq(paymentTransactions.type, "charge"),
-            eq(paymentTransactions.status, "pending"),
-            eq(lessonCharges.status, "authorized"),
-          ),
-        )
-        .orderBy(asc(paymentTransactions.createdAt))
-        .limit(limit);
-      return rows.map((row) => transactionFromRow(row.transaction));
-    },
-
-    async updatePaymentTransaction(id, update) {
-      await executor
-        .update(paymentTransactions)
-        .set({
-          ...(update.status !== undefined ? { status: update.status } : {}),
-          ...(update.stripePaymentIntentId !== undefined
-            ? { stripePaymentIntentId: update.stripePaymentIntentId }
-            : {}),
-          ...(update.processedAt !== undefined ? { processedAt: update.processedAt } : {}),
-          updatedAt: update.updatedAt,
-        })
-        .where(eq(paymentTransactions.id, id));
-    },
-
-    async saveRefund(refund) {
-      await executor.insert(refunds).values(refund).onConflictDoNothing();
-    },
-
-    async getRefund(id) {
-      const [row] = await executor.select().from(refunds).where(eq(refunds.id, id)).limit(1);
-      return row ? refundFromRow(row) : null;
-    },
-
-    async listRefundsForTransaction(paymentTransactionId) {
-      const rows = await executor
-        .select()
-        .from(refunds)
-        .where(eq(refunds.paymentTransactionId, paymentTransactionId))
-        .orderBy(asc(refunds.createdAt));
-      return rows.map(refundFromRow);
-    },
-
-    async updateRefund(id, update) {
-      await executor
-        .update(refunds)
-        .set({
-          status: update.status,
-          ...(update.processedAt !== undefined ? { processedAt: update.processedAt } : {}),
-          updatedAt: update.updatedAt,
-        })
-        .where(eq(refunds.id, id));
     },
 
     async appendAudit(event) {

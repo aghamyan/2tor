@@ -20,11 +20,80 @@ Downstream analytics, notifications, and reviewer interfaces must preserve this 
 summarize event counts, but must not convert them into a guilt label, risk verdict, or automated
 disciplinary action.
 
+**One narrow, disclosed exception:** a version's `settings.integrityPolicy` (`AssessmentIntegrityPolicy`
+in `models.ts`) lets a tutor opt a specific assessment into `"warn"` (client-shown notice) or
+`"auto_submit"` (the server ends the attempt via `recordAssessmentSignals` in services.ts once a
+tutor-set count of "left the exam" events — `INTEGRITY_VIOLATION_EVENT_TYPES`: tab switch, focus
+loss, fullscreen exit, browser minimize — is reached). This is not the suspicion score making a
+call; it is an explicit, author-configured setting, disclosed to the student on that assessment's
+entry screen before they start (`entry.notice.integrityPolicy`), with no verdict or guilt label
+attached — the attempt is simply closed (`abandoned`), same as a timed-out attempt, for a tutor to
+review like any other. `"log_only"` is the default, so every assessment that doesn't opt in behaves
+exactly as before: nothing here ever gates a submission on its own.
+
 ## Camera boundary
 
 A version may request a camera only when it names a policy version. Starting that version requires
 both an active consent record for `assessment_camera:<policyVersion>` and an explicit acknowledgment
 in the start request. This slice contains no recording, face identification, or emotion analysis.
+
+A version may additionally opt into `camera.headTrackingEnabled` (requires `camera.required`). When
+on, the student's browser runs on-device face presence/count/gaze detection
+(`@mediapipe/tasks-vision`, `components/assessments/proctoring/face-tracking-service.ts`) to emit
+`face_missing`, `face_returned`, `multiple_faces`, `gaze_away`, and a heuristic
+`external_device_suspected` signal. This is presence, count, and coarse gaze angle only — not face
+*identification* (no template is created or matched against an identity) and not emotion analysis,
+so it stays inside the boundary above. Every frame is processed locally in WASM; no image or video
+frame is ever sent to the server, and nothing is recorded or stored — only the derived signal
+(a short-lived boolean/count/angle) reaches `recordAssessmentSignal`. Disabled by default; an author
+opts in per version, matching CONVENTIONS' data-minimization rule that biometric-adjacent signals
+require an explicit, justified opt-in.
+
+Phone/calculator use is not detected directly — browsers cannot reliably see an external device.
+Instead, a repeated down-and-to-a-side glance pattern (as opposed to a centered, sustained downward
+tilt, which is normal handwriting posture and stays exempt) raises `external_device_suspected` for
+tutor review, per the spec's own instruction to flag rather than claim impossible detection.
+
+## Proctoring signals and the suspicion score
+
+Beyond the original focus/fullscreen/tab/copy/paste signals, this slice also detects (all
+client-side, all logged through the same `assessment_events` pipeline): browser minimizing,
+clipboard cut, select-all/print/save-page/view-source keyboard shortcuts, the right-click context
+menu, dragging content out of the page, a devtools keyboard shortcut (not devtools actually being
+open — that isn't reliably detectable), camera connect/disconnect, and the camera signals above.
+`packages/domain/assessments/suspicion.ts` exposes `computeSuspicionSummary`, a pure function that
+turns the event log into a weighted score, a severity band (`low`/`medium`/`high`), and per-attempt
+stats (face-visible %, tab-switch count, fullscreen exits, clipboard attempts, camera disconnects).
+It is **derived at read time on every call, never stored** — there is no suspicion-score column.
+The score inherits the "signals are not proof" contract above word for word: it is a review aid
+shown to the tutor (`components/assessments/diagnostic-review.tsx`), it is shown to the student as a
+non-blocking banner past a threshold (never a pause or fail), and it never gates `submitAssessmentAttempt`.
+
+New canonical event types (see `AssessmentEventType` in `models.ts`) did not require a database
+migration: they follow the existing-schema-compatibility pattern below exactly — each new type maps
+to the nearest existing Postgres enum bucket in `drizzle-database.ts`'s `rawEventType`, and the true
+type travels in `metadata[EVENT_TYPE_KEY]`. `packages/domain/assessments/head-pose.ts` is the pure
+math (rotation-matrix → yaw/pitch/roll) the face tracker uses to decide "looking away"; it has no
+DOM or MediaPipe dependency so it is unit-tested directly.
+
+## Convention exception: `@mediapipe/tasks-vision`
+
+CONVENTIONS.md bars a module from touching any `package.json`. This slice makes one deliberate,
+narrow exception: `@mediapipe/tasks-vision` (declared in the shared `pnpm-workspace.yaml` catalog,
+referenced only from `apps/web/package.json`) is the client-side face-landmark model the spec asks
+for by name. It is dynamically imported only inside `face-tracking-service.ts`, so it never loads
+unless a version has both `camera.required` and `camera.headTrackingEnabled` set. No other module
+dependency was added or changed.
+
+## Keyboard/clipboard/fullscreen enforcement is best-effort
+
+`components/assessments/proctoring/{shortcut,clipboard,focus}-guard.ts` intercept common shortcuts,
+clipboard events, the context menu, drag-out, and fullscreen exit. These discourage and log; they do
+not guarantee prevention — a browser or OS can always route around `preventDefault`, and devtools
+being *open* is not reliably detectable (only the shortcut *attempt* is). Every guard degrades
+gracefully: a version without `fullscreenRequired` runs only the always-on focus/tab/fullscreen/
+offline signals from the original slice, and a browser that fails to load the face-tracking model
+falls back to camera-presence-only monitoring rather than blocking the attempt.
 
 ## Diagnostic report release
 

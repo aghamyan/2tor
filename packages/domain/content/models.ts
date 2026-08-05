@@ -51,6 +51,10 @@ export interface ContentReportRecord {
   createdAt: Date;
   updatedAt: Date;
 }
+export interface ResourceSubjectOption {
+  id: string;
+  name: string;
+}
 
 export interface ContentDatabase {
   transaction<T>(operation: (database: ContentDatabase) => Promise<T>): Promise<T>;
@@ -63,6 +67,7 @@ export interface ContentDatabase {
   addBookmark(studentProfileId: string, resourceId: string): Promise<void>;
   removeBookmark(studentProfileId: string, resourceId: string): Promise<void>;
   hasBookmark(studentProfileId: string, resourceId: string): Promise<boolean>;
+  listBookmarkedResourceIds(studentProfileId: string): Promise<string[]>;
   saveAssignment(input: {
     id: string;
     resourceId: string;
@@ -79,4 +84,5 @@ export interface ContentDatabase {
   listOpenReports(limit: number): Promise<ContentReportRecord[]>;
   deleteLink(linkId: string): Promise<void>;
   listLinksForHealthCheck(limit: number): Promise<ResourceLinkRecord[]>;
+  listActiveSubjects(): Promise<ResourceSubjectOption[]>;
 }

@@ -20,6 +20,7 @@
     "@app/notifications": "workspace:*",
     "@app/observability": "workspace:*",
     "@app/validation": "workspace:*",
+    "@app/whatsapp": "workspace:*",
     "bullmq": "catalog:",
     "ioredis": "catalog:"
   }

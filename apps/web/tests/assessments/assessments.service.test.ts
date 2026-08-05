@@ -2,9 +2,15 @@ import { describe, expect, it } from "vitest";
 import { AssessmentError } from "../../../../packages/domain/assessments/errors";
 import {
   createAssessment,
+  deleteAssessment,
   getAssessmentAttemptReview,
+  getAssessmentForActor,
   getDiagnosticReportForActor,
+  listAssessmentAttemptsForActor,
+  listAssessableStudents,
+  listAssessmentsForActor,
   recordAssessmentSignal,
+  recordAssessmentSignals,
   recordDiagnosticConsultation,
   releaseDiagnosticReport,
   startAssessmentAttempt,
@@ -21,7 +27,14 @@ const student = {
 };
 const parent = { userId: "parent-1", roles: ["parent"] as const };
 
-async function setup(options: { cameraRequired?: boolean } = {}) {
+async function setup(
+  options: {
+    cameraRequired?: boolean;
+    audience?: { mode: "everyone" } | { mode: "selected"; studentProfileIds: string[] };
+    maxAttempts?: number | null;
+    integrityPolicy?: { violationLimit: number | null; action: "log_only" | "warn" | "auto_submit" };
+  } = {},
+) {
   const database = new InMemoryAssessmentDatabase();
   database.tutorAssignments.add("tutor-1:student-1");
   database.parentLinks.add("parent-1:student-1");
@@ -41,6 +54,9 @@ async function setup(options: { cameraRequired?: boolean } = {}) {
         required: options.cameraRequired ?? false,
         policyVersion: options.cameraRequired ? "camera-v2" : null,
       },
+      audience: options.audience,
+      maxAttempts: options.maxAttempts,
+      integrityPolicy: options.integrityPolicy,
       questions: [
         {
           type: "numeric",
@@ -101,6 +117,70 @@ describe("assessment integrity contract", () => {
     expect(review.events).toContainEqual(expect.objectContaining({ eventType: "tab_switch" }));
     expect(review.attempt).not.toHaveProperty("cheated");
     expect(review).not.toHaveProperty("verdict");
+    expect(review.suspicion.score).toBeGreaterThan(0);
+    expect(review.suspicion).not.toHaveProperty("verdict");
+  });
+
+  it("records a batch of proctoring signals in one call", async () => {
+    const { database, assessment } = await setup();
+    const session = await startAssessmentAttempt(database, student, assessment.id, {
+      cameraConsent: null,
+    });
+
+    const recorded = await recordAssessmentSignals(database, student, session.attempt.id, {
+      signals: [
+        { eventType: "face_missing", clientOccurredAt: null, metadata: null },
+        { eventType: "face_returned", clientOccurredAt: null, metadata: null },
+        { eventType: "devtools_shortcut", clientOccurredAt: null, metadata: { combo: "F12" } },
+      ],
+    });
+
+    expect(recorded.events).toHaveLength(3);
+    expect(recorded.attemptStatus).toBe("in_progress");
+    const review = await getAssessmentAttemptReview(database, tutor, session.attempt.id);
+    expect(review.eventCounts.face_missing).toBe(1);
+    expect(review.eventCounts.devtools_shortcut).toBe(1);
+  });
+
+  it("silently drops signals that arrive after the attempt is no longer open, instead of erroring", async () => {
+    const { database, assessment } = await setup();
+    const session = await startAssessmentAttempt(database, student, assessment.id, {
+      cameraConsent: null,
+    });
+    await submitAssessmentAttempt(database, student, session.attempt.id, {
+      honorStatementAccepted: true,
+    });
+
+    await expect(
+      recordAssessmentSignal(database, student, session.attempt.id, {
+        eventType: "fullscreen_exit",
+        clientOccurredAt: null,
+        metadata: null,
+      }),
+    ).resolves.toBeNull();
+
+    const review = await getAssessmentAttemptReview(database, tutor, session.attempt.id);
+    expect(review.eventCounts.fullscreen_exit ?? 0).toBe(0);
+  });
+
+  it("still rejects a signal from a student who does not own the attempt", async () => {
+    const { database, assessment } = await setup();
+    const session = await startAssessmentAttempt(database, student, assessment.id, {
+      cameraConsent: null,
+    });
+    const otherStudent = {
+      userId: "other-student-user",
+      studentProfileId: "student-2",
+      roles: ["student"] as const,
+    };
+
+    await expect(
+      recordAssessmentSignal(database, otherStudent, session.attempt.id, {
+        eventType: "tab_switch",
+        clientOccurredAt: null,
+        metadata: null,
+      }),
+    ).rejects.toMatchObject({ code: "FORBIDDEN" } satisfies Partial<AssessmentError>);
   });
 
   it("blocks a camera-required attempt without explicit consent", async () => {
@@ -194,5 +274,288 @@ describe("diagnostic report release", () => {
       id: report.id,
       releasedToParentAt: expect.any(Date),
     });
+  });
+});
+
+describe("tutor-facing attempt list", () => {
+  it("shows the assigned tutor a submitted attempt with its suspicion severity", async () => {
+    const { database, assessment } = await setup();
+    database.studentNames.set("student-1", "Ari Student");
+    const session = await startAssessmentAttempt(database, student, assessment.id, {
+      cameraConsent: null,
+    });
+    await recordAssessmentSignal(database, student, session.attempt.id, {
+      eventType: "multiple_faces",
+      clientOccurredAt: null,
+      metadata: null,
+    });
+    await submitAssessmentAttempt(database, student, session.attempt.id, {
+      honorStatementAccepted: true,
+    });
+
+    const page = await listAssessmentAttemptsForActor(database, tutor, assessment.id, {});
+    expect(page.items).toHaveLength(1);
+    const [item] = page.items;
+    if (!item) throw new Error("expected one attempt in the list");
+    expect(item).toMatchObject({
+      id: session.attempt.id,
+      studentName: "Ari Student",
+      status: "submitted",
+    });
+    expect(item.suspicion.score).toBeGreaterThan(0);
+    expect(page.nextCursor).toBeNull();
+  });
+
+  it("hides another tutor's students from the list, but staff see everyone", async () => {
+    const { database, assessment } = await setup();
+    const otherTutor = { userId: "tutor-2", roles: ["tutor"] as const };
+    const staff = { userId: "admin-1", roles: ["administrator"] as const };
+    await startAssessmentAttempt(database, student, assessment.id, { cameraConsent: null });
+
+    const otherTutorPage = await listAssessmentAttemptsForActor(database, otherTutor, assessment.id, {});
+    expect(otherTutorPage.items).toHaveLength(0);
+
+    const staffPage = await listAssessmentAttemptsForActor(database, staff, assessment.id, {});
+    expect(staffPage.items).toHaveLength(1);
+  });
+
+  it("rejects a student or parent trying to view the attempt list", async () => {
+    const { database, assessment } = await setup();
+    await expect(
+      listAssessmentAttemptsForActor(database, student, assessment.id, {}),
+    ).rejects.toMatchObject({ code: "FORBIDDEN" } satisfies Partial<AssessmentError>);
+    await expect(
+      listAssessmentAttemptsForActor(database, parent, assessment.id, {}),
+    ).rejects.toMatchObject({ code: "FORBIDDEN" } satisfies Partial<AssessmentError>);
+  });
+
+  it("paginates with a cursor, newest attempt first", async () => {
+    const { database, assessment } = await setup();
+    const secondStudent = {
+      userId: "student-2-user",
+      studentProfileId: "student-2",
+      roles: ["student"] as const,
+    };
+    database.tutorAssignments.add("tutor-1:student-2");
+    const first = await startAssessmentAttempt(database, student, assessment.id, {
+      cameraConsent: null,
+    });
+    // ULIDs from the plain (non-monotonic) generator only sort reliably across different
+    // milliseconds; force that gap so cursor ordering below is deterministic.
+    await new Promise((resolve) => setTimeout(resolve, 2));
+    const second = await startAssessmentAttempt(database, secondStudent, assessment.id, {
+      cameraConsent: null,
+    });
+
+    const firstPage = await listAssessmentAttemptsForActor(database, tutor, assessment.id, {
+      limit: 1,
+    });
+    expect(firstPage.items).toHaveLength(1);
+    const [firstPageItem] = firstPage.items;
+    if (!firstPageItem) throw new Error("expected one attempt in the first page");
+    expect(firstPageItem.id).toBe(second.attempt.id);
+    expect(firstPage.nextCursor).toBe(second.attempt.id);
+
+    const secondPage = await listAssessmentAttemptsForActor(database, tutor, assessment.id, {
+      limit: 1,
+      cursor: firstPage.nextCursor,
+    });
+    expect(secondPage.items).toHaveLength(1);
+    const [secondPageItem] = secondPage.items;
+    if (!secondPageItem) throw new Error("expected one attempt in the second page");
+    expect(secondPageItem.id).toBe(first.attempt.id);
+    expect(secondPage.nextCursor).toBeNull();
+  });
+});
+
+describe("audience", () => {
+  it("keeps a published assessment open to every student by default", async () => {
+    const { database, assessment } = await setup();
+    await expect(
+      startAssessmentAttempt(database, student, assessment.id, { cameraConsent: null }),
+    ).resolves.toMatchObject({ attempt: { studentProfileId: "student-1" } });
+  });
+
+  it("blocks a student left out of a selected audience, both browsing and starting", async () => {
+    const { database, assessment } = await setup({
+      audience: { mode: "selected", studentProfileIds: ["student-2"] },
+    });
+
+    await expect(
+      startAssessmentAttempt(database, student, assessment.id, { cameraConsent: null }),
+    ).rejects.toMatchObject({ code: "FORBIDDEN" } satisfies Partial<AssessmentError>);
+    await expect(getAssessmentForActor(database, student, assessment.id)).rejects.toMatchObject({
+      code: "FORBIDDEN",
+    } satisfies Partial<AssessmentError>);
+    expect(await listAssessmentsForActor(database, student)).toHaveLength(0);
+  });
+
+  it("admits a student who is in the selected audience", async () => {
+    const { database, assessment } = await setup({
+      audience: { mode: "selected", studentProfileIds: ["student-1"] },
+    });
+
+    await expect(
+      startAssessmentAttempt(database, student, assessment.id, { cameraConsent: null }),
+    ).resolves.toMatchObject({ attempt: { studentProfileId: "student-1" } });
+    expect(await listAssessmentsForActor(database, student)).toHaveLength(1);
+  });
+
+  it("never restricts a tutor or staff member browsing their own draft or any published assessment", async () => {
+    const { database, assessment } = await setup({
+      audience: { mode: "selected", studentProfileIds: ["student-2"] },
+    });
+    await expect(getAssessmentForActor(database, tutor, assessment.id)).resolves.toBeDefined();
+  });
+
+  it("lists a tutor's own assigned students, and every active student for staff", async () => {
+    const { database } = await setup();
+    database.studentNames.set("student-1", "Ari Student");
+    database.activeStudents.push({ studentProfileId: "student-9", studentName: "Someone Else" });
+
+    const forTutor = await listAssessableStudents(database, tutor);
+    expect(forTutor).toEqual([{ studentProfileId: "student-1", studentName: "Ari Student" }]);
+
+    const staff = { userId: "admin-1", roles: ["administrator"] as const };
+    const forStaff = await listAssessableStudents(database, staff);
+    expect(forStaff).toEqual([{ studentProfileId: "student-9", studentName: "Someone Else" }]);
+  });
+});
+
+describe("max attempts", () => {
+  it("allows a fresh attempt after time elapses without ever completing, without spending the allowance", async () => {
+    const { database, assessment } = await setup({ maxAttempts: 1 });
+    const first = await startAssessmentAttempt(database, student, assessment.id, {
+      cameraConsent: null,
+    });
+    // Simulate an abandoned (never-submitted) attempt — it must not consume the allowance.
+    const stored = await database.getAttempt(first.attempt.id);
+    if (!stored) throw new Error("expected the first attempt to exist");
+    await database.saveAttempt({ ...stored, status: "abandoned" });
+
+    await expect(
+      startAssessmentAttempt(database, student, assessment.id, { cameraConsent: null }),
+    ).resolves.toMatchObject({ attempt: { studentProfileId: "student-1" } });
+  });
+
+  it("blocks a new attempt once the student has completed the configured maximum", async () => {
+    const { database, assessment } = await setup({ maxAttempts: 1 });
+    const first = await startAssessmentAttempt(database, student, assessment.id, {
+      cameraConsent: null,
+    });
+    await submitAssessmentAttempt(database, student, first.attempt.id, {
+      honorStatementAccepted: true,
+    });
+
+    await expect(
+      startAssessmentAttempt(database, student, assessment.id, { cameraConsent: null }),
+    ).rejects.toMatchObject({
+      code: "ATTEMPT_LIMIT_REACHED",
+    } satisfies Partial<AssessmentError>);
+  });
+});
+
+describe("integrity policy", () => {
+  it("leaves an attempt untouched under the default log-only policy, no matter how many signals arrive", async () => {
+    const { database, assessment } = await setup();
+    const session = await startAssessmentAttempt(database, student, assessment.id, {
+      cameraConsent: null,
+    });
+    for (let i = 0; i < 10; i += 1) {
+      await recordAssessmentSignal(database, student, session.attempt.id, {
+        eventType: "tab_switch",
+        clientOccurredAt: null,
+        metadata: null,
+      });
+    }
+    const attempt = await database.getAttempt(session.attempt.id);
+    expect(attempt?.status).toBe("in_progress");
+  });
+
+  it("auto-submits once the configured violation limit is reached, and stops accepting further answers", async () => {
+    const { database, assessment } = await setup({
+      integrityPolicy: { violationLimit: 2, action: "auto_submit" },
+    });
+    const session = await startAssessmentAttempt(database, student, assessment.id, {
+      cameraConsent: null,
+    });
+
+    const first = await recordAssessmentSignal(database, student, session.attempt.id, {
+      eventType: "tab_switch",
+      clientOccurredAt: null,
+      metadata: null,
+    });
+    expect(first).not.toBeNull();
+    let attempt = await database.getAttempt(session.attempt.id);
+    expect(attempt?.status).toBe("in_progress");
+
+    const secondBatch = await recordAssessmentSignals(database, student, session.attempt.id, {
+      signals: [{ eventType: "fullscreen_exit", clientOccurredAt: null, metadata: null }],
+    });
+    expect(secondBatch.attemptStatus).toBe("abandoned");
+    attempt = await database.getAttempt(session.attempt.id);
+    expect(attempt?.status).toBe("abandoned");
+
+    await expect(
+      recordAssessmentSignal(database, student, session.attempt.id, {
+        eventType: "tab_switch",
+        clientOccurredAt: null,
+        metadata: null,
+      }),
+    ).resolves.toBeNull();
+  });
+
+  it("never counts benign camera/face signals toward the violation limit", async () => {
+    const { database, assessment } = await setup({
+      integrityPolicy: { violationLimit: 1, action: "auto_submit" },
+    });
+    const session = await startAssessmentAttempt(database, student, assessment.id, {
+      cameraConsent: null,
+    });
+    await recordAssessmentSignals(database, student, session.attempt.id, {
+      signals: [
+        { eventType: "camera_ready", clientOccurredAt: null, metadata: null },
+        { eventType: "face_returned", clientOccurredAt: null, metadata: null },
+        { eventType: "connectivity_interruption", clientOccurredAt: null, metadata: null },
+      ],
+    });
+    const attempt = await database.getAttempt(session.attempt.id);
+    expect(attempt?.status).toBe("in_progress");
+  });
+});
+
+describe("delete (archive)", () => {
+  it("lets the author archive their own assessment, dropping it out of every listing", async () => {
+    const { database, assessment } = await setup();
+    expect(await listAssessmentsForActor(database, student)).toHaveLength(1);
+
+    await deleteAssessment(database, tutor, assessment.id);
+
+    expect(await listAssessmentsForActor(database, student)).toHaveLength(0);
+    expect(await listAssessmentsForActor(database, tutor)).toHaveLength(0);
+    await expect(startAssessmentAttempt(database, student, assessment.id, { cameraConsent: null })).rejects.toMatchObject(
+      { code: "ASSESSMENT_NOT_OPEN" } satisfies Partial<AssessmentError>,
+    );
+  });
+
+  it("still lets the author (or staff) open an archived assessment directly, e.g. to review past attempts", async () => {
+    const { database, assessment } = await setup();
+    await deleteAssessment(database, tutor, assessment.id);
+    await expect(getAssessmentForActor(database, tutor, assessment.id)).resolves.toBeDefined();
+  });
+
+  it("rejects a tutor deleting another tutor's assessment", async () => {
+    const { database, assessment } = await setup();
+    const otherTutor = { userId: "tutor-2", roles: ["tutor"] as const };
+    await expect(deleteAssessment(database, otherTutor, assessment.id)).rejects.toMatchObject({
+      code: "FORBIDDEN",
+    } satisfies Partial<AssessmentError>);
+  });
+
+  it("lets staff delete any assessment", async () => {
+    const { database, assessment } = await setup();
+    const staff = { userId: "admin-1", roles: ["administrator"] as const };
+    await deleteAssessment(database, staff, assessment.id);
+    expect(await database.getAssessment(assessment.id)).toMatchObject({ status: "archived" });
   });
 });

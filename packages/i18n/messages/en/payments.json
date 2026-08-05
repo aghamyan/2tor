@@ -6,9 +6,7 @@
     "overview": {
       "eyebrow": "Billing ledger",
       "title": "Money in plain sight",
-      "intro": "Review lesson charges, authorize secure card payments, and keep every invoice, receipt, and refund in one traceable record.",
-      "secureTitle": "Stripe-hosted card entry",
-      "secureBody": "Card details go directly to Stripe. This application keeps references and the last four digits only—never a card number."
+      "intro": "Review lesson charges and keep every invoice, receipt, and refund in one traceable record."
     },
     "summary": {
       "kicker": "Current position",
@@ -40,8 +38,7 @@
       "empty": "No payment transactions have been recorded.",
       "date": "Date",
       "amount": "Amount",
-      "status": "Status",
-      "action": "Action"
+      "status": "Status"
     },
     "statuses": {
       "draft": "Draft",
@@ -53,30 +50,6 @@
       "succeeded": "Succeeded",
       "failed": "Failed",
       "canceled": "Canceled"
-    },
-    "checkout": {
-      "open": "Pay securely",
-      "loading": "Opening Stripe’s secure payment form…",
-      "secureFields": "Secure card payment fields hosted by Stripe",
-      "authorize": "Authorize payment",
-      "authorizing": "Authorizing…",
-      "authorized": "Authorization received. The charge will settle through the reconciliation flow.",
-      "hosted": "Card fields above are rendered and processed by Stripe. They are not sent to or stored by 2tor.",
-      "errors": {
-        "load": "Stripe’s secure form could not load. Check the connection and try again.",
-        "unavailable": "Card payments are not configured for this environment.",
-        "prepare": "This payment could not be prepared. Refresh the invoice and try again.",
-        "confirm": "Stripe could not authorize this payment."
-      }
-    },
-    "refunds": {
-      "open": "Refund",
-      "reason": "Refund reason",
-      "reasonPlaceholder": "Record the policy or operational reason",
-      "confirm": "Request full refund",
-      "saving": "Requesting…",
-      "requested": "Refund requested",
-      "error": "The refund request was not accepted. Check the amount, permission, and MFA state."
     },
     "discounts": {
       "eyebrow": "Administrator control",

@@ -62,6 +62,13 @@ export const studentProfiles = pgTable("student_profiles", {
     .unique()
     .references(() => users.id, { onDelete: "cascade" }),
   preferredName: text("preferred_name").notNull(),
+  /**
+   * E.164, plaintext (see `parentProfiles.phone`'s note above — the "field-level encrypted"
+   * claim there isn't implemented anywhere in this repo today). Optional; only collected for
+   * WhatsApp group membership, and only usable once a parent opts the child in with consent —
+   * see `packages/domain/whatsapp`.
+   */
+  phone: text("phone"),
   gradeLevel: text("grade_level"),
   isAdultLearner: boolean("is_adult_learner").notNull().default(false),
   usState: text("us_state"),

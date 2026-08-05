@@ -18,6 +18,18 @@ const emailEnvShape = {
   SES_REGION: optional,
 };
 
+/**
+ * Both optional (not `required()`) — unlike this file's other integrations, WhatsApp isn't
+ * expected to be configured in every environment yet (it needs Meta Official Business Account
+ * approval first). `@app/whatsapp`'s `"disabled"` provider kind is used whenever these are unset,
+ * so the app must still boot without them. See packages/domain/whatsapp/README.md.
+ */
+const whatsappEnvShape = {
+  WHATSAPP_ACCESS_TOKEN: optional,
+  WHATSAPP_PHONE_NUMBER_ID: optional,
+  WHATSAPP_API_VERSION: optional,
+};
+
 const emailProviderSchema = z.object(emailEnvShape).superRefine((env, context) => {
   const sesKeys = ["SES_ACCESS_KEY_ID", "SES_SECRET_ACCESS_KEY", "SES_REGION"] as const;
   const hasAnySesValue = sesKeys.some((key) => env[key] !== undefined);
@@ -57,9 +69,6 @@ export const serverEnvSchema = z
     S3_ACCESS_KEY_ID: required("S3_ACCESS_KEY_ID"),
     S3_SECRET_ACCESS_KEY: required("S3_SECRET_ACCESS_KEY"),
 
-    STRIPE_SECRET_KEY: required("STRIPE_SECRET_KEY"),
-    STRIPE_WEBHOOK_SECRET: required("STRIPE_WEBHOOK_SECRET"),
-
     ...emailEnvShape,
 
     WEB_PUSH_VAPID_PUBLIC_KEY: required("WEB_PUSH_VAPID_PUBLIC_KEY"),
@@ -71,6 +80,8 @@ export const serverEnvSchema = z
     ZOOM_CLIENT_ID: required("ZOOM_CLIENT_ID"),
     ZOOM_CLIENT_SECRET: required("ZOOM_CLIENT_SECRET"),
 
+    ...whatsappEnvShape,
+
     APP_URL: requiredUrl("APP_URL"),
     SESSION_SECRET: required("SESSION_SECRET").min(
       32,
@@ -81,9 +92,7 @@ export const serverEnvSchema = z
   .and(emailProviderSchema);
 
 /** Values that are explicitly safe for browser bundles. */
-export const publicEnvSchema = z.object({
-  NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: required("NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY"),
-});
+export const publicEnvSchema = z.object({});
 
 export type ServerEnv = z.infer<typeof serverEnvSchema>;
 export type PublicEnv = z.infer<typeof publicEnvSchema>;

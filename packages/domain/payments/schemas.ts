@@ -14,12 +14,6 @@ export const transactionListSchema = z
 
 export const invoiceListSchema = transactionListSchema;
 
-export const prepareInvoicePaymentSchema = z
-  .object({
-    invoiceId: id,
-  })
-  .strict();
-
 export const createPriceSchema = z
   .object({
     key: z.string().trim().min(3).max(100),
@@ -36,14 +30,6 @@ export const createPriceSchema = z
       value.effectiveTo === null || new Date(value.effectiveFrom) < new Date(value.effectiveTo),
     { path: ["effectiveTo"], message: "The price end must be after its start." },
   );
-
-export const createRefundSchema = z
-  .object({
-    paymentTransactionId: id,
-    amountMinor: moneyMinor,
-    reason: z.string().trim().min(3).max(2_000),
-  })
-  .strict();
 
 export const createDiscountSchema = z
   .object({
@@ -99,6 +85,5 @@ export const financialReportSchema = z
     message: "The report end must be after its start.",
   });
 
-export type CreateRefundInput = z.infer<typeof createRefundSchema>;
 export type CreateDiscountInput = z.infer<typeof createDiscountSchema>;
 export type CreatePriceInput = z.infer<typeof createPriceSchema>;

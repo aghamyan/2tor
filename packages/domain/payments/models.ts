@@ -77,25 +77,10 @@ export interface PaymentTransactionRecord {
   lessonChargeId: string | null;
   invoiceId: string | null;
   parentProfileId: string;
-  stripePaymentIntentId: string | null;
   type: "charge" | "refund" | "adjustment";
   amountMinor: number;
   currency: PaymentCurrency;
   status: PaymentTransactionStatus;
-  processedAt: Date | null;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-export interface RefundRecord {
-  id: string;
-  paymentTransactionId: string;
-  amountMinor: number;
-  currency: PaymentCurrency;
-  reason: string;
-  status: RefundStatus;
-  requestedByUserId: string;
-  approvedByUserId: string | null;
   processedAt: Date | null;
   createdAt: Date;
   updatedAt: Date;
@@ -113,14 +98,6 @@ export interface DiscountRecord {
   endsAt: Date | null;
   createdByUserId: string;
   isActive: boolean;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-export interface PaymentCustomerRecord {
-  id: string;
-  parentProfileId: string;
-  stripeCustomerId: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -158,12 +135,6 @@ export interface PaymentAuditRecord {
   previousValue?: unknown;
   newValue?: unknown;
   createdAt: Date;
-}
-
-export interface TransactionUpdate {
-  status?: PaymentTransactionStatus;
-  stripePaymentIntentId?: string;
-  processedAt?: Date | null;
 }
 
 export interface PaymentDatabase {
@@ -207,106 +178,14 @@ export interface PaymentDatabase {
   saveDiscount(discount: DiscountRecord): Promise<void>;
   setDiscountActive(id: string, isActive: boolean, updatedAt: Date): Promise<void>;
 
-  getPaymentCustomer(parentProfileId: string): Promise<PaymentCustomerRecord | null>;
-  savePaymentCustomer(customer: PaymentCustomerRecord): Promise<void>;
-
-  savePaymentTransaction(transaction: PaymentTransactionRecord): Promise<void>;
-  getPaymentTransaction(id: string): Promise<PaymentTransactionRecord | null>;
-  getPaymentTransactionForUpdate(id: string): Promise<PaymentTransactionRecord | null>;
-  getPaymentTransactionByStripeIntent(
-    stripePaymentIntentId: string,
-  ): Promise<PaymentTransactionRecord | null>;
   listPaymentTransactions(
     parentProfileId: string | null,
     cursor: string | null,
     limit: number,
   ): Promise<PaymentTransactionRecord[]>;
-  listAuthorizedTransactions(limit: number): Promise<PaymentTransactionRecord[]>;
-  updatePaymentTransaction(
-    id: string,
-    update: TransactionUpdate & { updatedAt: Date },
-  ): Promise<void>;
-
-  saveRefund(refund: RefundRecord): Promise<void>;
-  getRefund(id: string): Promise<RefundRecord | null>;
-  listRefundsForTransaction(paymentTransactionId: string): Promise<RefundRecord[]>;
-  updateRefund(
-    id: string,
-    update: { status: RefundStatus; processedAt?: Date | null; updatedAt: Date },
-  ): Promise<void>;
 
   appendAudit(event: PaymentAuditRecord): Promise<void>;
   /** Atomic insert-if-absent. False means this exact external event was already applied. */
   claimIdempotency(event: PaymentAuditRecord): Promise<boolean>;
   getFinancialReport(from: Date, to: Date, currency: PaymentCurrency): Promise<FinancialReport>;
 }
-
-export interface CreateStripeCustomerInput {
-  parentProfileId: string;
-  idempotencyKey: string;
-}
-
-export interface CreateStripePaymentInput {
-  amountMinor: number;
-  currency: PaymentCurrency;
-  stripeCustomerId: string;
-  invoiceId: string;
-  transactionId: string;
-  idempotencyKey: string;
-  captureMethod: "automatic" | "manual";
-}
-
-export interface PaymentGateway {
-  createCustomer(input: CreateStripeCustomerInput): Promise<{ id: string }>;
-  createPaymentIntent(
-    input: CreateStripePaymentInput,
-  ): Promise<{ id: string; clientSecret: string; status: string }>;
-  capturePaymentIntent(
-    stripePaymentIntentId: string,
-    idempotencyKey: string,
-  ): Promise<{ id: string; status: string }>;
-  createRefund(input: {
-    stripePaymentIntentId: string;
-    amountMinor: number;
-    refundId: string;
-    idempotencyKey: string;
-  }): Promise<{ id: string; status: string }>;
-}
-
-export interface PaymentNotification {
-  userId: string;
-  type: "payment_receipt" | "payment_failure" | "payment_refund";
-  amountMinor: number;
-  currency: PaymentCurrency;
-  relatedEntity: { type: "invoice" | "refund"; id: string };
-}
-
-export interface PaymentNotifier {
-  notify(input: PaymentNotification): Promise<void>;
-}
-
-export type StripePaymentWebhookEvent =
-  | {
-      id: string;
-      type:
-        | "payment_intent.amount_capturable_updated"
-        | "payment_intent.succeeded"
-        | "payment_intent.payment_failed"
-        | "payment_intent.canceled";
-      createdAt: Date;
-      paymentIntentId: string;
-    }
-  | {
-      id: string;
-      type: "refund.created" | "refund.updated" | "refund.failed";
-      createdAt: Date;
-      refundId: string;
-      appRefundId: string | null;
-      status: "pending" | "requires_action" | "succeeded" | "failed" | "canceled" | null;
-    }
-  | {
-      id: string;
-      type: "ignored";
-      createdAt: Date;
-      sourceType: string;
-    };

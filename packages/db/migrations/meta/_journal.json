@@ -15,6 +15,13 @@
       "when": 1785248380496,
       "tag": "0001_audit_events_immutable",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1785798037405,
+      "tag": "0002_mixed_synch",
+      "breakpoints": true
     }
   ]
 }

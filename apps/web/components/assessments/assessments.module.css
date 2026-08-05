@@ -376,6 +376,127 @@
   padding: 0.75rem 1rem;
 }
 
+.overviewHeader .secondaryButton {
+  margin-top: 1.5rem;
+}
+
+.form {
+  display: grid;
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.formGrid {
+  display: grid;
+  gap: 1.25rem;
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+}
+
+.choiceRow {
+  align-items: end;
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: 1fr 1fr auto;
+}
+
+.form > .primaryButton {
+  justify-self: start;
+}
+
+.field {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.label {
+  color: var(--ink);
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.input,
+.select,
+.textarea {
+  background: white;
+  border: 1px solid #aeb9c8;
+  border-radius: 0;
+  color: var(--ink);
+  font: inherit;
+  padding: 0.65rem 0.85rem;
+  width: 100%;
+}
+
+.textarea {
+  min-height: 5rem;
+  resize: vertical;
+}
+
+.input:focus,
+.select:focus,
+.textarea:focus {
+  outline: 3px solid #8ea4ff;
+  outline-offset: 2px;
+}
+
+.checkboxRow {
+  align-items: center;
+  display: flex;
+  gap: 0.6rem;
+}
+
+.checkboxRow input {
+  accent-color: var(--cobalt);
+  height: 1.1rem;
+  width: 1.1rem;
+}
+
+.hint {
+  color: var(--muted);
+  font-size: 0.82rem;
+  margin: 0;
+}
+
+.question {
+  border-top: 1px solid var(--line);
+  display: grid;
+  gap: 1rem;
+  padding: 1.5rem 0;
+}
+
+.buttonSecondary,
+.buttonDanger {
+  border: 0;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+  justify-self: start;
+  padding: 0.55rem 0.9rem;
+}
+
+.buttonSecondary {
+  background: var(--mist);
+  color: var(--cobalt);
+}
+
+.buttonSecondary:hover {
+  background: #dce6fb;
+}
+
+.buttonDanger {
+  background: #fff3e1;
+  color: var(--amber);
+}
+
+.buttonDanger:hover {
+  background: #ffe6bd;
+}
+
+.buttonSecondary:disabled,
+.buttonDanger:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
 .runner {
   max-width: 62rem;
   padding: 1rem 2rem 5rem;
@@ -530,6 +651,8 @@
 .reportForm textarea:focus,
 .primaryButton:focus-visible,
 .secondaryButton:focus-visible,
+.buttonSecondary:focus-visible,
+.buttonDanger:focus-visible,
 .assessmentLink:focus-visible,
 .backLink:focus-visible {
   outline: 3px solid #8ea4ff;
@@ -640,6 +763,142 @@
   color: var(--muted);
 }
 
+.suspicionOverview,
+.eventTimeline {
+  margin: 2.5rem 0;
+}
+
+.severityTag {
+  font-family: ui-monospace, monospace;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  padding: 0.4rem 0.7rem;
+  text-transform: uppercase;
+}
+
+.severity_low {
+  background: #e8f5f3;
+  color: var(--teal);
+}
+
+.severity_medium {
+  background: #fff3e1;
+  color: var(--amber);
+}
+
+.severity_high {
+  background: #fbe4e1;
+  color: #a3271b;
+}
+
+.suspicionScore {
+  align-items: baseline;
+  display: flex;
+  gap: 0.75rem;
+  margin: 1.25rem 0;
+}
+
+.suspicionScore strong {
+  font-family: Georgia, serif;
+  font-size: 3rem;
+  font-weight: 500;
+}
+
+.suspicionScore span {
+  color: var(--muted);
+}
+
+.suspicionBreakdown {
+  border-collapse: collapse;
+  margin-top: 1.5rem;
+  width: 100%;
+}
+
+.suspicionBreakdown th,
+.suspicionBreakdown td {
+  border-bottom: 1px solid var(--line);
+  padding: 0.6rem 0.75rem;
+  text-align: left;
+}
+
+.suspicionBreakdown th {
+  color: var(--muted);
+  font-size: 0.78rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.timelineList {
+  list-style: none;
+  margin: 1.5rem 0 0;
+  max-height: 24rem;
+  overflow-y: auto;
+  padding: 0;
+}
+
+.timelineList li {
+  align-items: center;
+  border-top: 1px solid var(--line);
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: auto auto 1fr;
+  padding: 0.6rem 0;
+}
+
+.timelineList time {
+  color: var(--muted);
+  font-family: ui-monospace, monospace;
+  font-size: 0.8rem;
+}
+
+.severityDot {
+  border-radius: 50%;
+  height: 0.55rem;
+  width: 0.55rem;
+}
+
+.severityDot.severity_low {
+  background: var(--teal);
+}
+
+.severityDot.severity_medium {
+  background: var(--amber);
+}
+
+.severityDot.severity_high {
+  background: #a3271b;
+}
+
+.attemptsList {
+  list-style: none;
+  margin: 1.5rem 0 0;
+  padding: 0;
+}
+
+.attemptRow {
+  align-items: center;
+  border-top: 1px solid var(--line);
+  color: inherit;
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: 1.4fr auto 1.4fr auto auto;
+  padding: 1.1rem 0;
+  text-decoration: none;
+  transition:
+    color 160ms ease,
+    padding 160ms ease;
+}
+
+.attemptRow:hover {
+  color: var(--cobalt);
+  padding-left: 0.5rem;
+}
+
+.attemptStudent {
+  font-weight: 700;
+}
+
 .reportForm {
   display: grid;
   gap: 1.2rem;
@@ -679,6 +938,140 @@
   position: absolute;
   white-space: nowrap;
   width: 1px;
+}
+
+/* Locks question text (not answer inputs) from selection while exam mode is active. */
+.examLocked .questionCard h2,
+.examLocked .questionCard > header,
+.examLocked .choice span {
+  user-select: none;
+}
+
+.cameraPreflight {
+  background: var(--mist);
+  display: grid;
+  gap: 1rem;
+  margin: 1.5rem 0;
+  padding: 1.5rem;
+}
+
+.cameraPreflight h2 {
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+.cameraPreflight > p {
+  color: var(--muted);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.preflightChecklist {
+  color: var(--muted);
+  display: grid;
+  gap: 0.4rem;
+  line-height: 1.5;
+  margin: 0;
+  padding-left: 1.2rem;
+}
+
+.cameraPreview {
+  aspect-ratio: 4 / 3;
+  background: var(--ink);
+  max-width: 22rem;
+  position: relative;
+}
+
+.cameraPreviewVideo {
+  height: 100%;
+  object-fit: cover;
+  transform: scaleX(-1);
+  width: 100%;
+}
+
+.cameraPreviewPlaceholder {
+  align-items: center;
+  color: white;
+  display: flex;
+  inset: 0;
+  justify-content: center;
+  padding: 1rem;
+  position: absolute;
+  text-align: center;
+}
+
+.preflightConfirmed {
+  color: var(--teal);
+  font-weight: 700;
+  margin: 0;
+}
+
+.detectionOverlay {
+  align-items: center;
+  background: var(--mist);
+  display: flex;
+  gap: 0.75rem;
+  margin: 1.5rem 0;
+  padding: 0.75rem 1rem;
+  position: sticky;
+  top: 0.5rem;
+  z-index: 5;
+}
+
+.detectionVideo {
+  border: 1px solid var(--line);
+  height: 3.4rem;
+  object-fit: cover;
+  transform: scaleX(-1);
+  width: 4.5rem;
+}
+
+.detectionDot {
+  animation: proctoring-pulse 2s ease-in-out infinite;
+  background: #c0392b;
+  border-radius: 50%;
+  height: 0.5rem;
+  width: 0.5rem;
+}
+
+.detectionLabel {
+  color: var(--muted);
+  font-size: 0.82rem;
+  margin: 0;
+}
+
+@keyframes proctoring-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.35;
+  }
+}
+
+.suspicionBanner {
+  background: #fff3e1;
+  border-left: 3px solid var(--amber);
+  color: #754300;
+  margin: 1.5rem 0;
+  padding: 0.85rem 1rem;
+}
+
+.fullscreenPrompt {
+  align-items: center;
+  background: var(--ink);
+  color: white;
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+  margin: 1.5rem 0;
+  padding: 1rem 1.25rem;
+}
+
+.fullscreenPrompt p {
+  margin: 0;
 }
 
 @media (max-width: 760px) {
@@ -734,11 +1127,29 @@
   .answerReview li {
     grid-template-columns: 1fr;
   }
+
+  .cameraPreview {
+    max-width: 100%;
+  }
+
+  .attemptRow {
+    align-items: start;
+    grid-template-columns: 1fr auto;
+  }
+
+  .fullscreenPrompt {
+    align-items: stretch;
+    flex-direction: column;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .assessmentLink,
   .timeRail div {
     transition: none;
+  }
+
+  .detectionDot {
+    animation: none;
   }
 }

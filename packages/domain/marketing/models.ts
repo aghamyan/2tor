@@ -3,7 +3,8 @@ export type LeadKind =
   | "assessment"
   | "contact"
   | "tutor_application"
-  | "trial_class";
+  | "trial_class"
+  | "group_matching";
 
 /**
  * Deliberately small public-contact record. Child names, dates of birth, and learning

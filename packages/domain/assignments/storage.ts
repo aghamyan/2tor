@@ -33,6 +33,10 @@ export function createS3SubmissionStorage(): SubmissionStorage {
   const bucket = required("S3_BUCKET");
   return {
     async putPrivate({ key, body, mimeType, metadata }) {
+      // An empty (but defined) KMS_KEY_ID must resolve to `undefined`, not `""` — the AWS SDK
+      // treats a defined SSEKMSKeyId as "encrypt with aws:kms" regardless of ServerSideEncryption,
+      // which local S3-compatible stores (e.g. MinIO) reject as an unsupported encryption method.
+      const kmsKeyId = process.env.KMS_KEY_ID || undefined;
       await client.send(
         new PutObjectCommand({
           Bucket: bucket,
@@ -40,8 +44,8 @@ export function createS3SubmissionStorage(): SubmissionStorage {
           Body: body,
           ContentType: mimeType,
           Metadata: metadata,
-          ServerSideEncryption: process.env.KMS_KEY_ID ? "aws:kms" : undefined,
-          SSEKMSKeyId: process.env.KMS_KEY_ID,
+          ServerSideEncryption: kmsKeyId ? "aws:kms" : undefined,
+          SSEKMSKeyId: kmsKeyId,
         }),
       );
     },

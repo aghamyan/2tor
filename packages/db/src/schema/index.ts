@@ -14,3 +14,4 @@ export * from "./communication";
 export * from "./gamification";
 export * from "./finance";
 export * from "./operations";
+export * from "./whatsapp";

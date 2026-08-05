@@ -7,6 +7,10 @@ import styles from "./marketing.module.css";
 import { Testimonial } from "./testimonial";
 import type { MarketingSlug } from "./seo";
 import { isSubjectCurriculumSlug, SubjectCurriculumPage } from "./subjects/subject-curriculum-page";
+import { GroupLessonsPage } from "./group-lessons/group-lessons";
+import { ParentsPage } from "./parents/parents-page";
+import { HowItWorksPage } from "./how-it-works/how-it-works-page";
+import { ConsultationPage } from "./consultation/consultation-page";
 export { pageSlugs, faqJsonLd, type MarketingSlug } from "./seo";
 
 export const pageKey: Record<MarketingSlug, string> = {
@@ -130,7 +134,19 @@ export function HomePage({ locale }: { locale: Locale }) {
   );
 }
 
-export function StandardPage({ locale, slug }: { locale: Locale; slug: MarketingSlug }) {
+export function StandardPage({
+  locale,
+  slug,
+  consultationContext,
+}: {
+  locale: Locale;
+  slug: MarketingSlug;
+  consultationContext?: {
+    subject?: string;
+    format?: string;
+    goal?: string;
+  };
+}) {
   const t = useTranslations("marketing");
   const key = pageKey[slug];
   const faq = slug === "faq";
@@ -138,6 +154,34 @@ export function StandardPage({ locale, slug }: { locale: Locale; slug: Marketing
     return (
       <MarketingChrome locale={locale} fullBleed={slug === "mathematics"}>
         <SubjectCurriculumPage slug={slug} />
+      </MarketingChrome>
+    );
+  }
+  if (slug === "group-lessons") {
+    return (
+      <MarketingChrome locale={locale} fullBleed>
+        <GroupLessonsPage locale={locale} />
+      </MarketingChrome>
+    );
+  }
+  if (slug === "parents") {
+    return (
+      <MarketingChrome locale={locale} fullBleed>
+        <ParentsPage locale={locale} />
+      </MarketingChrome>
+    );
+  }
+  if (slug === "how-it-works") {
+    return (
+      <MarketingChrome locale={locale} fullBleed>
+        <HowItWorksPage locale={locale} />
+      </MarketingChrome>
+    );
+  }
+  if (slug === "consultation") {
+    return (
+      <MarketingChrome locale={locale} fullBleed>
+        <ConsultationPage locale={locale} initialContext={consultationContext} />
       </MarketingChrome>
     );
   }

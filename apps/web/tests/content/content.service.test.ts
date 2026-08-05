@@ -1,7 +1,10 @@
 import { describe, expect, it } from "vitest";
 import { ContentError } from "../../../../packages/domain/content/errors";
 import {
+  bookmarkResource,
   createResource,
+  listBookmarkedResourceIds,
+  listResourceSubjects,
   removeDeadLinks,
   reportContent,
   uploadTutorMaterial,
@@ -91,5 +94,19 @@ describe("copyright-safe content", () => {
         links: [{ url: "https://example.com/video", title: null }],
       }),
     ).rejects.toMatchObject({ code: "INVALID_VIDEO_URL" } satisfies Partial<ContentError>);
+  });
+  it("lists active subjects for the resource-creation form", async () => {
+    const database = new InMemoryContentDatabase();
+    database.subjects.push({ id: "math", name: "Mathematics" });
+    await expect(listResourceSubjects(database, tutor)).resolves.toEqual([
+      { id: "math", name: "Mathematics" },
+    ]);
+  });
+  it("reports a student's bookmarked resources so saved state survives a reload", async () => {
+    const database = new InMemoryContentDatabase();
+    const resource = await publishedVideo(database);
+    await bookmarkResource(database, student, resource.id);
+    await expect(listBookmarkedResourceIds(database, student)).resolves.toEqual([resource.id]);
+    await expect(listBookmarkedResourceIds(database, tutor)).resolves.toEqual([]);
   });
 });

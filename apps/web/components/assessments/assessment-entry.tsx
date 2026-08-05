@@ -4,6 +4,12 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import styles from "./assessments.module.css";
+import { CameraPreflight } from "./proctoring/camera-preflight";
+import type { CameraHandle } from "./proctoring/camera-service";
+import { DetectionOverlay } from "./proctoring/detection-overlay";
+import { IntegrityPolicyBanner } from "./proctoring/integrity-policy-banner";
+import { SuspicionBanner } from "./proctoring/suspicion-banner";
+import { useExamProctoring } from "./proctoring/use-exam-proctoring";
 
 type Question = {
   id: string;
@@ -14,6 +20,12 @@ type Question = {
   points: number;
 };
 
+type CameraSettings = { required: boolean; policyVersion: string | null; headTrackingEnabled: boolean };
+type IntegrityPolicySettings = {
+  violationLimit: number | null;
+  action: "log_only" | "warn" | "auto_submit";
+};
+
 type SerializedSession = {
   assessment: { id: string; title: string; description: string | null; type: string };
   version: {
@@ -21,7 +33,9 @@ type SerializedSession = {
     settings: {
       durationSeconds: number | null;
       fullscreenRequired: boolean;
-      camera: { required: boolean; policyVersion: string | null };
+      camera: CameraSettings;
+      maxAttempts: number | null;
+      integrityPolicy: IntegrityPolicySettings;
     };
   };
   attempt: { id: string; status: string; startedAt: string };
@@ -34,14 +48,6 @@ type Preflight = {
   assessment: SerializedSession["assessment"];
   version: SerializedSession["version"] & { questionCount: number };
 };
-
-type SignalType =
-  | "focus_loss"
-  | "fullscreen_exit"
-  | "tab_switch"
-  | "connectivity_interruption"
-  | "copy_attempt"
-  | "paste_attempt";
 
 function messageFromResponse(payload: unknown, fallback: string) {
   if (
@@ -73,6 +79,8 @@ export function AssessmentEntry({ assessmentId }: { assessmentId: string }) {
   const [preflight, setPreflight] = useState<Preflight | null>(null);
   const [session, setSession] = useState<SerializedSession | null>(null);
   const [cameraAccepted, setCameraAccepted] = useState(false);
+  const [cameraHandle, setCameraHandle] = useState<CameraHandle | null>(null);
+  const cameraHandleRef = useRef<CameraHandle | null>(null);
   const [loading, setLoading] = useState(true);
   const [starting, setStarting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -98,6 +106,19 @@ export function AssessmentEntry({ assessmentId }: { assessmentId: string }) {
       active = false;
     };
   }, [assessmentId, t]);
+
+  // Releases the camera if the student never starts (navigates away from the preflight screen).
+  useEffect(() => {
+    return () => {
+      if (!session) cameraHandleRef.current?.stop();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- runs once on unmount; `session` is read via closure intentionally.
+  }, []);
+
+  function handleCameraReady(handle: CameraHandle) {
+    cameraHandleRef.current = handle;
+    setCameraHandle(handle);
+  }
 
   async function start() {
     if (!preflight) return;
@@ -138,9 +159,21 @@ export function AssessmentEntry({ assessmentId }: { assessmentId: string }) {
         {error ?? t("errors.load")}
       </p>
     );
-  if (session) return <AssessmentRunner session={session} />;
+  if (session)
+    return (
+      <AssessmentRunner
+        session={session}
+        cameraHandle={cameraHandle}
+        onCameraRelease={() => {
+          cameraHandleRef.current?.stop();
+          cameraHandleRef.current = null;
+          setCameraHandle(null);
+        }}
+      />
+    );
 
   const settings = preflight.version.settings;
+  const cameraReady = !settings.camera.required || cameraHandle !== null;
   return (
     <div className={styles.shell}>
       <Link className={styles.backLink} href="/assessments">
@@ -169,6 +202,12 @@ export function AssessmentEntry({ assessmentId }: { assessmentId: string }) {
             <dt>{t("entry.version")}</dt>
             <dd>{preflight.version.versionNumber}</dd>
           </div>
+          {settings.maxAttempts !== null ? (
+            <div>
+              <dt>{t("entry.attemptsAllowed")}</dt>
+              <dd>{settings.maxAttempts}</dd>
+            </div>
+          ) : null}
         </dl>
       </header>
 
@@ -181,9 +220,21 @@ export function AssessmentEntry({ assessmentId }: { assessmentId: string }) {
           <li>{t("entry.notice.focus")}</li>
           <li>{t("entry.notice.connection")}</li>
           <li>{t("entry.notice.answers")}</li>
+          {settings.fullscreenRequired ? <li>{t("entry.notice.examMode")}</li> : null}
+          {settings.camera.required ? <li>{t("entry.notice.camera")}</li> : null}
+          {settings.camera.headTrackingEnabled ? <li>{t("entry.notice.headTracking")}</li> : null}
+          {settings.integrityPolicy.action !== "log_only" && settings.integrityPolicy.violationLimit !== null ? (
+            <li>
+              {t(`entry.notice.integrityPolicy.${settings.integrityPolicy.action}`, {
+                count: settings.integrityPolicy.violationLimit,
+              })}
+            </li>
+          ) : null}
         </ul>
         <p className={styles.notProof}>{t("entry.notice.notProof")}</p>
       </section>
+
+      {settings.camera.required ? <CameraPreflight onReady={handleCameraReady} /> : null}
 
       <section className={styles.startPanel}>
         <div>
@@ -209,7 +260,7 @@ export function AssessmentEntry({ assessmentId }: { assessmentId: string }) {
         ) : null}
         <button
           className={styles.primaryButton}
-          disabled={starting || (settings.camera.required && !cameraAccepted)}
+          disabled={starting || (settings.camera.required && !cameraAccepted) || !cameraReady}
           onClick={() => void start()}
           type="button"
         >
@@ -220,9 +271,17 @@ export function AssessmentEntry({ assessmentId }: { assessmentId: string }) {
   );
 }
 
-function AssessmentRunner({ session }: { session: SerializedSession }) {
+function AssessmentRunner({
+  session,
+  cameraHandle,
+  onCameraRelease,
+}: {
+  session: SerializedSession;
+  cameraHandle: CameraHandle | null;
+  onCameraRelease: () => void;
+}) {
   const t = useTranslations("assessments");
-  const fullscreenEntered = useRef(false);
+  const containerRef = useRef<HTMLDivElement | null>(null);
   const elapsedSeconds = useRef(0);
   const [answers, setAnswers] = useState<Record<string, string>>(
     Object.fromEntries(
@@ -233,54 +292,39 @@ function AssessmentRunner({ session }: { session: SerializedSession }) {
   const [error, setError] = useState<string | null>(null);
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const closedSideEffectsRan = useRef(false);
   const duration = session.version.settings.durationSeconds;
+  const strict = session.version.settings.fullscreenRequired;
+  const camera = session.version.settings.camera;
+  const integrityPolicy = session.version.settings.integrityPolicy;
   const [remaining, setRemaining] = useState(() =>
     session.deadlineAt
       ? Math.max(0, Math.ceil((new Date(session.deadlineAt).getTime() - Date.now()) / 1_000))
       : null,
   );
 
-  const sendSignal = useCallback(
-    (
-      eventType: SignalType,
-      metadata: Record<string, string | number | boolean | null> | null = null,
-    ) => {
-      void fetch(`/api/assessments/attempts/${encodeURIComponent(session.attempt.id)}/events`, {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        keepalive: true,
-        body: JSON.stringify({ eventType, clientOccurredAt: new Date().toISOString(), metadata }),
-      });
-    },
-    [session.attempt.id],
-  );
+  const proctoring = useExamProctoring({
+    attemptId: session.attempt.id,
+    strict,
+    camera: camera.required ? { required: true, headTrackingEnabled: camera.headTrackingEnabled } : null,
+    cameraHandle,
+    containerRef,
+  });
 
+  // The server ended this attempt under the tutor's auto-submit integrity policy. The terminal
+  // screen below reacts directly to `proctoring.attemptClosedByPolicy`; this effect only runs the
+  // one-time teardown (stop guards, drop fullscreen/camera) exactly once, via a ref rather than
+  // state, since nothing here needs to trigger an additional render.
   useEffect(() => {
-    fullscreenEntered.current = Boolean(document.fullscreenElement);
-    function visibility() {
-      if (document.visibilityState === "hidden") sendSignal("tab_switch");
-    }
-    function blur() {
-      sendSignal("focus_loss");
-    }
-    function fullscreen() {
-      if (document.fullscreenElement) fullscreenEntered.current = true;
-      else if (fullscreenEntered.current) sendSignal("fullscreen_exit");
-    }
-    function offline() {
-      sendSignal("connectivity_interruption", { state: "offline" });
-    }
-    document.addEventListener("visibilitychange", visibility);
-    document.addEventListener("fullscreenchange", fullscreen);
-    window.addEventListener("blur", blur);
-    window.addEventListener("offline", offline);
-    return () => {
-      document.removeEventListener("visibilitychange", visibility);
-      document.removeEventListener("fullscreenchange", fullscreen);
-      window.removeEventListener("blur", blur);
-      window.removeEventListener("offline", offline);
-    };
-  }, [sendSignal]);
+    if (!proctoring.attemptClosedByPolicy || submitted || closedSideEffectsRan.current) return;
+    closedSideEffectsRan.current = true;
+    proctoring.stopAll();
+    if (document.fullscreenElement) void document.exitFullscreen();
+    onCameraRelease();
+    // proctoring/onCameraRelease/submitted are read via closure; this should only ever run once,
+    // on the transition from false to true.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [proctoring.attemptClosedByPolicy]);
 
   useEffect(() => {
     if (!session.deadlineAt) return;
@@ -307,24 +351,27 @@ function AssessmentRunner({ session }: { session: SerializedSession }) {
     return Math.max(0, Math.min(1, remaining / duration));
   }, [duration, remaining]);
 
-  async function save(questionId: string, answerText = answers[questionId] ?? "") {
-    if (remaining === 0) return;
-    const response = await fetch(
-      `/api/assessments/attempts/${encodeURIComponent(session.attempt.id)}/answers/${encodeURIComponent(questionId)}`,
-      {
-        method: "PATCH",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({
-          answerText: answerText || null,
-          timeSpentSeconds: elapsedSeconds.current,
-        }),
-      },
-    );
-    if (!response.ok) {
-      const payload = (await response.json()) as unknown;
-      setError(messageFromResponse(payload, t("errors.save")));
-    }
-  }
+  const save = useCallback(
+    async (questionId: string, answerText: string) => {
+      if (remaining === 0) return;
+      const response = await fetch(
+        `/api/assessments/attempts/${encodeURIComponent(session.attempt.id)}/answers/${encodeURIComponent(questionId)}`,
+        {
+          method: "PATCH",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({
+            answerText: answerText || null,
+            timeSpentSeconds: elapsedSeconds.current,
+          }),
+        },
+      );
+      if (!response.ok) {
+        const payload = (await response.json()) as unknown;
+        setError(messageFromResponse(payload, t("errors.save")));
+      }
+    },
+    [remaining, session.attempt.id, t],
+  );
 
   async function submit() {
     if (!honorAccepted) return;
@@ -332,7 +379,9 @@ function AssessmentRunner({ session }: { session: SerializedSession }) {
     setError(null);
     try {
       if (remaining !== 0) {
-        await Promise.all(session.questions.map((question) => save(question.id)));
+        await Promise.all(
+          session.questions.map((question) => save(question.id, answers[question.id] ?? "")),
+        );
       }
       const response = await fetch(
         `/api/assessments/attempts/${encodeURIComponent(session.attempt.id)}/submit`,
@@ -344,16 +393,31 @@ function AssessmentRunner({ session }: { session: SerializedSession }) {
       );
       const payload = (await response.json()) as unknown;
       if (!response.ok) throw new Error(messageFromResponse(payload, t("errors.submit")));
+      // Stop every guard before touching fullscreen/camera so their own teardown side effects
+      // (fullscreenchange, track "ended") never re-enter as signals against a closed attempt.
+      proctoring.stopAll();
       setSubmitted(true);
-      if (document.fullscreenElement) {
-        fullscreenEntered.current = false;
-        await document.exitFullscreen();
-      }
+      if (document.fullscreenElement) await document.exitFullscreen();
+      onCameraRelease();
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : t("errors.submit"));
     } finally {
       setSubmitting(false);
     }
+  }
+
+  if (proctoring.attemptClosedByPolicy) {
+    return (
+      <section className={styles.completion}>
+        <span aria-hidden="true">■</span>
+        <p className={styles.eyebrow}>{t("runner.closedByPolicy.kicker")}</p>
+        <h1>{t("runner.closedByPolicy.title")}</h1>
+        <p>{t("runner.closedByPolicy.body")}</p>
+        <Link className={styles.primaryButton} href="/assessments">
+          {t("runner.closedByPolicy.back")}
+        </Link>
+      </section>
+    );
   }
 
   if (submitted) {
@@ -371,11 +435,7 @@ function AssessmentRunner({ session }: { session: SerializedSession }) {
   }
 
   return (
-    <div
-      className={styles.runner}
-      onCopy={() => sendSignal("copy_attempt")}
-      onPaste={() => sendSignal("paste_attempt")}
-    >
+    <div className={strict ? `${styles.runner} ${styles.examLocked}` : styles.runner} ref={containerRef}>
       <aside className={styles.timeRail} aria-label={t("runner.timeRemaining")}>
         <div style={{ transform: `scaleY(${progress})` }} />
       </aside>
@@ -389,6 +449,34 @@ function AssessmentRunner({ session }: { session: SerializedSession }) {
           <small>{remaining === 0 ? t("runner.elapsed") : t("runner.remaining")}</small>
         </div>
       </header>
+
+      {camera.required ? (
+        <DetectionOverlay
+          videoRef={proctoring.videoRef}
+          faceTrackingUnavailable={proctoring.faceTrackingUnavailable}
+          cameraDisconnected={proctoring.cameraDisconnected}
+        />
+      ) : null}
+
+      <SuspicionBanner suspicion={proctoring.suspicion} bus={proctoring.bus} />
+      <IntegrityPolicyBanner
+        violationCount={proctoring.integrityViolationCount}
+        policy={integrityPolicy}
+        bus={proctoring.bus}
+      />
+
+      {strict && proctoring.fullscreenExited ? (
+        <div className={styles.fullscreenPrompt} role="alertdialog" aria-labelledby="fullscreen-prompt-title">
+          <p id="fullscreen-prompt-title">{t("proctoring.fullscreen.exited")}</p>
+          <button
+            className={styles.primaryButton}
+            onClick={() => proctoring.requestFullscreenReentry()}
+            type="button"
+          >
+            {t("proctoring.fullscreen.reenter")}
+          </button>
+        </div>
+      ) : null}
 
       {remaining === 0 ? <p className={styles.elapsedNotice}>{t("runner.elapsedNotice")}</p> : null}
 
@@ -425,7 +513,7 @@ function AssessmentRunner({ session }: { session: SerializedSession }) {
               <textarea
                 className={question.type === "code" ? styles.codeAnswer : styles.longAnswer}
                 disabled={remaining === 0}
-                onBlur={() => void save(question.id)}
+                onBlur={() => void save(question.id, answers[question.id] ?? "")}
                 onChange={(event) =>
                   setAnswers((current) => ({ ...current, [question.id]: event.target.value }))
                 }
@@ -437,7 +525,7 @@ function AssessmentRunner({ session }: { session: SerializedSession }) {
                 className={styles.shortAnswer}
                 disabled={remaining === 0}
                 inputMode={question.type === "numeric" ? "decimal" : "text"}
-                onBlur={() => void save(question.id)}
+                onBlur={() => void save(question.id, answers[question.id] ?? "")}
                 onChange={(event) =>
                   setAnswers((current) => ({ ...current, [question.id]: event.target.value }))
                 }

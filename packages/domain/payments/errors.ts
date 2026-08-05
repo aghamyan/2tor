@@ -9,7 +9,6 @@ export const PAYMENT_ERROR_CODES = [
   "TRANSACTION_NOT_FOUND",
   "REFUND_EXCEEDS_AVAILABLE",
   "PAYMENT_NOT_READY",
-  "STRIPE_SIGNATURE_INVALID",
 ] as const;
 
 export type PaymentErrorCode = (typeof PAYMENT_ERROR_CODES)[number];

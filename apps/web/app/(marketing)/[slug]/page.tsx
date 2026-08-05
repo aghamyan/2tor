@@ -23,13 +23,34 @@ export async function generateMetadata({
   const t = await getTranslations({ locale, namespace: "marketing" });
   return { title: t(`pages.${pageKey[slug as MarketingSlug]}.title`) };
 }
-export default async function Page({ params }: { params: Promise<{ slug: string }> }) {
+export default async function Page({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ slug: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
   const { slug } = await params;
   if (!pageSlugs.includes(slug as MarketingSlug)) notFound();
   const locale = resolveLocale((await headers()).get("x-locale"));
+  const query = await searchParams;
+  const first = (value: string | string[] | undefined) =>
+    Array.isArray(value) ? value[0] : value;
   return (
     <>
-      <StandardPage locale={locale} slug={slug as MarketingSlug} />
+      <StandardPage
+        locale={locale}
+        slug={slug as MarketingSlug}
+        consultationContext={
+          slug === "consultation"
+            ? {
+                subject: first(query.subject),
+                format: first(query.format),
+                goal: first(query.goal),
+              }
+            : undefined
+        }
+      />
       {slug === "faq" && (
         <script
           type="application/ld+json"

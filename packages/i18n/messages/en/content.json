@@ -1,6 +1,13 @@
 {
   "content": {
     "nav": { "label": "Learning resources" },
+    "types": {
+      "document": "Guide",
+      "video": "Video",
+      "link": "Link",
+      "worksheet": "Practice set",
+      "interactive": "Interactive"
+    },
     "overview": {
       "kicker": "Resource library",
       "title": "Learning resources",
@@ -17,7 +24,65 @@
       "safety": {
         "title": "Report concerns",
         "body": "Reports remove the external link right away and send it to moderation."
+      },
+      "actions": {
+        "create": "Post a resource"
+      },
+      "library": {
+        "kicker": "Resource library",
+        "title": "Available resources",
+        "empty": "No resources are available yet. Tutors can post one from this page.",
+        "noDescription": "Open this resource for more detail.",
+        "subject": "Subject: {subject}",
+        "report": "Report this resource",
+        "reportPlaceholder": "Why are you reporting this?",
+        "reportSubmit": "Send report",
+        "reportSending": "Sending…",
+        "reportCancel": "Cancel",
+        "reported": "Reported for review."
       }
+    },
+    "newResource": {
+      "back": "Resource library",
+      "eyebrow": "Tutor workspace",
+      "title": "Post a resource",
+      "intro": "Share a video, guide, or worksheet with your students. Publish it now or save a draft to keep refining it first.",
+      "resourceTitle": "Title",
+      "type": "Resource type",
+      "subject": "Subject",
+      "selectSubject": "No specific subject",
+      "noSubjects": "No subjects are available yet. You can still post this resource without one.",
+      "ownership": "Ownership",
+      "ownershipOption": {
+        "tutor_created": "I created this material myself",
+        "third_party_licensed": "Third-party material I have rights to reference",
+        "company": "Official platform material"
+      },
+      "description": "Description",
+      "tags": "Tags",
+      "tagsPlaceholder": "fractions, grade 6, practice",
+      "tagsHint": "Separate tags with commas. Tags help students find this resource.",
+      "videoUrl": "YouTube URL",
+      "videoUrlHint": "Only YouTube links are supported. The video stays on YouTube; we never download or host it.",
+      "videoLinkTitle": "Link title (optional)",
+      "attachMaterial": "Attach a file (optional)",
+      "attachMaterialHint": "Files are reviewed by an administrator before publication and won't appear in the library until approved. Video files are not accepted — use a YouTube link instead.",
+      "rightsConfirm": "I confirm I have the rights to share this file.",
+      "publishNow": "Publish now",
+      "publishHint": "Save a draft to keep refining it — drafts aren't shown in the resource library until you publish.",
+      "post": "Post resource",
+      "posting": "Posting…",
+      "resourceCreatedUploadFailed": "The resource was posted, but the attached file failed to upload.",
+      "validation": {
+        "title": "Add a title.",
+        "videoUrl": "Add a YouTube URL for this video.",
+        "rights": "Confirm you have the rights to share this file, or remove it."
+      }
+    },
+    "errors": {
+      "create": "The resource could not be posted.",
+      "report": "That report could not be sent.",
+      "upload": "The file could not be uploaded."
     }
   }
 }

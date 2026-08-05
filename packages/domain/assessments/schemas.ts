@@ -72,6 +72,35 @@ export const assessmentQuestionInputSchema = z
     }
   });
 
+const audienceSchema = z
+  .discriminatedUnion("mode", [
+    z.object({ mode: z.literal("everyone") }).strict(),
+    z
+      .object({
+        mode: z.literal("selected"),
+        studentProfileIds: z.array(z.string().trim().min(1).max(100)).min(1).max(500),
+      })
+      .strict(),
+  ])
+  .default({ mode: "everyone" });
+
+const integrityPolicySchema = z
+  .object({
+    violationLimit: z.number().int().min(1).max(100).nullable().default(null),
+    action: z.enum(["log_only", "warn", "auto_submit"]).default("log_only"),
+  })
+  .strict()
+  .default({ violationLimit: null, action: "log_only" })
+  .superRefine((value, context) => {
+    if (value.violationLimit === null && value.action !== "log_only") {
+      context.addIssue({
+        code: "custom",
+        path: ["violationLimit"],
+        message: "Set a violation limit before choosing a warn or auto-submit action.",
+      });
+    }
+  });
+
 export const assessmentVersionInputSchema = z
   .object({
     changeSummary: nullableText(2_000),
@@ -90,9 +119,13 @@ export const assessmentVersionInputSchema = z
       .object({
         required: z.boolean().default(false),
         policyVersion: z.string().trim().min(1).max(100).nullable(),
+        headTrackingEnabled: z.boolean().default(false),
       })
       .strict()
-      .default({ required: false, policyVersion: null }),
+      .default({ required: false, policyVersion: null, headTrackingEnabled: false }),
+    audience: audienceSchema,
+    maxAttempts: z.number().int().min(1).max(100).nullable().default(null),
+    integrityPolicy: integrityPolicySchema,
     questions: z.array(assessmentQuestionInputSchema).min(1).max(300),
   })
   .strict()
@@ -109,6 +142,13 @@ export const assessmentVersionInputSchema = z
         code: "custom",
         path: ["camera", "policyVersion"],
         message: "A camera policy is only valid when the camera is required.",
+      });
+    }
+    if (!value.camera.required && value.camera.headTrackingEnabled) {
+      context.addIssue({
+        code: "custom",
+        path: ["camera", "headTrackingEnabled"],
+        message: "Head tracking requires the camera to be required.",
       });
     }
     const poolSizes = new Map<string, number>();
@@ -172,16 +212,34 @@ export const saveAssessmentAnswerSchema = z
   })
   .strict();
 
+const STUDENT_DETECTABLE_EVENT_TYPES = [
+  "focus_loss",
+  "fullscreen_exit",
+  "tab_switch",
+  "connectivity_interruption",
+  "copy_attempt",
+  "paste_attempt",
+  "browser_minimized",
+  "cut_attempt",
+  "select_all_attempt",
+  "print_attempt",
+  "save_attempt",
+  "view_source_attempt",
+  "context_menu_attempt",
+  "drag_attempt",
+  "devtools_shortcut",
+  "camera_ready",
+  "camera_disconnected",
+  "face_missing",
+  "face_returned",
+  "multiple_faces",
+  "gaze_away",
+  "external_device_suspected",
+] as const;
+
 export const integritySignalSchema = z
   .object({
-    eventType: z.enum([
-      "focus_loss",
-      "fullscreen_exit",
-      "tab_switch",
-      "connectivity_interruption",
-      "copy_attempt",
-      "paste_attempt",
-    ]),
+    eventType: z.enum(STUDENT_DETECTABLE_EVENT_TYPES),
     clientOccurredAt: z.string().datetime().nullable().default(null),
     metadata: z
       .record(
@@ -190,6 +248,20 @@ export const integritySignalSchema = z
       )
       .nullable()
       .default(null),
+  })
+  .strict();
+
+/** Client-side guards emit many state-transition signals; batch them into one round trip. */
+export const integritySignalBatchSchema = z
+  .object({
+    signals: z.array(integritySignalSchema).min(1).max(50),
+  })
+  .strict();
+
+export const attemptListSchema = z
+  .object({
+    cursor: z.string().trim().min(1).max(128).nullable().default(null),
+    limit: z.number().int().min(1).max(100).default(25),
   })
   .strict();
 
@@ -220,6 +292,8 @@ export type CreateVersionRequestInput = z.input<typeof createVersionRequestSchem
 export type StartAttemptInput = z.input<typeof startAttemptSchema>;
 export type SaveAssessmentAnswerInput = z.input<typeof saveAssessmentAnswerSchema>;
 export type IntegritySignalInput = z.input<typeof integritySignalSchema>;
+export type IntegritySignalBatchInput = z.input<typeof integritySignalBatchSchema>;
+export type AttemptListInput = z.input<typeof attemptListSchema>;
 export type SubmitAssessmentInput = z.input<typeof submitAssessmentSchema>;
 export type DiagnosticReportInput = z.input<typeof diagnosticReportSchema>;
 export type ConsultationInput = z.input<typeof consultationSchema>;

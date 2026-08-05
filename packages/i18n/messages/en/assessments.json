@@ -13,7 +13,7 @@
       "in_progress": "In progress",
       "submitted": "Submitted",
       "graded": "Graded",
-      "abandoned": "Closed after time elapsed"
+      "abandoned": "Closed without submission"
     },
     "overview": {
       "kicker": "Assessment workspace",
@@ -42,8 +42,11 @@
         "kicker": "Assessment library",
         "title": "Available assessments",
         "loading": "Loading the assessment library…",
-        "empty": "No assessments are available yet. Tutors can create one through the assessment API.",
+        "empty": "No assessments are available yet.",
         "noDescription": "Open the assessment brief and collection notice."
+      },
+      "actions": {
+        "create": "Create assessment"
       }
     },
     "entry": {
@@ -55,6 +58,7 @@
       "minutes": "{count, plural, one {# minute} other {# minutes}}",
       "untimed": "Untimed",
       "version": "Version",
+      "attemptsAllowed": "Attempts allowed",
       "notice": {
         "label": "Before you begin",
         "title": "This assessment records activity signals",
@@ -63,7 +67,14 @@
         "focus": "tab or focus changes and fullscreen exits",
         "connection": "connection interruptions and detectable copy/paste attempts",
         "answers": "saved answers and answer changes",
-        "notProof": "These signals provide context only. They are not proof of misconduct and never produce an automatic accusation."
+        "examMode": "keyboard shortcuts, clipboard, and the right-click menu are restricted for the duration",
+        "camera": "your camera must stay on and visible",
+        "headTracking": "on-device face and gaze tracking runs locally in your browser — no video ever leaves your device",
+        "integrityPolicy": {
+          "warn": "If this assessment detects {count, plural, one {# instance} other {# instances}} of leaving the exam (switching tabs, exiting fullscreen, losing focus, or minimizing the window), you will see an on-screen warning",
+          "auto_submit": "If this assessment detects {count, plural, one {# instance} other {# instances}} of leaving the exam (switching tabs, exiting fullscreen, losing focus, or minimizing the window), it will be automatically submitted"
+        },
+        "notProof": "These signals provide context only. They are not proof of misconduct. Any automatic action this specific assessment takes is described above — no other assessment behaves this way."
       },
       "ready": {
         "title": "Ready to begin?",
@@ -102,6 +113,12 @@
         "title": "Your assessment is complete",
         "body": "Your tutor can now review the answers and activity context. Any diagnostic report is written by the tutor and shared with your family after consultation.",
         "back": "Return to assessments"
+      },
+      "closedByPolicy": {
+        "kicker": "Attempt closed",
+        "title": "This attempt was automatically submitted",
+        "body": "Your tutor set this assessment to close automatically after repeated tab switches, fullscreen exits, or similar activity, and that limit was reached. Your saved answers were kept. Your tutor will review this attempt and can follow up with you.",
+        "back": "Return to assessments"
       }
     },
     "signals": {
@@ -111,7 +128,73 @@
       "connectivity_interruption": "Connection interruptions",
       "copy_attempt": "Copy attempts",
       "paste_attempt": "Paste attempts",
-      "answer_change": "Answer changes"
+      "answer_change": "Answer changes",
+      "start": "Assessment started",
+      "end": "Assessment ended",
+      "answer_timestamp": "Answer saved",
+      "browser_minimized": "Browser minimized",
+      "cut_attempt": "Cut attempts",
+      "select_all_attempt": "Select-all attempts",
+      "print_attempt": "Print attempts",
+      "save_attempt": "Save-page attempts",
+      "view_source_attempt": "View-source attempts",
+      "context_menu_attempt": "Right-click menu attempts",
+      "drag_attempt": "Drag-out attempts",
+      "devtools_shortcut": "Developer-tools shortcut",
+      "camera_ready": "Camera confirmed",
+      "camera_disconnected": "Camera disconnected",
+      "face_missing": "Face not visible",
+      "face_returned": "Face visible again",
+      "multiple_faces": "Multiple faces detected",
+      "gaze_away": "Looked away from screen",
+      "external_device_suspected": "Possible external device glance",
+      "warning_shown": "Warning shown to student"
+    },
+    "proctoring": {
+      "preflight": {
+        "title": "Camera check",
+        "body": "Confirm your camera before you begin. Sit facing the camera in good light, with your whole face visible and no hat or face covering.",
+        "faceCamera": "Sit facing the camera",
+        "keepVisible": "Keep your face visible throughout the assessment",
+        "lighting": "Use good, even lighting",
+        "noCoverings": "Remove hats or face coverings",
+        "request": "Turn on camera",
+        "requesting": "Requesting camera access…",
+        "notStarted": "Camera preview will appear here",
+        "confirmed": "Camera confirmed. You're ready to begin.",
+        "errors": {
+          "unsupported": "This browser does not support camera access. Try a recent version of Chrome, Firefox, Safari, or Edge.",
+          "denied": "Camera access was denied. Allow camera access in your browser settings, then try again.",
+          "no-device": "No camera was found. Connect a camera and try again.",
+          "unknown": "The camera could not be started. Try again."
+        }
+      },
+      "overlay": {
+        "active": "Camera monitoring is active",
+        "limited": "Camera is on; on-device face tracking is unavailable in this browser",
+        "disconnected": "Camera disconnected — reconnect to continue"
+      },
+      "warning": {
+        "returnToAssessment": "Please return to the assessment.",
+        "integrityPolicy": "Your tutor has set an activity limit for this assessment, and it has been reached. Please stay on this page and continue your work — your tutor will review this attempt."
+      },
+      "fullscreen": {
+        "exited": "Please return to fullscreen to continue the assessment.",
+        "reenter": "Return to fullscreen"
+      }
+    },
+    "attempts": {
+      "back": "Assessment library",
+      "kicker": "Attempts",
+      "loading": "Loading attempts…",
+      "empty": "No student has started this assessment yet.",
+      "submittedAt": "Submitted {date}",
+      "stillInProgress": "Still in progress",
+      "loadMore": "Load more",
+      "loadingMore": "Loading…",
+      "delete": "Delete assessment",
+      "deleting": "Deleting…",
+      "deleteConfirm": "Delete this assessment? Students will no longer see or be able to start it. Past attempts and reports are kept and stay reachable from this page."
     },
     "review": {
       "loading": "Loading the attempt review…",
@@ -121,6 +204,39 @@
         "kicker": "Activity context",
         "title": "Recorded signals",
         "contract": "Counts describe browser activity only. They do not establish intent or prove misconduct. Review them with the answers and speak with the learner when context is needed."
+      },
+      "suspicion": {
+        "kicker": "Review signals",
+        "title": "Suspicion overview",
+        "notProof": "This score summarizes signal weight for your review. It is never a verdict, and this score never fails or blocks a submission by itself — the decision is always yours. (If you set an activity-based auto-submit policy for this assessment, that is a separate, disclosed setting — see the assessment's attempts and activity policy.)",
+        "scoreLabel": "suspicion points",
+        "severity": {
+          "low": "Low",
+          "medium": "Medium",
+          "high": "High"
+        },
+        "stats": {
+          "notTracked": "Not tracked",
+          "faceVisible": "Face visible",
+          "tabSwitches": "Tab switches",
+          "fullscreenExits": "Fullscreen exits",
+          "clipboardAttempts": "Copy/paste attempts",
+          "cameraDisconnects": "Camera disconnects",
+          "multipleFaces": "Multiple-face detections",
+          "duration": "Attempt duration",
+          "warningsShown": "Warnings shown to student"
+        },
+        "breakdownCaption": "Suspicion points by signal type",
+        "breakdownColumns": {
+          "type": "Signal",
+          "count": "Count",
+          "points": "Points"
+        }
+      },
+      "timeline": {
+        "kicker": "Full record",
+        "title": "Event timeline",
+        "empty": "No events were recorded for this attempt."
       },
       "answers": {
         "kicker": "Response record",
@@ -148,13 +264,96 @@
         "action": "Release to parent"
       }
     },
+    "newAssessment": {
+      "back": "Assessment library",
+      "eyebrow": "Tutor workspace",
+      "title": "Create an assessment",
+      "intro": "Build a versioned assessment from question to question. Publish it now or save a draft to keep refining it before students see it.",
+      "subject": "Subject",
+      "selectSubject": "Select a subject",
+      "noSubjects": "No subjects are available yet. Ask an administrator to add one before creating an assessment.",
+      "assessmentTitle": "Title",
+      "description": "Description",
+      "type": "Assessment type",
+      "duration": "Time limit (minutes)",
+      "durationHint": "Leave blank for an untimed assessment.",
+      "publishNow": "Publish now",
+      "publishHint": "Drafts are visible only to you. Students only ever see published assessments.",
+      "questions": "Questions",
+      "questionType": "Question type",
+      "questionTypeOption": {
+        "multiple_choice": "Multiple choice",
+        "short_answer": "Short answer",
+        "numeric": "Numeric",
+        "essay": "Essay",
+        "code": "Code"
+      },
+      "prompt": "Prompt",
+      "points": "Points",
+      "correctAnswer": "Correct answer (optional, for your own reference)",
+      "options": "Answer choices",
+      "optionKey": "Key",
+      "optionLabel": "Label",
+      "addOption": "Add choice",
+      "removeOption": "Remove choice",
+      "addQuestion": "Add question",
+      "removeQuestion": "Remove question",
+      "create": "Create assessment",
+      "creating": "Creating…",
+      "proctoring": {
+        "legend": "Exam mode",
+        "fullscreen": "Require fullscreen and lock down keyboard shortcuts, clipboard, and the right-click menu",
+        "fullscreenHint": "Turns on strict exam mode: keyboard shortcuts, copy/paste, the context menu, and dragging content out of the page are blocked.",
+        "camera": "Require a working camera",
+        "cameraHint": "Students must pass a camera check before starting and stay on camera for the duration.",
+        "policyVersion": "Camera policy version",
+        "policyVersionPlaceholder": "e.g. camera-v1",
+        "headTracking": "Enable on-device face and gaze tracking",
+        "headTrackingHint": "Runs entirely in the student's browser. No video is recorded or uploaded — only face-presence, count, and gaze-direction signals are logged."
+      },
+      "audience": {
+        "legend": "Who can take this assessment",
+        "everyone": "Every student",
+        "selected": "Only specific students",
+        "noStudents": "You have no assigned students yet. Ask an administrator to assign students before restricting this assessment to specific ones."
+      },
+      "integrity": {
+        "legend": "Attempts and activity policy",
+        "maxAttempts": "Maximum attempts",
+        "maxAttemptsHint": "Leave blank to allow unlimited attempts. Only completed (submitted) attempts count toward this limit.",
+        "action": "If a student repeatedly leaves the assessment (switches tabs, exits fullscreen, loses focus, or minimizes the window)",
+        "actionOption": {
+          "log_only": "Just log it for my review (default)",
+          "warn": "Show the student an on-screen warning",
+          "auto_submit": "Automatically submit their attempt"
+        },
+        "actionHint": {
+          "log_only": "Nothing changes for the student. You'll still see every recorded signal when you review their attempt.",
+          "warn": "The student sees a clear on-screen notice once they reach the limit below. Their attempt keeps running — you still decide what happens next.",
+          "auto_submit": "Once the limit below is reached, the attempt is ended automatically and the student is told why. This is disclosed to the student before they start."
+        },
+        "violationLimit": "Number of instances before this applies",
+        "violationLimitHint": "Counts tab switches, fullscreen exits, focus loss, and window minimizing together."
+      },
+      "validation": {
+        "subject": "Choose a subject.",
+        "title": "Add a title.",
+        "questions": "Add at least one question.",
+        "choices": "Question {number} needs at least two answer choices.",
+        "cameraPolicy": "Add a camera policy version.",
+        "audience": "Select at least one student, or choose \"Every student\".",
+        "violationLimit": "Set a number of instances for this policy."
+      }
+    },
     "errors": {
       "load": "The assessment could not be loaded.",
       "start": "The assessment could not be started.",
       "save": "This answer could not be saved.",
       "submit": "The assessment could not be submitted.",
       "review": "The attempt review could not be loaded.",
-      "report": "The diagnostic report could not be updated."
+      "report": "The diagnostic report could not be updated.",
+      "create": "The assessment could not be created.",
+      "delete": "The assessment could not be deleted."
     }
   }
 }

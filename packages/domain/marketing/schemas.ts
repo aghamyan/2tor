@@ -11,7 +11,14 @@ const optionalText = (maximum: number) =>
 export const createMarketingLeadSchema = z
   .object({
     kind: z
-      .enum(["consultation", "assessment", "contact", "tutor_application", "trial_class"])
+      .enum([
+        "consultation",
+        "assessment",
+        "contact",
+        "tutor_application",
+        "trial_class",
+        "group_matching",
+      ])
       .default("consultation"),
     parentName: z.string().trim().min(2).max(120),
     email: z.string().trim().email().max(254),

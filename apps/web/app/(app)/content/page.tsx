@@ -1,16 +1,23 @@
-import { ContentOverview } from "../../../components/content/content-overview";
+import { ResourcesOverview } from "../../../components/content/resources-overview";
 import { ResourceLibraryPage } from "../../../components/student-workspace/student-pages";
-import { currentSession } from "../../../lib/current-session";
+import { loadContentPageData } from "./queries";
+
+export const dynamic = "force-dynamic";
 
 export default async function ContentPage({
   searchParams,
 }: {
   searchParams: Promise<{ q?: string }>;
 }) {
-  const [session, params] = await Promise.all([currentSession(), searchParams]);
-  return session?.roles.includes("student") ? (
-    <ResourceLibraryPage initialQuery={params.q} />
+  const [data, params] = await Promise.all([loadContentPageData(), searchParams]);
+  return data.isStudent ? (
+    <ResourceLibraryPage
+      resources={data.resources}
+      subjects={data.subjects}
+      bookmarkedResourceIds={data.bookmarkedResourceIds}
+      initialQuery={params.q}
+    />
   ) : (
-    <ContentOverview />
+    <ResourcesOverview resources={data.resources} subjects={data.subjects} canCreate={data.canCreate} />
   );
 }

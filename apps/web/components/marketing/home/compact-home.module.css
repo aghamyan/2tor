@@ -826,6 +826,7 @@
   background: var(--paper);
   padding-bottom: clamp(5rem, 8vw, 8rem);
   position: relative;
+  scroll-margin-top: 5.5rem;
 }
 
 .subjectSection::before {
@@ -862,7 +863,7 @@
 .subjectRail {
   display: grid;
   gap: 0.65rem;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
 .subjectCard {
@@ -907,25 +908,42 @@
 .subjectCard:hover .subjectIcon {
   transform: rotate(-5deg) scale(1.06);
 }
-.subjectIcon.code {
-  background: var(--mint-soft);
-  border-color: #c6ebda;
-  color: #147557;
-}
 .subjectIcon.armenian {
   background: var(--coral-soft);
   border-color: #f3ccc2;
   color: #ad4d35;
 }
-.subjectIcon.sat {
-  background: var(--yellow-soft);
-  border-color: #f1dfa7;
-  color: #946d0c;
+
+.subjectCardComingSoon {
+  background: transparent;
+  border: 1px dashed var(--line);
+  border-radius: 0.9rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  justify-content: center;
+  min-height: 9.7rem;
+  padding: 1rem;
 }
-.subjectIcon.toefl {
-  background: #e8f1ff;
-  border-color: #cdddfa;
-  color: #315cae;
+
+.subjectComingSoonBadge {
+  align-items: center;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 99px;
+  color: var(--muted);
+  display: inline-flex;
+  font-size: 0.58rem;
+  font-weight: 800;
+  gap: 0.35rem;
+  letter-spacing: 0.02em;
+  padding: 0.3rem 0.55rem;
+  text-transform: uppercase;
+  width: fit-content;
+}
+
+.subjectCardComingSoon .subjectText strong {
+  color: var(--muted);
 }
 
 .subjectText {
@@ -1087,7 +1105,8 @@
   .feedbackCard {
     left: 0;
   }
-  .subjectCard {
+  .subjectCard,
+  .subjectCardComingSoon {
     min-height: 10.6rem;
   }
 }
@@ -1124,7 +1143,7 @@
     max-width: 14rem;
   }
   .subjectRail {
-    grid-template-columns: repeat(5, 15.5rem);
+    grid-template-columns: repeat(3, 15.5rem);
     overflow-x: auto;
     padding-bottom: 1rem;
     scroll-snap-type: x proximity;
@@ -1132,7 +1151,8 @@
   .subjectRail > div {
     scroll-snap-align: start;
   }
-  .subjectCard {
+  .subjectCard,
+  .subjectCardComingSoon {
     min-height: 9.5rem;
   }
   .swipeHint {
@@ -1335,7 +1355,7 @@
     padding-top: 2rem;
   }
   .subjectRail {
-    grid-template-columns: repeat(5, 14.75rem);
+    grid-template-columns: repeat(3, 14.75rem);
     margin-right: -1rem;
     padding-right: 1rem;
     scrollbar-width: none;
@@ -1343,7 +1363,8 @@
   .subjectRail::-webkit-scrollbar {
     display: none;
   }
-  .subjectCard {
+  .subjectCard,
+  .subjectCardComingSoon {
     min-height: 9.2rem;
   }
 }

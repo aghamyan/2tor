@@ -1,0 +1,493 @@
+{
+  "parents": {
+    "content": {
+      "meta": {
+        "title": "For parents",
+        "description": "A clear view of lesson goals, homework, tutor feedback, attendance, and learning progress."
+      },
+      "hero": {
+        "eyebrow": "For families",
+        "title": "Know what your child is learning, and what comes next.",
+        "body": "See lesson goals, homework, tutor feedback, attendance, and progress in one clear parent workspace.",
+        "reassurance": "You stay involved in the important decisions while the tutor manages the day-to-day learning.",
+        "primary": "Book a free consultation",
+        "secondary": "See the parent dashboard",
+        "note": "No long forms. We start with a short conversation about your child's needs.",
+        "trust": [
+          "Verified tutor records",
+          "Feedback after each lesson",
+          "Parent-visible progress",
+          "Clear learning plans"
+        ]
+      },
+      "dashboard": {
+        "label": "Illustrative parent workspace",
+        "greeting": "Good afternoon, Ani",
+        "learner": "Aram's learning",
+        "subject": "Mathematics · Grade 6",
+        "currentGoal": "Current goal",
+        "goal": "Fractions and ratios",
+        "nextLesson": "Next lesson",
+        "nextLessonValue": "Thursday, 4:00 PM",
+        "homework": "Homework",
+        "homeworkValue": "1 task due Friday",
+        "feedback": "Latest tutor feedback",
+        "feedbackValue": "Aram understands equivalent fractions visually. Next, we will practise common denominators.",
+        "progress": "Target skills",
+        "progressValue": "3 of 5 developing",
+        "attendance": "Last lesson",
+        "attendanceValue": "Attended",
+        "nav": {
+          "overview": "Overview",
+          "classes": "Classes",
+          "homework": "Homework",
+          "progress": "Progress",
+          "feedback": "Feedback"
+        },
+        "viewAssignment": "View assignment",
+        "feedbackMeta": "Today · Mariam S.",
+        "illustrative": "Example content. Your workspace reflects your child's actual plan and lessons."
+      },
+      "visibility": {
+        "eyebrow": "Parent visibility",
+        "title": "Everything important, in one place",
+        "body": "Open the part you need without piecing together updates from messages, calendars, and homework links.",
+        "ariaLabel": "Parent dashboard sections",
+        "tabs": [
+          {
+            "id": "overview",
+            "label": "Overview",
+            "title": "A useful snapshot, not a wall of data",
+            "body": "See the next class, active learning goal, homework status, and latest tutor note together.",
+            "items": ["Next class", "Current learning goal", "Homework status", "Latest feedback"]
+          },
+          {
+            "id": "feedback",
+            "label": "Feedback",
+            "title": "Specific notes after the lesson",
+            "body": "Review the topic covered, participation, strengths, challenges, recommendation, and next focus.",
+            "items": [
+              "Topic covered",
+              "What went well",
+              "Where support is needed",
+              "Next lesson focus"
+            ]
+          },
+          {
+            "id": "homework",
+            "label": "Homework",
+            "title": "One place to follow assigned work",
+            "body": "Parents have read-only visibility into the task, due date, submission, tutor review, and grade when used.",
+            "items": ["Assigned task", "Due date", "Submission status", "Tutor review"]
+          },
+          {
+            "id": "progress",
+            "label": "Progress",
+            "title": "Evidence behind the learning plan",
+            "body": "Follow current goals, milestones, assessment evidence, and tutor observations over time.",
+            "items": [
+              "Current goals",
+              "Skills developing",
+              "Completed milestones",
+              "Evidence and observations"
+            ]
+          },
+          {
+            "id": "schedule",
+            "label": "Schedule",
+            "title": "Classes and attendance at a glance",
+            "body": "See upcoming lessons, attendance, reschedules, cancellations, and the time zone used for planning.",
+            "items": ["Upcoming classes", "Attendance", "Schedule changes", "Time zone"]
+          }
+        ]
+      },
+      "lesson": {
+        "eyebrow": "After every lesson",
+        "title": "What parents receive after each lesson",
+        "body": "Feedback is structured to explain what happened and guide the next class, not to provide generic praise.",
+        "topicLabel": "Lesson topic",
+        "topic": "Adding fractions with unlike denominators",
+        "tutor": "Mariam S. · Mathematics tutor",
+        "attendance": "Attended",
+        "engagement": "Worked steadily with prompts",
+        "skills": ["Visual fraction models", "Equivalent fractions", "Common denominators"],
+        "strengthLabel": "Strength",
+        "strength": "Used visual models accurately",
+        "challengeLabel": "Needs practice",
+        "challenge": "Finding the least common denominator",
+        "homeworkLabel": "Homework assigned",
+        "homework": "Three scaffolded examples due Friday",
+        "nextLabel": "Next step",
+        "next": "Practise three scaffolded examples before moving to word problems.",
+        "planAction": "Learning plan update requires parent acknowledgment",
+        "publishedAfter": "Published after a completed lesson",
+        "linkedParent": "Visible to a linked parent",
+        "skillsPractised": "skills practised"
+      },
+      "plan": {
+        "eyebrow": "Learning plan",
+        "title": "A clear path, not disconnected lessons",
+        "body": "The active plan brings together the student's current level, short- and long-term goals, priority skills, planned sequence, review points, and evidence of progress.",
+        "steps": [
+          "Understand current level",
+          "Set learning goals",
+          "Teach and practise",
+          "Review evidence",
+          "Adjust the plan"
+        ],
+        "pathLabel": "Sample mathematics path",
+        "path": [
+          {
+            "label": "Fractions",
+            "state": "complete"
+          },
+          {
+            "label": "Ratios",
+            "state": "current"
+          },
+          {
+            "label": "Expressions",
+            "state": "upcoming"
+          },
+          {
+            "label": "Equations",
+            "state": "upcoming"
+          }
+        ],
+        "complete": "Completed",
+        "current": "Current",
+        "upcoming": "Upcoming",
+        "cta": "Explore the mathematics curriculum"
+      },
+      "level": {
+        "eyebrow": "Starting point",
+        "title": "We start from the student's actual level",
+        "body": "School grade is useful context, but it is not the whole picture. The starting point can combine a parent consultation, school topics, student work, a placement assessment when useful, tutor observation, and previous results.",
+        "sources": [
+          "Parent consultation",
+          "School topics",
+          "Student work",
+          "Placement assessment",
+          "Tutor observation",
+          "Previous results"
+        ],
+        "pathways": [
+          {
+            "title": "Catching up",
+            "body": "Build prerequisite skills before returning to current coursework."
+          },
+          {
+            "title": "Staying on track",
+            "body": "Reinforce school learning, practise consistently, and address gaps early."
+          },
+          {
+            "title": "Moving ahead",
+            "body": "Introduce more advanced material when the evidence shows the student is ready."
+          }
+        ],
+        "note": "The learning plan can change as new evidence appears."
+      },
+      "tutor": {
+        "eyebrow": "Tutor quality",
+        "title": "Tutors are reviewed for subject fit and teaching readiness",
+        "body": "2tor keeps internal verification records for identity, education or certification, background checks where used, references, safeguarding, platform onboarding, and subject-specific preparation. A tutor's public profile shows teaching capabilities without exposing private documents.",
+        "checks": [
+          "Identity review",
+          "Education or certification records",
+          "Subjects and grade ranges",
+          "Teaching languages",
+          "Training records",
+          "Ongoing evaluation records"
+        ],
+        "profileLabel": "Sample public profile",
+        "name": "Mariam S.",
+        "role": "Mathematics tutor",
+        "grades": "Grades 5–9",
+        "languages": "Armenian · English",
+        "experience": "6 years teaching experience",
+        "approach": "Uses visual models first, then moves to symbolic practice and explanation.",
+        "verified": "Profile and teaching capabilities reviewed",
+        "reviewedLabel": "Reviewed",
+        "gradesLabel": "Grade levels",
+        "languagesLabel": "Languages",
+        "experienceLabel": "Experience",
+        "approachLabel": "Teaching approach",
+        "cta": "See our safety approach"
+      },
+      "communication": {
+        "eyebrow": "Communication",
+        "title": "Clear communication without constant messaging",
+        "body": "Parents should not need to ask after every class what happened. The essential information is recorded in lesson feedback, with parent-inclusive messaging for questions and changes.",
+        "appropriate": [
+          "Lesson feedback",
+          "Learning plan updates",
+          "Schedule changes",
+          "Homework concerns",
+          "Progress questions",
+          "Support requests"
+        ],
+        "tutorLabel": "Mariam · Tutor",
+        "tutorMessage": "Today we focused on fraction comparison. Aram improved with visual models but still needs practice explaining why two fractions are equivalent.",
+        "parentLabel": "Ani · Parent",
+        "parentMessage": "Thank you. Please keep the next homework short because of school exams this week.",
+        "note": "Messages are part of a parent-inclusive learning space. Response timing depends on tutor and support availability."
+      },
+      "control": {
+        "eyebrow": "Clear roles",
+        "title": "You stay in control of important decisions",
+        "body": "The tutor leads instruction. Parents keep visibility and control over enrollment, major plan changes, privacy, schedule decisions, payments, and requests to change tutor.",
+        "tutorTitle": "Tutor-managed",
+        "tutorItems": [
+          "Lesson instruction",
+          "Practice selection",
+          "Structured lesson feedback",
+          "Homework recommendations"
+        ],
+        "parentTitle": "Parent-controlled",
+        "sharedPlan": "shared plan",
+        "parentItems": [
+          "Enrollment decisions",
+          "Schedule preferences",
+          "Payments and invoices",
+          "Major learning plan acknowledgment",
+          "Privacy choices",
+          "Tutor-change requests"
+        ]
+      },
+      "formats": {
+        "eyebrow": "Lesson format",
+        "title": "Choose the format that fits your child",
+        "body": "Neither option is automatically better. The useful choice depends on the learning need, pace, timing, and available compatible learners.",
+        "individual": {
+          "title": "Individual lessons",
+          "intro": "Often a good fit for",
+          "items": [
+            "Highly specific learning gaps",
+            "A unique pace",
+            "Time-sensitive preparation",
+            "Intensive exam work",
+            "Maximum one-to-one attention"
+          ],
+          "cta": "Explore individual lessons"
+        },
+        "group": {
+          "title": "Group lessons",
+          "intro": "Often a good fit for",
+          "items": [
+            "Students at a similar level",
+            "Shared topics",
+            "Peer discussion",
+            "Lower cost",
+            "Social motivation"
+          ],
+          "note": "Group availability depends on finding compatible learners.",
+          "cta": "Explore group lessons"
+        }
+      },
+      "safety": {
+        "eyebrow": "Safety and privacy",
+        "title": "Designed around student privacy",
+        "body": "Student accounts are linked to parents, learning records are relationship-scoped, and student-visible conversations must include a parent or guardian. Uploaded learning files are kept private, scanned, and shared through short-lived authorized links.",
+        "items": [
+          "Parent-linked student accounts",
+          "No unnecessary public student profile",
+          "Parent-inclusive communication",
+          "Private, scanned document handling",
+          "Relationship-based record access",
+          "Audited staff access where required"
+        ],
+        "cta": "Read our safety approach"
+      },
+      "beforeAfter": {
+        "eyebrow": "Less coordination",
+        "title": "You should not have to become the tutor",
+        "body": "Stay close to the decisions that matter without rebuilding the learning record yourself.",
+        "withoutTitle": "Without a clear system",
+        "without": [
+          "Asking what happened after every class",
+          "Searching for homework links",
+          "Guessing whether progress is real",
+          "Repeating instructions between tutor and child",
+          "Tracking lessons in messages and spreadsheets"
+        ],
+        "withTitle": "With 2tor",
+        "with": [
+          "Structured lesson summaries",
+          "One homework location",
+          "Visible progress evidence",
+          "Clear next steps",
+          "Centralized communication"
+        ]
+      },
+      "start": {
+        "eyebrow": "Getting started",
+        "title": "Getting started is simple",
+        "body": "A short conversation creates a sensible starting point. You can review the recommendation before deciding what happens next.",
+        "steps": [
+          {
+            "title": "Tell us what you are noticing",
+            "body": "Share the current school level, difficult topics, goals, and schedule."
+          },
+          {
+            "title": "We identify the right starting point",
+            "body": "We use the consultation, and an assessment or tutor review when useful."
+          },
+          {
+            "title": "Meet the tutor",
+            "body": "Confirm the tutor, subject, lesson format, schedule, and pricing before lessons begin."
+          },
+          {
+            "title": "Track the learning",
+            "body": "Receive lesson feedback and follow goals, homework, attendance, and milestones."
+          }
+        ]
+      },
+      "form": {
+        "eyebrow": "Free consultation",
+        "title": "Tell us about your child",
+        "body": "It takes about two minutes. We only ask for the information needed to start a useful conversation.",
+        "progress": "Step {current} of {total}",
+        "learner": "Learner",
+        "learnerIntro": "What is the current learning context?",
+        "grade": "Grade or course",
+        "gradeOptions": [
+          {
+            "value": "",
+            "label": "Choose an option"
+          },
+          {
+            "value": "under_8",
+            "label": "Early primary / under 8"
+          },
+          {
+            "value": "8_10",
+            "label": "Grades 3–4"
+          },
+          {
+            "value": "11_13",
+            "label": "Grades 5–7"
+          },
+          {
+            "value": "14_17",
+            "label": "Grades 8–12"
+          },
+          {
+            "value": "adult",
+            "label": "College or adult learner"
+          }
+        ],
+        "subject": "Subject",
+        "subjectPlaceholder": "For example, mathematics",
+        "challenge": "Current challenge",
+        "challengePlaceholder": "What are you noticing?",
+        "goal": "Goal",
+        "goalIntro": "What would you like lessons to support?",
+        "goals": [
+          "Catch up",
+          "Stay on track",
+          "Move ahead",
+          "Prepare for an exam",
+          "Build confidence",
+          "Not sure"
+        ],
+        "preference": "Lesson preference",
+        "preferenceIntro": "Which format are you considering?",
+        "preferences": ["Individual lessons", "Group lessons", "Help me choose"],
+        "schedule": "Schedule",
+        "scheduleIntro": "When is your family usually available?",
+        "timezone": "Time zone",
+        "days": "Preferred days",
+        "time": "Preferred time range",
+        "daysPlaceholder": "For example, Monday and Thursday",
+        "timePlaceholder": "For example, 4:00–7:00 PM",
+        "contact": "Parent contact",
+        "contactIntro": "Where should we send the consultation follow-up?",
+        "name": "Parent or guardian name",
+        "email": "Email",
+        "phone": "Phone, optional",
+        "consentPrefix": "I agree to the",
+        "privacy": "Privacy Policy",
+        "next": "Continue",
+        "back": "Back",
+        "submit": "Request a free consultation",
+        "sending": "Sending request…",
+        "success": "Your consultation request is with our team.",
+        "successBody": "We will use the details you shared to prepare for a short first conversation.",
+        "error": "We could not send the request. Check the required fields and try again.",
+        "required": "Complete the required fields before continuing.",
+        "note": "No payment details are collected here.",
+        "aboutTime": "About two minutes",
+        "onlyDetails": "Only the details we need"
+      },
+      "faq": {
+        "eyebrow": "Questions parents ask",
+        "title": "Direct answers before you decide",
+        "items": [
+          [
+            "How often will I receive feedback?",
+            "Published lesson feedback is available after each completed lesson."
+          ],
+          [
+            "Can I see what my child is learning?",
+            "Yes. Linked parents can view the active learning plan, goals, milestones, parent-visible feedback, and assigned work."
+          ],
+          [
+            "Can I communicate directly with the tutor?",
+            "Parent-inclusive conversations support progress questions, homework concerns, and schedule updates. The platform does not create private adult-child channels."
+          ],
+          [
+            "How do you measure progress?",
+            "Progress is connected to goals and milestones supported by evidence such as tutor observations, assignments, projects, or assessments."
+          ],
+          [
+            "Can I change tutors?",
+            "A linked parent can submit a tutor-change request. The support team reviews the request and manages the matching process."
+          ],
+          [
+            "Can we switch between individual and group lessons?",
+            "You can discuss a format change with the team. Group placement depends on compatible learners and availability."
+          ],
+          [
+            "What if my child falls behind?",
+            "The tutor can revisit prerequisite skills and recommend a learning-plan adjustment based on new evidence."
+          ],
+          [
+            "What if my child needs more advanced material?",
+            "The plan can move ahead when tutor observation and learning evidence show the student is ready."
+          ],
+          [
+            "How is homework managed?",
+            "Tutors assign and review work in the platform. Linked parents have read-only visibility into assignments, submissions, grades, and files."
+          ],
+          [
+            "Are lessons aligned with school curriculum?",
+            "School topics can inform the plan, while the tutor also addresses prerequisites and individual goals. Alignment depends on the subject and the plan you agree on."
+          ],
+          [
+            "How are tutors verified?",
+            "2tor maintains internal records for identity and relevant education, certification, training, and other review types. Public profiles show approved teaching capabilities, not private documents."
+          ],
+          [
+            "What information can parents see?",
+            "Linked parents can see relationship-scoped learning records, including parent-visible feedback, plans, assignments, schedule information, and milestones."
+          ],
+          [
+            "Can I pause lessons?",
+            "Contact support to discuss pausing or ending lessons and any schedule or payment implications."
+          ],
+          [
+            "What happens during the free consultation?",
+            "We discuss the learner's current context, goals, schedule, possible starting point, tutor fit, lesson format, and pricing. You can decide what to do next."
+          ]
+        ]
+      },
+      "final": {
+        "title": "See the learning clearly.",
+        "body": "Tell us what your child needs. We will help you understand a sensible starting point, tutor, and lesson format.",
+        "primary": "Book a free consultation",
+        "secondary": "Explore subjects",
+        "note": "No pressure. Start with a short conversation."
+      }
+    }
+  }
+}

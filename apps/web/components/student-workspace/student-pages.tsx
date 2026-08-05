@@ -17,6 +17,7 @@ import {
   Headphones,
   LifeBuoy,
   ListFilter,
+  type LucideIcon,
   MessageCircleQuestion,
   MessageSquareText,
   Paperclip,
@@ -33,13 +34,13 @@ import {
 
 import type { ClassListRecord } from "../../app/(app)/scheduling/queries";
 import type { AssignmentListData } from "../../app/(app)/assignments/queries";
+import type { AssessmentsPageData } from "../../app/(app)/assessments/queries";
+import type { ContentPageData } from "../../app/(app)/content/queries";
 import {
-  assessments,
   demoStudent,
   learningTasks,
   projects,
   questions,
-  resources,
   skills,
   subjectJourneys,
 } from "./fixtures";
@@ -62,7 +63,6 @@ import {
 } from "./workspace";
 
 const SHOW_PRESENTATION_FIXTURES = process.env.NODE_ENV !== "production";
-const EMPTY_RESOURCES: typeof resources = [];
 
 function Tabs({
   tabs,
@@ -804,86 +804,37 @@ export function StudentHomeworkPage({ data }: { data: AssignmentListData }) {
   );
 }
 
-export function AssessmentsPage() {
-  const [tab, setTab] = useState("Upcoming");
-  const availableAssessments = SHOW_PRESENTATION_FIXTURES ? assessments : [];
-  const visible = availableAssessments.filter((a) =>
-    tab === "Upcoming"
-      ? a.status === "pending"
-      : tab === "In progress"
-        ? a.status === "in-progress"
-        : a.status === "completed",
-  );
+function formatAssessmentType(type: string) {
+  return type.charAt(0).toUpperCase() + type.slice(1);
+}
+
+export function AssessmentsPage({ assessments }: { assessments: AssessmentsPageData["assessments"] }) {
   return (
     <WorkspacePage>
       <PageHeader
         eyebrow="Learning · Evaluations"
         title="Assessments"
-        description="Complete evaluations, review results, and understand what to practice next."
+        description="Complete evaluations your tutor has published for you, then review results and what to practice next."
         action={<SecondaryLink href="/content">Preparation resources</SecondaryLink>}
       />
-      <Tabs
-        tabs={["Upcoming", "In progress", "Completed"]}
-        active={tab}
-        onChange={setTab}
-        label="Assessment status"
-      />
-      {visible.length === 0 ? (
+      {assessments.length === 0 ? (
         <EmptyState
-          title={tab === "In progress" ? "No assessment in progress" : `No ${tab.toLowerCase()} assessments`}
-          description={
-            tab === "In progress"
-              ? "When you start an assessment, your saved attempt will appear here."
-              : "There is nothing in this view right now."
-          }
+          title="No assessments yet"
+          description="When your tutor publishes an assessment, it will appear here."
           primary={<PrimaryLink href="/content">Review preparation resources</PrimaryLink>}
           secondary={<SecondaryLink href="/academics">View learning goals</SecondaryLink>}
         />
       ) : (
         <div className={s.assessmentGrid}>
-          {visible.map((a) => (
-          <article className={s.assessmentCard} key={a.id}>
-            <header>
-              <span>{a.type}</span>
-              <StatusBadge status={a.status} />
-            </header>
-            <p>{a.subject}</p>
-            <h2>{a.title}</h2>
-            {a.score ? (
-              <>
-                <div className={s.resultHero}>
-                  <ProgressRing value={a.score} label="score" size="small" />
-                  <div>
-                    <strong>{a.strongest}</strong>
-                    <span>Strongest area</span>
-                    <small>Practice next: {a.practice}</small>
-                  </div>
-                </div>
-                <InsightNote>
-                  You improved {a.subject === "English" ? "6" : "9"} points since your previous
-                  result.
-                </InsightNote>
-              </>
-            ) : (
-              <>
-                <dl>
-                  <div>
-                    <dt>Duration</dt>
-                    <dd>{a.duration}</dd>
-                  </div>
-                  <div>
-                    <dt>Due</dt>
-                    <dd>{a.due}</dd>
-                  </div>
-                  <div>
-                    <dt>Attempts</dt>
-                    <dd>{a.attempts}</dd>
-                  </div>
-                </dl>
-                <PrimaryLink href={`/assessments/${a.id}`}>Start assessment</PrimaryLink>
-              </>
-            )}
-          </article>
+          {assessments.map((a) => (
+            <article className={s.assessmentCard} key={a.id}>
+              <header>
+                <span>{formatAssessmentType(a.type)}</span>
+              </header>
+              <h2>{a.title}</h2>
+              <p>{a.description ?? "No description provided."}</p>
+              <PrimaryLink href={`/assessments/${a.id}`}>Start assessment</PrimaryLink>
+            </article>
           ))}
         </div>
       )}
@@ -1122,32 +1073,114 @@ export function ProgressPage() {
   );
 }
 
-export function ResourceLibraryPage({ initialQuery = "" }: { initialQuery?: string }) {
-  const availableResources = SHOW_PRESENTATION_FIXTURES ? resources : EMPTY_RESOURCES;
+const RESOURCE_THUMB: Record<
+  ContentPageData["resources"][number]["type"],
+  { label: string; icon: LucideIcon }
+> = {
+  video: { label: "Video", icon: PlayCircle },
+  interactive: { label: "Interactive", icon: Sparkles },
+  document: { label: "Guide", icon: BookMarked },
+  worksheet: { label: "Practice set", icon: BookMarked },
+  link: { label: "Guide", icon: BookMarked },
+};
+
+function messageFromResourceResponse(payload: unknown, fallback: string) {
+  if (
+    typeof payload === "object" &&
+    payload !== null &&
+    "error" in payload &&
+    typeof payload.error === "object" &&
+    payload.error !== null &&
+    "message" in payload.error &&
+    typeof payload.error.message === "string"
+  ) {
+    return payload.error.message;
+  }
+  return fallback;
+}
+
+export function ResourceLibraryPage({
+  resources,
+  subjects,
+  bookmarkedResourceIds,
+  initialQuery = "",
+}: {
+  resources: ContentPageData["resources"];
+  subjects: ContentPageData["subjects"];
+  bookmarkedResourceIds: string[];
+  initialQuery?: string;
+}) {
   const [query, setQuery] = useState(initialQuery);
-  const [filter, setFilter] = useState("All");
-  const [savedIds, setSavedIds] = useState(
-    () =>
-      new Set(
-        availableResources.filter((resource) => resource.saved).map((resource) => resource.id),
-      ),
-  );
+  const [filter, setFilter] = useState<"All" | ContentPageData["resources"][number]["type"]>("All");
+  const [savedIds, setSavedIds] = useState(() => new Set(bookmarkedResourceIds));
   const [openResourceId, setOpenResourceId] = useState<string | null>(null);
+  const [reportingId, setReportingId] = useState<string | null>(null);
+  const [reportReason, setReportReason] = useState("");
+  const [reportedIds, setReportedIds] = useState<Set<string>>(new Set());
+  const [error, setError] = useState<string | null>(null);
+  const subjectName = (subjectId: string | null) =>
+    subjectId ? (subjects.find((subject) => subject.id === subjectId)?.name ?? null) : null;
   const visible = useMemo(
     () =>
-      availableResources.filter(
-        (r) =>
-          (filter === "All" || r.type === filter) &&
-          r.title.toLowerCase().includes(query.toLowerCase()),
+      resources.filter(
+        (r) => (filter === "All" || r.type === filter) && r.title.toLowerCase().includes(query.toLowerCase()),
       ),
-    [availableResources, query, filter],
+    [resources, query, filter],
   );
+
+  async function toggleSaved(resourceId: string) {
+    const wasSaved = savedIds.has(resourceId);
+    setSavedIds((current) => {
+      const next = new Set(current);
+      if (wasSaved) next.delete(resourceId);
+      else next.add(resourceId);
+      return next;
+    });
+    setError(null);
+    try {
+      const response = await fetch("/api/content/bookmarks", {
+        method: wasSaved ? "DELETE" : "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ resourceId }),
+      });
+      if (!response.ok) throw new Error();
+    } catch {
+      setSavedIds((current) => {
+        const next = new Set(current);
+        if (wasSaved) next.add(resourceId);
+        else next.delete(resourceId);
+        return next;
+      });
+      setError("That resource could not be saved. Try again.");
+    }
+  }
+
+  async function submitReport(resourceId: string) {
+    if (!reportReason.trim()) return;
+    setError(null);
+    try {
+      const response = await fetch("/api/content/reports", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ resourceId, reason: reportReason.trim() }),
+      });
+      const payload = (await response.json()) as unknown;
+      if (!response.ok)
+        throw new Error(messageFromResourceResponse(payload, "That report could not be sent."));
+      setReportedIds((current) => new Set(current).add(resourceId));
+      setReportingId(null);
+      setReportReason("");
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : "That report could not be sent.");
+    }
+  }
+
   return (
     <WorkspacePage>
       <PageHeader
         eyebrow="Resources · Library"
         title="Resource library"
-        description="Find videos, worksheets, links, and practice selected for your learning goals."
+        description="Find videos, guides, and practice your tutors have published."
         action={<SecondaryLink href="/academics">View learning goals</SecondaryLink>}
       />
       <div className={s.libraryToolbar}>
@@ -1162,24 +1195,34 @@ export function ResourceLibraryPage({ initialQuery = "" }: { initialQuery?: stri
         </label>
         <select
           value={filter}
-          onChange={(e) => setFilter(e.target.value)}
+          onChange={(e) => setFilter(e.target.value as typeof filter)}
           aria-label="Resource type"
         >
-          <option>All</option>
-          <option>Video</option>
-          <option>Interactive</option>
-          <option>Guide</option>
-          <option>Practice set</option>
+          <option value="All">All</option>
+          {(["video", "document", "worksheet", "interactive", "link"] as const).map((type) => (
+            <option key={type} value={type}>
+              {RESOURCE_THUMB[type].label}
+            </option>
+          ))}
         </select>
       </div>
       <SectionHeader
-        title="Recommended for you"
-        description="Selected from your current goals and tutor recommendations."
+        title="Published resources"
+        description="Everything your tutors have shared with the class."
       />
+      {error ? (
+        <p role="alert" className={s.inlineError}>
+          {error}
+        </p>
+      ) : null}
       {visible.length === 0 ? (
         <EmptyState
-          title="No resources match that search"
-          description="Try a broader search or reset the resource type filter."
+          title={resources.length === 0 ? "No resources yet" : "No resources match that search"}
+          description={
+            resources.length === 0
+              ? "When your tutor publishes a resource, it will appear here."
+              : "Try a broader search or reset the resource type filter."
+          }
           primary={
             <button
               className={s.primaryButton}
@@ -1195,75 +1238,99 @@ export function ResourceLibraryPage({ initialQuery = "" }: { initialQuery?: stri
         />
       ) : (
         <div className={s.resourceGrid}>
-          {visible.map((r) => (
-            <article className={s.resourceCard} key={r.id}>
-              <div className={s.resourceThumb} data-type={r.type}>
-                {r.type === "Video" ? (
-                  <PlayCircle />
-                ) : r.type === "Interactive" ? (
-                  <Sparkles />
-                ) : (
-                  <BookMarked />
-                )}
-                <span>{r.type}</span>
-              </div>
-              <div className={s.resourceBody}>
-                <p>{r.subject}</p>
-                <h2>{r.title}</h2>
-                <span>
-                  {r.duration} · {r.skill}
-                </span>
-                <small>
-                  {r.assignedBy === "Recommended"
-                    ? "Recommended for you"
-                    : `Assigned by ${r.assignedBy}`}
-                </small>
-                <div>
-                  <button
-                    className={s.resourceOpen}
-                    type="button"
-                    onClick={() => setOpenResourceId((current) => (current === r.id ? null : r.id))}
-                    aria-expanded={openResourceId === r.id}
-                  >
-                    {openResourceId === r.id ? "Close details" : "Open resource"}{" "}
-                    <ArrowUpRight size={14} />
-                  </button>
-                  <button
-                    type="button"
-                    aria-label={savedIds.has(r.id) ? "Remove from saved" : "Save resource"}
-                    onClick={() =>
-                      setSavedIds((current) => {
-                        const next = new Set(current);
-                        if (next.has(r.id)) next.delete(r.id);
-                        else next.add(r.id);
-                        return next;
-                      })
-                    }
-                  >
-                    <Star size={16} fill={savedIds.has(r.id) ? "currentColor" : "none"} />
-                  </button>
+          {visible.map((r) => {
+            const thumb = RESOURCE_THUMB[r.type];
+            const ThumbIcon = thumb.icon;
+            const videoLink = r.links.find((link) => link.provider === "youtube");
+            const isOpen = openResourceId === r.id;
+            return (
+              <article className={s.resourceCard} key={r.id}>
+                <div className={s.resourceThumb} data-type={thumb.label}>
+                  <ThumbIcon />
+                  <span>{thumb.label}</span>
                 </div>
-                {openResourceId === r.id ? (
-                  <div className={s.resourceDetails}>
-                    <strong>Learning goal</strong>
-                    <p>
-                      Use this resource to strengthen {r.skill.toLowerCase()} before your next
-                      connected task.
-                    </p>
-                    <SecondaryLink href="/assignments">Open related homework</SecondaryLink>
+                <div className={s.resourceBody}>
+                  <p>{subjectName(r.subjectId) ?? "General"}</p>
+                  <h2>{r.title}</h2>
+                  <span>{r.tags.length > 0 ? r.tags.join(" · ") : "No tags yet"}</span>
+                  <small>{new Date(r.createdAt).toLocaleDateString()}</small>
+                  <div>
+                    <button
+                      className={s.resourceOpen}
+                      type="button"
+                      onClick={() => setOpenResourceId((current) => (current === r.id ? null : r.id))}
+                      aria-expanded={isOpen}
+                    >
+                      {isOpen ? "Close details" : "Open resource"} <ArrowUpRight size={14} />
+                    </button>
+                    <button
+                      type="button"
+                      aria-label={savedIds.has(r.id) ? "Remove from saved" : "Save resource"}
+                      onClick={() => void toggleSaved(r.id)}
+                    >
+                      <Star size={16} fill={savedIds.has(r.id) ? "currentColor" : "none"} />
+                    </button>
                   </div>
-                ) : null}
-              </div>
-            </article>
-          ))}
+                  {isOpen ? (
+                    <div className={s.resourceDetails}>
+                      <p>{r.description ?? "No description provided."}</p>
+                      {videoLink ? (
+                        <iframe
+                          style={{ aspectRatio: "16 / 9", width: "100%", border: 0 }}
+                          src={videoLink.url}
+                          title={videoLink.title ?? r.title}
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                          allowFullScreen
+                        />
+                      ) : null}
+                      {reportedIds.has(r.id) ? (
+                        <small>Reported for review.</small>
+                      ) : reportingId === r.id ? (
+                        <div className={s.inlineActions}>
+                          <input
+                            value={reportReason}
+                            onChange={(e) => setReportReason(e.target.value)}
+                            placeholder="Why are you reporting this?"
+                          />
+                          <button
+                            className={s.primaryButton}
+                            type="button"
+                            disabled={!reportReason.trim()}
+                            onClick={() => void submitReport(r.id)}
+                          >
+                            Send report
+                          </button>
+                          <button
+                            className={s.secondaryButton}
+                            type="button"
+                            onClick={() => {
+                              setReportingId(null);
+                              setReportReason("");
+                            }}
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      ) : (
+                        <button
+                          className={s.secondaryButton}
+                          type="button"
+                          onClick={() => setReportingId(r.id)}
+                        >
+                          Report this resource
+                        </button>
+                      )}
+                    </div>
+                  ) : null}
+                </div>
+              </article>
+            );
+          })}
         </div>
       )}
       <div className={s.safetyNote}>
         <ShieldCheck size={17} />
-        <span>
-          External links open with a clear warning.{" "}
-          <Link href="/support?view=resource-report">Report a resource</Link>
-        </span>
+        <span>External links open with a clear warning. Use “Report this resource” above if something is wrong.</span>
       </div>
     </WorkspacePage>
   );

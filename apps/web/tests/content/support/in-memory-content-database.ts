@@ -3,6 +3,7 @@ import type {
   ContentReportRecord,
   ResourceLinkRecord,
   ResourceRecord,
+  ResourceSubjectOption,
   TutorUploadRecord,
 } from "../../../../../packages/domain/content/models";
 export class InMemoryContentDatabase implements ContentDatabase {
@@ -12,6 +13,7 @@ export class InMemoryContentDatabase implements ContentDatabase {
   readonly uploads = new Map<string, TutorUploadRecord>();
   readonly reports = new Map<string, ContentReportRecord>();
   readonly tutorProfiles = new Map<string, string>();
+  readonly subjects: ResourceSubjectOption[] = [];
   async transaction<T>(operation: (database: ContentDatabase) => Promise<T>): Promise<T> {
     return operation(this);
   }
@@ -37,6 +39,11 @@ export class InMemoryContentDatabase implements ContentDatabase {
   }
   async hasBookmark(studentProfileId: string, resourceId: string) {
     return this.bookmarks.has(`${studentProfileId}:${resourceId}`);
+  }
+  async listBookmarkedResourceIds(studentProfileId: string) {
+    return [...this.bookmarks]
+      .filter((key) => key.startsWith(`${studentProfileId}:`))
+      .map((key) => key.slice(studentProfileId.length + 1));
   }
   async saveAssignment(input: { resourceId: string }) {
     this.assignments.push(input);
@@ -67,5 +74,8 @@ export class InMemoryContentDatabase implements ContentDatabase {
   }
   async listLinksForHealthCheck(limit: number): Promise<ResourceLinkRecord[]> {
     return [...this.resources.values()].flatMap((resource) => resource.links).slice(0, limit);
+  }
+  async listActiveSubjects() {
+    return this.subjects;
   }
 }

@@ -94,8 +94,8 @@ const events = await getChargeableLessonEvents(db, { since: lastPolledAt });
 finance.ts`), so Payments can safely upsert-if-not-exists keyed on `lessonId` — this query is
   safe to call repeatedly over overlapping time ranges.
 - Payments owns converting `chargePercentage` into an actual `amount_minor`/`currency` (looking up
-  the lesson's price) and everything downstream (Stripe, invoices, refunds). This module has no
-  opinion on money.
+  the lesson's price) and everything downstream (invoices, refunds). This module has no opinion on
+  money.
 
 ### Missed-feedback hook (Academic / D6)
 

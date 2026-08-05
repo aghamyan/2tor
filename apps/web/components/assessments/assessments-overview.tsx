@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { useTranslations } from "next-intl";
 import styles from "./assessments.module.css";
 
@@ -12,7 +13,7 @@ interface AssessmentListItem {
   status: "draft" | "published" | "archived";
 }
 
-export function AssessmentsOverview() {
+export function AssessmentsOverview({ canCreate = false }: { canCreate?: boolean }) {
   const t = useTranslations("assessments");
   const [assessments, setAssessments] = useState<AssessmentListItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -44,6 +45,11 @@ export function AssessmentsOverview() {
         <p className={styles.eyebrow}>{t("overview.kicker")}</p>
         <h1>{t("overview.title")}</h1>
         <p className={styles.lede}>{t("overview.intro")}</p>
+        {canCreate ? (
+          <Link className={styles.secondaryButton} href="/assessments/new">
+            {t("overview.actions.create")}
+          </Link>
+        ) : null}
       </header>
 
       <section className={styles.contract} aria-labelledby="signal-contract-title">

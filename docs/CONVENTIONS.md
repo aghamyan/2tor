@@ -34,7 +34,8 @@
 - Sensitive actions (exports, refunds, role changes, message access by staff, consent changes,
   lesson-record edits, verification decisions) MUST emit an append-only `audit_events` row via
   `@app/audit`'s `recordAudit()` including actor, action, resource, reason, previous value.
-- Never store card numbers. Payment card data only via Stripe tokens/Elements.
+- Never store card numbers. Card payment collection is not currently integrated; if reintroduced,
+  card data must go through the processor's hosted tokens/elements, never through the app.
 - Secrets come from `@app/config` (env), never hardcoded. No production data in tests or fixtures.
 
 ## Data & privacy

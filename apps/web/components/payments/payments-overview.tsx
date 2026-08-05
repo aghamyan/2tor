@@ -8,26 +8,18 @@ import type {
   PaymentTransactionRecord,
 } from "../../../../packages/domain/payments/models";
 import { DiscountForm } from "./discount-form";
-import { PaymentElementForm } from "./payment-element-form";
-import { RefundForm } from "./refund-form";
 import styles from "./payments.module.css";
 
 export function PaymentsOverview({
   invoices,
   transactions,
   reports,
-  canPay,
-  canRefund,
   canManageDiscounts,
-  stripePublishableKey,
 }: {
   invoices: InvoiceRecord[];
   transactions: PaymentTransactionRecord[];
   reports: FinancialReport[];
-  canPay: boolean;
-  canRefund: boolean;
   canManageDiscounts: boolean;
-  stripePublishableKey: string | null;
 }) {
   const t = useTranslations("payments");
   const format = useFormatter();
@@ -48,13 +40,6 @@ export function PaymentsOverview({
           <p className={styles.eyebrow}>{t("overview.eyebrow")}</p>
           <h1>{t("overview.title")}</h1>
           <p className={styles.lede}>{t("overview.intro")}</p>
-        </div>
-        <div className={styles.securitySeal}>
-          <span aria-hidden="true">S</span>
-          <p>
-            <strong>{t("overview.secureTitle")}</strong>
-            {t("overview.secureBody")}
-          </p>
         </div>
       </header>
 
@@ -153,12 +138,6 @@ export function PaymentsOverview({
                       <dd>{money(invoice.discountMinor, invoice.currency)}</dd>
                     </div>
                   </dl>
-                  {canPay && invoice.status === "open" ? (
-                    <PaymentElementForm
-                      invoiceId={invoice.id}
-                      publishableKey={stripePublishableKey}
-                    />
-                  ) : null}
                 </li>
               ))}
             </ol>
@@ -182,7 +161,6 @@ export function PaymentsOverview({
                     <th>{t("transactions.date")}</th>
                     <th>{t("transactions.amount")}</th>
                     <th>{t("transactions.status")}</th>
-                    {canRefund ? <th>{t("transactions.action")}</th> : null}
                   </tr>
                 </thead>
                 <tbody>
@@ -196,18 +174,6 @@ export function PaymentsOverview({
                           {t(`statuses.${transaction.status}`)}
                         </span>
                       </td>
-                      {canRefund ? (
-                        <td>
-                          {transaction.status === "succeeded" ? (
-                            <RefundForm
-                              transactionId={transaction.id}
-                              amountMinor={transaction.amountMinor}
-                            />
-                          ) : (
-                            "—"
-                          )}
-                        </td>
-                      ) : null}
                     </tr>
                   ))}
                 </tbody>

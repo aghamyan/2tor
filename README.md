@@ -9,7 +9,7 @@ testing, accessibility) that apply to every change in this repo.
 ## Stack
 
 Next.js · TypeScript (strict) · PostgreSQL 16 + Drizzle ORM · Redis + BullMQ · S3-compatible
-storage (MinIO locally) · Stripe · next-intl · Tailwind CSS v4 + shadcn/ui · Zod · Vitest ·
+storage (MinIO locally) · next-intl · Tailwind CSS v4 + shadcn/ui · Zod · Vitest ·
 Playwright.
 
 ## Repository layout

@@ -12,8 +12,6 @@ const databaseURL =
   process.env.DATABASE_URL_TEST ?? "postgres://postgres:postgres@127.0.0.1:5433/app_test";
 
 process.env.DATABASE_URL = databaseURL;
-process.env.STRIPE_WEBHOOK_SECRET ??= "whsec_e2e_only";
-process.env.STRIPE_SECRET_KEY ??= "sk_test_e2e_only";
 
 export default defineConfig({
   testDir: configDirectory,
@@ -77,8 +75,6 @@ export default defineConfig({
       E2E_WEB_PORT: new URL(baseURL).port || "3100",
       DATABASE_URL: databaseURL,
       REDIS_URL: process.env.E2E_REDIS_URL ?? "redis://127.0.0.1:6389",
-      STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET,
-      STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY,
       NEXT_TELEMETRY_DISABLED: "1",
     },
   },

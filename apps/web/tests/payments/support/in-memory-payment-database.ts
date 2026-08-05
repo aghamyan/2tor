@@ -7,13 +7,10 @@ import type {
   LessonPriceType,
   PaymentAuditRecord,
   PaymentCurrency,
-  PaymentCustomerRecord,
   PaymentDatabase,
   PaymentTransactionRecord,
   PriceRecord,
   PriceRuleRecord,
-  RefundRecord,
-  TransactionUpdate,
 } from "../../../../../packages/domain/payments/models";
 
 export class InMemoryPaymentDatabase implements PaymentDatabase {
@@ -24,9 +21,7 @@ export class InMemoryPaymentDatabase implements PaymentDatabase {
   readonly charges = new Map<string, LessonChargeRecord>();
   readonly invoices = new Map<string, InvoiceRecord>();
   readonly discounts = new Map<string, DiscountRecord>();
-  readonly customers = new Map<string, PaymentCustomerRecord>();
   readonly transactions = new Map<string, PaymentTransactionRecord>();
-  readonly refunds = new Map<string, RefundRecord>();
   readonly audits = new Map<string, PaymentAuditRecord>();
 
   async transaction<T>(operation: (database: PaymentDatabase) => Promise<T>): Promise<T> {
@@ -151,39 +146,6 @@ export class InMemoryPaymentDatabase implements PaymentDatabase {
     if (discount) this.discounts.set(id, { ...discount, isActive, updatedAt });
   }
 
-  async getPaymentCustomer(parentProfileId: string) {
-    return (
-      [...this.customers.values()].find(
-        (customer) => customer.parentProfileId === parentProfileId,
-      ) ?? null
-    );
-  }
-
-  async savePaymentCustomer(customer: PaymentCustomerRecord) {
-    const existing = await this.getPaymentCustomer(customer.parentProfileId);
-    if (!existing) this.customers.set(customer.id, customer);
-  }
-
-  async savePaymentTransaction(transaction: PaymentTransactionRecord) {
-    if (!this.transactions.has(transaction.id)) this.transactions.set(transaction.id, transaction);
-  }
-
-  async getPaymentTransaction(id: string) {
-    return this.transactions.get(id) ?? null;
-  }
-
-  async getPaymentTransactionForUpdate(id: string) {
-    return this.transactions.get(id) ?? null;
-  }
-
-  async getPaymentTransactionByStripeIntent(stripePaymentIntentId: string) {
-    return (
-      [...this.transactions.values()].find(
-        (transaction) => transaction.stripePaymentIntentId === stripePaymentIntentId,
-      ) ?? null
-    );
-  }
-
   async listPaymentTransactions(
     parentProfileId: string | null,
     cursor: string | null,
@@ -197,58 +159,6 @@ export class InMemoryPaymentDatabase implements PaymentDatabase {
       )
       .sort((left, right) => right.id.localeCompare(left.id))
       .slice(0, limit);
-  }
-
-  async listAuthorizedTransactions(limit: number) {
-    return [...this.transactions.values()]
-      .filter((transaction) => {
-        const charge = transaction.lessonChargeId
-          ? this.charges.get(transaction.lessonChargeId)
-          : null;
-        return transaction.status === "pending" && charge?.status === "authorized";
-      })
-      .slice(0, limit);
-  }
-
-  async updatePaymentTransaction(id: string, update: TransactionUpdate & { updatedAt: Date }) {
-    const transaction = this.transactions.get(id);
-    if (!transaction) return;
-    this.transactions.set(id, {
-      ...transaction,
-      status: update.status ?? transaction.status,
-      stripePaymentIntentId: update.stripePaymentIntentId ?? transaction.stripePaymentIntentId,
-      processedAt: update.processedAt === undefined ? transaction.processedAt : update.processedAt,
-      updatedAt: update.updatedAt,
-    });
-  }
-
-  async saveRefund(refund: RefundRecord) {
-    if (!this.refunds.has(refund.id)) this.refunds.set(refund.id, refund);
-  }
-
-  async getRefund(id: string) {
-    return this.refunds.get(id) ?? null;
-  }
-
-  async listRefundsForTransaction(paymentTransactionId: string) {
-    return [...this.refunds.values()].filter(
-      (refund) => refund.paymentTransactionId === paymentTransactionId,
-    );
-  }
-
-  async updateRefund(
-    id: string,
-    update: { status: RefundRecord["status"]; processedAt?: Date | null; updatedAt: Date },
-  ) {
-    const refund = this.refunds.get(id);
-    if (refund) {
-      this.refunds.set(id, {
-        ...refund,
-        status: update.status,
-        processedAt: update.processedAt === undefined ? refund.processedAt : update.processedAt,
-        updatedAt: update.updatedAt,
-      });
-    }
   }
 
   async appendAudit(event: PaymentAuditRecord) {
@@ -273,24 +183,16 @@ export class InMemoryPaymentDatabase implements PaymentDatabase {
         transaction.createdAt >= from &&
         transaction.createdAt < to,
     );
-    const refundRows = [...this.refunds.values()].filter(
-      (refund) =>
-        refund.currency === currency &&
-        refund.status === "completed" &&
-        refund.createdAt >= from &&
-        refund.createdAt < to,
-    );
     const revenueMinor = transactionRows
       .filter((transaction) => transaction.status === "succeeded")
       .reduce((sum, transaction) => sum + transaction.amountMinor, 0);
-    const refundsMinor = refundRows.reduce((sum, refund) => sum + refund.amountMinor, 0);
     return {
       from,
       to,
       currency,
       revenueMinor,
-      refundsMinor,
-      netRevenueMinor: revenueMinor - refundsMinor,
+      refundsMinor: 0,
+      netRevenueMinor: revenueMinor,
       succeededCount: transactionRows.filter((item) => item.status === "succeeded").length,
       failedCount: transactionRows.filter((item) => item.status === "failed").length,
       pendingCount: transactionRows.filter((item) => item.status === "pending").length,

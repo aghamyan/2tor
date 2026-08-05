@@ -31,6 +31,7 @@ const nextConfig = {
     "@app/email",
     "@app/observability",
     "@app/notifications",
+    "@app/whatsapp",
   ],
 };
 

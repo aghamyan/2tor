@@ -6,6 +6,7 @@ import {
   resources,
   resourceTags,
   studentProfiles,
+  subjects,
   tutorContentUploads,
   tutorProfiles,
   type Database,
@@ -173,6 +174,13 @@ function repository(
         .limit(1);
       return Boolean(row);
     },
+    async listBookmarkedResourceIds(studentProfileId) {
+      const rows = await executor
+        .select({ resourceId: bookmarks.resourceId })
+        .from(bookmarks)
+        .where(eq(bookmarks.studentProfileId, studentProfileId));
+      return rows.map((row) => row.resourceId);
+    },
     async saveAssignment(assignment) {
       await executor.insert(resourceAssignments).values(assignment);
     },
@@ -226,6 +234,13 @@ function repository(
         .orderBy(asc(resourceLinks.createdAt))
         .limit(limit);
       return rows.map(linkFromRow);
+    },
+    async listActiveSubjects() {
+      return executor
+        .select({ id: subjects.id, name: subjects.name })
+        .from(subjects)
+        .where(eq(subjects.isActive, true))
+        .orderBy(asc(subjects.name));
     },
   };
 }

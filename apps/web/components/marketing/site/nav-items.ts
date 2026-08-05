@@ -45,7 +45,6 @@ export const primaryNav: PrimaryNavEntry[] = [
   },
   { type: "link", id: "group-lessons", labelKey: "site.nav.groupLessons", href: "/group-lessons" },
   { type: "link", id: "for-parents", labelKey: "site.nav.forParents", href: "/parents" },
-  { type: "link", id: "tutors", labelKey: "site.nav.tutors", href: "/tutors" },
 ];
 
 export interface FooterGroup {
@@ -82,7 +81,6 @@ export const footerGroups: FooterGroup[] = [
     headingKey: "site.footer.familiesHeading",
     links: [
       { id: "for-parents", labelKey: "site.footer.forParents", href: "/parents" },
-      { id: "tutors", labelKey: "site.footer.tutors", href: "/tutors" },
       {
         id: "tutor-application",
         labelKey: "site.footer.tutorApplication",

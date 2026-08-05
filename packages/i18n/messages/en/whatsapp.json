@@ -1,0 +1,53 @@
+{
+  "whatsapp": {
+    "overview": {
+      "title": "WhatsApp notifications",
+      "description": "Set up a WhatsApp group for each child to get lesson reminders and end-of-class updates.",
+      "empty": "No linked children found."
+    },
+    "settings": {
+      "title": "WhatsApp group — {studentName}",
+      "enableLabel": "Send WhatsApp notifications",
+      "enableHint": "Turns on the pre-lesson reminder and the end-of-class message for this student's WhatsApp group.",
+      "leadTimeLabel": "Remind me before class starts",
+      "leadTimeOptions": {
+        "15": "15 minutes before",
+        "30": "30 minutes before",
+        "60": "1 hour before",
+        "120": "2 hours before",
+        "1440": "1 day before"
+      },
+      "includeChildLabel": "Include my child's own number in the group",
+      "includeChildHint": "Requires a valid parental consent record on file.",
+      "save": "Save preferences",
+      "groupStatus": {
+        "title": "Group status",
+        "not_provisioned": "Not set up yet",
+        "active": "Active",
+        "disabled": "Disabled"
+      },
+      "syncButton": "Set up / refresh WhatsApp group",
+      "members": {
+        "title": "Members",
+        "empty": "No members invited yet.",
+        "role": {
+          "tutor": "Tutor",
+          "parent": "Parent",
+          "student": "Student"
+        },
+        "status": {
+          "invited": "Invited — waiting to join",
+          "joined": "Joined",
+          "removed": "Removed"
+        }
+      },
+      "errors": {
+        "consentRequired": "A valid parental consent record is required before including a child's number.",
+        "groupNotEnabled": "Enable WhatsApp notifications before setting up the group.",
+        "noParentLinked": "At least one linked parent with a phone number is required.",
+        "noTutorAssigned": "An active tutor assignment is required before the group can be set up.",
+        "generic": "Something went wrong. Try again."
+      }
+    }
+  }
+}

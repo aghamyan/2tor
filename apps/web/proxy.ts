@@ -136,6 +136,9 @@ function buildCsp(nonce: string): string {
     "img-src 'self' data: blob:",
     "font-src 'self' data:",
     "connect-src 'self'",
+    // Content resources embed only canonical YouTube video URLs (see
+    // packages/domain/content/services.ts's videoEmbedUrl) — never arbitrary third-party frames.
+    "frame-src https://www.youtube.com",
     "frame-ancestors 'none'",
     "base-uri 'self'",
     "form-action 'self'",

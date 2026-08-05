@@ -39,9 +39,6 @@ error, so Node exits before the application starts.
 | `S3_BUCKET`                          | upload storage bucket                                    | server   |
 | `S3_ACCESS_KEY_ID`                   | S3/MinIO authentication                                  | server   |
 | `S3_SECRET_ACCESS_KEY`               | S3/MinIO authentication                                  | server   |
-| `STRIPE_SECRET_KEY`                  | Stripe server API                                        | server   |
-| `STRIPE_WEBHOOK_SECRET`              | Stripe webhook signature verification                    | server   |
-| `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | Stripe.js in the browser                                 | public   |
 | `RESEND_API_KEY`                     | Resend email delivery; use this **or** the SES set below | server   |
 | `SES_ACCESS_KEY_ID`                  | Amazon SES credentials                                   | server   |
 | `SES_SECRET_ACCESS_KEY`              | Amazon SES credentials                                   | server   |
@@ -52,6 +49,9 @@ error, so Node exits before the application starts.
 | `ZOOM_ACCOUNT_ID`                    | Zoom Server-to-Server OAuth                              | server   |
 | `ZOOM_CLIENT_ID`                     | Zoom Server-to-Server OAuth                              | server   |
 | `ZOOM_CLIENT_SECRET`                 | Zoom Server-to-Server OAuth                              | server   |
+| `WHATSAPP_ACCESS_TOKEN`              | Meta WhatsApp Cloud API auth; optional, see below         | server   |
+| `WHATSAPP_PHONE_NUMBER_ID`           | Meta WhatsApp Cloud API sender number; optional            | server   |
+| `WHATSAPP_API_VERSION`               | Meta Graph API version, defaults to `v25.0` if unset       | server   |
 | `APP_URL`                            | canonical application URL and callback URLs              | server   |
 | `SESSION_SECRET`                     | session signing/encryption                               | server   |
 | `KMS_KEY_ID`                         | envelope encryption key selection                        | server   |
@@ -59,3 +59,8 @@ error, so Node exits before the application starts.
 Email requires either `RESEND_API_KEY`, or all of `SES_ACCESS_KEY_ID`,
 `SES_SECRET_ACCESS_KEY`, and `SES_REGION`. `SESSION_SECRET` must be at least
 32 characters.
+
+`WHATSAPP_ACCESS_TOKEN`/`WHATSAPP_PHONE_NUMBER_ID` are optional, unlike every other integration
+here — WhatsApp needs a Meta Official Business Account approval this repo can't assume is in place
+yet. `@app/whatsapp`'s provider falls back to a logging no-op ("disabled") kind when either is
+unset, so the app still boots. See `packages/domain/whatsapp/README.md`.

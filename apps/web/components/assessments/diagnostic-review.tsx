@@ -5,15 +5,63 @@ import Link from "next/link";
 import { useTranslations } from "next-intl";
 import styles from "./assessments.module.css";
 
+type SuspicionSummary = {
+  score: number;
+  severity: "low" | "medium" | "high";
+  breakdown: { eventType: string; count: number; points: number }[];
+  stats: {
+    faceVisiblePercent: number | null;
+    tabSwitchCount: number;
+    fullscreenExitCount: number;
+    copyAttemptCount: number;
+    pasteAttemptCount: number;
+    cameraDisconnectCount: number;
+    multipleFacesCount: number;
+    warningCount: number;
+    totalDurationSeconds: number | null;
+  };
+};
+
 type Review = {
   assessment: { title: string };
   version: { questions: { id: string; prompt: string; points: number }[] };
   attempt: { id: string; status: string; startedAt: string; submittedAt: string | null };
   answers: { questionId: string; answerText: string | null; answerChangeCount: number }[];
-  events: { id: string; eventType: string; occurredAt: string }[];
+  events: { id: string; eventType: string; occurredAt: string; metadata: Record<string, unknown> | null }[];
   eventCounts: Record<string, number>;
+  suspicion: SuspicionSummary;
   report: Report | null;
 };
+
+const HIGH_WEIGHT_EVENTS = new Set([
+  "browser_minimized",
+  "devtools_shortcut",
+  "external_device_suspected",
+  "copy_attempt",
+  "paste_attempt",
+]);
+const MEDIUM_WEIGHT_EVENTS = new Set([
+  "face_missing",
+  "fullscreen_exit",
+  "camera_disconnected",
+  "multiple_faces",
+  "cut_attempt",
+  "tab_switch",
+  "view_source_attempt",
+]);
+
+function eventSeverity(eventType: string): "low" | "medium" | "high" {
+  if (HIGH_WEIGHT_EVENTS.has(eventType)) return "high";
+  if (MEDIUM_WEIGHT_EVENTS.has(eventType)) return "medium";
+  return "low";
+}
+
+function formatDuration(totalSeconds: number | null, fallback: string) {
+  if (totalSeconds === null) return fallback;
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  return `${minutes}m ${String(seconds).padStart(2, "0")}s`;
+}
 
 type Report = {
   id: string;
@@ -140,6 +188,113 @@ export function DiagnosticReview({ attemptId }: { attemptId: string }) {
         </div>
         <span className={styles.statusTag}>{t(`statuses.${review.attempt.status}`)}</span>
       </header>
+
+      <section className={styles.suspicionOverview} aria-labelledby="suspicion-overview-title">
+        <div className={styles.sectionHeading}>
+          <div>
+            <p className={styles.eyebrow}>{t("review.suspicion.kicker")}</p>
+            <h2 id="suspicion-overview-title">{t("review.suspicion.title")}</h2>
+          </div>
+          <span className={`${styles.severityTag} ${styles[`severity_${review.suspicion.severity}`]}`}>
+            {t(`review.suspicion.severity.${review.suspicion.severity}`)}
+          </span>
+        </div>
+        <p className={styles.signalContract}>{t("review.suspicion.notProof")}</p>
+
+        <div className={styles.suspicionScore}>
+          <strong>{review.suspicion.score}</strong>
+          <span>{t("review.suspicion.scoreLabel")}</span>
+        </div>
+
+        <div className={styles.signalGrid}>
+          <article>
+            <strong>
+              {review.suspicion.stats.faceVisiblePercent === null
+                ? t("review.suspicion.stats.notTracked")
+                : `${review.suspicion.stats.faceVisiblePercent}%`}
+            </strong>
+            <span>{t("review.suspicion.stats.faceVisible")}</span>
+          </article>
+          <article>
+            <strong>{review.suspicion.stats.tabSwitchCount}</strong>
+            <span>{t("review.suspicion.stats.tabSwitches")}</span>
+          </article>
+          <article>
+            <strong>{review.suspicion.stats.fullscreenExitCount}</strong>
+            <span>{t("review.suspicion.stats.fullscreenExits")}</span>
+          </article>
+          <article>
+            <strong>{review.suspicion.stats.copyAttemptCount + review.suspicion.stats.pasteAttemptCount}</strong>
+            <span>{t("review.suspicion.stats.clipboardAttempts")}</span>
+          </article>
+          <article>
+            <strong>{review.suspicion.stats.cameraDisconnectCount}</strong>
+            <span>{t("review.suspicion.stats.cameraDisconnects")}</span>
+          </article>
+          <article>
+            <strong>{review.suspicion.stats.multipleFacesCount}</strong>
+            <span>{t("review.suspicion.stats.multipleFaces")}</span>
+          </article>
+          <article>
+            <strong>{formatDuration(review.suspicion.stats.totalDurationSeconds, t("review.suspicion.stats.notTracked"))}</strong>
+            <span>{t("review.suspicion.stats.duration")}</span>
+          </article>
+          <article>
+            <strong>{review.suspicion.stats.warningCount}</strong>
+            <span>{t("review.suspicion.stats.warningsShown")}</span>
+          </article>
+        </div>
+
+        {review.suspicion.breakdown.length > 0 ? (
+          <table className={styles.suspicionBreakdown}>
+            <caption className={styles.srOnly}>{t("review.suspicion.breakdownCaption")}</caption>
+            <thead>
+              <tr>
+                <th scope="col">{t("review.suspicion.breakdownColumns.type")}</th>
+                <th scope="col">{t("review.suspicion.breakdownColumns.count")}</th>
+                <th scope="col">{t("review.suspicion.breakdownColumns.points")}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {review.suspicion.breakdown.map((entry) => (
+                <tr key={entry.eventType}>
+                  <td>{t(`signals.${entry.eventType}`)}</td>
+                  <td>{entry.count}</td>
+                  <td>{entry.points}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        ) : null}
+      </section>
+
+      <section className={styles.eventTimeline} aria-labelledby="event-timeline-title">
+        <div className={styles.sectionHeading}>
+          <div>
+            <p className={styles.eyebrow}>{t("review.timeline.kicker")}</p>
+            <h2 id="event-timeline-title">{t("review.timeline.title")}</h2>
+          </div>
+        </div>
+        {review.events.length === 0 ? (
+          <p className={styles.empty}>{t("review.timeline.empty")}</p>
+        ) : (
+          <ol className={styles.timelineList}>
+            {review.events.map((item) => {
+              const severity = eventSeverity(item.eventType);
+              return (
+                <li key={item.id}>
+                  <span className={`${styles.severityDot} ${styles[`severity_${severity}`]}`} aria-hidden="true" />
+                  <time dateTime={item.occurredAt}>
+                    {new Date(item.occurredAt).toLocaleTimeString()}
+                  </time>
+                  <span>{t(`signals.${item.eventType}`)}</span>
+                  <span className={styles.srOnly}>{t(`review.suspicion.severity.${severity}`)}</span>
+                </li>
+              );
+            })}
+          </ol>
+        )}
+      </section>
 
       <section className={styles.signalReview} aria-labelledby="signal-review-title">
         <div className={styles.sectionHeading}>

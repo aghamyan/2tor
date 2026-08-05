@@ -154,6 +154,13 @@
   flex-wrap: wrap;
   gap: 0.6rem;
 }
+.inlineError {
+  background: var(--ws-amber-soft);
+  border-left: 3px solid var(--ws-amber);
+  border-radius: 0.5rem;
+  color: #7a5610;
+  padding: 0.75rem 1rem;
+}
 .iconButton {
   align-items: center;
   background: white;

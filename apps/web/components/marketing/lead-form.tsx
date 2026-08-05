@@ -8,7 +8,13 @@ export function LeadForm({
   kind = "consultation",
   defaultInterest,
 }: {
-  kind?: "consultation" | "assessment" | "contact" | "tutor_application" | "trial_class";
+  kind?:
+    | "consultation"
+    | "assessment"
+    | "contact"
+    | "tutor_application"
+    | "trial_class"
+    | "group_matching";
   defaultInterest?: string;
 }) {
   const t = useTranslations("marketing.form");

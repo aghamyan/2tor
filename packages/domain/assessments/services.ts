@@ -1,37 +1,46 @@
 import { ulid } from "ulid";
 import { AssessmentError } from "./errors";
+import { INTEGRITY_VIOLATION_EVENT_TYPES } from "./models";
 import type {
   AssessmentActor,
   AssessmentAnswerRecord,
+  AssessmentAttemptListPage,
   AssessmentAttemptRecord,
   AssessmentAttemptReview,
+  AssessmentAttemptStatus,
   AssessmentDatabase,
   AssessmentEventRecord,
   AssessmentEventType,
   AssessmentRecord,
   AssessmentSession,
+  AssessmentStudentOption,
+  AssessmentSubjectOption,
   AssessmentVersionRecord,
   DiagnosticReportRecord,
 } from "./models";
 import { presentAssessmentQuestions } from "./randomization";
 import {
   assessmentVersionInputSchema,
+  attemptListSchema,
   consultationSchema,
   createAssessmentSchema,
   diagnosticReportSchema,
-  integritySignalSchema,
+  integritySignalBatchSchema,
   saveAssessmentAnswerSchema,
   startAttemptSchema,
   submitAssessmentSchema,
   type AssessmentVersionInput,
+  type AttemptListInput,
   type ConsultationInput,
   type CreateAssessmentInput,
   type DiagnosticReportInput,
+  type IntegritySignalBatchInput,
   type IntegritySignalInput,
   type SaveAssessmentAnswerInput,
   type StartAttemptInput,
   type SubmitAssessmentInput,
 } from "./schemas";
+import { computeSuspicionSummary } from "./suspicion";
 
 function hasRole(actor: AssessmentActor, ...roles: AssessmentActor["roles"][number][]) {
   return roles.some((role) => actor.roles.includes(role));
@@ -83,7 +92,21 @@ function versionSettings(values: ReturnType<typeof assessmentVersionInputSchema.
     randomizeQuestionOrder: values.randomizeQuestionOrder,
     poolSelections: values.poolSelections,
     camera: values.camera,
+    audience: values.audience,
+    maxAttempts: values.maxAttempts,
+    integrityPolicy: values.integrityPolicy,
   };
+}
+
+/** A student is in scope for a version's audience — `"everyone"`, or explicitly named. */
+function isInAudience(version: AssessmentVersionRecord, studentProfileId: string | undefined) {
+  const audience = version.settings.audience;
+  return audience.mode === "everyone" || (!!studentProfileId && audience.studentProfileIds.includes(studentProfileId));
+}
+
+/** Staff, or the assessment's own author — the same bar as creating a new version. */
+export function canManageAssessment(actor: AssessmentActor, assessment: AssessmentRecord): boolean {
+  return isStaff(actor) || assessment.createdByUserId === actor.userId;
 }
 
 function buildVersion(
@@ -170,7 +193,7 @@ export async function addAssessmentVersion(
   const assessment = await database.getAssessment(assessmentId);
   if (!assessment)
     throw new AssessmentError("ASSESSMENT_NOT_FOUND", "Assessment was not found.", 404);
-  if (!isStaff(actor) && assessment.createdByUserId !== actor.userId) {
+  if (!canManageAssessment(actor, assessment)) {
     throw new AssessmentError(
       "FORBIDDEN",
       "Only the assessment author can create a new version.",
@@ -199,12 +222,36 @@ export async function addAssessmentVersion(
   return version;
 }
 
+/** Active subjects the actor may pick when authoring an assessment — the new-assessment form's subject picker. */
+export async function listAssessableSubjects(
+  database: AssessmentDatabase,
+  actor: AssessmentActor | null | undefined,
+): Promise<AssessmentSubjectOption[]> {
+  requireActor(actor);
+  requireAuthor(actor);
+  return database.listActiveSubjects();
+}
+
+/** Students the actor may pick for a "selected students" audience — staff see everyone, a tutor sees their own roster. */
+export async function listAssessableStudents(
+  database: AssessmentDatabase,
+  actor: AssessmentActor | null | undefined,
+): Promise<AssessmentStudentOption[]> {
+  requireActor(actor);
+  requireAuthor(actor);
+  return isStaff(actor)
+    ? database.listAllActiveStudents()
+    : database.listActiveStudentsForTutor(actor.userId);
+}
+
 export async function listAssessmentsForActor(
   database: AssessmentDatabase,
   actor: AssessmentActor | null | undefined,
 ): Promise<AssessmentRecord[]> {
   requireActor(actor);
-  const assessments = await database.listAssessments();
+  const assessments = (await database.listAssessments()).filter(
+    (assessment) => assessment.status !== "archived",
+  );
   if (isStaff(actor)) return assessments;
   if (hasRole(actor, "tutor")) {
     return assessments.filter(
@@ -212,7 +259,14 @@ export async function listAssessmentsForActor(
         assessment.status === "published" || assessment.createdByUserId === actor.userId,
     );
   }
-  return assessments.filter((assessment) => assessment.status === "published");
+  const published = assessments.filter((assessment) => assessment.status === "published");
+  if (!hasRole(actor, "student")) return published;
+  const visible: AssessmentRecord[] = [];
+  for (const assessment of published) {
+    const version = await database.getLatestPublishedVersion(assessment.id);
+    if (version && isInAudience(version, actor.studentProfileId)) visible.push(assessment);
+  }
+  return visible;
 }
 
 export async function getAssessmentForActor(
@@ -224,20 +278,42 @@ export async function getAssessmentForActor(
   const assessment = await database.getAssessment(assessmentId);
   if (!assessment)
     throw new AssessmentError("ASSESSMENT_NOT_FOUND", "Assessment was not found.", 404);
-  if (
-    assessment.status !== "published" &&
-    !isStaff(actor) &&
-    assessment.createdByUserId !== actor.userId
-  ) {
+  const canSeeDraft = canManageAssessment(actor, assessment);
+  if (assessment.status !== "published" && !canSeeDraft) {
     throw new AssessmentError("FORBIDDEN", "This assessment is not published.", 403);
   }
-  const canSeeDraft = isStaff(actor) || assessment.createdByUserId === actor.userId;
   const version = canSeeDraft
     ? await database.getLatestVersion(assessment.id)
     : await database.getLatestPublishedVersion(assessment.id);
   if (!version)
     throw new AssessmentError("VERSION_NOT_FOUND", "Assessment version was not found.", 404);
+  if (!canSeeDraft && hasRole(actor, "student") && !isInAudience(version, actor.studentProfileId)) {
+    throw new AssessmentError("FORBIDDEN", "This assessment is not assigned to you.", 403);
+  }
   return { assessment, version };
+}
+
+/**
+ * Soft delete: archives the assessment rather than removing rows, since attempts and diagnostic
+ * reports (student educational history) may already reference it and `assessmentAttempts` has an
+ * `onDelete: "restrict"` FK to `assessmentVersions` — a hard delete would throw once anyone has
+ * taken it. Archived assessments drop out of every browsing list (`listAssessmentsForActor`) but
+ * stay reachable by id for tutors/staff to review past attempts and reports.
+ */
+export async function deleteAssessment(
+  database: AssessmentDatabase,
+  actor: AssessmentActor | null | undefined,
+  assessmentId: string,
+): Promise<void> {
+  requireActor(actor);
+  const assessment = await database.getAssessment(assessmentId);
+  if (!assessment)
+    throw new AssessmentError("ASSESSMENT_NOT_FOUND", "Assessment was not found.", 404);
+  if (!canManageAssessment(actor, assessment)) {
+    throw new AssessmentError("FORBIDDEN", "Only the assessment author can delete it.", 403);
+  }
+  if (assessment.status === "archived") return;
+  await database.saveAssessment({ ...assessment, status: "archived", updatedAt: new Date() });
 }
 
 function event(
@@ -277,6 +353,24 @@ export async function startAssessmentAttempt(
       "A published assessment version was not found.",
       404,
     );
+
+  if (!isInAudience(version, studentProfileId)) {
+    throw new AssessmentError("FORBIDDEN", "This assessment is not assigned to you.", 403);
+  }
+  const maxAttempts = version.settings.maxAttempts;
+  if (maxAttempts !== null) {
+    const completed = await database.countCompletedAttemptsForStudent(
+      assessment.id,
+      studentProfileId,
+    );
+    if (completed >= maxAttempts) {
+      throw new AssessmentError(
+        "ATTEMPT_LIMIT_REACHED",
+        `This assessment allows at most ${maxAttempts} attempt${maxAttempts === 1 ? "" : "s"}, and you have already completed that many.`,
+        409,
+      );
+    }
+  }
 
   const cameraPolicy = version.settings.camera;
   if (cameraPolicy.required) {
@@ -468,24 +562,78 @@ export async function saveAssessmentAnswer(
   return answer;
 }
 
+/**
+ * Guards (fullscreen/focus/shortcut/face-tracking listeners) can outlive the moment a student
+ * submits — a keepalive request already in flight, or a listener that hasn't torn down yet. Once
+ * an attempt is no longer open these are stale telemetry, not an error: skip silently rather than
+ * rejecting, so a late signal never surfaces as a failure to the student.
+ */
+export interface RecordedAssessmentSignals {
+  events: AssessmentEventRecord[];
+  attemptStatus: AssessmentAttemptStatus;
+}
+
+export async function recordAssessmentSignals(
+  database: AssessmentDatabase,
+  actor: AssessmentActor | null | undefined,
+  attemptId: string,
+  input: IntegritySignalBatchInput,
+): Promise<RecordedAssessmentSignals> {
+  requireActor(actor);
+  const values = integritySignalBatchSchema.parse(input);
+  const { attempt, version } = await attemptContext(database, attemptId);
+  requireAttemptOwner(actor, attempt);
+  if (attempt.status !== "in_progress") return { events: [], attemptStatus: attempt.status };
+  const occurredAt = new Date();
+  const recorded = values.signals.map((signal) =>
+    event(attempt.id, signal.eventType, occurredAt, {
+      ...signal.metadata,
+      clientOccurredAt: signal.clientOccurredAt,
+    }),
+  );
+  await database.appendEvents(recorded);
+
+  /**
+   * `"auto_submit"` is the only tier enforced here — a tutor-configured, disclosed exception to
+   * the "signals never gate submission" default (see `AssessmentIntegrityPolicy` in models.ts).
+   * `"warn"` is enforced client-side only (see `use-exam-proctoring.ts`); `"log_only"` (the
+   * default) leaves this branch dormant so every pre-existing assessment behaves identically.
+   */
+  const { violationLimit, action } = version.settings.integrityPolicy;
+  if (action === "auto_submit" && violationLimit !== null) {
+    const allEvents = await database.listEvents(attempt.id);
+    const violationCount = allEvents.filter((item) =>
+      INTEGRITY_VIOLATION_EVENT_TYPES.includes(item.eventType),
+    ).length;
+    if (violationCount >= violationLimit) {
+      const closedAt = new Date();
+      await database.transaction(async (transaction) => {
+        await transaction.saveAttempt({ ...attempt, status: "abandoned", updatedAt: closedAt });
+        await transaction.appendEvents([
+          event(attempt.id, "end", closedAt, {
+            submission: "integrity_policy_auto_submit",
+            violationCount,
+            violationLimit,
+          }),
+        ]);
+      });
+      return { events: recorded, attemptStatus: "abandoned" };
+    }
+  }
+  return { events: recorded, attemptStatus: "in_progress" };
+}
+
+/** Single-signal convenience wrapper over {@link recordAssessmentSignals}. */
 export async function recordAssessmentSignal(
   database: AssessmentDatabase,
   actor: AssessmentActor | null | undefined,
   attemptId: string,
   input: IntegritySignalInput,
-): Promise<AssessmentEventRecord> {
-  requireActor(actor);
-  const values = integritySignalSchema.parse(input);
-  const { attempt } = await attemptContext(database, attemptId);
-  requireAttemptOwner(actor, attempt);
-  requireOpen(attempt);
-  const occurredAt = new Date();
-  const recorded = event(attempt.id, values.eventType, occurredAt, {
-    ...values.metadata,
-    clientOccurredAt: values.clientOccurredAt,
+): Promise<AssessmentEventRecord | null> {
+  const { events } = await recordAssessmentSignals(database, actor, attemptId, {
+    signals: [input],
   });
-  await database.appendEvents([recorded]);
-  return recorded;
+  return events[0] ?? null;
 }
 
 export async function submitAssessmentAttempt(
@@ -546,8 +694,43 @@ export async function getAssessmentAttemptReview(
     answers: await database.listAnswers(attempt.id),
     events,
     eventCounts: countEvents(events),
+    suspicion: computeSuspicionSummary(events),
     report: await database.getDiagnosticReportForAttempt(attempt.id),
   };
+}
+
+/**
+ * The tutor-facing "did this student finish, and was anything flagged" list (spec §16). Staff see
+ * every attempt on the assessment; a tutor sees only attempts by their own assigned students —
+ * the same scoping {@link requireAssignedTutor} applies per-attempt, applied here as a list filter.
+ */
+export async function listAssessmentAttemptsForActor(
+  database: AssessmentDatabase,
+  actor: AssessmentActor | null | undefined,
+  assessmentId: string,
+  input: AttemptListInput,
+): Promise<AssessmentAttemptListPage> {
+  requireActor(actor);
+  if (!isStaff(actor) && !hasRole(actor, "tutor")) {
+    throw new AssessmentError("FORBIDDEN", "Only teaching staff can review attempts.", 403);
+  }
+  const assessment = await database.getAssessment(assessmentId);
+  if (!assessment)
+    throw new AssessmentError("ASSESSMENT_NOT_FOUND", "Assessment was not found.", 404);
+  const values = attemptListSchema.parse(input);
+  const rows = await database.listAttemptsForAssessment(assessmentId, {
+    tutorUserId: isStaff(actor) ? null : actor.userId,
+    cursor: values.cursor,
+    limit: values.limit + 1,
+  });
+  const page = rows.slice(0, values.limit);
+  const items = await Promise.all(
+    page.map(async (row) => ({
+      ...row,
+      suspicion: computeSuspicionSummary(await database.listEvents(row.id)),
+    })),
+  );
+  return { items, nextCursor: rows.length > values.limit ? (page.at(-1)?.id ?? null) : null };
 }
 
 export async function writeDiagnosticReport(

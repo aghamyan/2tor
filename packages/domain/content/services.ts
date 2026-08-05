@@ -91,6 +91,21 @@ export async function listResources(
   actorRequired(actor);
   return database.listPublishedResources(filters);
 }
+export async function listResourceSubjects(
+  database: ContentDatabase,
+  actor: ContentActor | null | undefined,
+) {
+  actorRequired(actor);
+  return database.listActiveSubjects();
+}
+export async function listBookmarkedResourceIds(
+  database: ContentDatabase,
+  actor: ContentActor | null | undefined,
+) {
+  actorRequired(actor);
+  if (!actor.studentProfileId || !roles(actor, "student")) return [];
+  return database.listBookmarkedResourceIds(actor.studentProfileId);
+}
 export async function bookmarkResource(
   database: ContentDatabase,
   actor: ContentActor | null | undefined,

@@ -1,71 +1,11 @@
 import { expect, expectJson, test } from "./fixtures/actors";
-import { databaseRows } from "./helpers/database";
-import { signedStripeEvent } from "./helpers/stripe";
 
 interface Envelope<T> {
   data: T;
   requestId: string;
 }
 
-test.describe.serial("payments and tutor payouts", () => {
-  test("billing authorization is scoped and a signed webhook is idempotent", async ({ actors }) => {
-    const forbiddenResponse = await actors.tutor.post("/api/payments/intents", {
-      headers: { "idempotency-key": "e2e-tutor-cannot-authorize" },
-      data: { invoiceId: "invoice_e2e_authorization" },
-    });
-    const forbidden = await expectJson<{ error: { code: string } }>(forbiddenResponse, 403);
-    expect(forbidden.error.code).toBe("FORBIDDEN");
-
-    const eventId = "evt_e2e_authorization_once";
-    const { payload, signature } = signedStripeEvent({
-      id: eventId,
-      object: "event",
-      api_version: "2026-06-30.basil",
-      created: Math.floor(Date.now() / 1_000),
-      livemode: false,
-      pending_webhooks: 1,
-      request: { id: null, idempotency_key: null },
-      type: "payment_intent.amount_capturable_updated",
-      data: {
-        object: {
-          id: "pi_e2e_authorization",
-          object: "payment_intent",
-        },
-      },
-    });
-
-    const deliver = () =>
-      actors.admin.post("/api/payments/webhooks/stripe", {
-        data: payload,
-        headers: {
-          "content-type": "application/json",
-          "stripe-signature": signature,
-        },
-      });
-
-    const first = await expectJson<Envelope<{ applied: boolean; ignored: boolean }>>(
-      await deliver(),
-      200,
-    );
-    expect(first.data).toEqual({ applied: true, ignored: false });
-
-    const replay = await expectJson<Envelope<{ applied: boolean; ignored: boolean }>>(
-      await deliver(),
-      200,
-    );
-    expect(replay.data).toEqual({ applied: false, ignored: false });
-
-    const [charge] = databaseRows<{ status: string }>(
-      "SELECT status FROM lesson_charges WHERE id = 'lcharge_e2e_authorization'",
-    );
-    expect(charge?.status).toBe("authorized");
-    const [claimCount] = databaseRows<{ count: number }>(
-      `SELECT COUNT(*)::int AS count FROM audit_events ` +
-        `WHERE action = 'payments.stripe_webhook.received' AND resource_id = '${eventId}'`,
-    );
-    expect(claimCount?.count).toBe(1);
-  });
-
+test.describe("tutor payouts", () => {
   test("finance creates, reconciles, exports, and completes a tutor payout batch", async ({
     actors,
   }) => {

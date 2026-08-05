@@ -10,20 +10,26 @@ import {
   parentProfiles,
   parentStudentLinks,
   studentProfiles,
+  subjects,
   tutorProfiles,
   tutorStudentAssignments,
   type Database,
   type Transaction,
 } from "@app/db";
-import { and, asc, desc, eq, isNotNull, isNull } from "drizzle-orm";
+import { and, asc, desc, eq, inArray, isNotNull, isNull, lt } from "drizzle-orm";
 import type {
   AssessmentAnswerRecord,
+  AssessmentAttemptListItem,
   AssessmentAttemptRecord,
+  AssessmentAudience,
   AssessmentDatabase,
   AssessmentEventRecord,
   AssessmentEventType,
+  AssessmentIntegrityPolicy,
   AssessmentQuestionRecord,
   AssessmentRecord,
+  AssessmentStudentOption,
+  AssessmentSubjectOption,
   AssessmentVersionRecord,
   AssessmentVersionSettings,
   DiagnosticReportRecord,
@@ -35,13 +41,41 @@ const VERSION_ENVELOPE_PREFIX = "2TOR_ASSESSMENT_VERSION_V1:";
 const REPORT_ENVELOPE_PREFIX = "2TOR_DIAGNOSTIC_REPORT_V1:";
 const EVENT_TYPE_KEY = "__assessmentEventType";
 
+const defaultAudience: AssessmentAudience = { mode: "everyone" };
+const defaultIntegrityPolicy: AssessmentIntegrityPolicy = { violationLimit: null, action: "log_only" };
+
 const defaultSettings: AssessmentVersionSettings = {
   durationSeconds: null,
   fullscreenRequired: false,
   randomizeQuestionOrder: true,
   poolSelections: {},
-  camera: { required: false, policyVersion: null },
+  camera: { required: false, policyVersion: null, headTrackingEnabled: false },
+  audience: defaultAudience,
+  maxAttempts: null,
+  integrityPolicy: defaultIntegrityPolicy,
 };
+
+function decodeAudience(value: unknown): AssessmentAudience {
+  if (
+    typeof value === "object" &&
+    value !== null &&
+    (value as { mode?: unknown }).mode === "selected" &&
+    Array.isArray((value as { studentProfileIds?: unknown }).studentProfileIds)
+  ) {
+    const studentProfileIds = (value as { studentProfileIds: unknown[] }).studentProfileIds.filter(
+      (id): id is string => typeof id === "string",
+    );
+    if (studentProfileIds.length > 0) return { mode: "selected", studentProfileIds };
+  }
+  return defaultAudience;
+}
+
+function decodeIntegrityPolicy(value: unknown): AssessmentIntegrityPolicy {
+  const record = typeof value === "object" && value !== null ? (value as Record<string, unknown>) : {};
+  const violationLimit = typeof record.violationLimit === "number" ? record.violationLimit : null;
+  const action = record.action === "warn" || record.action === "auto_submit" ? record.action : "log_only";
+  return violationLimit === null ? { violationLimit: null, action: "log_only" } : { violationLimit, action };
+}
 
 function numeric(value: string | null): number | null {
   return value === null ? null : Number(value);
@@ -84,7 +118,11 @@ function decodeVersion(value: string | null): {
             typeof settings.camera?.policyVersion === "string"
               ? settings.camera.policyVersion
               : null,
+          headTrackingEnabled: settings.camera?.headTrackingEnabled === true,
         },
+        audience: decodeAudience(settings.audience),
+        maxAttempts: typeof settings.maxAttempts === "number" ? settings.maxAttempts : null,
+        integrityPolicy: decodeIntegrityPolicy(settings.integrityPolicy),
       },
     };
   } catch {
@@ -135,6 +173,12 @@ function mapQuestion(row: typeof assessmentQuestions.$inferSelect): AssessmentQu
   };
 }
 
+/**
+ * The Postgres enum predates this proctoring extension (spec §2-16) and only the assessments
+ * module owns its schema file — see README "Existing-schema compatibility". Rather than a
+ * migration, every canonical type below rides in an existing bucket and the true type travels in
+ * `metadata[EVENT_TYPE_KEY]`; `mapEvent` always reconstructs the canonical value for callers.
+ */
 function rawEventType(
   eventType: AssessmentEventType,
 ): typeof assessmentEvents.$inferInsert.eventType {
@@ -145,25 +189,64 @@ function rawEventType(
     case "answer_timestamp":
       return "answer_change";
     case "connectivity_interruption":
+    case "camera_ready":
+    case "camera_disconnected":
+    case "face_missing":
+    case "face_returned":
+    case "multiple_faces":
+    case "gaze_away":
+    case "external_device_suspected":
       return "tab_switch";
+    case "browser_minimized":
+    case "warning_shown":
+      return "focus_loss";
+    case "cut_attempt":
+    case "select_all_attempt":
+    case "print_attempt":
+    case "save_attempt":
+    case "view_source_attempt":
+    case "devtools_shortcut":
+      return "copy_attempt";
+    case "context_menu_attempt":
+    case "drag_attempt":
+      return "paste_attempt";
     default:
       return eventType;
   }
 }
 
+const CANONICAL_EVENT_TYPES: readonly AssessmentEventType[] = [
+  "start",
+  "end",
+  "answer_timestamp",
+  "focus_loss",
+  "fullscreen_exit",
+  "tab_switch",
+  "connectivity_interruption",
+  "copy_attempt",
+  "paste_attempt",
+  "answer_change",
+  "browser_minimized",
+  "cut_attempt",
+  "select_all_attempt",
+  "print_attempt",
+  "save_attempt",
+  "view_source_attempt",
+  "context_menu_attempt",
+  "drag_attempt",
+  "devtools_shortcut",
+  "camera_ready",
+  "camera_disconnected",
+  "face_missing",
+  "face_returned",
+  "multiple_faces",
+  "gaze_away",
+  "external_device_suspected",
+  "warning_shown",
+];
+
 function isEventType(value: unknown): value is AssessmentEventType {
-  return [
-    "start",
-    "end",
-    "answer_timestamp",
-    "focus_loss",
-    "fullscreen_exit",
-    "tab_switch",
-    "connectivity_interruption",
-    "copy_attempt",
-    "paste_attempt",
-    "answer_change",
-  ].includes(String(value));
+  return CANONICAL_EVENT_TYPES.includes(value as AssessmentEventType);
 }
 
 function mapEvent(row: typeof assessmentEvents.$inferSelect): AssessmentEventRecord {
@@ -488,6 +571,60 @@ function repository(
       return expired;
     },
 
+    async listAttemptsForAssessment(assessmentId, options) {
+      const versionRows = await executor
+        .select({ id: assessmentVersions.id })
+        .from(assessmentVersions)
+        .where(eq(assessmentVersions.assessmentId, assessmentId));
+      const versionIds = versionRows.map((row) => row.id);
+      if (versionIds.length === 0) return [];
+
+      const conditions = [inArray(assessmentAttempts.assessmentVersionId, versionIds)];
+      if (options.cursor) conditions.push(lt(assessmentAttempts.id, options.cursor));
+
+      if (options.tutorUserId) {
+        const assignmentRows = await executor
+          .select({ studentProfileId: tutorStudentAssignments.studentProfileId })
+          .from(tutorStudentAssignments)
+          .innerJoin(tutorProfiles, eq(tutorProfiles.id, tutorStudentAssignments.tutorProfileId))
+          .where(
+            and(
+              eq(tutorProfiles.userId, options.tutorUserId),
+              eq(tutorStudentAssignments.status, "active"),
+            ),
+          );
+        const tutorStudentIds = assignmentRows.map((row) => row.studentProfileId);
+        if (tutorStudentIds.length === 0) return [];
+        conditions.push(inArray(assessmentAttempts.studentProfileId, tutorStudentIds));
+      }
+
+      const rows = await executor
+        .select({
+          id: assessmentAttempts.id,
+          studentProfileId: assessmentAttempts.studentProfileId,
+          studentName: studentProfiles.preferredName,
+          status: assessmentAttempts.status,
+          startedAt: assessmentAttempts.startedAt,
+          submittedAt: assessmentAttempts.submittedAt,
+          score: assessmentAttempts.score,
+          maxScore: assessmentAttempts.maxScore,
+          proctorMode: assessmentAttempts.proctorMode,
+        })
+        .from(assessmentAttempts)
+        .innerJoin(studentProfiles, eq(studentProfiles.id, assessmentAttempts.studentProfileId))
+        .where(and(...conditions))
+        .orderBy(desc(assessmentAttempts.id))
+        .limit(options.limit);
+
+      return rows.map(
+        (row): AssessmentAttemptListItem => ({
+          ...row,
+          score: numeric(row.score),
+          maxScore: numeric(row.maxScore),
+        }),
+      );
+    },
+
     async saveAnswer(answer) {
       const [existing] = await executor
         .select({ id: assessmentAnswers.id })
@@ -667,6 +804,67 @@ function repository(
         .where(eq(diagnosticReports.assessmentAttemptId, attemptId))
         .limit(1);
       return row ? mapReport(row) : null;
+    },
+
+    async listActiveSubjects(): Promise<AssessmentSubjectOption[]> {
+      const rows = await executor
+        .select({ id: subjects.id, name: subjects.name })
+        .from(subjects)
+        .where(eq(subjects.isActive, true))
+        .orderBy(asc(subjects.name));
+      return rows;
+    },
+
+    async listActiveStudentsForTutor(tutorUserId): Promise<AssessmentStudentOption[]> {
+      const rows = await executor
+        .select({
+          studentProfileId: tutorStudentAssignments.studentProfileId,
+          studentName: studentProfiles.preferredName,
+        })
+        .from(tutorStudentAssignments)
+        .innerJoin(tutorProfiles, eq(tutorProfiles.id, tutorStudentAssignments.tutorProfileId))
+        .innerJoin(
+          studentProfiles,
+          eq(studentProfiles.id, tutorStudentAssignments.studentProfileId),
+        )
+        .where(
+          and(eq(tutorProfiles.userId, tutorUserId), eq(tutorStudentAssignments.status, "active")),
+        )
+        .orderBy(asc(studentProfiles.preferredName));
+      const byStudentId = new Map(rows.map((row) => [row.studentProfileId, row.studentName]));
+      return [...byStudentId.entries()].map(([studentProfileId, studentName]) => ({
+        studentProfileId,
+        studentName,
+      }));
+    },
+
+    async listAllActiveStudents(): Promise<AssessmentStudentOption[]> {
+      const rows = await executor
+        .select({ studentProfileId: studentProfiles.id, studentName: studentProfiles.preferredName })
+        .from(studentProfiles)
+        .where(eq(studentProfiles.status, "active"))
+        .orderBy(asc(studentProfiles.preferredName));
+      return rows;
+    },
+
+    async countCompletedAttemptsForStudent(assessmentId, studentProfileId) {
+      const versionRows = await executor
+        .select({ id: assessmentVersions.id })
+        .from(assessmentVersions)
+        .where(eq(assessmentVersions.assessmentId, assessmentId));
+      const versionIds = versionRows.map((row) => row.id);
+      if (versionIds.length === 0) return 0;
+      const rows = await executor
+        .select({ id: assessmentAttempts.id })
+        .from(assessmentAttempts)
+        .where(
+          and(
+            inArray(assessmentAttempts.assessmentVersionId, versionIds),
+            eq(assessmentAttempts.studentProfileId, studentProfileId),
+            inArray(assessmentAttempts.status, ["submitted", "graded"]),
+          ),
+        );
+      return rows.length;
     },
   };
 }

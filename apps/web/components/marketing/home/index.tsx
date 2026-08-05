@@ -89,26 +89,16 @@ const copy: Record<Locale, HomeCopy> = {
           description: "Build confidence through visual problem solving",
         },
         {
-          key: "code",
-          name: "Programming",
-          description: "Learn by creating real projects",
-        },
-        {
           key: "armenian",
-          name: "Armenian",
+          name: "Armenian Heritage",
           description: "Language, culture, and heritage",
         },
-        {
-          key: "sat",
-          name: "SAT Prep",
-          description: "Focused preparation with measurable progress",
-        },
-        {
-          key: "toefl",
-          name: "TOEFL",
-          description: "Structured practice for academic English",
-        },
       ],
+      comingSoon: {
+        badge: "Coming soon",
+        title: "More subjects on the way",
+        description: "New subjects are added regularly.",
+      },
     },
     benefits: {
       eyebrow: "The complete learning loop",
@@ -181,15 +171,17 @@ const copy: Record<Locale, HomeCopy> = {
           name: "Մաթեմատիկա",
           description: "Վստահություն՝ տեսողական խնդիրների միջոցով",
         },
-        { key: "code", name: "Ծրագրավորում", description: "Սովորել՝ ստեղծելով իրական նախագծեր" },
-        { key: "armenian", name: "Հայոց լեզու", description: "Լեզու, մշակույթ և ժառանգություն" },
-        { key: "sat", name: "SAT պատրաստում", description: "Նպատակային և չափելի պատրաստություն" },
         {
-          key: "toefl",
-          name: "TOEFL",
-          description: "Կառուցված վարժանք ակադեմիական անգլերենի համար",
+          key: "armenian",
+          name: "Հայոց ժառանգություն",
+          description: "Լեզու, մշակույթ և ժառանգություն",
         },
       ],
+      comingSoon: {
+        badge: "Շուտով",
+        title: "Ավելի շատ առարկաներ՝ ճանապարհին",
+        description: "Նոր առարկաներ պարբերաբար ավելացվում են։",
+      },
     },
     benefits: {
       eyebrow: "Ուսուցման ամբողջական շղթա",
@@ -222,10 +214,7 @@ const copy: Record<Locale, HomeCopy> = {
 
 const subjectPaths: Record<HomeCopy["subjects"]["items"][number]["key"], string> = {
   math: "/mathematics",
-  code: "/programming",
   armenian: "/armenian-language-heritage",
-  sat: "/sat",
-  toefl: "/toefl",
 };
 
 export function HomePageContent({ locale }: { locale: Locale }) {
@@ -245,7 +234,7 @@ export function HomePageContent({ locale }: { locale: Locale }) {
         titleLead={content.hero.titleLead}
         titleAccent={content.hero.titleAccent}
         description={content.hero.description}
-        primaryCta={{ label: content.hero.primary, href: localHref(locale, "/consultation") }}
+        primaryCta={{ label: content.hero.primary, href: "#courses" }}
         secondaryCta={{
           label: content.hero.secondary,
           href: localHref(locale, "/free-assessment"),

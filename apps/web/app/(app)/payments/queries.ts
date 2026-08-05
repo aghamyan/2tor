@@ -36,11 +36,6 @@ export async function loadPaymentDashboard() {
       invoices: invoices.items,
       transactions: transactions.items,
       reports,
-      canPay:
-        context.actor.roles.includes("parent") ||
-        context.actor.roles.includes("administrator") ||
-        context.actor.roles.includes("super_administrator"),
-      canRefund: canReport,
       canManageDiscounts:
         context.actor.roles.includes("administrator") ||
         context.actor.roles.includes("super_administrator"),

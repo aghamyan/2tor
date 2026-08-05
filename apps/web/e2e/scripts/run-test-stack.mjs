@@ -318,8 +318,6 @@ nextProcess = spawn(
       ...process.env,
       DATABASE_URL: databaseUrl,
       REDIS_URL: `redis://${redisHost}:${String(redisPort)}`,
-      STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY ?? "sk_test_e2e_only",
-      STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET ?? "whsec_e2e_only",
       NEXT_TELEMETRY_DISABLED: "1",
     },
     stdio: "inherit",

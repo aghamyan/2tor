@@ -451,8 +451,8 @@
           "body": "Work academic disputes, content reports, safety reports, and incident follow-up."
         },
         "refunds": {
-          "title": "Refund queue",
-          "body": "Review payment evidence and route large refunds through step-up controls."
+          "title": "Refund oversight",
+          "body": "Review transaction status for charges that may need a refund. Refund initiation is not currently available in the app."
         },
         "dataRequests": {
           "title": "Data requests",
@@ -478,7 +478,7 @@
         },
         "refunds": {
           "title": "Refunds",
-          "body": "Request evidence-backed refunds while large amounts remain step-up protected."
+          "body": "Review transaction status for refund-eligible charges. Refund initiation is not currently available in the app."
         },
         "liability": {
           "title": "Tutor payout liability",

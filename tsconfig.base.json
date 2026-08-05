@@ -42,7 +42,9 @@
       "@app/observability": ["packages/observability/src/index.ts"],
       "@app/observability/*": ["packages/observability/src/*"],
       "@app/notifications": ["packages/notifications/src/index.ts"],
-      "@app/notifications/*": ["packages/notifications/src/*"]
+      "@app/notifications/*": ["packages/notifications/src/*"],
+      "@app/whatsapp": ["packages/whatsapp/src/index.ts"],
+      "@app/whatsapp/*": ["packages/whatsapp/src/*"]
     }
   }
 }

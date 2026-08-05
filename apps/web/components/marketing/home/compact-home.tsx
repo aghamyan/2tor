@@ -7,14 +7,13 @@ import {
   BookOpenCheck,
   Braces,
   Check,
-  Code2,
+  Clock,
   FileCheck2,
   Languages,
   LineChart,
   NotebookPen,
   ShieldCheck,
   Sparkles,
-  Target,
   TrendingUp,
   type LucideIcon,
 } from "lucide-react";
@@ -41,7 +40,7 @@ export interface ClassroomCopy {
 }
 
 export interface SubjectItem {
-  key: "math" | "code" | "armenian" | "sat" | "toefl";
+  key: "math" | "armenian";
   name: string;
   description: string;
   href: string;
@@ -52,6 +51,11 @@ export interface SubjectCopy {
   title: string;
   hint: string;
   items: readonly SubjectItem[];
+  comingSoon: {
+    title: string;
+    description: string;
+    badge: string;
+  };
 }
 
 export interface BenefitItem {
@@ -292,16 +296,13 @@ function FeatureCard({
 
 const subjectIcons: Record<SubjectItem["key"], LucideIcon> = {
   math: LineChart,
-  code: Code2,
   armenian: Languages,
-  sat: Target,
-  toefl: BookOpenCheck,
 };
 
 export function SubjectExplorer({ copy }: { copy: SubjectCopy }) {
   const reduceMotion = useReducedMotion();
   return (
-    <section className={styles.subjectSection} aria-labelledby="subject-title">
+    <section id="courses" className={styles.subjectSection} aria-labelledby="subject-title">
       <div className={styles.sectionShell}>
         <div className={styles.subjectHeading}>
           <div>
@@ -336,6 +337,27 @@ export function SubjectExplorer({ copy }: { copy: SubjectCopy }) {
               </motion.div>
             );
           })}
+          <motion.div
+            initial={{ opacity: 0, y: 18 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.3 }}
+            transition={
+              reduceMotion
+                ? { duration: 0 }
+                : { duration: 0.5, delay: copy.items.length * 0.06, ease }
+            }
+          >
+            <div className={styles.subjectCardComingSoon}>
+              <span className={styles.subjectComingSoonBadge}>
+                <Clock size={12} aria-hidden="true" />
+                {copy.comingSoon.badge}
+              </span>
+              <span className={styles.subjectText}>
+                <strong>{copy.comingSoon.title}</strong>
+                <small>{copy.comingSoon.description}</small>
+              </span>
+            </div>
+          </motion.div>
         </div>
       </div>
     </section>

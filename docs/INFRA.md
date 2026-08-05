@@ -78,9 +78,9 @@ notes on how they're used:
   `S3_ACCESS_KEY_ID`, etc. rather than the AWS SDK's ambient `AWS_ACCESS_KEY_ID` / instance-role
   auto-detection, specifically so local/staging runs always use the explicit MinIO credentials
   you set here and never silently pick up unrelated AWS credentials from the environment.
-- **The "Application integrations" section** (Stripe, Resend, SES, web push, Sentry, Zoom,
-  session/KMS secrets) are passed through to the `web`/`worker` containers via `env_file: .env`
-  in `docker-compose.yml` — set real values in your untracked `.env`, never in `.env.example`.
+- **The "Application integrations" section** (Resend, SES, web push, Sentry, Zoom, session/KMS
+  secrets) are passed through to the `web`/`worker` containers via `env_file: .env` in
+  `docker-compose.yml` — set real values in your untracked `.env`, never in `.env.example`.
 
 ## Migration path: RDS + managed Redis + real S3 (env swap, no code change)
 
