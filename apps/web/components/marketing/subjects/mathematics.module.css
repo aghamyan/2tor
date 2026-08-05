@@ -1,17 +1,17 @@
 .page {
-  --math-ink: #19223b;
-  --math-muted: #596479;
-  --math-blue: #4657c8;
-  --math-blue-dark: #273674;
-  --math-mint: #75d6c4;
-  --math-mint-soft: #e4f7f2;
-  --math-amber: #f3bd63;
-  --math-paper: #f5f7fc;
-  --math-line: #dce1ee;
-  --math-white: #ffffff;
+  --math-ink: hsl(var(--vz-ink));
+  --math-muted: hsl(var(--vz-muted));
+  --math-blue: hsl(var(--vz-accent));
+  --math-blue-dark: hsl(var(--vz-accent));
+  --math-mint: hsl(var(--vz-positive));
+  --math-mint-soft: hsl(var(--vz-positive) / 12%);
+  --math-amber: hsl(var(--vz-accent));
+  --math-paper: hsl(var(--vz-paper));
+  --math-line: hsl(var(--vz-line));
+  --math-white: hsl(var(--vz-surface));
   background: var(--math-white);
   color: var(--math-ink);
-  font-family: "Avenir Next", Avenir, "Segoe UI", sans-serif;
+  font-family: var(--vz-display);
   min-width: 0;
   overflow: clip;
 }
@@ -46,10 +46,10 @@
 }
 
 .hero {
-  background-color: #f8f9fd;
+  background-color: hsl(var(--vz-surface));
   background-image:
-    linear-gradient(rgb(70 87 200 / 4%) 1px, transparent 1px),
-    linear-gradient(90deg, rgb(70 87 200 / 4%) 1px, transparent 1px);
+    linear-gradient(hsl(var(--vz-accent) / 4%) 1px, transparent 1px),
+    linear-gradient(90deg, hsl(var(--vz-accent) / 4%) 1px, transparent 1px);
   background-size: 36px 36px;
   border-bottom: 1px solid var(--math-line);
   position: relative;
@@ -108,7 +108,7 @@
 
 .heroPrompt {
   border-left: 3px solid var(--math-mint);
-  color: #3d4960;
+  color: hsl(var(--vz-ink));
   font-size: 0.93rem;
   font-weight: 610;
   line-height: 1.55;
@@ -131,7 +131,7 @@
 .inlineBookButton,
 .backButton {
   align-items: center;
-  border-radius: 0.7rem;
+  border-radius: var(--vz-r-pill);
   cursor: pointer;
   display: inline-flex;
   font-size: 0.93rem;
@@ -141,7 +141,11 @@
   min-height: 3.25rem;
   padding: 0.75rem 1.1rem;
   text-decoration: none;
-  transition: background 180ms ease, border-color 180ms ease, color 180ms ease, transform 180ms ease;
+  transition:
+    background 180ms ease,
+    border-color 180ms ease,
+    color 180ms ease,
+    transform 180ms ease;
 }
 
 .primaryButton svg,
@@ -160,8 +164,8 @@
 }
 
 .primaryButton:hover:not(:disabled) {
-  background: #3848b6;
-  border-color: #3848b6;
+  background: hsl(var(--vz-accent));
+  border-color: hsl(var(--vz-accent));
   transform: translateY(-2px);
 }
 
@@ -172,7 +176,7 @@
 
 .secondaryButton {
   background: transparent;
-  border: 1px solid #aeb7c9;
+  border: 1px solid hsl(var(--vz-line));
   color: var(--math-ink);
 }
 
@@ -194,7 +198,7 @@
 .trustGrid span,
 .supportLine {
   align-items: center;
-  color: #465168;
+  color: hsl(var(--vz-ink));
   display: flex;
   font-size: 0.78rem;
   font-weight: 650;
@@ -216,14 +220,14 @@
 }
 
 .supportLine svg {
-  color: #d38a19;
+  color: hsl(var(--vz-accent));
 }
 
 .journey {
   background: var(--math-blue-dark);
-  border: 1px solid #1d295e;
-  border-radius: 1.65rem;
-  box-shadow: 0 2.2rem 4.5rem rgb(25 34 59 / 20%);
+  border: 1px solid hsl(var(--vz-ink));
+  border-radius: var(--vz-r-card);
+  box-shadow: 0 2.2rem 4.5rem hsl(var(--vz-ink) / 20%);
   color: white;
   min-height: 35rem;
   overflow: hidden;
@@ -232,7 +236,7 @@
 }
 
 .journey::after {
-  border: 1px solid rgb(117 214 196 / 26%);
+  border: 1px solid hsl(var(--vz-positive) / 26%);
   border-radius: 50%;
   content: "";
   height: 15rem;
@@ -244,7 +248,7 @@
 
 .journeyTopline {
   align-items: center;
-  border-bottom: 1px solid rgb(255 255 255 / 13%);
+  border-bottom: 1px solid hsl(var(--vz-surface) / 13%);
   display: flex;
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size: 0.67rem;
@@ -276,7 +280,7 @@
 }
 
 .pathLine {
-  background: rgb(255 255 255 / 17%);
+  background: hsl(var(--vz-surface) / 17%);
   bottom: 1.15rem;
   left: 0.82rem;
   position: absolute;
@@ -296,15 +300,19 @@
 }
 
 @keyframes drawPath {
-  from { transform: scaleY(0); }
-  to { transform: scaleY(1); }
+  from {
+    transform: scaleY(0);
+  }
+  to {
+    transform: scaleY(1);
+  }
 }
 
 .journeyNode {
   align-items: center;
   background: transparent;
   border: 0;
-  color: rgb(255 255 255 / 56%);
+  color: hsl(var(--vz-surface) / 56%);
   cursor: pointer;
   display: grid;
   gap: 0.55rem;
@@ -315,15 +323,19 @@
 
 .journeyNode > span {
   align-items: center;
-  background: #303f7b;
-  border: 2px solid #5e6da3;
+  background: hsl(var(--vz-ink));
+  border: 2px solid hsl(var(--vz-muted));
   border-radius: 50%;
   display: flex;
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size: 0.55rem;
   height: 1.7rem;
   justify-content: center;
-  transition: background 180ms ease, border-color 180ms ease, color 180ms ease, transform 180ms ease;
+  transition:
+    background 180ms ease,
+    border-color 180ms ease,
+    color 180ms ease,
+    transform 180ms ease;
   width: 1.7rem;
 }
 
@@ -352,8 +364,12 @@
 }
 
 @keyframes markerPulse {
-  0% { box-shadow: 0 0 0 0 rgb(243 189 99 / 60%); }
-  100% { box-shadow: 0 0 0 0.7rem rgb(243 189 99 / 0%); }
+  0% {
+    box-shadow: 0 0 0 0 hsl(var(--vz-accent) / 60%);
+  }
+  100% {
+    box-shadow: 0 0 0 0.7rem hsl(var(--vz-accent) / 0%);
+  }
 }
 
 .journeyNode:hover > span {
@@ -363,9 +379,9 @@
 
 .mathPreview {
   align-self: center;
-  background: rgb(255 255 255 / 7%);
-  border: 1px solid rgb(255 255 255 / 13%);
-  border-radius: 1.15rem;
+  background: hsl(var(--vz-surface) / 7%);
+  border: 1px solid hsl(var(--vz-surface) / 13%);
+  border-radius: var(--vz-r-card);
   min-width: 0;
   overflow: hidden;
   padding: 1rem;
@@ -381,7 +397,7 @@
 }
 
 .previewLabel span {
-  color: #aeb9e4;
+  color: hsl(var(--vz-line));
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size: 0.6rem;
   letter-spacing: 0.1em;
@@ -403,12 +419,18 @@
 }
 
 @keyframes visualIn {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .visualShape {
-  fill: rgb(117 214 196 / 22%);
+  fill: hsl(var(--vz-positive) / 22%);
   stroke: var(--math-mint);
   stroke-width: 2;
 }
@@ -428,23 +450,23 @@
 .visualCut,
 .visualAngle {
   fill: none;
-  stroke: #d5dcff;
+  stroke: hsl(var(--vz-line-soft));
   stroke-width: 2;
 }
 
 .visualFill {
-  fill: rgb(243 189 99 / 38%);
+  fill: hsl(var(--vz-accent) / 38%);
 }
 
 .visualGrid {
   fill: none;
-  stroke: rgb(255 255 255 / 10%);
+  stroke: hsl(var(--vz-surface) / 10%);
   stroke-width: 1;
 }
 
 .visualAxis {
   fill: none;
-  stroke: rgb(255 255 255 / 45%);
+  stroke: hsl(var(--vz-surface) / 45%);
   stroke-width: 1.5;
 }
 
@@ -463,14 +485,14 @@
 }
 
 .mathPreview > p {
-  color: #d0d7f2;
+  color: hsl(var(--vz-surface-2));
   font-size: 0.72rem;
   line-height: 1.45;
   margin: 0;
 }
 
 .journeyNote {
-  color: #bdc7ed;
+  color: hsl(var(--vz-surface-2));
   font-size: 0.7rem;
   margin: 0.7rem 0 0;
   padding-left: 0.2rem;
@@ -510,7 +532,7 @@
 }
 
 .levelNavigator {
-  border-top: 1px solid #bfc7d8;
+  border-top: 1px solid hsl(var(--vz-line));
   margin-top: 2.6rem;
 }
 
@@ -526,7 +548,7 @@
 }
 
 .levelGroup > p {
-  color: #707b90;
+  color: hsl(var(--vz-muted));
   font-size: 0.71rem;
   font-weight: 780;
   letter-spacing: 0.1em;
@@ -548,7 +570,7 @@
 .levelButton {
   background: transparent;
   border: 1px solid transparent;
-  border-radius: 0.85rem;
+  border-radius: var(--vz-r-input);
   color: var(--math-ink);
   cursor: pointer;
   display: flex;
@@ -556,19 +578,25 @@
   min-height: 8.7rem;
   padding: 0.8rem;
   text-align: left;
-  transition: background 180ms ease, border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+  transition:
+    background 180ms ease,
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    transform 180ms ease;
 }
 
 .levelButton:hover {
   background: white;
-  border-color: #cbd2e1;
+  border-color: hsl(var(--vz-line-soft));
   transform: translateY(-2px);
 }
 
 .levelButton[data-selected="true"] {
   background: var(--math-white);
   border-color: var(--math-blue);
-  box-shadow: 0 0.6rem 1.6rem rgb(39 54 116 / 9%), inset 0 3px var(--math-blue);
+  box-shadow:
+    0 0.6rem 1.6rem hsl(var(--vz-ink) / 9%),
+    inset 0 3px var(--math-blue);
 }
 
 .levelTitle {
@@ -634,14 +662,14 @@
 
 .inlineBookButton {
   background: var(--math-mint-soft);
-  border: 1px solid #acdcd1;
-  color: #155c51;
+  border: 1px solid hsl(var(--vz-positive) / 30%);
+  color: hsl(var(--vz-positive));
   white-space: nowrap;
 }
 
 .inlineBookButton:hover {
-  background: #d6f3ec;
-  border-color: #72bbae;
+  background: hsl(var(--vz-positive) / 12%);
+  border-color: hsl(var(--vz-positive));
   transform: translateY(-2px);
 }
 
@@ -665,7 +693,7 @@
 
 .bestFor span {
   align-items: center;
-  color: #4f5c70;
+  color: hsl(var(--vz-ink));
   display: flex;
   font-size: 0.78rem;
   font-weight: 600;
@@ -673,7 +701,7 @@
 }
 
 .bestFor svg {
-  color: #19917c;
+  color: hsl(var(--vz-positive));
   height: 0.9rem;
   width: 0.9rem;
 }
@@ -703,7 +731,7 @@
 }
 
 .unitPath {
-  border-top: 1px solid #adb7ca;
+  border-top: 1px solid hsl(var(--vz-line));
   margin-top: 1.8rem;
   position: relative;
 }
@@ -714,7 +742,7 @@
 }
 
 .unit[data-expanded="true"] {
-  background: #f7f9ff;
+  background: hsl(var(--vz-surface));
 }
 
 .unitButton {
@@ -760,7 +788,7 @@
 }
 
 .unitPosition {
-  color: #7a8497;
+  color: hsl(var(--vz-muted));
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size: 0.63rem;
   text-align: right;
@@ -787,12 +815,18 @@
 }
 
 @keyframes unitOpen {
-  from { opacity: 0; transform: translateY(-5px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .detailLabel {
-  color: #737e92;
+  color: hsl(var(--vz-muted));
   font-size: 0.67rem;
   font-weight: 780;
   letter-spacing: 0.1em;
@@ -812,7 +846,7 @@
 .unitPanel li,
 .outcomes li {
   align-items: start;
-  color: #3f4c61;
+  color: hsl(var(--vz-ink));
   display: flex;
   font-size: 0.85rem;
   gap: 0.55rem;
@@ -821,7 +855,7 @@
 
 .unitPanel li svg,
 .outcomes li svg {
-  color: #168f79;
+  color: hsl(var(--vz-positive));
   flex: none;
   height: 1rem;
   margin-top: 0.12rem;
@@ -839,7 +873,7 @@
 
 .dependency span {
   align-items: center;
-  color: #2b766a;
+  color: hsl(var(--vz-positive));
   display: flex;
   font-size: 0.64rem;
   font-weight: 780;
@@ -854,7 +888,7 @@
 }
 
 .dependency strong {
-  color: #21584f;
+  color: hsl(var(--vz-positive));
   font-size: 0.78rem;
   line-height: 1.4;
 }
@@ -886,7 +920,7 @@
 }
 
 .outcomes li {
-  color: #e7ebfc;
+  color: hsl(var(--vz-surface));
   font-size: 0.9rem;
 }
 
@@ -908,9 +942,9 @@
 
 .prerequisiteChips span {
   background: white;
-  border: 1px solid #c9d0df;
+  border: 1px solid hsl(var(--vz-line-soft));
   border-radius: 0.5rem;
-  color: #485468;
+  color: hsl(var(--vz-ink));
   font-size: 0.74rem;
   font-weight: 640;
   padding: 0.55rem 0.65rem;
@@ -1014,7 +1048,7 @@
 }
 
 .adaptiveSection {
-  background: #eef1fa;
+  background: hsl(var(--vz-surface));
   border-bottom: 1px solid var(--math-line);
   border-top: 1px solid var(--math-line);
   padding: clamp(4rem, 8vw, 7rem) 0;
@@ -1042,7 +1076,7 @@
 }
 
 .adaptivePath::before {
-  background: #b7c0dc;
+  background: hsl(var(--vz-line));
   content: "";
   height: 2px;
   left: 1.5rem;
@@ -1066,7 +1100,7 @@
 .adaptiveStep > span {
   align-items: center;
   background: var(--math-blue-dark);
-  border: 5px solid #eef1fa;
+  border: 5px solid hsl(var(--vz-surface));
   border-radius: 50%;
   color: white;
   display: flex;
@@ -1082,7 +1116,7 @@
 }
 
 .adaptiveStep:nth-child(3) > span {
-  background: #188e7a;
+  background: hsl(var(--vz-positive));
 }
 
 .adaptiveStep > div {
@@ -1117,7 +1151,7 @@
 }
 
 .conversionSection .kicker {
-  color: #c7fff5;
+  color: hsl(var(--vz-positive) / 12%);
 }
 
 .conversionSection h2 {
@@ -1126,7 +1160,7 @@
 }
 
 .conversionSection p:not(.kicker) {
-  color: #e3e7ff;
+  color: hsl(var(--vz-surface));
   margin-top: 1rem;
   max-width: 42rem;
 }
@@ -1155,7 +1189,7 @@
 
 .conversionAction span {
   align-items: center;
-  color: #dbe0ff;
+  color: hsl(var(--vz-surface));
   display: flex;
   font-size: 0.68rem;
   gap: 0.35rem;
@@ -1172,7 +1206,7 @@
 
 .dialogBackdrop {
   align-items: center;
-  background: rgb(14 20 43 / 72%);
+  background: hsl(var(--vz-ink) / 72%);
   display: flex;
   inset: 0;
   justify-content: center;
@@ -1183,8 +1217,8 @@
 
 .dialog {
   background: white;
-  border-radius: 1.35rem;
-  box-shadow: 0 2rem 6rem rgb(0 0 0 / 28%);
+  border-radius: var(--vz-r-card);
+  box-shadow: 0 2rem 6rem hsl(var(--vz-ink) / 28%);
   max-height: calc(100vh - 2.5rem);
   max-width: 36rem;
   overflow-y: auto;
@@ -1195,7 +1229,7 @@
 
 .dialogClose {
   align-items: center;
-  background: #f0f2f8;
+  background: hsl(var(--vz-surface));
   border: 0;
   border-radius: 50%;
   color: var(--math-ink);
@@ -1210,7 +1244,7 @@
 }
 
 .dialogClose:hover {
-  background: #e3e6f0;
+  background: hsl(var(--vz-surface-2));
 }
 
 .dialogClose svg {
@@ -1248,8 +1282,8 @@
 
 .stepProgress span {
   align-items: center;
-  border-top: 3px solid #d9deea;
-  color: #8a94a7;
+  border-top: 3px solid hsl(var(--vz-line-soft));
+  color: hsl(var(--vz-muted));
   display: flex;
   font-size: 0.69rem;
   font-weight: 800;
@@ -1280,7 +1314,7 @@
 
 .bookingField > span,
 .goalFieldset legend {
-  color: #384359;
+  color: hsl(var(--vz-ink));
   font-size: 0.76rem;
   font-weight: 750;
 }
@@ -1288,8 +1322,8 @@
 .bookingField select,
 .bookingField input {
   background: white;
-  border: 1px solid #b7c0d0;
-  border-radius: 0.65rem;
+  border: 1px solid hsl(var(--vz-line));
+  border-radius: var(--vz-r-input);
   color: var(--math-ink);
   min-height: 3rem;
   padding: 0.65rem 0.75rem;
@@ -1298,7 +1332,7 @@
 
 .bookingField select:hover,
 .bookingField input:hover {
-  border-color: #77849d;
+  border-color: hsl(var(--vz-muted));
 }
 
 .goalFieldset {
@@ -1315,8 +1349,8 @@
 
 .goalFieldset label {
   align-items: center;
-  border: 1px solid #cbd2df;
-  border-radius: 0.7rem;
+  border: 1px solid hsl(var(--vz-line-soft));
+  border-radius: var(--vz-r-input);
   cursor: pointer;
   display: grid;
   gap: 0.7rem;
@@ -1325,7 +1359,7 @@
 }
 
 .goalFieldset label[data-selected="true"] {
-  background: #f5f7ff;
+  background: hsl(var(--vz-surface));
   border-color: var(--math-blue);
 }
 
@@ -1356,7 +1390,7 @@
 .formSummary {
   align-items: center;
   background: var(--math-mint-soft);
-  color: #245f56;
+  color: hsl(var(--vz-positive));
   display: grid;
   gap: 0.7rem;
   grid-template-columns: auto 1fr auto;
@@ -1377,7 +1411,7 @@
 .formSummary button {
   background: transparent;
   border: 0;
-  color: #245f56;
+  color: hsl(var(--vz-positive));
   cursor: pointer;
   font-size: 0.69rem;
   font-weight: 750;
@@ -1407,8 +1441,8 @@
 }
 
 .formError {
-  background: #fff0ef;
-  color: #9d2f2a;
+  background: hsl(var(--vz-accent) / 10%);
+  color: hsl(var(--vz-accent));
   font-size: 0.73rem;
   margin: 0;
   padding: 0.65rem;
@@ -1422,7 +1456,7 @@
 
 .backButton {
   background: transparent;
-  border: 1px solid #c0c8d8;
+  border: 1px solid hsl(var(--vz-line));
   color: var(--math-ink);
 }
 
@@ -1432,7 +1466,7 @@
 
 .privacyNote {
   align-items: center;
-  color: #778195;
+  color: hsl(var(--vz-muted));
   display: flex;
   font-size: 0.64rem;
   gap: 0.35rem;
@@ -1454,7 +1488,7 @@
   align-items: center;
   background: var(--math-mint-soft);
   border-radius: 50%;
-  color: #15836f;
+  color: hsl(var(--vz-positive));
   display: flex;
   height: 4rem;
   justify-content: center;
@@ -1595,7 +1629,7 @@
   }
 
   .journey {
-    border-radius: 1.2rem;
+    border-radius: var(--vz-r-card);
     padding: 1rem;
   }
 
@@ -1702,10 +1736,10 @@
   .mobileCta {
     align-items: center;
     background: var(--math-blue-dark);
-    border: 1px solid rgb(255 255 255 / 20%);
-    border-radius: 0.75rem;
+    border: 1px solid hsl(var(--vz-surface) / 20%);
+    border-radius: var(--vz-r-pill);
     bottom: 0.75rem;
-    box-shadow: 0 0.8rem 2rem rgb(18 26 62 / 30%);
+    box-shadow: 0 0.8rem 2rem hsl(var(--vz-ink) / 30%);
     color: white;
     display: flex;
     font-size: 0.82rem;

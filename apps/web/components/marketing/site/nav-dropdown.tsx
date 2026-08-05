@@ -23,6 +23,10 @@ import styles from "./site.module.css";
 export interface NavDropdownProps {
   triggerLabel: ReactNode;
   triggerClassName?: string;
+  /** Extra data-* attributes for the trigger, e.g. the active-route marker. */
+  triggerData?: Record<string, string>;
+  /** `aria-current` for the trigger when one of its pages is the current route. */
+  triggerAriaCurrent?: "true" | undefined;
   panelClassName?: string;
   align?: "start" | "end";
   children: ReactNode;
@@ -31,6 +35,8 @@ export interface NavDropdownProps {
 export function NavDropdown({
   triggerLabel,
   triggerClassName,
+  triggerData,
+  triggerAriaCurrent,
   panelClassName,
   align = "start",
   children,
@@ -124,6 +130,8 @@ export function NavDropdown({
         aria-expanded={open}
         aria-controls={panelId}
         className={triggerClassName}
+        aria-current={triggerAriaCurrent}
+        {...triggerData}
         onClick={() => setOpen((value) => !value)}
         onKeyDown={handleTriggerKeyDown}
       >

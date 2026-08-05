@@ -41,10 +41,15 @@ export function LanguageSwitcher({
   const pathname = usePathname() ?? "/";
 
   return (
+    /*
+     * A segmented control rather than two loose text links: one recessed track holding two
+     * segments, with the active one raised onto a surface. That shape says "this is a choice
+     * between two states" at a glance, which two adjacent words do not.
+     */
     <div
       role="group"
       aria-label={t("site.languageSwitcher.label")}
-      className={`flex items-center gap-1 ${className ?? ""}`}
+      className={`${styles.localeSwitch} ${className ?? ""}`}
     >
       {locales.map((candidate) => {
         const active = candidate === locale;
@@ -53,14 +58,15 @@ export function LanguageSwitcher({
             key={candidate}
             href={buildLocaleSwitchHref(pathname, candidate)}
             aria-current={active ? "true" : undefined}
+            data-active={active ? "true" : "false"}
             onClick={() => {
               document.cookie = `${LOCALE_COOKIE_NAME}=${candidate}; path=/; max-age=${LOCALE_COOKIE_MAX_AGE}; samesite=lax`;
             }}
-            className={`${styles.languageSwitcherLink} ${
-              active ? styles.languageSwitcherLinkActive : ""
-            } shrink-0 whitespace-nowrap rounded-md px-2 py-1 text-xs font-medium`}
+            className={styles.localeSwitchOption}
           >
-            {variant === "compact" ? candidate.toUpperCase() : t(`site.languageSwitcher.${candidate}`)}
+            {variant === "compact"
+              ? candidate.toUpperCase()
+              : t(`site.languageSwitcher.${candidate}`)}
           </Link>
         );
       })}

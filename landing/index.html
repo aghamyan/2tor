@@ -1,0 +1,401 @@
+<!doctype html>
+<html lang="en" data-theme="auto">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Varzharan · Math tutoring that runs like a school</title>
+<meta name="description" content="Vetted Armenian teachers, one-on-one lessons on an American K-12 math curriculum, and a plan built from your child's own assessment.">
+
+<!-- Brand dot, matching the nav mark. Geometry only: an Armenian glyph in an SVG favicon
+     would show as tofu wherever no Armenian face is installed. -->
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='16' fill='%23B45309'/%3E%3C/svg%3E">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- Instrument Sans = display. Atkinson Hyperlegible = body (high-legibility, chosen for parents
+     reading on phones). Noto Sans Armenian is appended to BOTH stacks in CSS: the brand name is
+     Armenian script and neither Latin face covers it, so CSS per-glyph fallback carries Վարժարան. -->
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;0,700;1,500&family=Noto+Sans+Armenian:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+
+<!-- Runs before first paint: marks the document as scripted (so reveal animations are
+     only hidden when JS can reveal them) and applies a stored theme with no flash. -->
+<script>
+(function () {
+  var r = document.documentElement;
+  r.classList.add('js');
+  try {
+    var t = localStorage.getItem('varzharan-theme');
+    if (t === 'light' || t === 'dark') r.setAttribute('data-theme', t);
+  } catch (e) {}
+})();
+</script>
+</head>
+<body>
+
+<a class="skip" href="#main">Skip to content</a>
+
+<!-- Sentinel for the nav's scrolled state. IntersectionObserver watches this instead of a scroll listener. -->
+<div id="nav-sentinel" aria-hidden="true"></div>
+
+<header class="nav" id="nav">
+ <div class="nav__bar" id="nav-bar">
+  <div class="nav__inner">
+
+    <a class="brand" href="#top" aria-label="Varzharan, home">
+      <span class="brand__mark" lang="hy" aria-hidden="true">Վ</span>
+      <span class="brand__word">Varzharan</span>
+    </a>
+
+    <nav class="nav__links" aria-label="Sections">
+      <!-- The travelling highlight. One element that slides and restretches between
+           links, rather than a background on each link, so the movement is continuous. -->
+      <span class="nav__indicator" id="nav-indicator" aria-hidden="true"></span>
+      <a href="#how">How it works</a>
+      <a href="#subjects">Subjects</a>
+      <a href="#progress">For parents</a>
+      <a href="#teachers">Teachers</a>
+    </nav>
+
+    <div class="nav__actions">
+      <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Switch to dark theme">
+        <span id="theme-label">Dark</span>
+      </button>
+      <a class="btn btn--ghost nav__login" href="#">Parent login</a>
+      <a class="btn btn--primary" href="#enroll">Enroll</a>
+      <button class="burger" id="burger" type="button" aria-expanded="false" aria-controls="mobile-menu" aria-label="Open menu">
+        <span></span><span></span>
+      </button>
+    </div>
+
+  </div>
+
+  <div class="mobile-menu" id="mobile-menu" hidden>
+    <a href="#how">How it works</a>
+    <a href="#subjects">Subjects</a>
+    <a href="#progress">For parents</a>
+    <a href="#teachers">Teachers</a>
+    <a href="#">Parent login</a>
+    <a class="btn btn--primary mobile-menu__cta" href="#enroll">Enroll</a>
+  </div>
+ </div>
+</header>
+
+<main id="main">
+
+  <!-- ══ HERO ══ Asymmetric split: copy left, portrait media right. -->
+  <section class="hero" id="top">
+    <div class="hero__inner">
+
+      <div class="hero__copy">
+        <h1 class="hero__title" data-reveal data-split style="--i:0">
+          Math tutoring that runs like a school.
+        </h1>
+        <p class="hero__sub" data-reveal style="--i:1">
+          Vetted teachers in Armenia, one-on-one lessons, and a plan built from your
+          child's own assessment.
+        </p>
+        <div class="hero__cta" data-reveal style="--i:2">
+          <a class="btn btn--primary btn--lg" href="#enroll">Enroll</a>
+          <a class="btn btn--quiet btn--lg" href="#how">See how it works</a>
+        </div>
+      </div>
+
+      <figure class="hero__media" data-reveal style="--i:3">
+        <!-- PLACEHOLDER: stock stand-in (picsum id 24, an open book). Replace with real
+             photography of a lesson in progress, portrait, ~1000x1250. -->
+        <img src="https://picsum.photos/id/24/1000/1250"
+             alt="An open book on a desk." width="1000" height="1250" fetchpriority="high">
+      </figure>
+
+    </div>
+
+    <!-- Trust facts live UNDER the hero, never inside it. No invented statistics.
+         The gradient field behind these cards is not decoration: glass needs real
+         content underneath or it reads as a flat tinted box. -->
+    <div class="facts">
+      <div class="facts__field" aria-hidden="true"></div>
+      <div class="facts__inner">
+
+        <article class="fact glass" data-reveal style="--i:-1">
+          <span class="fact__mark" aria-hidden="true">K<i>-</i>12</span>
+          <strong>Mathematics</strong>
+          <span class="fact__sub">Elementary through calculus</span>
+        </article>
+
+        <article class="fact glass" data-reveal style="--i:-1">
+          <span class="fact__mark" aria-hidden="true">1<i>:</i>1</span>
+          <strong>One-on-one</strong>
+          <span class="fact__sub">The same teacher every week</span>
+        </article>
+
+        <article class="fact glass" data-reveal style="--i:-1">
+          <span class="fact__mark" aria-hidden="true">US</span>
+          <strong>American curriculum</strong>
+          <span class="fact__sub">Matched to your child's school</span>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ══ HOW IT WORKS ══ Numbered sequence. This is the whole difference from a tutor marketplace. -->
+  <section class="how" id="how">
+    <div class="wrap">
+      <h2 class="section-title" data-reveal data-split>Four things happen before the first lesson ends.</h2>
+
+      <ol class="steps" data-reveal>
+        <li class="step" data-reveal style="--i:0">
+          <span class="step__link" aria-hidden="true"></span>
+          <span class="step__node"><span>01</span></span>
+          <h3>We test before we teach</h3>
+          <p>An assessment maps what your child knows, and what is missing.</p>
+        </li>
+        <li class="step" data-reveal style="--i:1">
+          <span class="step__link" aria-hidden="true"></span>
+          <span class="step__node"><span>02</span></span>
+          <h3>You get a written plan</h3>
+          <p>What comes next, what can be skipped, and how fast to move.</p>
+        </li>
+        <li class="step" data-reveal style="--i:2">
+          <span class="step__link" aria-hidden="true"></span>
+          <span class="step__node"><span>03</span></span>
+          <h3>One teacher who stays</h3>
+          <p>The same vetted teacher every week, reachable between lessons.</p>
+        </li>
+        <li class="step" data-reveal style="--i:3">
+          <span class="step__node"><span>04</span></span>
+          <h3>Progress you can see</h3>
+          <p>After each lesson: what was covered, and what comes next.</p>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+
+  <!-- ══ SUBJECTS ══ Bento. Sized by stage so a parent can locate their own child in one glance. -->
+  <section class="subjects" id="subjects">
+    <div class="wrap">
+      <h2 class="section-title" data-reveal data-split>Find your child.</h2>
+
+      <div class="bento">
+
+        <article class="tile tile--photo spotlight" data-reveal style="--i:0">
+          <!-- PLACEHOLDER: stock stand-in (picsum id 180, a desk mid-study). -->
+          <img class="tile__bg" src="https://picsum.photos/id/180/1200/900" alt="" aria-hidden="true" loading="lazy">
+          <div class="tile__body">
+            <span class="tile__grade glass">Grades 9 to 12</span>
+            <h3>High school</h3>
+            <p>Algebra I, Geometry, Algebra II, Precalculus, Trigonometry, Statistics, Calculus.</p>
+          </div>
+        </article>
+
+        <article class="tile spotlight" data-reveal style="--i:1">
+          <div class="tile__body">
+            <span class="tile__grade">Grades K to 5</span>
+            <h3>Elementary</h3>
+            <p>Number sense, fractions, decimals, measurement, and early problem solving.</p>
+          </div>
+        </article>
+
+        <article class="tile spotlight" data-reveal style="--i:2">
+          <div class="tile__body">
+            <span class="tile__grade">Grades 6 to 8</span>
+            <h3>Middle school</h3>
+            <p>Pre-algebra, ratios, expressions, equations, inequalities, and functions.</p>
+          </div>
+        </article>
+
+        <article class="tile tile--block spotlight" data-reveal style="--i:3">
+          <div class="tile__body">
+            <span class="tile__grade">Grades 10 to 12</span>
+            <h3>SAT and ACT math</h3>
+            <p>Timed practice, error analysis, and the question types your child keeps losing points on.</p>
+          </div>
+        </article>
+
+        <article class="tile tile--photo tile--photo-sm spotlight" data-reveal style="--i:4">
+          <!-- PLACEHOLDER: stock stand-in (picsum id 42, a long study table). -->
+          <img class="tile__bg" src="https://picsum.photos/id/42/900/700" alt="" aria-hidden="true" loading="lazy">
+          <div class="tile__body">
+            <span class="tile__grade glass">By invitation</span>
+            <h3>Competition math</h3>
+            <p>Problems that do not fit a formula, for students who finish early.</p>
+          </div>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ══ FOR PARENTS ══ Editorial two-column. Deliberately NOT a simulated dashboard. -->
+  <section class="progress" id="progress">
+    <div class="wrap">
+      <h2 class="section-title" data-reveal data-split>You always know where your child stands.</h2>
+      <p class="section-lede" data-reveal>
+        Not "attended 12 lessons." A real academic record, in plain language.
+      </p>
+
+      <div class="progress__grid">
+
+        <!-- Sample academic record. The 62% to 84% figure is the example given in the
+             project brief, not an invented statistic. -->
+        <article class="record" data-reveal>
+          <header class="record__head">
+            <div class="record__id">
+              <h3>Grade 7 Mathematics</h3>
+              <p class="record__meta">Updated after every lesson</p>
+            </div>
+            <span class="record__code">MTH-G7</span>
+          </header>
+
+          <dl class="record__group record__group--metrics">
+            <div class="record__row">
+              <dt>Course progress</dt>
+              <dd class="record__meterwrap">
+                <span class="meter" role="img" aria-label="68 percent complete">
+                  <span class="meter__fill" style="--pct:68%"></span>
+                </span>
+                <b class="record__pct" data-count="68" data-suffix="%">68%</b>
+              </dd>
+            </div>
+            <div class="record__row">
+              <dt>Latest assessment</dt>
+              <dd>
+                <span class="delta"><span class="delta__arrow" aria-hidden="true">&#8593;</span>
+                  62% to <b>84%</b></span>
+              </dd>
+            </div>
+          </dl>
+
+          <!-- Dots carry real state here (done / needs work / upcoming), which is the
+               one case where a coloured dot earns its place. -->
+          <dl class="record__group">
+            <div class="record__row" data-state="done">
+              <dt><i class="dot" aria-hidden="true"></i>Mastered</dt>
+              <dd>Linear equations</dd>
+            </div>
+            <div class="record__row" data-state="review">
+              <dt><i class="dot" aria-hidden="true"></i>In review</dt>
+              <dd>Equations with fractions</dd>
+            </div>
+            <div class="record__row" data-state="next">
+              <dt><i class="dot" aria-hidden="true"></i>Next up</dt>
+              <dd>Proportional reasoning</dd>
+            </div>
+          </dl>
+
+          <p class="record__foot">Sample record. Every student has one.</p>
+        </article>
+
+        <div class="progress__side">
+          <article class="note" data-reveal style="--i:1">
+            <span class="note__wash" aria-hidden="true"></span>
+            <header class="note__head">
+              <span class="note__avatar" aria-hidden="true">AG</span>
+              <span class="note__who">
+                <b>Anahit Ghazaryan</b>
+                <span>Note after today's lesson</span>
+              </span>
+            </header>
+            <p class="note__body">Solid grasp of the method. Still slow when the
+              denominators differ.</p>
+            <ul class="note__tags">
+              <li class="is-action">10 practice problems</li>
+              <li>Fractions</li>
+            </ul>
+          </article>
+
+          <blockquote class="quote" data-reveal style="--i:2">
+            <!-- No leading/trailing whitespace: it would collapse into a space and push
+                 the ::before / ::after quote marks away from the text. -->
+            <p>I stopped guessing whether the lessons were working. Every week I can see
+              what he learned and what he still needs.</p>
+            <cite>Karine Ohanian <span>Parent of a 9th grader, Glendale</span></cite>
+          </blockquote>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ══ TEACHERS ══ Horizontal scroll-snap rail. Dasa2 dumps 15 headshots in a grid; a rail
+       lets a parent browse without the page turning into a directory. -->
+  <section class="teachers" id="teachers">
+    <div class="wrap">
+      <div class="teachers__head">
+        <div>
+          <h2 class="section-title" data-reveal data-split>Teachers are chosen, not listed.</h2>
+          <p class="section-lede" data-reveal>
+            Every teacher is interviewed, tested on mathematics and English, and observed
+            teaching before they ever meet a student.
+          </p>
+        </div>
+        <div class="rail-nav" data-reveal>
+          <button type="button" class="rail-btn" id="rail-prev" aria-label="Previous teachers">&#8592;</button>
+          <button type="button" class="rail-btn" id="rail-next" aria-label="More teachers">&#8594;</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PLACEHOLDER CONTENT: names and monograms stand in for real vetted staff and headshots. -->
+    <ul class="rail" id="rail" tabindex="0" aria-label="Teachers, scrollable">
+      <li class="teacher" data-reveal style="--i:-1"><span class="teacher__mono" aria-hidden="true">AG</span><h3>Anahit Ghazaryan</h3><p>Algebra I and II</p><span class="teacher__grades">Grades 8 to 11</span></li>
+      <li class="teacher" data-reveal style="--i:-1"><span class="teacher__mono" aria-hidden="true">TP</span><h3>Tigran Petrosyan</h3><p>Geometry and Trigonometry</p><span class="teacher__grades">Grades 9 to 12</span></li>
+      <li class="teacher" data-reveal style="--i:-1"><span class="teacher__mono" aria-hidden="true">NH</span><h3>Nvard Hakobyan</h3><p>Elementary mathematics</p><span class="teacher__grades">Grades K to 5</span></li>
+      <li class="teacher" data-reveal style="--i:-1"><span class="teacher__mono" aria-hidden="true">AM</span><h3>Armen Melikyan</h3><p>Precalculus and Calculus</p><span class="teacher__grades">Grades 11 to 12</span></li>
+      <li class="teacher" data-reveal style="--i:-1"><span class="teacher__mono" aria-hidden="true">SA</span><h3>Siranush Avetisyan</h3><p>Pre-algebra</p><span class="teacher__grades">Grades 6 to 8</span></li>
+      <li class="teacher" data-reveal style="--i:-1"><span class="teacher__mono" aria-hidden="true">VM</span><h3>Vahagn Mkrtchyan</h3><p>Competition mathematics</p><span class="teacher__grades">Grades 7 to 12</span></li>
+    </ul>
+  </section>
+
+
+  <!-- ══ CTA ══ -->
+  <section class="cta" id="enroll">
+    <div class="wrap cta__inner">
+      <h2 data-reveal data-split>It starts with the assessment.</h2>
+      <p data-reveal style="--i:1">
+        Tell us your child's grade and school. We take it from there.
+      </p>
+      <a class="btn btn--primary btn--lg" href="#" data-reveal style="--i:2">Enroll</a>
+    </div>
+  </section>
+
+</main>
+
+<footer class="footer">
+  <div class="wrap footer__inner">
+    <div class="footer__brand">
+      <span class="brand__mark" lang="hy" aria-hidden="true">Վ</span>
+      <p><span lang="hy">Վարժարան</span> connects Armenian-American students with vetted teachers in Armenia.</p>
+    </div>
+    <nav class="footer__col" aria-label="Program">
+      <h4>Program</h4>
+      <a href="#how">How it works</a>
+      <a href="#subjects">Subjects</a>
+      <a href="#progress">For parents</a>
+    </nav>
+    <nav class="footer__col" aria-label="Company">
+      <h4>Company</h4>
+      <a href="#teachers">Teachers</a>
+      <a href="#">Teach with us</a>
+      <a href="#">Contact</a>
+    </nav>
+    <nav class="footer__col" aria-label="Account">
+      <h4>Account</h4>
+      <a href="#">Parent login</a>
+      <a href="#enroll">Enroll</a>
+    </nav>
+  </div>
+  <div class="wrap footer__base">
+    <span>&copy; 2026 <span lang="hy">Վարժարան</span></span>
+    <span><a href="#">Privacy</a> <a href="#">Terms</a></span>
+  </div>
+</footer>
+
+<script src="main.js"></script>
+</body>
+</html>

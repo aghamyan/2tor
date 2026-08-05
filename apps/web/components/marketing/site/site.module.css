@@ -1,78 +1,111 @@
 /*
  * `@app/ui`'s components style themselves with semantic Tailwind utilities (`bg-primary`,
  * `text-foreground`, `ring-ring`, …) that resolve against `packages/ui/src/theme/tokens.css` +
- * `packages/ui/tailwind-preset.ts`. Neither is wired into apps/web's Tailwind build yet — confirmed
- * empirically (`apps/web/app/globals.css` is a bare `@import "tailwindcss"`, no `@theme`/preset
- * bridge, no other file imports `tokens.css`) and already flagged by
- * `components/marketing/home/home.module.css`'s file header, which mirrors the same tokens locally
- * for the same reason: wiring the bridge touches Tailwind build config used by every route,
- * including `(app)/*`, which is out of this task's scope and file list. `--site-*` below copies
- * `tokens.css`'s HSL triplets verbatim (light + `.dark`) so this chrome still renders with the
- * real brand palette instead of unstyled/transparent `@app/ui` primitives, without editing any
- * locked file. Structural utilities (layout, spacing, radius, shadow scale) are unaffected by the
- * gap and are used directly as plain Tailwind classes throughout these components.
+ * `packages/ui/tailwind-preset.ts`. Neither is wired into apps/web's Tailwind build — the preset is
+ * a v3-shaped `Partial<Config>` and this app is on Tailwind v4, so it is inert. This chrome
+ * therefore defines every colour it needs locally, which is why `--site-*` exists at all.
+ *
+ * Those tokens used to copy `tokens.css`'s navy/cyan triplets verbatim. They now ALIAS the
+ * Varzharan design system (`app/globals.css`, `[data-surface="vz"]`, set by
+ * `app/(marketing)/layout.tsx`), so the site chrome shares one palette with the rest of the public
+ * pages and a rebrand stays a single-file edit. Custom properties cascade through the DOM
+ * independently of which stylesheet declared them, so a CSS-module rule resolves `--vz-*` from the
+ * layout ancestor normally.
+ *
+ * Names and shapes are unchanged on purpose: every `hsl(var(--site-…))` call site downstream keeps
+ * working, and `--vz-*` colour tokens are bare HSL triplets for exactly that reason. Structural
+ * utilities (layout, spacing, radius, shadow scale) are plain Tailwind classes throughout these
+ * components and are unaffected.
  */
 .scope {
-  --site-background: 0 0% 100%;
-  --site-foreground: 222 47% 11%;
-  --site-popover: 0 0% 100%;
-  --site-popover-foreground: 222 47% 11%;
-  --site-primary: 221 83% 35%;
-  --site-primary-foreground: 210 40% 98%;
-  --site-secondary: 213 33% 95%;
-  --site-secondary-foreground: 222 47% 17%;
-  --site-muted: 214 32% 96%;
-  --site-muted-foreground: 215 16% 35%;
-  --site-accent: 191 85% 31%;
-  --site-accent-foreground: 210 40% 98%;
-  --site-border: 214 24% 83%;
-  --site-ring: 221 83% 35%;
+  --site-background: var(--vz-surface);
+  --site-foreground: var(--vz-ink);
+  --site-popover: var(--vz-surface);
+  --site-popover-foreground: var(--vz-ink);
+  --site-primary: var(--vz-accent);
+  --site-primary-foreground: var(--vz-accent-on);
+  --site-secondary: var(--vz-surface-2);
+  --site-secondary-foreground: var(--vz-ink);
+  --site-muted: var(--vz-surface-2);
+  --site-muted-foreground: var(--vz-muted);
+  /* The landing page runs one brand accent plus `--positive` strictly for semantic status. There
+     is no second brand hue, so `--site-accent` folds onto the same vermillion rather than
+     inventing a teal that appears nowhere else. */
+  --site-accent: var(--vz-accent);
+  --site-accent-foreground: var(--vz-accent-on);
+  --site-border: var(--vz-line);
+  --site-ring: var(--vz-accent);
 }
-:global(.dark) .scope {
-  --site-background: 222 47% 8%;
-  --site-foreground: 210 40% 98%;
-  --site-popover: 222 42% 11%;
-  --site-popover-foreground: 210 40% 98%;
-  --site-primary: 213 94% 72%;
-  --site-primary-foreground: 222 47% 11%;
-  --site-secondary: 217 33% 17%;
-  --site-secondary-foreground: 210 40% 98%;
-  --site-muted: 217 33% 17%;
-  --site-muted-foreground: 215 20% 75%;
-  --site-accent: 188 78% 48%;
-  --site-accent-foreground: 222 47% 11%;
-  --site-border: 217 25% 28%;
-  --site-ring: 213 94% 72%;
-}
+/*
+ * No `:global(.dark)` block: every alias above points at a `--vz-*` token that already flips under
+ * `.dark` in `app/globals.css`, so the dark palette arrives without restating a single value here.
+ * That is the point of aliasing rather than copying.
+ */
 .scope :focus-visible {
   outline: 2px solid hsl(var(--site-ring));
   outline-offset: 2px;
 }
 
-/* Header */
+/* Header
+ *
+ * Transparent, and it stays transparent in both states. The glass bar inside needs real content
+ * moving underneath it to refract — over an opaque paper fill it would look identical with
+ * `backdrop-filter: none`, which is the test for whether a surface is glass or just a tinted div.
+ * Because the header is `sticky` it still occupies flow space, so nothing sits under it until the
+ * page actually scrolls. */
 .header {
-  background: hsl(228 33% 98%);
-  transition: background 200ms ease;
+  background: transparent;
 }
+/*
+ * The morphing island, ported from the landing page's nav. At the top of the page it is a
+ * full-bleed transparent strip. Once scrolled it contracts, drops away from the top edge, rounds
+ * into a pill, and materializes as glass.
+ *
+ * These are discrete state changes on a single threshold crossing (`header-frame.tsx` flips
+ * `data-scrolled` past 18px), not per-frame scroll-driven work, which is why animating `max-width`
+ * here is affordable.
+ */
 .headerFrame {
   background: transparent;
-  border-bottom: 1px solid transparent;
+  border: 1px solid transparent;
+  border-radius: 0;
+  box-shadow: none;
+  max-width: 88rem;
   min-height: 4.75rem;
+  backdrop-filter: blur(0px) saturate(100%);
   transition:
-    backdrop-filter 220ms ease,
-    background 220ms ease,
-    border-color 220ms ease,
-    min-height 220ms ease,
-    box-shadow 220ms ease;
+    max-width 550ms var(--vz-ease),
+    margin-top 550ms var(--vz-ease),
+    border-radius 550ms var(--vz-ease),
+    min-height 550ms var(--vz-ease),
+    background 450ms var(--vz-ease),
+    box-shadow 450ms var(--vz-ease),
+    backdrop-filter 450ms var(--vz-ease);
 }
-.header:has(.headerFrame[data-scrolled="true"]) {
-  backdrop-filter: blur(18px) saturate(145%);
-  background: hsl(var(--site-background) / 86%);
-}
+/*
+ * Glass materializes on the bar itself, not on the `.header` wrapper. Stacking a translucent
+ * surface on another translucent surface muddies both, and the wrapper spans the full viewport so
+ * blurring it would defeat the contracted-island shape entirely.
+ */
 .headerFrame[data-scrolled="true"] {
-  border-color: hsl(var(--site-border) / 76%);
-  box-shadow: 0 0.75rem 1.8rem hsl(var(--site-foreground) / 6%);
+  background: var(--vz-fx-glass-bg);
+  backdrop-filter: var(--vz-fx-glass-blur);
+  border-radius: 28px;
+  box-shadow: var(--vz-fx-glass-shadow);
+  margin-top: 12px;
+  max-width: 70rem;
   min-height: 4.2rem;
+}
+/* Reduced transparency is a real code path: fall back to an opaque surface with a drawn border,
+   since the rim above is an inset shadow rather than a `border-color`. */
+@media (prefers-reduced-transparency: reduce) {
+  .headerFrame[data-scrolled="true"] {
+    background: hsl(var(--vz-surface));
+    backdrop-filter: none;
+    box-shadow:
+      inset 0 0 0 1px hsl(var(--vz-line)),
+      var(--vz-fx-shadow);
+  }
 }
 .brand {
   align-items: center;
@@ -81,24 +114,31 @@
   gap: 0.08rem;
   padding-right: 0.45rem;
 }
+/* A plain accent pill. The old mark was a rotated squircle with its own border and drop shadow —
+   three decorative moves on a 34px element, against a design language whose emphasis comes from
+   one accent and a lot of restraint. */
 .brandMark {
   align-items: center;
-  background: hsl(234 68% 55%);
-  border: 1px solid hsl(234 60% 45%);
-  border-radius: 50% 50% 50% 0.48rem;
-  box-shadow: 0 0.45rem 1rem hsl(234 68% 45% / 18%);
-  color: hsl(0 0% 100%);
+  background: hsl(var(--vz-accent));
+  border-radius: var(--vz-r-pill);
+  color: hsl(var(--vz-accent-on));
   display: inline-flex;
-  font-size: 1rem;
-  height: 2.15rem;
+  /* Display stack only — the body face has no Armenian coverage and this mark sits beside the
+     Armenian wordmark. */
+  font-family: var(--vz-display);
+  font-size: 1.125rem;
+  font-weight: 700;
+  height: 2rem;
   justify-content: center;
-  width: 2.15rem;
-  transform: rotate(-5deg);
+  line-height: 1;
+  width: 2rem;
 }
 .brandWord {
-  font-size: 1.2rem;
-  letter-spacing: -0.065em;
-  margin-left: 0.08rem;
+  font-family: var(--vz-display);
+  font-size: 1.16rem;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  margin-left: 0.4rem;
 }
 .navRail {
   background: transparent;
@@ -183,22 +223,25 @@
 }
 .subjectMenuIcon {
   align-items: center;
-  background: hsl(221 83% 96%);
-  border: 1px solid hsl(221 70% 88%);
+  background: hsl(var(--vz-accent) / 10%);
+  border: 1px solid hsl(var(--vz-accent) / 22%);
   border-radius: 0.65rem;
   color: hsl(var(--site-primary));
   display: inline-flex;
-  font-family: Georgia, serif;
+  font-family: var(--vz-display);
   font-size: 1.05rem;
   height: 2.55rem;
   justify-content: center;
   width: 2.55rem;
 }
+/* Heritage is the one place a second hue earns its keep: it distinguishes two sibling subjects in
+   the same menu. It uses `--vz-positive`, the existing semantic green, rather than a third brand
+   colour. */
 .subjectMenuIconHeritage {
-  background: hsl(158 48% 94%);
-  border-color: hsl(158 35% 83%);
-  color: hsl(161 76% 30%);
-  font-family: "Noto Serif Armenian", Georgia, serif;
+  background: hsl(var(--vz-positive) / 12%);
+  border-color: hsl(var(--vz-positive) / 26%);
+  color: hsl(var(--vz-positive));
+  font-family: var(--vz-display);
 }
 .subjectMenuArrow {
   color: hsl(var(--site-muted-foreground));
@@ -214,26 +257,96 @@
 
 /* Buttons (composed on top of @app/ui's <Button>, whose own color utilities don't resolve — see
    file header) */
+/* Flat vermillion, not a gradient. The landing page's primary button is a solid accent pill that
+   earns its depth from a hover lift plus an accent-tinted glow — a two-stop gradient on a button
+   this small reads as an artifact rather than as material. */
 .buttonPrimary {
-  background: linear-gradient(135deg, hsl(221 88% 55%), hsl(var(--site-primary)));
+  background: hsl(var(--site-primary));
+  border: 1px solid transparent;
+  border-radius: var(--vz-r-pill);
   box-shadow:
-    0 0.65rem 1.5rem hsl(221 83% 35% / 20%),
-    inset 0 1px hsl(0 0% 100% / 22%);
+    0 10px 26px -8px hsl(var(--vz-accent) / 42%),
+    0 1px 2px hsl(var(--vz-ink) / 8%);
   color: hsl(var(--site-primary-foreground));
-  border: 1px solid hsl(var(--site-primary));
+  font-family: var(--vz-display);
+  font-weight: 600;
+  letter-spacing: -0.01em;
   gap: 0.55rem;
+  /* Clips the travelling sheen to the pill. */
+  isolation: isolate;
+  overflow: hidden;
   padding-left: 1rem !important;
   padding-right: 0.55rem !important;
+  position: relative;
   transition:
-    box-shadow 200ms ease,
-    transform 200ms ease;
+    background-color 220ms var(--vz-ease),
+    box-shadow 220ms var(--vz-ease),
+    transform 220ms var(--vz-ease);
+}
+
+/*
+ * The travelling sheen: a band of light that enters at the left edge and slides across the whole
+ * button, continuously.
+ *
+ * A `transform: translateX` on a pseudo-element, NOT an animated `background-position` or
+ * `box-shadow`. Transform runs on the compositor; the other two repaint the button on every frame,
+ * forever, on every marketing page. Same look, a fraction of the cost.
+ *
+ * Sits above the fill but below the label (`z-index: 1` here, the label is lifted to 2), so the
+ * light passes over the surface rather than washing out the text.
+ */
+.buttonPrimary::after {
+  /* A wide, soft band. Narrower than this and it reads as a glitch rather than as light. */
+  background: linear-gradient(
+    100deg,
+    transparent 22%,
+    hsl(0 0% 100% / 16%) 38%,
+    hsl(0 0% 100% / 48%) 50%,
+    hsl(0 0% 100% / 16%) 62%,
+    transparent 78%
+  );
+  content: "";
+  inset: 0;
+  pointer-events: none;
+  position: absolute;
+  transform: translateX(-100%);
+  /* Linear, not eased: the band has to cross at a constant speed. An ease-in-out spends most of
+     the cycle parked off-screen at either end and then flicks through the middle. */
+  animation: vz-cta-sheen 2.9s linear infinite;
+  z-index: 1;
+}
+
+.buttonPrimary > * {
+  position: relative;
+  z-index: 2;
+}
+
+@keyframes vz-cta-sheen {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
+
+/* Indefinite motion is exactly what this query exists for. The button keeps its resting halo, so
+   it still reads as the primary action; only the travelling highlight stops. */
+@media (prefers-reduced-motion: reduce) {
+  .buttonPrimary::after {
+    animation: none;
+    transform: translateX(0);
+    opacity: 0.35;
+  }
 }
 .buttonPrimary:hover {
-  background: hsl(var(--site-primary) / 88%);
   box-shadow:
-    0 0.85rem 1.9rem hsl(221 83% 35% / 27%),
-    0 0 0 4px hsl(221 83% 55% / 8%);
+    var(--vz-fx-glow),
+    0 1px 2px hsl(var(--vz-ink) / 10%);
   transform: translateY(-2px);
+}
+.buttonPrimary:active {
+  transform: scale(0.975);
 }
 .buttonIcon {
   background: hsl(0 0% 100% / 14%);
@@ -321,22 +434,75 @@
   border-top: 1px solid hsl(var(--site-border));
   color: hsl(var(--site-muted-foreground));
 }
-.languageSwitcherLink {
-  color: hsl(var(--site-foreground) / 85%);
-  border: 1px solid hsl(var(--site-border));
-}
-.languageSwitcherLink:hover {
-  color: hsl(var(--site-primary));
-}
-.languageSwitcherLinkActive {
-  background: hsl(var(--site-secondary));
-  color: hsl(var(--site-foreground));
-  font-weight: 600;
-}
-
 @media (prefers-reduced-motion: reduce) {
   .header,
   .headerFrame {
     transition: none;
   }
+}
+
+/* ── Active-route pill ─────────────────────────────────────────────────────────
+   One shared element moved between items by framer-motion's `layoutId`, so it
+   glides rather than blinking. The label sits above it. */
+.navPill {
+  background: hsl(var(--vz-accent) / 12%);
+  border-radius: var(--vz-r-pill);
+  inset: 0;
+  position: absolute;
+  z-index: 0;
+}
+.navLabel {
+  position: relative;
+  z-index: 1;
+}
+.navLink[data-active="true"],
+.dropdownTrigger[data-active="true"] {
+  color: hsl(var(--site-primary));
+}
+/* The dropdown trigger cannot host the shared pill (it is a button with its own state), so it
+   takes the same fill directly. Visually identical, no layout animation. */
+.dropdownTrigger[data-active="true"] {
+  background: hsl(var(--vz-accent) / 12%);
+  border-radius: var(--vz-r-pill);
+}
+
+/* ── Language switcher ─────────────────────────────────────────────────────────
+   A segmented control: a recessed track with the active locale raised onto a
+   surface. Both options stay real `<Link>`s, and the visible text is still the
+   whole accessible name — an `aria-label` override that did not contain the
+   visible "EN"/"HY" would fail WCAG 2.5.3 Label in Name, which the repo's axe
+   sweep checks on every public page. The `role="group"` label supplies context. */
+.localeSwitch {
+  align-items: center;
+  background: hsl(var(--vz-ink) / 6%);
+  border: 1px solid hsl(var(--vz-line));
+  border-radius: var(--vz-r-pill);
+  display: inline-flex;
+  gap: 0.15rem;
+  padding: 0.18rem;
+}
+.localeSwitchOption {
+  border-radius: var(--vz-r-pill);
+  color: hsl(var(--vz-muted));
+  font-family: var(--vz-display);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  padding: 0.28rem 0.6rem;
+  transition:
+    background 200ms var(--vz-ease),
+    box-shadow 200ms var(--vz-ease),
+    color 200ms var(--vz-ease);
+  white-space: nowrap;
+}
+.localeSwitchOption:hover {
+  color: hsl(var(--vz-ink));
+}
+/* 5.10:1 on the raised surface. */
+.localeSwitchOption[data-active="true"] {
+  background: hsl(var(--vz-surface));
+  box-shadow:
+    0 1px 2px hsl(var(--vz-ink) / 10%),
+    inset 0 0 0 1px hsl(var(--vz-line-soft));
+  color: hsl(var(--vz-accent));
 }

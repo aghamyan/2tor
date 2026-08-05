@@ -1,0 +1,1606 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   Varzharan landing page
+
+   Palette   Pine green + warm bone + vermillion. Chosen off the anti-default
+             rotation: navy+gold is the reflex pick for anything academic, and the
+             brass/ochre accent family it pulls in is a documented AI tell.
+             Every pairing was checked by calculation, not by eye:
+               light   ink on paper 12.02:1 · muted 5.34:1 · accent 4.68:1
+                       white on accent 5.19:1
+               dark    ink on paper 15.93:1 · muted 7.07:1 · accent 6.65:1
+                       paper on accent 6.65:1 · muted on card 6.34:1
+             Composited pairs, worst case (scrim over a pure white photo):
+               block tile body 9.13:1 · block chip 8.12:1
+               photo tile heading 11.94:1 · body 8.57:1 (measured at the text's
+               actual position on the gradient, not at the mid stop)
+               short photo tile 9.22:1 / 6.82:1
+               text on glass over the brightest backdrop 12.59:1 · secondary 6.53:1
+               reduced-transparency photo chip 10.8:1
+             All pass WCAG AA for body text.
+
+             To rebrand: change --accent / --accent-on in the two theme blocks, and
+             --block / --block-on / --scrim in the shared block below. Those five
+             tokens are the only place brand color is defined.
+
+   Radius    One documented system, applied everywhere:
+               buttons, chips, avatars  →  full pill (--r-pill)
+               cards, tiles, media      →  18px      (--r-card)
+               inputs                   →  12px      (--r-input)
+
+   Theme     Light and dark are both first-class. `auto` follows the OS; the nav
+             toggle writes data-theme="light|dark" onto <html> and wins over it.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Tokens ───────────────────────────────────────────────────────────────── */
+
+:root {
+  --paper:      #F5F3ED;
+  --surface:    #FFFDF8;
+  --surface-2:  #EDEAE1;
+  --ink:        #14352B;
+  --muted:      #57685D;
+  --accent:     #C2401F;
+  --accent-on:  #FFFFFF;
+  --accent-wash:rgba(194, 64, 31, .10);
+  --line:       rgba(20, 53, 43, .15);
+  --line-soft:  rgba(20, 53, 43, .08);
+  --shadow:     0 1px 2px rgba(20,53,43,.05), 0 12px 32px -12px rgba(20,53,43,.18);
+  --shadow-lg:  0 2px 4px rgba(20,53,43,.06), 0 28px 60px -20px rgba(20,53,43,.28);
+  --glow:       rgba(194, 64, 31, .16);
+  /* Semantic status, deliberately NOT the brand accent. Vermillion on a rising test
+     score reads as a warning; a gain has to look like a gain. */
+  --positive:      #186445;
+  --positive-wash: rgba(24, 100, 69, .10);
+
+  /* Brand color blocks. Deliberately identical in both themes: a filled tile is a
+     brand surface, not a themed one, so it reads the same on paper and on ink. */
+  --block:    #14352B;
+  --block-on: #FFFFFF;
+  --scrim:    8, 22, 17;
+
+  /* Glass material. Apple's Liquid Glass is a real-time refraction shader; the web has
+     no equivalent and there is no official Apple CSS package. feDisplacementMap through
+     backdrop-filter was tested and produces wobble, not glass, so this is built from
+     blur + saturation + an offset specular rim + chromatic fringing instead.
+       --glass-base    opacity floor, guarantees legibility over any backdrop
+       --glass-fill-*  the translucent gradient that reads as the material
+       --glass-spec    the crisp top-left highlight, the single most important cue
+       --field-*       colours placed BEHIND glass, light enough to keep text legible */
+  --glass-border: rgba(20, 53, 43, .13);
+  --glass-hi:     rgba(255, 255, 255, .95);
+  --glass-shadow: 0 1px 2px rgba(20,53,43,.05), 0 16px 40px -12px rgba(20,53,43,.22);
+  --glass-base:   rgba(245, 243, 237, .42);
+  --glass-fill-a: rgba(255, 255, 255, .34);
+  --glass-fill-b: rgba(255, 255, 255, .10);
+  --glass-rim:    rgba(255, 255, 255, .48);
+  --glass-spec:   rgba(255, 255, 255, .98);
+  --glass-spec-b: rgba(255, 255, 255, .55);
+  --glass-inner:  rgba(255, 255, 255, .20);
+  /* Backdrop field colours. Light yet saturated on purpose: glass needs colour to
+     refract, but the text sitting on top still has to clear WCAG AA. */
+  --field-1: #8FBBA1;
+  --field-2: #F0A085;
+  --field-3: #E9CE9E;
+
+  --font-display: "Instrument Sans", "Noto Sans Armenian", ui-sans-serif, system-ui, sans-serif;
+  --font-body:    "Atkinson Hyperlegible", "Noto Sans Armenian", ui-sans-serif, system-ui, sans-serif;
+  --font-mono:    ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+
+  --r-card:  18px;
+  --r-input: 12px;
+  --r-pill:  999px;
+
+  --wrap:  1200px;
+  --gutter: clamp(20px, 4vw, 40px);
+  --section-y: clamp(80px, 10vw, 148px);
+  --nav-h: 68px;
+
+  --ease: cubic-bezier(.16, 1, .3, 1);
+}
+
+/* Dark tokens. Duplicated across the OS query and the explicit attribute so the
+   nav toggle can override the OS in BOTH directions. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper:      #0B1410;
+    --surface:    #14201B;
+    --surface-2:  #18251F;
+    --ink:        #E9EEE9;
+    --muted:      #93A398;
+    --accent:     #F4744F;
+    --accent-on:  #0B1410;
+    --accent-wash:rgba(244, 116, 79, .13);
+    --line:       rgba(255, 255, 255, .12);
+    --line-soft:  rgba(255, 255, 255, .07);
+    --shadow:     0 1px 2px rgba(0,0,0,.4), 0 12px 32px -12px rgba(0,0,0,.6);
+    --shadow-lg:  0 2px 4px rgba(0,0,0,.5), 0 28px 60px -20px rgba(0,0,0,.7);
+    --glow:       rgba(244, 116, 79, .22);
+    --positive:      #5FD1A0;
+    --positive-wash: rgba(95, 209, 160, .14);
+    --glass-border: rgba(255, 255, 255, .15);
+    --glass-hi:     rgba(255, 255, 255, .26);
+    --glass-shadow: 0 1px 2px rgba(0,0,0,.35), 0 16px 40px -12px rgba(0,0,0,.68);
+    --glass-base:   rgba(12, 21, 17, .52);
+    --glass-fill-a: rgba(255, 255, 255, .11);
+    --glass-fill-b: rgba(255, 255, 255, .02);
+    --glass-rim:    rgba(255, 255, 255, .24);
+    --glass-spec:   rgba(255, 255, 255, .66);
+    --glass-spec-b: rgba(255, 255, 255, .26);
+    --glass-inner:  rgba(255, 255, 255, .08);
+    --field-1: #1B4534;
+    --field-2: #5E2A1A;
+    --field-3: #46381D;
+  }
+}
+:root[data-theme="dark"] {
+  --paper:      #0B1410;
+  --surface:    #14201B;
+  --surface-2:  #18251F;
+  --ink:        #E9EEE9;
+  --muted:      #93A398;
+  --accent:     #F4744F;
+  --accent-on:  #0B1410;
+  --accent-wash:rgba(244, 116, 79, .13);
+  --line:       rgba(255, 255, 255, .12);
+  --line-soft:  rgba(255, 255, 255, .07);
+  --shadow:     0 1px 2px rgba(0,0,0,.4), 0 12px 32px -12px rgba(0,0,0,.6);
+  --shadow-lg:  0 2px 4px rgba(0,0,0,.5), 0 28px 60px -20px rgba(0,0,0,.7);
+  --glow:       rgba(244, 116, 79, .22);
+  --positive:      #5FD1A0;
+  --positive-wash: rgba(95, 209, 160, .14);
+  --glass-border: rgba(255, 255, 255, .15);
+  --glass-hi:     rgba(255, 255, 255, .26);
+  --glass-shadow: 0 1px 2px rgba(0,0,0,.35), 0 16px 40px -12px rgba(0,0,0,.68);
+  --glass-base:   rgba(12, 21, 17, .52);
+  --glass-fill-a: rgba(255, 255, 255, .11);
+  --glass-fill-b: rgba(255, 255, 255, .02);
+  --glass-rim:    rgba(255, 255, 255, .24);
+  --glass-spec:   rgba(255, 255, 255, .66);
+  --glass-spec-b: rgba(255, 255, 255, .26);
+  --glass-inner:  rgba(255, 255, 255, .08);
+  --field-1: #1B4534;
+  --field-2: #5E2A1A;
+  --field-3: #46381D;
+}
+
+/* ── Base ─────────────────────────────────────────────────────────────────── */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: calc(var(--nav-h) + 16px);
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 17px;
+  line-height: 1.62;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: -0.028em;
+  line-height: 1.08;
+  margin: 0;
+  text-wrap: balance;
+}
+
+p  { margin: 0; }
+ul, ol { margin: 0; padding: 0; list-style: none; }
+img { display: block; max-width: 100%; }
+
+a { color: inherit; text-decoration: none; }
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+.wrap {
+  width: 100%;
+  max-width: var(--wrap);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+.skip {
+  position: absolute;
+  left: -9999px;
+  top: 8px;
+  z-index: 100;
+  background: var(--accent);
+  color: var(--accent-on);
+  padding: 10px 18px;
+  border-radius: var(--r-pill);
+  font-weight: 700;
+}
+.skip:focus { left: 16px; }
+
+/* Height sets how far you scroll before the nav morphs. 1px would trigger instantly. */
+#nav-sentinel { position: absolute; top: 0; height: 28px; width: 100%; }
+
+/* ── Section headings ─────────────────────────────────────────────────────── */
+
+.section-title {
+  font-size: clamp(2rem, 4vw, 3.05rem);
+  max-width: 20ch;
+}
+
+.section-lede {
+  margin-top: 20px;
+  color: var(--muted);
+  font-size: 1.06rem;
+  max-width: 56ch;
+}
+
+/* ── Buttons ──────────────────────────────────────────────────────────────── */
+
+.btn {
+  --lift: 0px;
+  position: relative;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  white-space: nowrap;          /* CTA labels never wrap */
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  padding: 11px 22px;
+  border: 1px solid transparent;
+  border-radius: var(--r-pill);
+  cursor: pointer;
+  transform: translateY(var(--lift));
+  transition: transform .22s var(--ease), background-color .22s var(--ease),
+              border-color .22s var(--ease), box-shadow .22s var(--ease),
+              color .22s var(--ease);
+}
+
+.btn--lg { font-size: 1.03rem; padding: 15px 30px; }
+
+.btn--primary {
+  background: var(--accent);
+  color: var(--accent-on);
+  box-shadow: 0 1px 2px rgba(0,0,0,.08);
+}
+.btn--primary:hover { --lift: -2px; box-shadow: 0 10px 26px -8px var(--glow), 0 1px 2px rgba(0,0,0,.1); }
+.btn--primary:active { --lift: 0px; transform: scale(.975); }
+
+.btn--ghost {
+  background: transparent;
+  color: var(--ink);
+  border-color: var(--line);
+}
+.btn--ghost:hover { --lift: -2px; border-color: var(--ink); background: var(--surface); }
+.btn--ghost:active { --lift: 0px; transform: scale(.975); }
+
+.btn--quiet {
+  background: transparent;
+  color: var(--ink);
+  border-color: var(--line);
+}
+.btn--quiet:hover { --lift: -2px; background: var(--surface); border-color: var(--ink); }
+.btn--quiet:active { --lift: 0px; transform: scale(.975); }
+
+/* Click feedback: ripple originates at the pointer, so the button acknowledges
+   exactly where it was pressed. */
+.ripple {
+  position: absolute;
+  border-radius: 50%;
+  transform: scale(0);
+  background: currentColor;
+  opacity: .28;
+  pointer-events: none;
+  animation: ripple .58s var(--ease) forwards;
+}
+@keyframes ripple { to { transform: scale(2.6); opacity: 0; } }
+
+/* ── Liquid glass ─────────────────────────────────────────────────────────────
+   A CSS approximation of Apple's Liquid Glass. Apple's is a real-time refraction
+   shader on the compositor; the web has no equivalent, and SVG feDisplacementMap
+   through backdrop-filter was tested here and produces wobble, not glass. So this
+   reproduces the four cues that actually read as the material:
+
+     1. heavy blur with a saturation lift (glass concentrates colour, not just blurs)
+     2. an asymmetric specular rim: bright top lip, faint bottom bounce
+     3. an inner hairline just inside the rim, which reads as glass thickness
+     4. an edge lens: extra blur in the outer 10px only, so the rim looks thicker
+
+   Every glass surface must sit over real content. Glass with a flat fill behind it
+   is just a tinted div, so these are only used over photography, gradient fields,
+   or scrolling page content.
+   ───────────────────────────────────────────────────────────────────────────── */
+
+.glass {
+  position: relative;
+  isolation: isolate;
+  /* A translucent fill over a tinted base. The base guarantees a legibility floor no
+     matter what passes underneath; the gradient is what actually reads as glass. */
+  background:
+    linear-gradient(140deg, var(--glass-fill-a), var(--glass-fill-b)),
+    var(--glass-base);
+  border: none;
+  backdrop-filter: blur(12px) saturate(200%) brightness(1.06);
+  -webkit-backdrop-filter: blur(12px) saturate(200%) brightness(1.06);
+  box-shadow:
+    /* rim */
+    inset 0 0 0 1px var(--glass-rim),
+    /* the money detail: a crisp specular line just inside the top-left edge, and a
+       dimmer bounce on the bottom-right. Negative spread keeps them hairline thin.
+       This is what reads as a thick, light-catching edge rather than a flat tint. */
+    inset 2px 3px 0 -2px var(--glass-spec),
+    inset -2px -3px 0 -2px var(--glass-spec-b),
+    /* chromatic fringing: warm on one edge, cool on the other, the way a real lens
+       splits light. Constant across themes because it is optics, not palette. */
+    inset 3px 0 12px -7px rgba(255, 140, 90, .55),
+    inset -3px 0 12px -7px rgba(90, 170, 255, .50),
+    /* inner bloom */
+    inset 0 0 18px 3px var(--glass-inner),
+    var(--glass-shadow);
+}
+
+/* Outer lens halo. A radial mask fades it inward, so there is no hard inner edge.
+   The previous version masked a ring with content-box XOR, which drew a visible
+   rectangle inside every card and was the single worst thing about the effect. */
+.glass::after,
+.nav__bar::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  backdrop-filter: blur(8px) saturate(140%);
+  -webkit-backdrop-filter: blur(8px) saturate(140%);
+  -webkit-mask: radial-gradient(128% 128% at 50% 50%, transparent 54%, #000 92%);
+  mask: radial-gradient(128% 128% at 50% 50%, transparent 54%, #000 92%);
+}
+
+/* Sheen sweep across the face. */
+.glass::before,
+.nav__bar::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(150% 200% at 12% -52%, var(--glass-hi), transparent 44%);
+}
+
+/* Vibrancy: on glass, never the muted grey, and secondary text derives from ink. */
+.glass :is(h3, strong, b) { color: var(--ink); }
+.glass :is(p, span):not(.fact__mark) { color: color-mix(in srgb, var(--ink) 78%, var(--paper)); }
+
+/* ── Navigation ───────────────────────────────────────────────────────────── */
+
+/* Fixed shell. Transparent and click-through; only the bar inside it is interactive,
+   so the empty space beside the shrunken island does not swallow clicks. */
+.nav {
+  position: fixed;
+  inset: 0 0 auto 0;
+  z-index: 50;
+  pointer-events: none;
+}
+
+/* The morphing island. At the top of the page it is a full-bleed transparent strip.
+   Once the page scrolls it contracts, drops away from the top edge, rounds into a
+   pill, and materializes as glass. Measured from roseart.io: 1440->1100 wide,
+   72->60 tall, y 0->12, radius 0->pill, transparent -> blurred translucent.
+
+   These are discrete state changes on a single threshold crossing, not per-frame
+   scroll-driven work, which is why animating width/height here is fine. */
+.nav__bar {
+  pointer-events: auto;
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  width: 100%;
+  max-width: 100%;
+  margin: 0 auto;
+  border: 1px solid transparent;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  backdrop-filter: blur(0px) saturate(100%);
+  -webkit-backdrop-filter: blur(0px) saturate(100%);
+  transition:
+    max-width       .55s var(--ease),
+    margin-top      .55s var(--ease),
+    border-radius   .55s var(--ease),
+    background-color .45s var(--ease),
+    border-color    .45s var(--ease),
+    box-shadow      .45s var(--ease),
+    backdrop-filter .45s var(--ease);
+}
+
+/* Materialize: the blur ramps in with the shape change, so the surface reads as a
+   real material arriving rather than a rectangle that merely faded. */
+.nav.is-stuck .nav__bar {
+  max-width: 1120px;
+  margin-top: 12px;
+  border-radius: 28px;
+  border-color: transparent;
+  background:
+    linear-gradient(140deg, var(--glass-fill-a), var(--glass-fill-b)),
+    var(--glass-base);
+  box-shadow:
+    inset 0 0 0 1px var(--glass-rim),
+    inset 2px 3px 0 -2px var(--glass-spec),
+    inset -2px -3px 0 -2px var(--glass-spec-b),
+    inset 3px 0 12px -7px rgba(255, 140, 90, .55),
+    inset -3px 0 12px -7px rgba(90, 170, 255, .50),
+    inset 0 0 18px 3px var(--glass-inner),
+    var(--glass-shadow);
+  backdrop-filter: blur(12px) saturate(200%) brightness(1.06);
+  -webkit-backdrop-filter: blur(12px) saturate(200%) brightness(1.06);
+}
+
+/* The nav uses the shared .glass recipe below; only the fade-in is nav-specific. */
+.nav__bar::before,
+.nav__bar::after { opacity: 0; transition: opacity .45s var(--ease); }
+.nav.is-stuck .nav__bar::before,
+.nav.is-stuck .nav__bar::after,
+.nav__bar.is-open::before,
+.nav__bar.is-open::after { opacity: 1; }
+
+/* When the mobile menu is open the island has to hold a stacked panel, so it
+   relaxes from a pill into a rounded rect. */
+.nav__bar.is-open {
+  border-radius: 26px;
+  border-color: transparent;
+  background:
+    linear-gradient(140deg, var(--glass-fill-a), var(--glass-fill-b)),
+    var(--glass-base);
+  box-shadow:
+    inset 0 0 0 1px var(--glass-rim),
+    inset 2px 3px 0 -2px var(--glass-spec),
+    inset -2px -3px 0 -2px var(--glass-spec-b),
+    inset 3px 0 12px -7px rgba(255, 140, 90, .55),
+    inset -3px 0 12px -7px rgba(90, 170, 255, .50),
+    inset 0 0 18px 3px var(--glass-inner),
+    var(--glass-shadow);
+  backdrop-filter: blur(12px) saturate(200%) brightness(1.06);
+  -webkit-backdrop-filter: blur(12px) saturate(200%) brightness(1.06);
+}
+
+.nav__inner {
+  height: var(--nav-h);
+  max-width: var(--wrap);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  transition: height .55s var(--ease), padding-inline .55s var(--ease);
+}
+.nav.is-stuck .nav__inner {
+  height: 58px;
+  padding-inline: clamp(16px, 2vw, 22px);
+}
+
+/* The fixed nav no longer occupies flow space, so the page reserves it here. */
+body { padding-top: var(--nav-h); }
+
+.brand { display: inline-flex; align-items: center; gap: 10px; margin-right: auto; }
+
+.brand__mark {
+  display: grid;
+  place-items: center;
+  width: 32px; height: 32px;
+  border-radius: var(--r-pill);
+  background: var(--accent);
+  color: var(--accent-on);
+  /* Display stack only. The mono stack has no Armenian coverage. */
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1;
+  padding-bottom: 1px;
+}
+
+.brand__word {
+  font-family: var(--font-display);
+  font-size: 1.16rem;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+}
+
+.nav__links { position: relative; display: flex; gap: 2px; }
+
+.nav__links a {
+  position: relative;
+  z-index: 1;
+  font-family: var(--font-display);
+  font-size: .93rem;
+  font-weight: 500;
+  color: var(--muted);
+  padding: 7px 13px;
+  border-radius: var(--r-pill);
+  transition: color .3s var(--ease);
+}
+.nav__links a:hover { color: var(--ink); }
+.nav__links a[aria-current] { color: var(--accent); font-weight: 600; }
+
+/* Travelling highlight. Transform moves it, width restretches it; both share one
+   curve so the pill reads as a single object gliding between labels instead of a
+   background switching off one item and on to another. Critically damped, no
+   overshoot, because this is following the scroll rather than a flick. */
+.nav__indicator {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  height: 32px;
+  width: 0;
+  margin-top: -16px;
+  border-radius: var(--r-pill);
+  background: var(--accent-wash);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 26%, transparent);
+  opacity: 0;
+  pointer-events: none;
+  transform: translate3d(0, 0, 0);
+  transition:
+    transform .52s var(--ease),
+    width     .52s var(--ease),
+    opacity   .28s var(--ease);
+}
+.nav__indicator.is-on { opacity: 1; }
+
+/* Mirror the state in the mobile menu, which has no room for a sliding pill. */
+.mobile-menu a[aria-current] { color: var(--accent); font-weight: 600; }
+
+.nav__actions { display: flex; align-items: center; gap: 10px; }
+
+.theme-toggle {
+  font-family: var(--font-display);
+  font-size: .84rem;
+  font-weight: 600;
+  color: var(--muted);
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: var(--r-pill);
+  padding: 7px 14px;
+  cursor: pointer;
+  transition: color .22s var(--ease), border-color .22s var(--ease), transform .22s var(--ease);
+}
+.theme-toggle:hover { color: var(--ink); border-color: var(--ink); transform: translateY(-1px); }
+.theme-toggle:active { transform: scale(.96); }
+
+.burger {
+  display: none;
+  width: 40px; height: 40px;
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: var(--r-pill);
+  cursor: pointer;
+  padding: 0;
+  place-items: center;
+  /* place-content, not just place-items: without it the two auto rows stretch to fill the
+     40px button and the strokes sit 21.5px apart, so the close state renders as a chevron
+     instead of an X. Content-sized rows put them exactly 6.5px apart. */
+  place-content: center;
+  gap: 5px;
+}
+.burger span {
+  display: block;
+  width: 16px; height: 1.5px;
+  background: var(--ink);
+  transition: transform .3s var(--ease), opacity .2s var(--ease);
+}
+.burger[aria-expanded="true"] span:first-child { transform: translateY(3.25px) rotate(45deg); }
+.burger[aria-expanded="true"] span:last-child  { transform: translateY(-3.25px) rotate(-45deg); }
+
+.mobile-menu {
+  display: none;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px var(--gutter) 24px;
+  border-top: 1px solid var(--glass-border);
+  background: transparent;
+}
+.mobile-menu a {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 1.05rem;
+  padding: 12px 0;
+  color: var(--ink);
+}
+/* Selector must out-rank `.mobile-menu a` above, or the CTA inherits --ink and ends up
+   as low-contrast text on the gold fill. */
+.mobile-menu a.mobile-menu__cta {
+  margin-top: 12px;
+  justify-content: center;
+  color: var(--accent-on);
+}
+
+/* ── Hero ─────────────────────────────────────────────────────────────────── */
+
+.hero__inner {
+  max-width: var(--wrap);
+  margin-inline: auto;
+  padding: clamp(52px, 7vw, 92px) var(--gutter) clamp(56px, 7vw, 88px);
+  display: grid;
+  grid-template-columns: 1fr .74fr;
+  gap: clamp(36px, 5vw, 72px);
+  align-items: center;
+}
+
+.hero__title {
+  font-size: clamp(2.55rem, 5.4vw, 4.05rem);
+  line-height: 1.03;
+  letter-spacing: -0.04em;
+  max-width: 15ch;
+}
+
+.hero__sub {
+  margin-top: 22px;
+  font-size: clamp(1.06rem, 1.5vw, 1.2rem);
+  color: var(--muted);
+  max-width: 44ch;
+}
+
+.hero__cta { margin-top: 36px; display: flex; flex-wrap: wrap; gap: 12px; }
+
+.hero__media {
+  margin: 0;
+  overflow: hidden;                 /* clips the drifting image at the rounded corners */
+  border-radius: var(--r-card);
+  box-shadow: var(--shadow-lg);
+}
+.hero__media img {
+  width: 100%;
+  height: min(60vh, 580px);
+  object-fit: cover;
+}
+
+/* Trust facts. One restrained gradient field sits behind the glass cards, because a
+   glass surface over flat paper is indistinguishable from a tinted div. */
+.facts {
+  position: relative;
+  isolation: isolate;
+  border-top: 1px solid var(--line-soft);
+  border-bottom: 1px solid var(--line-soft);
+  padding-block: clamp(30px, 4vw, 46px);
+  overflow: hidden;
+}
+.facts__field {
+  position: absolute;
+  inset: -30% -10%;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(46% 66% at 10% 44%, var(--field-1), transparent 62%),
+    radial-gradient(42% 62% at 45% 82%, var(--field-2), transparent 64%),
+    radial-gradient(38% 56% at 74% 18%, var(--field-3), transparent 66%),
+    radial-gradient(34% 50% at 95% 64%, var(--field-1), transparent 68%);
+  filter: blur(8px);
+}
+
+.facts__inner {
+  position: relative;
+  max-width: var(--wrap);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.fact {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3px;
+  padding: 20px 22px;
+  border-radius: var(--r-card);
+  transition: transform .4s var(--ease), box-shadow .4s var(--ease);
+}
+.fact:hover { transform: translateY(-3px); }
+
+/* The mark carries the fact; the words underneath only qualify it. */
+.fact__mark {
+  font-family: var(--font-display);
+  font-size: 1.72rem;
+  font-weight: 600;
+  letter-spacing: -0.045em;
+  line-height: 1;
+  color: var(--accent);
+  margin-bottom: 9px;
+  font-variant-numeric: tabular-nums;
+}
+.fact__mark i { font-style: normal; opacity: .42; padding-inline: .04em; }
+
+.fact strong {
+  font-family: var(--font-display);
+  font-size: 1.02rem;
+  font-weight: 600;
+  letter-spacing: -0.022em;
+  color: var(--ink);
+}
+.fact__sub { font-size: .92rem; line-height: 1.45; }
+
+
+/* ── How it works ─────────────────────────────────────────────────────────── */
+
+.how { padding-block: var(--section-y); }
+
+/* Connected timeline. The four steps ARE the argument, so they read as one continuous
+   path rather than four stacked paragraphs. The gold connector draws itself as the
+   section arrives, which is the motion doing the explaining: this is a sequence. */
+
+.steps {
+  --steps-gap: 24px;
+  --node: 56px;
+  position: relative;
+  margin-top: clamp(40px, 4.6vw, 62px);
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  /* Three named rows: node, heading, body. Each step opts into them with subgrid so
+     a heading that wraps to two lines cannot knock its neighbours' body copy off the
+     shared baseline. */
+  grid-template-rows: auto auto auto;
+  column-gap: var(--steps-gap);
+  row-gap: 0;
+}
+
+/* One continuous rail from the first node's centre to the last node's centre, rather
+   than three separate segments. Segments read as loose dashes between circles; a single
+   rail reads as one process. It fades toward the far end so the row resolves instead of
+   stopping dead after 04. */
+.steps::before {
+  content: "";
+  position: absolute;
+  top: calc(var(--node) / 2 - 1px);
+  /* Nodes sit at the LEFT of each column, so the rail must stop at the last node's
+     centre, not at the container edge. That is one column width in from the right,
+     minus half a node. Getting this from the container edge overshot by a full column. */
+  /* Nodes are centred in their columns, so the rail runs centre-to-centre and leaves
+     an equal half-column of air at each end. Left-aligned nodes left a dead quarter
+     on the right, which is what made the row look off-centre. */
+  left:  calc((100% - 3 * var(--steps-gap)) / 8);
+  right: calc((100% - 3 * var(--steps-gap)) / 8);
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg,
+    var(--accent),
+    color-mix(in srgb, var(--accent) 42%, var(--line)) 62%,
+    var(--line));
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 1.15s var(--ease) .18s;
+}
+.js .steps.is-in::before { transform: scaleX(1); }
+
+/* The list itself is only a trigger for the rail; it must not also fade and slide,
+   or the group and its children would animate on top of each other. */
+.js .steps[data-reveal] { opacity: 1; transform: none; transition: none; }
+
+/* Desktop uses the continuous rail; the per-step connectors are the mobile fallback,
+   where a single rail cannot know where the last node's centre sits. */
+@media (min-width: 961px) { .step__link { display: none; } }
+
+.step {
+  position: relative;
+  display: grid;
+  grid-row: span 3;
+  grid-template-rows: subgrid;
+  justify-items: center;
+  text-align: center;
+}
+
+/* No subgrid: fall back to a plain column. Headings may then wrap unevenly, which is
+   cosmetic rather than broken. */
+@supports not (grid-template-rows: subgrid) {
+  .step { display: flex; flex-direction: column; align-items: center; }
+}
+
+/* Track between this node and the next. right:-12px reaches across the 24px grid gap
+   and stops 12px short of the following node. */
+.step__link {
+  position: absolute;
+  top: 27px;
+  left: 68px;
+  right: -12px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--line);
+  overflow: hidden;
+}
+.step__link::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform .95s var(--ease) calc(var(--i, 0) * .16s + .2s);
+}
+.js .step.is-in .step__link::after { transform: scaleX(1); }
+
+.step__node {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border-radius: var(--r-pill);
+  /* Opaque: the wash is translucent, and the rail runs underneath. */
+  background: var(--paper);
+  border: 1.5px solid var(--line);
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+  transition: transform .4s var(--ease), border-color .4s var(--ease),
+              color .4s var(--ease), background-color .4s var(--ease),
+              box-shadow .4s var(--ease);
+}
+.js .step.is-in .step__node {
+  border-color: color-mix(in srgb, var(--accent) 55%, var(--line));
+  background: linear-gradient(var(--accent-wash), var(--accent-wash)), var(--paper);
+  color: var(--accent);
+}
+/* Hover fills solid: unambiguous feedback, and it lifts the node clear of the rail. */
+.step:hover .step__node {
+  transform: translateY(-3px) scale(1.06);
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--accent-on);
+  box-shadow: 0 12px 26px -10px var(--glow);
+}
+
+
+.step h3 {
+  margin-top: 20px;
+  font-size: clamp(1.08rem, 1.5vw, 1.24rem);
+  max-width: 16ch;
+  transition: color .3s var(--ease);
+}
+.step:hover h3 { color: var(--accent); }
+.step p { margin-top: 10px; color: var(--muted); font-size: .95rem; max-width: 30ch; }
+
+/* ── Subjects (bento) ─────────────────────────────────────────────────────── */
+
+.subjects { padding-block: var(--section-y); }
+
+.bento {
+  margin-top: clamp(40px, 5vw, 64px);
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 16px;
+}
+
+.tile {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  grid-column: span 5;
+  min-height: 210px;
+  display: flex;
+  align-items: flex-end;
+  padding: 28px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-card);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  transition: transform .38s var(--ease), box-shadow .38s var(--ease), border-color .38s var(--ease);
+}
+.tile:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); border-color: color-mix(in srgb, var(--accent) 45%, var(--line)); }
+
+/* Cursor spotlight. Coordinates come from a pointermove handler writing --mx/--my. */
+.spotlight::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(340px circle at var(--mx, 50%) var(--my, 50%), var(--glow), transparent 62%);
+  transition: opacity .35s var(--ease);
+}
+.tile:hover.spotlight::before { opacity: 1; }
+
+.tile__body { position: relative; z-index: 2; }
+
+.tile__grade {
+  display: inline-block;
+  font-family: var(--font-display);
+  font-size: .78rem;
+  font-weight: 600;
+  color: var(--accent);
+  background: var(--accent-wash);
+  padding: 4px 11px;
+  border-radius: var(--r-pill);
+  margin-bottom: 14px;
+}
+.tile h3 { font-size: clamp(1.4rem, 2.4vw, 1.95rem); }
+.tile p  { margin-top: 10px; color: var(--muted); font-size: .96rem; max-width: 40ch; }
+
+/* Two photographic cells now, not one, so the grid has real visual rhythm instead of
+   one photo carrying four typographic boxes. */
+.tile--photo {
+  grid-column: span 7;
+  grid-row: span 2;
+  min-height: 436px;
+  border-color: transparent;
+}
+.tile--photo-sm { grid-column: span 6; grid-row: auto; min-height: 236px; }
+.tile--photo-sm::after {
+  background: linear-gradient(to top,
+    rgba(var(--scrim), .95) 10%,
+    rgba(var(--scrim), .80) 58%,
+    rgba(var(--scrim), .50) 100%);
+}
+
+.tile__bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+  transform: scale(1.02);
+  transition: transform .8s var(--ease);
+}
+.tile--photo::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(to top,
+    rgba(var(--scrim), .93) 6%,
+    rgba(var(--scrim), .66) 46%,
+    rgba(var(--scrim), .28) 100%);
+}
+.tile--photo:hover .tile__bg { transform: scale(1.07); }
+.tile--photo h3 { color: #F4F6F8; }
+.tile--photo p  { color: rgba(244,246,248,.82); }
+
+/* Glass chip over photography: the one place glass is unambiguously right, because
+   there is real image detail behind it to refract. */
+.tile--photo .tile__grade {
+  color: #FFFFFF;
+  border-radius: var(--r-pill);
+  padding: 5px 13px;
+}
+.tile--photo .tile__grade::after { padding: 6px; }
+
+/* Solid brand block. */
+.tile--block { grid-column: span 6; background: var(--block); border-color: transparent; }
+.tile--block h3 { color: var(--block-on); }
+.tile--block p  { color: color-mix(in srgb, var(--block-on) 80%, var(--block)); }
+.tile--block .tile__grade { color: var(--block-on); background: rgba(255,255,255,.16); }
+
+/* ── For parents ──────────────────────────────────────────────────────────── */
+
+.progress { padding-block: var(--section-y); background: var(--surface-2); }
+
+.progress__grid {
+  margin-top: clamp(44px, 5vw, 68px);
+  display: grid;
+  grid-template-columns: 1.06fr .94fr;
+  gap: clamp(28px, 4vw, 56px);
+  align-items: start;
+}
+
+/* ── Academic record card ─────────────────────────────────────────────────── */
+
+.record {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-card);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  transition: transform .4s var(--ease), box-shadow .4s var(--ease);
+}
+.record:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); }
+
+.record__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 22px 26px 20px;
+  border-bottom: 1px solid var(--line);
+}
+.record__head h3 { font-size: 1.18rem; }
+.record__meta { margin-top: 4px; color: var(--muted); font-size: .86rem; }
+.record__code {
+  flex: 0 0 auto;
+  margin-top: 3px;
+  font-family: var(--font-mono);
+  font-size: .74rem;
+  letter-spacing: .09em;
+  color: var(--muted);
+}
+
+/* Two groups: live metrics, then curriculum state. The divider between them does the
+   grouping, so individual rows need only a hairline. */
+.record__group { padding: 6px 0; }
+.record__group--metrics { border-bottom: 1px solid var(--line); background: var(--surface-2); }
+
+.record__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 13px 26px;
+}
+.record__row + .record__row { border-top: 1px solid var(--line-soft); }
+
+.record__row dt {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--muted);
+  font-size: .94rem;
+}
+.record__row dd {
+  margin: 0;
+  text-align: right;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1rem;
+  letter-spacing: -0.015em;
+  color: var(--ink);
+}
+
+/* State dots. Colour encodes status, not decoration. */
+.dot {
+  width: 7px; height: 7px;
+  border-radius: var(--r-pill);
+  flex: 0 0 auto;
+}
+[data-state="done"]   .dot { background: var(--positive); }
+[data-state="review"] .dot { background: var(--accent); }
+[data-state="next"]   .dot { background: transparent; box-shadow: inset 0 0 0 1.5px var(--muted); }
+
+.record__meterwrap { display: flex; align-items: center; gap: 12px; }
+.record__pct { font-variant-numeric: tabular-nums; color: var(--positive); }
+
+.meter {
+  display: block;
+  width: clamp(96px, 15vw, 168px);
+  height: 7px;
+  border-radius: var(--r-pill);
+  background: color-mix(in srgb, var(--ink) 14%, transparent);
+  overflow: hidden;
+}
+.meter__fill {
+  display: block;
+  height: 100%;
+  width: var(--pct, 0%);
+  border-radius: inherit;
+  /* Progress is a good thing, so it reads in the positive tone, not the alert one. */
+  background: linear-gradient(90deg, var(--positive), color-mix(in srgb, var(--positive) 58%, #FFFFFF));
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 1.1s var(--ease) .28s;
+}
+.js .record.is-in .meter__fill { transform: scaleX(1); }
+
+/* A rising score is a gain. Green, with an up arrow to say so twice. */
+.delta {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 13px;
+  border-radius: var(--r-pill);
+  background: var(--positive-wash);
+  color: var(--positive);
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: .92rem;
+  font-variant-numeric: tabular-nums;
+}
+.delta__arrow { font-size: .85em; }
+.delta b { font-weight: 700; }
+
+.record__foot {
+  padding: 14px 26px 18px;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: .82rem;
+}
+
+.progress__side { display: flex; flex-direction: column; gap: 20px; }
+
+/* ── Teacher note ─────────────────────────────────────────────────────────── */
+
+/* Solid, not glass. Over this section's near-flat background a backdrop-filter would
+   change nothing visible, and a card full of specific feedback wants maximum legibility.
+   The lift comes from hierarchy and a warm corner wash instead. */
+.note {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-card);
+  padding: 26px;
+  box-shadow: var(--shadow);
+  transition: transform .4s var(--ease), box-shadow .4s var(--ease);
+}
+.note:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); }
+
+.note__wash {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(78% 104% at 100% 0%, var(--accent-wash), transparent 64%);
+}
+
+.note__head {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--line-soft);
+}
+.note__avatar {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  width: 44px; height: 44px;
+  border-radius: var(--r-pill);
+  background: var(--accent-wash);
+  color: var(--accent);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: .9rem;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 11%, transparent);
+}
+.note__who { display: flex; flex-direction: column; line-height: 1.32; min-width: 0; }
+.note__who b { font-family: var(--font-display); font-weight: 600; font-size: 1rem; }
+.note__who span { color: var(--muted); font-size: .85rem; }
+
+.note__body {
+  margin-top: 20px;
+  font-family: var(--font-display);
+  font-size: 1.22rem;
+  font-weight: 500;
+  line-height: 1.42;
+  letter-spacing: -0.022em;
+  text-wrap: pretty;
+}
+
+.note__tags { margin-top: 20px; display: flex; flex-wrap: wrap; gap: 8px; }
+.note__tags li {
+  font-family: var(--font-display);
+  font-size: .79rem;
+  font-weight: 600;
+  color: var(--muted);
+  border: 1px solid var(--line);
+  border-radius: var(--r-pill);
+  padding: 5px 12px;
+}
+/* The one tag that is an instruction rather than a label. */
+.note__tags li.is-action {
+  color: var(--accent);
+  background: var(--accent-wash);
+  border-color: color-mix(in srgb, var(--accent) 34%, var(--line));
+}
+
+.quote {
+  margin: 0;
+  padding: 28px;
+  border-radius: var(--r-card);
+  border: 1px solid var(--line);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+.quote p {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  line-height: 1.48;
+  letter-spacing: -0.018em;
+}
+.quote p::before { content: "\201C"; }
+.quote p::after  { content: "\201D"; }
+.quote cite {
+  display: block;
+  margin-top: 18px;
+  font-style: normal;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: .93rem;
+}
+.quote cite span { display: block; font-weight: 400; color: var(--muted); font-size: .87rem; }
+
+/* ── Teachers rail ────────────────────────────────────────────────────────── */
+
+.teachers { padding-block: var(--section-y); }
+
+.teachers__head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 32px;
+}
+
+.rail-nav { display: flex; gap: 8px; flex-shrink: 0; }
+.rail-btn {
+  width: 44px; height: 44px;
+  display: grid; place-items: center;
+  font-size: 1.05rem;
+  color: var(--ink);
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: var(--r-pill);
+  cursor: pointer;
+  transition: transform .22s var(--ease), background-color .22s var(--ease), border-color .22s var(--ease);
+}
+.rail-btn:hover { background: var(--accent); border-color: var(--accent); color: var(--accent-on); transform: translateY(-2px); }
+.rail-btn:active { transform: scale(.94); }
+
+.rail {
+  margin-top: clamp(36px, 4vw, 52px);
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-padding-left: max(var(--gutter), calc((100vw - var(--wrap)) / 2 + var(--gutter)));
+  padding-inline: max(var(--gutter), calc((100vw - var(--wrap)) / 2 + var(--gutter)));
+  padding-block: 4px 12px;
+  scrollbar-width: none;
+}
+.rail::-webkit-scrollbar { display: none; }
+
+.teacher {
+  flex: 0 0 268px;
+  scroll-snap-align: start;
+  padding: 26px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-card);
+  background: var(--surface);
+  transition: transform .35s var(--ease), box-shadow .35s var(--ease), border-color .35s var(--ease);
+}
+.teacher:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--line));
+}
+
+/* PLACEHOLDER: monogram stands in until real headshots exist. */
+.teacher__mono {
+  display: grid;
+  place-items: center;
+  width: 54px; height: 54px;
+  border-radius: var(--r-pill);
+  background: var(--accent-wash);
+  color: var(--accent);
+  font-family: var(--font-display);
+  font-size: 1.02rem;
+  font-weight: 700;
+  letter-spacing: 0;
+  margin-bottom: 20px;
+}
+.teacher h3 { font-size: 1.16rem; }
+.teacher p  { margin-top: 6px; color: var(--muted); font-size: .95rem; }
+.teacher__grades {
+  display: inline-block;
+  margin-top: 16px;
+  font-family: var(--font-display);
+  font-size: .78rem;
+  font-weight: 600;
+  color: var(--muted);
+  border: 1px solid var(--line);
+  padding: 4px 11px;
+  border-radius: var(--r-pill);
+}
+
+/* ── Closing CTA ──────────────────────────────────────────────────────────── */
+
+.cta { padding-block: var(--section-y); border-top: 1px solid var(--line-soft); }
+.cta__inner { text-align: center; display: flex; flex-direction: column; align-items: center; }
+.cta h2 { font-size: clamp(2.1rem, 4.4vw, 3.3rem); max-width: 16ch; }
+.cta p  { margin-top: 20px; color: var(--muted); font-size: 1.08rem; max-width: 44ch; }
+.cta .btn { margin-top: 34px; }
+
+/* ── Footer ───────────────────────────────────────────────────────────────── */
+
+.footer { border-top: 1px solid var(--line-soft); padding-top: clamp(48px, 6vw, 76px); }
+
+.footer__inner {
+  display: grid;
+  grid-template-columns: 2.1fr repeat(3, 1fr);
+  gap: 40px;
+}
+.footer__brand { display: flex; flex-direction: column; gap: 16px; max-width: 34ch; }
+.footer__brand p { color: var(--muted); font-size: .95rem; }
+
+.footer__col { display: flex; flex-direction: column; gap: 11px; }
+.footer__col h4 {
+  font-size: .82rem;
+  font-weight: 600;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+.footer__col a {
+  font-size: .95rem;
+  color: var(--ink);
+  width: fit-content;
+  transition: color .22s var(--ease);
+}
+.footer__col a:hover { color: var(--accent); }
+
+.footer__base {
+  margin-top: clamp(44px, 5vw, 68px);
+  padding-block: 24px;
+  border-top: 1px solid var(--line-soft);
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  color: var(--muted);
+  font-size: .87rem;
+}
+.footer__base a { margin-left: 16px; transition: color .22s var(--ease); }
+.footer__base a:hover { color: var(--ink); }
+
+/* ── Scroll reveal ────────────────────────────────────────────────────────── */
+/* Gated on .js so the page is fully readable if the script never runs. */
+
+.js [data-reveal] {
+  opacity: 0;
+  transform: translateY(18px);
+  transition:
+    opacity   .72s var(--ease) calc(var(--i, 0) * 85ms),
+    transform .72s var(--ease) calc(var(--i, 0) * 85ms);
+}
+.js [data-reveal].is-in { opacity: 1; transform: none; }
+
+/* ── Split headline scaffolding ───────────────────────────────────────────── */
+
+.word {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: top;
+  padding-bottom: .16em;
+  margin-bottom: -.16em;
+}
+.word__inner { display: inline-block; }
+
+/* ── Scroll-linked motion ─────────────────────────────────────────────────────
+   Above, [data-reveal] is a one-shot IntersectionObserver fade. That is the
+   fallback. Where the browser supports scroll-driven animations, the reveal is
+   replaced by a timeline tied to the element's own passage through the viewport:
+   it morphs IN as it rises and OUT as it leaves, and it is scrubbable, so scrolling
+   back up plays it backwards. No JS, no library, and it runs off the main thread.
+
+   Nothing blurs. A moving soft edge does the work instead, so text is legible at
+   every frame of its arrival.
+   ───────────────────────────────────────────────────────────────────────────── */
+
+/* Registered so the mask stop can actually interpolate. Without @property a custom
+   property animates as a discrete swap, not a sweep. The initial value is the fully
+   revealed state, so anything that never animates simply shows. */
+@property --reveal {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 132%;
+}
+
+/* The reveal: a soft edge sweeps up the element while the content rises to meet it.
+   Type stays at full opacity and full sharpness the whole way, which is the entire
+   point. The previous version blurred and faded text mid-flight, so every element
+   spent its arrival as an unreadable smear. */
+@keyframes veil-in {
+  from { --reveal: 0%;   transform: translateY(28px); }
+  to   { --reveal: 132%; transform: none; }
+}
+
+/* Leaving is quieter than arriving, and starts late enough that nothing fades while
+   it is still comfortably readable. */
+@keyframes veil-out {
+  from { opacity: 1; transform: none; }
+  to   { opacity: 0; transform: translateY(-14px); }
+}
+
+/* Words rise out from behind a mask. Same language as the block reveal, one level down. */
+@keyframes word-rise {
+  from { transform: translateY(115%) rotate(2.5deg); opacity: .2; }
+  to   { transform: none; opacity: 1; }
+}
+
+@keyframes hero-drift {
+  from { transform: translateY(-2.5%) scale(1.06); }
+  to   { transform: translateY(3.5%) scale(1.01); }
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+
+    .js [data-reveal] {
+      opacity: 1;
+      transform: none;
+      transition: none;
+      /* 22% feathered band: a hard stop reads as a wipe, a soft one as emergence. */
+      -webkit-mask-image: linear-gradient(to top,
+        #000 0 calc(var(--reveal) - 22%), transparent var(--reveal));
+      mask-image: linear-gradient(to top,
+        #000 0 calc(var(--reveal) - 22%), transparent var(--reveal));
+      animation: veil-in linear both, veil-out linear forwards;
+      animation-timeline: view(), view();
+      /* --i staggers siblings by shifting where each one's range opens. */
+      animation-range:
+        entry calc(4% + var(--i, 0) * 3%) entry calc(56% + var(--i, 0) * 3%),
+        exit 55% exit 100%;
+    }
+
+    /* The step list is only a trigger for the rail; it must not morph as a block. */
+    .js .steps[data-reveal] { animation: none; }
+
+
+    .word__inner {
+      animation: word-rise linear both;
+      animation-timeline: view();
+      animation-range:
+        entry calc(2% + var(--w, 0) * 2.4%)
+        entry calc(46% + var(--w, 0) * 2.4%);
+    }
+
+    /* Parallax: the hero image drifts against the scroll, which gives the top of the
+       page depth without moving anything the eye is reading. */
+    .hero__media img {
+      animation: hero-drift linear both;
+      animation-timeline: view();
+      animation-range: entry 0% exit 100%;
+    }
+  }
+}
+
+/* ── Responsive ───────────────────────────────────────────────────────────── */
+
+@media (max-width: 1024px) {
+  .nav__links { display: none; }
+  .nav__login { display: none; }
+  .burger { display: grid; }
+  .mobile-menu { display: flex; }
+  .mobile-menu[hidden] { display: none; }
+
+  .hero__inner { grid-template-columns: 1fr; }
+  .hero__media { order: -1; }
+  .hero__media img { height: min(38vh, 320px); }
+  .hero__title { max-width: 100%; }
+
+  .tile, .tile--photo, .tile--block, .tile--photo-sm { grid-column: span 6; grid-row: auto; }
+  .tile--photo { min-height: 340px; }
+
+  .progress__grid { grid-template-columns: 1fr; }
+  .footer__inner { grid-template-columns: 1fr 1fr; }
+}
+
+@media (max-width: 768px) {
+  body { font-size: 16px; }
+
+  .facts__inner { grid-template-columns: 1fr; gap: 12px; }
+  .fact { padding: 17px 19px; }
+  .fact__mark { font-size: 1.5rem; margin-bottom: 6px; }
+
+  .tile, .tile--photo, .tile--block, .tile--photo-sm { grid-column: span 12; }
+
+  .teachers__head { flex-direction: column; align-items: flex-start; gap: 24px; }
+  .rail { scroll-padding-left: var(--gutter); padding-inline: var(--gutter); }
+  .teacher { flex-basis: 78vw; }
+
+  .footer__inner { grid-template-columns: 1fr; gap: 32px; }
+  .footer__base { flex-direction: column; }
+  .footer__base a { margin-left: 0; margin-right: 16px; }
+}
+
+/* Timeline goes 4-col straight to 1-col. A 2-col grid would leave step 2's connector
+   pointing at the end of the row instead of at the next node. */
+@media (max-width: 960px) {
+  .steps { grid-template-columns: 1fr; gap: 0; }
+  .steps::before { display: none; }   /* vertical fallback uses .step__link */
+
+  .step {
+    display: grid;
+    grid-row: auto;
+    grid-template-rows: auto auto;
+    grid-template-columns: 56px 1fr;
+    grid-template-areas:
+      "node title"
+      "node body";
+    column-gap: 20px;
+    padding-bottom: 30px;
+    justify-items: start;
+    text-align: left;
+  }
+  .step__node { grid-area: node; }
+  .step h3 { grid-area: title; margin-top: 13px; max-width: 52ch; }
+  .step p  { grid-area: body;  max-width: 52ch; }
+  .step p { max-width: 52ch; }
+
+  /* Connector rotates to vertical: runs down the gutter to the next node. */
+  .step__link {
+    top: 68px;
+    bottom: -12px;
+    left: 27px;
+    right: auto;
+    width: 2px;
+    height: auto;
+  }
+  .step__link::after { transform: scaleY(0); transform-origin: top; }
+  .js .step.is-in .step__link::after { transform: scaleY(1); }
+}
+
+@media (max-width: 640px) {
+  .record__head, .record__group, .record__row, .record__foot { padding-inline: 18px; }
+  .record__group { padding-inline: 0; }
+  .record__row { flex-wrap: wrap; gap: 6px; }
+
+  /* The meter gets its own full-width line. width:100% inside a shrink-to-fit flex
+     parent resolves against an auto width and collapses the bar to nothing. */
+  .record__meterwrap { width: 100%; }
+  .meter { width: auto; flex: 1 1 auto; }
+}
+
+/* ── Reduced motion ───────────────────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+
+  *, *::before, *::after {
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important;
+  }
+
+  .js [data-reveal] { opacity: 1; transform: none; }
+  .steps::before { transform: scaleX(1) !important; }
+  .nav__indicator { transition: opacity .001ms !important; }
+  /* These start at scale 0, so "no animation" has to mean "already drawn". */
+  .step__link::after { transform: scaleX(1) !important; }
+  .meter__fill { transform: scaleX(1) !important; }
+  .spotlight::before { display: none; }
+  .ripple { display: none; }
+  .tile:hover, .teacher:hover, .btn:hover { transform: none; }
+}
+
+/* ── Reduced transparency ─────────────────────────────────────────────────── */
+
+@media (prefers-reduced-transparency: reduce) {
+  .nav.is-stuck .nav__bar,
+  .nav__bar.is-open {
+    background: var(--paper);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border-color: var(--line);
+    box-shadow: var(--shadow);
+  }
+  /* The rim is an inset shadow on the glass, so the solid fallback needs a real
+     border put back, and the specular/chromatic layers stripped. */
+  .glass {
+    background: var(--surface);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border: 1px solid var(--line);
+    box-shadow: var(--shadow);
+  }
+  /* The chips over photography keep white text, so they need a dark solid fill here.
+     Falling back to --surface would put white text on a light chip. */
+  .tile--photo .tile__grade.glass {
+    background: rgba(var(--scrim), .82);
+    border-color: rgba(255, 255, 255, .28);
+  }
+  .glass::before, .glass::after,
+  .nav__bar::before, .nav__bar::after { display: none; }
+}
