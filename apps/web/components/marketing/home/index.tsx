@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server";
 import type { Locale } from "@app/i18n/config";
 import { localHref } from "./content";
 import {
@@ -7,6 +8,12 @@ import {
   type ClassroomCopy,
   type SubjectCopy,
 } from "./compact-home";
+import {
+  GroupLessonsStrip,
+  ParentPreviewStrip,
+  type GroupLessonsCopy,
+  type ParentPreviewCopy,
+} from "./home-sections";
 import { Hero } from "./hero";
 import styles from "./compact-home.module.css";
 
@@ -15,49 +22,48 @@ import styles from "./compact-home.module.css";
  * identity; the public surfaces now share one stack (Instrument Sans / Atkinson Hyperlegible /
  * Noto Sans Armenian) loaded once in `app/(marketing)/layout.tsx` from `../fonts.ts`. Loading a
  * fourth family here would have shipped an extra font download for a page that no longer uses it.
+ *
+ * This page runs a single face out of that stack — see the header of `compact-home.module.css`.
  */
 interface HomeCopy {
   hero: {
-    eyebrow: string;
     titleLead: string;
     titleAccent: string;
-    description: string;
-    primary: string;
-    secondary: string;
-    trust: readonly string[];
-    socialProof: string;
+    /*
+     * What replaced the hero paragraph. Four differentiators, each a fragment rather than a
+     * sentence — these are the things 2tor does that a generic tutoring listing does not, so they
+     * earn the space a description of the category would have wasted.
+     */
+    differentiators: readonly string[];
+    courses: string;
   };
   classroom: ClassroomCopy;
   subjects: Omit<SubjectCopy, "items"> & {
     items: readonly Omit<SubjectCopy["items"][number], "href">[];
   };
   benefits: BenefitsCopy;
+  group: GroupLessonsCopy;
+  parents: ParentPreviewCopy;
 }
 
 const copy: Record<Locale, HomeCopy> = {
   en: {
     hero: {
-      eyebrow: "Personal online learning",
       titleLead: "Big goals start with",
       titleAccent: "one good lesson.",
-      description:
-        "Live, personalized classes with tutors who notice where your child gets stuck, adapt in real time, and keep parents informed after every lesson.",
-      primary: "Find my tutor",
-      secondary: "Take a free assessment",
-      trust: [
-        "Verified expert tutors",
-        "Parent-visible progress",
-        "US-aligned curriculum",
-        "Safe by design",
+      differentiators: [
+        "Anti-cheating system",
+        "Group classes",
+        "Office hours outside class",
+        "Daily feedback from your tutor",
       ],
-      socialProof: "Trusted by families learning across the US",
+      courses: "Explore courses",
     },
     classroom: {
       ariaLabel:
-        "2tor classroom preview, cycling through a mathematics, Armenian, and chess lesson with parent progress tools",
+        "2tor classroom preview, cycling through a mathematics, programming, Armenian, and chess lesson, each with the tutor's note afterwards",
       live: "Live lesson",
-      wins: "3 learning wins this week",
-      streak: "4 week streak",
+      courses: "Courses",
       subjects: [
         {
           key: "math",
@@ -67,7 +73,6 @@ const copy: Record<Locale, HomeCopy> = {
           tutorInitial: "A",
           topic: "Visual equations",
           prompt: "Balance both sides",
-          confidence: "Confidence improved by 18%",
           note: {
             author: "Anna Ghazaryan",
             initials: "AG",
@@ -79,6 +84,24 @@ const copy: Record<Locale, HomeCopy> = {
           },
         },
         {
+          key: "programming",
+          label: "Programming",
+          lesson: "Programming: Loops",
+          tutor: "Davit · Today at 5:00 PM",
+          tutorInitial: "D",
+          topic: "Loops",
+          prompt: "Repeat with purpose",
+          note: {
+            author: "Davit Sargsyan",
+            initials: "DS",
+            role: "Note after today's lesson",
+            body: "Wrote the loop unprompted. Still forgets to check the exit condition.",
+            action: "1 mini project",
+            topic: "While loops",
+            status: "Summary sent to parents",
+          },
+        },
+        {
           key: "armenian",
           label: "Armenian",
           lesson: "Armenian: Reading and writing",
@@ -86,7 +109,6 @@ const copy: Record<Locale, HomeCopy> = {
           tutorInitial: "Ս",
           topic: "The alphabet",
           prompt: "Sound out each letter",
-          confidence: "Reading fluency improved by 22%",
           note: {
             author: "Siranush Petrosyan",
             initials: "SP",
@@ -105,7 +127,6 @@ const copy: Record<Locale, HomeCopy> = {
           tutorInitial: "Տ",
           topic: "Knight tactics",
           prompt: "Find the fork",
-          confidence: "Puzzle accuracy improved by 15%",
           note: {
             author: "Tigran Hakobyan",
             initials: "TH",
@@ -126,19 +147,24 @@ const copy: Record<Locale, HomeCopy> = {
         {
           key: "math",
           name: "Mathematics",
-          description: "Build confidence through visual problem solving",
+          description: "Build confidence through visual problem solving.",
+        },
+        {
+          key: "programming",
+          name: "Programming",
+          description: "Make it, test it, explain it, improve it. One real project at a time.",
         },
         {
           key: "armenian",
-          name: "Armenian Heritage",
-          description: "Language, culture, and heritage",
+          name: "Armenian Language & Culture",
+          description: "Read, write, and speak the language, with the culture behind it.",
+        },
+        {
+          key: "chess",
+          name: "Chess",
+          description: "Tactics, patience, and thinking two moves ahead.",
         },
       ],
-      comingSoon: {
-        badge: "Coming soon",
-        title: "More subjects on the way",
-        description: "New subjects are added regularly.",
-      },
     },
     benefits: {
       eyebrow: "The complete learning loop",
@@ -164,32 +190,64 @@ const copy: Record<Locale, HomeCopy> = {
           title: "Practice that continues after class",
           body: "Homework, projects, and weekly problem-solving sessions reinforce learning.",
         },
+        {
+          key: "availability",
+          signal: "Outside class hours",
+          title: "Office hours, not just lessons",
+          body: "Tutors keep open office hours between sessions. A student who gets stuck on a Tuesday does not have to stay stuck until Thursday.",
+        },
       ],
+    },
+    group: {
+      eyebrow: "Small-group learning",
+      title: "Or learn alongside two or three others.",
+      body: "Groups are matched by subject, level, and goal, not by whichever slot happened to be free. The same verified tutors, at around 40% less than one to one.",
+      points: [
+        "Two to four students per group",
+        "Matched by level, not by age",
+        "Around 40% lower cost",
+      ],
+      cta: "See how matching works",
+      seatsLabel: "2 to 4 students",
+      seatsAriaLabel: "A group of two to four students, shown as four seats with three taken",
+    },
+    parents: {
+      eyebrow: "For parents",
+      title: "See what happened, without having to ask.",
+      body: "The parent view gathers the next class, the current goal, homework status, and the tutor's latest note in one place, so you are not reconstructing the week out of messages.",
+      cta: "See the parent view",
+      dashboard: {
+        ariaLabel:
+          "Sample parent view showing the next class, current goal, homework status, and latest tutor note",
+        label: "Parent view",
+        child: "Ani \u00b7 Grade 6",
+        tabs: ["Overview", "Feedback", "Homework", "Progress", "Schedule"],
+        rows: [
+          { label: "Next class", value: "Tomorrow, 4:00 PM" },
+          { label: "Current goal", value: "Fractions with unlike denominators" },
+          { label: "Homework", value: "Submitted, awaiting review" },
+          { label: "Latest note", value: "Solid grasp of the method." },
+        ],
+      },
     },
   },
   hy: {
     hero: {
-      eyebrow: "Անհատական առցանց ուսուցում",
       titleLead: "Մեծ նպատակները սկսվում են",
       titleAccent: "մեկ լավ դասից։",
-      description:
-        "Անհատական ուղիղ դասեր ուսուցիչների հետ, որոնք նկատում են դժվարությունը, անմիջապես փոխում բացատրությունը և յուրաքանչյուր դասից հետո տեղեկացնում ծնողներին։",
-      primary: "Գտնել իմ ուսուցչին",
-      secondary: "Անցնել անվճար գնահատում",
-      trust: [
-        "Ստուգված մասնագետներ",
-        "Ծնողին տեսանելի առաջընթաց",
-        "ԱՄՆ ծրագրին համապատասխան",
-        "Անվտանգ միջավայր",
+      differentiators: [
+        "Խաբեության դեմ համակարգ",
+        "Խմբային դասեր",
+        "Բաց ժամեր դասից դուրս",
+        "Ամենօրյա արձագանք ուսուցչից",
       ],
-      socialProof: "ԱՄՆ-ում սովորող ընտանիքների վստահելի ընտրությունը",
+      courses: "Դիտել դասընթացները",
     },
     classroom: {
       ariaLabel:
-        "2tor-ի դասասենյակի օրինակ՝ մաթեմատիկայի, հայերենի և շախմատի դասերով և առաջընթացի գործիքներով",
+        "2tor-ի դասասենյակի օրինակ՝ մաթեմատիկայի, ծրագրավորման, հայերենի և շախմատի դասերով և յուրաքանչյուրից հետո ուսուցչի նշումով",
       live: "Ուղիղ դաս",
-      wins: "3 ուսումնական հաջողություն այս շաբաթ",
-      streak: "4 շաբաթ անընդմեջ",
+      courses: "Դասընթացներ",
       subjects: [
         {
           key: "math",
@@ -199,7 +257,6 @@ const copy: Record<Locale, HomeCopy> = {
           tutorInitial: "Ա",
           topic: "Տեսողական հավասարումներ",
           prompt: "Հավասարակշռիր երկու կողմերը",
-          confidence: "Վստահությունն աճել է 18%-ով",
           note: {
             author: "Աննա Ղազարյան",
             initials: "ԱՂ",
@@ -211,6 +268,24 @@ const copy: Record<Locale, HomeCopy> = {
           },
         },
         {
+          key: "programming",
+          label: "Ծրագրավորում",
+          lesson: "Ծրագրավորում․ ցիկլեր",
+          tutor: "Դավիթ · Այսօր՝ 17։00",
+          tutorInitial: "Դ",
+          topic: "Ցիկլեր",
+          prompt: "Կրկնիր նպատակով",
+          note: {
+            author: "Դավիթ Սարգսյան",
+            initials: "ԴՍ",
+            role: "Նշում այսօրվա դասից հետո",
+            body: "Ցիկլը գրեց ինքնուրույն։ Դեռ մոռանում է ստուգել ելքի պայմանը։",
+            action: "1 փոքր նախագիծ",
+            topic: "While ցիկլեր",
+            status: "Ամփոփումն ուղարկված է ծնողին",
+          },
+        },
+        {
           key: "armenian",
           label: "Հայերեն",
           lesson: "Հայերեն․ ընթերցանություն և գիր",
@@ -218,7 +293,6 @@ const copy: Record<Locale, HomeCopy> = {
           tutorInitial: "Ս",
           topic: "Այբուբենը",
           prompt: "Հնչյունավորիր յուրաքանչյուր տառը",
-          confidence: "Ընթերցանության սահունությունն աճել է 22%-ով",
           note: {
             author: "Սիրանուշ Պետրոսյան",
             initials: "ՍՊ",
@@ -237,7 +311,6 @@ const copy: Record<Locale, HomeCopy> = {
           tutorInitial: "Տ",
           topic: "Ձիու մարտավարություն",
           prompt: "Գտիր պատառաքաղը",
-          confidence: "Խնդիրների ճշգրտությունն աճել է 15%-ով",
           note: {
             author: "Տիգրան Հակոբյան",
             initials: "ՏՀ",
@@ -258,19 +331,24 @@ const copy: Record<Locale, HomeCopy> = {
         {
           key: "math",
           name: "Մաթեմատիկա",
-          description: "Վստահություն՝ տեսողական խնդիրների միջոցով",
+          description: "Վստահություն՝ տեսողական խնդիրների միջոցով։",
+        },
+        {
+          key: "programming",
+          name: "Ծրագրավորում",
+          description: "Ստեղծել, փորձարկել, բացատրել, բարելավել՝ մեկ իրական նախագծով։",
         },
         {
           key: "armenian",
-          name: "Հայոց ժառանգություն",
-          description: "Լեզու, մշակույթ և ժառանգություն",
+          name: "Հայոց լեզու և մշակույթ",
+          description: "Կարդալ, գրել և խոսել՝ մշակույթի հետ միասին։",
+        },
+        {
+          key: "chess",
+          name: "Շախմատ",
+          description: "Մարտավարություն, համբերություն և երկու քայլ առաջ մտածելը։",
         },
       ],
-      comingSoon: {
-        badge: "Շուտով",
-        title: "Ավելի շատ առարկաներ՝ ճանապարհին",
-        description: "Նոր առարկաներ պարբերաբար ավելացվում են։",
-      },
     },
     benefits: {
       eyebrow: "Ուսուցման ամբողջական շղթա",
@@ -296,17 +374,90 @@ const copy: Record<Locale, HomeCopy> = {
           title: "Շարունակվող վարժանք",
           body: "Տնային աշխատանքը, նախագծերը և շաբաթական հանդիպումները ամրապնդում են գիտելիքը։",
         },
+        {
+          key: "availability",
+          signal: "Դասից դուրս ժամերին",
+          title: "Բաց ժամեր, ոչ միայն դասեր",
+          body: "Ուսուցիչները դասերի միջև ունեն բաց ժամեր։ Երեքշաբթի դժվարացած սովորողը ստիպված չէ սպասել մինչև հինգշաբթի։",
+        },
       ],
+    },
+    group: {
+      eyebrow:
+        "\u0553\u0578\u0584\u0580 \u056d\u0574\u0562\u0578\u057e \u0578\u0582\u057d\u0578\u0582\u0581\u0578\u0582\u0574",
+      title:
+        "\u053f\u0561\u0574 \u057d\u0578\u057e\u0578\u0580\u056b\u0580 \u0587\u057d \u0565\u0580\u056f\u0578\u0582-\u0565\u0580\u0565\u0584 \u0570\u0578\u0563\u0578\u0582 \u0570\u0565\u057f\u0589",
+      body: "\u053d\u0574\u0562\u0565\u0580\u0568 \u056f\u0561\u0566\u0574\u057e\u0578\u0582\u0574 \u0565\u0576 \u0568\u057d\u057f \u0561\u057c\u0561\u0580\u056f\u0561\u0575\u056b, \u0574\u0561\u056f\u0561\u0580\u0564\u0561\u056f\u056b \u0587 \u0576\u057a\u0561\u057f\u0561\u056f\u056b, \u0578\u0579 \u0569\u0565 \u0568\u057d\u057f \u0561\u0566\u0561\u057f \u056a\u0561\u0574\u056b\u0589 \u0546\u0578\u0582\u0575\u0576 \u057d\u057f\u0578\u0582\u0563\u057e\u0561\u056e \u0578\u0582\u057d\u0578\u0582\u0581\u056b\u0579\u0576\u0565\u0580\u0568\u055d \u0574\u0578\u057f 40%-\u0578\u057e \u0561\u057e\u0565\u056c\u056b \u0574\u0561\u057f\u0579\u0565\u056c\u056b, \u0584\u0561\u0576 \u0561\u0576\u0570\u0561\u057f\u0561\u056f\u0561\u0576 \u0564\u0561\u057d\u0565\u0580\u0568\u0589",
+      points: [
+        "\u0535\u0580\u056f\u0578\u0582\u057d\u056b\u0581 \u0579\u0578\u0580\u057d \u057d\u0578\u057e\u0578\u0580\u0578\u0572 \u056d\u0574\u0562\u0578\u0582\u0574",
+        "\u0540\u0561\u0574\u0561\u057a\u0561\u057f\u0561\u057d\u056d\u0561\u0576\u0565\u0581\u0578\u0582\u0574 \u0568\u057d\u057f \u0574\u0561\u056f\u0561\u0580\u0564\u0561\u056f\u056b, \u0578\u0579 \u0569\u0565 \u057f\u0561\u0580\u056b\u0584\u056b",
+        "\u0544\u0578\u057f 40%-\u0578\u057e \u0581\u0561\u056e\u0580 \u0561\u0580\u056a\u0565\u0584",
+      ],
+      cta: "\u054f\u0565\u057d\u0576\u0565\u056c, \u0569\u0565 \u056b\u0576\u0579\u057a\u0565\u057d \u0567 \u056f\u0561\u0566\u0574\u057e\u0578\u0582\u0574 \u056d\u0578\u0582\u0574\u0562\u0568",
+      seatsLabel: "2-\u056b\u0581 4 \u057d\u0578\u057e\u0578\u0580\u0578\u0572",
+      seatsAriaLabel:
+        "\u0535\u0580\u056f\u0578\u0582\u057d\u056b\u0581 \u0579\u0578\u0580\u057d \u057d\u0578\u057e\u0578\u0580\u0578\u0572\u056b \u056d\u0578\u0582\u0574\u0562\u055d \u0579\u0578\u0580\u057d \u057f\u0565\u0572\u0578\u057e, \u0578\u0580\u0578\u0576\u0581\u056b\u0581 \u0565\u0580\u0565\u0584\u0568 \u0566\u0562\u0561\u0572\u057e\u0561\u056e \u0567",
+    },
+    parents: {
+      eyebrow: "\u053e\u0576\u0578\u0572\u0576\u0565\u0580\u056b \u0570\u0561\u0574\u0561\u0580",
+      title:
+        "\u054f\u0565\u057d\u0565\u0584, \u0569\u0565 \u056b\u0576\u0579 \u0567 \u0565\u0572\u0565\u056c\u055d \u0561\u057c\u0561\u0576\u0581 \u0570\u0561\u0580\u0581\u0576\u0565\u056c\u0578\u0582\u0589",
+      body: "\u053e\u0576\u0578\u0572\u056b \u0567\u057b\u0578\u0582\u0574 \u0574\u0565\u056f \u057f\u0565\u0572\u0578\u0582\u0574 \u0570\u0561\u057e\u0561\u0584\u057e\u0561\u056e \u0565\u0576 \u0570\u0561\u057b\u0578\u0580\u0564 \u0564\u0561\u057d\u0568, \u0568\u0576\u0569\u0561\u0581\u056b\u056f \u0576\u057a\u0561\u057f\u0561\u056f\u0568, \u057f\u0576\u0561\u0575\u056b\u0576 \u0561\u0577\u056d\u0561\u057f\u0561\u0576\u0584\u056b \u056f\u0561\u0580\u0563\u0561\u057e\u056b\u0573\u0561\u056f\u0568 \u0587 \u0578\u0582\u057d\u0578\u0582\u0581\u0579\u056b \u057e\u0565\u0580\u057b\u056b\u0576 \u0576\u0577\u0578\u0582\u0574\u0568\u0589",
+      cta: "\u054f\u0565\u057d\u0576\u0565\u056c \u056e\u0576\u0578\u0572\u056b \u0567\u057b\u0568",
+      dashboard: {
+        ariaLabel:
+          "\u053e\u0576\u0578\u0572\u056b \u0567\u057b\u056b \u0585\u0580\u056b\u0576\u0561\u056f\u055d \u0570\u0561\u057b\u0578\u0580\u0564 \u0564\u0561\u057d\u0578\u057e, \u0568\u0576\u0569\u0561\u0581\u056b\u056f \u0576\u057a\u0561\u057f\u0561\u056f\u0578\u057e, \u057f\u0576\u0561\u0575\u056b\u0576 \u0561\u0577\u056d\u0561\u057f\u0561\u0576\u0584\u056b \u056f\u0561\u0580\u0563\u0561\u057e\u056b\u0573\u0561\u056f\u0578\u057e \u0587 \u0578\u0582\u057d\u0578\u0582\u0581\u0579\u056b \u057e\u0565\u0580\u057b\u056b\u0576 \u0576\u0577\u0578\u0582\u0574\u0578\u057e",
+        label: "\u053e\u0576\u0578\u0572\u056b \u0567\u057b",
+        child:
+          "\u0531\u0576\u056b \u00b7 6-\u0580\u0564 \u0564\u0561\u057d\u0561\u0580\u0561\u0576",
+        tabs: [
+          "\u0538\u0576\u0564\u0570\u0561\u0576\u0578\u0582\u0580",
+          "\u0531\u0580\u0571\u0561\u0563\u0561\u0576\u0584",
+          "\u054f\u0576\u0561\u0575\u056b\u0576",
+          "\u0531\u057c\u0561\u057b\u0568\u0576\u0569\u0561\u0581",
+          "\u0534\u0561\u057d\u0561\u0581\u0578\u0582\u0581\u0561\u056f",
+        ],
+        rows: [
+          {
+            label: "\u0540\u0561\u057b\u0578\u0580\u0564 \u0564\u0561\u057d\u0568",
+            value: "\u054e\u0561\u0572\u0568\u055d 16\u056900",
+          },
+          {
+            label:
+              "\u0538\u0576\u0569\u0561\u0581\u056b\u056f \u0576\u057a\u0561\u057f\u0561\u056f\u0568",
+            value:
+              "\u054f\u0561\u0580\u0562\u0565\u0580 \u0570\u0561\u0575\u057f\u0561\u0580\u0561\u0580\u0576\u0565\u0580\u0578\u057e \u056f\u0578\u057f\u0578\u0580\u0561\u056f\u0576\u0565\u0580",
+          },
+          {
+            label: "\u054f\u0576\u0561\u0575\u056b\u0576",
+            value:
+              "\u0548\u0582\u0572\u0561\u0580\u056f\u057e\u0561\u056e \u0567, \u057d\u057a\u0561\u057d\u0578\u0582\u0574 \u0567 \u057d\u057f\u0578\u0582\u0563\u0574\u0561\u0576",
+          },
+          {
+            label: "\u054e\u0565\u0580\u057b\u056b\u0576 \u0576\u0577\u0578\u0582\u0574\u0568",
+            value:
+              "\u0535\u0572\u0561\u0576\u0561\u056f\u0568 \u0575\u0578\u0582\u0580\u0561\u0581\u0580\u0565\u056c \u0567 \u057e\u057d\u057f\u0561\u0570\u0589",
+          },
+        ],
+      },
     },
   },
 };
 
+/*
+ * Every one of these is a real, publicly reachable marketing page — `/chess` was added alongside
+ * this card (`seo.ts` `pageSlugs`, `marketing-site.tsx` `pageKey`, `proxy.ts` `PUBLIC_PATHS`, and
+ * `pages.chess.*` in both message catalogues). A card pointing at an unregistered path would not
+ * 404; `proxy.ts` is deny-by-default, so it would bounce a logged-out visitor to `/login`.
+ */
 const subjectPaths: Record<HomeCopy["subjects"]["items"][number]["key"], string> = {
   math: "/mathematics",
+  programming: "/programming",
   armenian: "/armenian-language-heritage",
+  chess: "/chess",
 };
 
-export function HomePageContent({ locale }: { locale: Locale }) {
+export async function HomePageContent({ locale }: { locale: Locale }) {
   const content = copy[locale];
   const subjects: SubjectCopy = {
     ...content.subjects,
@@ -316,24 +467,30 @@ export function HomePageContent({ locale }: { locale: Locale }) {
     })),
   };
 
+  /*
+   * The consultation label is read from the shared marketing catalogue rather than restated in the
+   * copy record above, because the hero's primary button IS the header's button — same component
+   * styles, same destination. Two copies of the string would drift the moment one is reworded.
+   */
+  const t = await getTranslations({ locale, namespace: "marketing" });
+
   return (
     <div className={styles.page}>
       <Hero
-        eyebrow={content.hero.eyebrow}
         titleLead={content.hero.titleLead}
         titleAccent={content.hero.titleAccent}
-        description={content.hero.description}
-        primaryCta={{ label: content.hero.primary, href: "#courses" }}
-        secondaryCta={{
-          label: content.hero.secondary,
-          href: localHref(locale, "/free-assessment"),
+        differentiators={content.hero.differentiators}
+        consultationCta={{
+          label: t("site.actions.consultation"),
+          href: localHref(locale, "/consultation"),
         }}
-        trust={content.hero.trust}
-        socialProof={content.hero.socialProof}
+        coursesCta={{ label: content.hero.courses, href: "#courses" }}
         classroom={content.classroom}
       />
       <SubjectExplorer copy={subjects} />
       <LearningBenefits copy={content.benefits} />
+      <GroupLessonsStrip copy={content.group} href={localHref(locale, "/group-lessons")} />
+      <ParentPreviewStrip copy={content.parents} href={localHref(locale, "/parents")} />
     </div>
   );
 }

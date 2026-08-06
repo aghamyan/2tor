@@ -18,6 +18,7 @@ export const pageKey: Record<MarketingSlug, string> = {
   mathematics: "mathematics",
   programming: "programming",
   "armenian-language-heritage": "armenianHeritage",
+  chess: "chess",
   sat: "sat",
   toefl: "toefl",
   "group-lessons": "groupLessons",

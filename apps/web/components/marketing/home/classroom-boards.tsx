@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import styles from "./compact-home.module.css";
 
 /**
- * The three whiteboard artworks behind the rotating hero lesson card.
+ * The four whiteboard artworks behind the rotating hero lesson card.
  *
  * Each one is drawn, not photographed and not a screenshot of a real product surface — the same
  * rule the rest of this page follows. They share one visual language: strokes that draw themselves
@@ -17,7 +17,7 @@ import styles from "./compact-home.module.css";
 
 const ease = [0.22, 1, 0.36, 1] as const;
 
-export type BoardKey = "math" | "armenian" | "chess";
+export type BoardKey = "math" | "programming" | "armenian" | "chess";
 
 interface BoardProps {
   reduceMotion: boolean | null;
@@ -69,6 +69,111 @@ export function MathBoard({ reduceMotion, pace }: BoardProps) {
         initial={{ pathLength: 0 }}
         animate={{ pathLength: 1 }}
         transition={draw(reduceMotion, 0.9, 1.45, pace)}
+      />
+    </svg>
+  );
+}
+
+/**
+ * Programming: a loop taking shape on the board, written line by line.
+ *
+ * Deliberately NOT legible source code. At this size real syntax would be either unreadable or so
+ * large it stops looking like a screen, and it would need translating for `hy` — a whiteboard is
+ * the one surface on this page where the shape of the thing communicates better than its text. So
+ * the lines are drawn strokes whose LENGTH and INDENTATION carry the meaning: a header, an indented
+ * body, a closing line, with the braces written as real characters either side.
+ *
+ * Same grammar as the other three: strokes draw themselves left to right, in the order a person
+ * writes them, and exactly one stroke is accented — here the loop body, which is the line the
+ * lesson is actually about.
+ */
+export function ProgrammingBoard({ reduceMotion, pace }: BoardProps) {
+  /*
+   * x-start, x-end, y. Indentation is the whole point, so these are authored, not generated.
+   * Three code lines and a fourth row that holds only the closing brace — the brace IS that line,
+   * which is why there is no stroke at y=152.
+   */
+  const lines = [
+    { from: 96, to: 244, y: 46, accent: false },
+    { from: 126, to: 300, y: 84, accent: true },
+    { from: 126, to: 232, y: 118, accent: false },
+  ];
+  const gutter = [46, 84, 118, 152];
+  return (
+    <svg className={styles.codeBoard} viewBox="0 0 390 190" aria-hidden="true">
+      {/* Gutter ticks — the line numbers of an editor, reduced to marks. */}
+      {gutter.map((y, index) => (
+        <motion.circle
+          key={`tick-${y}`}
+          className={styles.codeTick}
+          cx={70}
+          cy={y}
+          r={3.2}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={draw(reduceMotion, 0.3, 0.28 + index * 0.1, pace)}
+        />
+      ))}
+
+      {lines.map((line, index) => (
+        <motion.path
+          key={`line-${line.y}`}
+          className={line.accent ? styles.codeLineAccent : styles.codeLine}
+          d={`M${line.from} ${line.y} L${line.to} ${line.y}`}
+          initial={{ pathLength: 0 }}
+          animate={{ pathLength: 1 }}
+          transition={draw(reduceMotion, 0.5, 0.4 + index * 0.22, pace)}
+        />
+      ))}
+
+      {/*
+        The braces. `{` sits just past the end of the header stroke, `}` occupies the last gutter
+        row on its own — the block opening and closing where they actually would.
+
+        Only `opacity` is animated. framer treats `x`/`y` on SVG children as ATTRIBUTES, so
+        animating `y` here would fight the positioning attribute of the same name rather than
+        translating the glyph.
+      */}
+      <motion.text
+        className={styles.codeBrace}
+        x={258}
+        y={58}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={draw(reduceMotion, 0.4, 0.62, pace)}
+      >
+        {"{"}
+      </motion.text>
+      <motion.text
+        className={styles.codeBrace}
+        x={96}
+        y={164}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={draw(reduceMotion, 0.4, 1.3, pace)}
+      >
+        {"}"}
+      </motion.text>
+
+      {/*
+        The caret. The one looping animation on this board, and it only runs once the lines are
+        written — a cursor blinking over an empty board reads as a bug. Reduced motion gets a
+        static caret rather than none, since it marks where the writing stopped.
+      */}
+      <motion.rect
+        className={styles.codeCaret}
+        x={306}
+        y={74}
+        width={3}
+        height={20}
+        rx={1.5}
+        initial={{ opacity: 0 }}
+        animate={reduceMotion ? { opacity: 1 } : { opacity: [0, 1, 1, 0, 0, 1] }}
+        transition={
+          reduceMotion
+            ? { duration: 0 }
+            : { duration: 2.2, delay: 1.15 * pace, repeat: Infinity, ease: "linear" }
+        }
       />
     </svg>
   );
@@ -226,5 +331,6 @@ export function ChessBoard({ reduceMotion, pace }: BoardProps) {
 export function ClassroomBoard({ subject, ...props }: BoardProps & { subject: BoardKey }) {
   if (subject === "armenian") return <ArmenianBoard {...props} />;
   if (subject === "chess") return <ChessBoard {...props} />;
+  if (subject === "programming") return <ProgrammingBoard {...props} />;
   return <MathBoard {...props} />;
 }

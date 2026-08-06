@@ -1,32 +1,63 @@
 import Link from "next/link";
-import { ArrowRight, Check, ClipboardCheck, GraduationCap, ShieldCheck } from "lucide-react";
+import { ArrowRight, CalendarClock, MessageSquareText, ShieldCheck, Users } from "lucide-react";
+import { headerButtonClass } from "../site/header-actions";
+import { ArrowUpRightIcon } from "../site/icons";
+import siteStyles from "../site/site.module.css";
 import { ClassroomPreview, type ClassroomCopy } from "./compact-home";
 import styles from "./compact-home.module.css";
 
 export interface HeroProps {
-  eyebrow: string;
   titleLead: string;
   titleAccent: string;
-  description: string;
-  primaryCta: { label: string; href: string };
-  secondaryCta: { label: string; href: string };
-  trust: readonly string[];
-  socialProof: string;
+  /** The four differentiators that replaced the hero paragraph. Order matches `differentiatorIcons`. */
+  differentiators: readonly string[];
+  consultationCta: { label: string; href: string };
+  coursesCta: { label: string; href: string };
   classroom: ClassroomCopy;
+}
+
+/*
+ * Positional, because the copy record supplies plain strings and the four points are a fixed,
+ * authored set rather than open-ended data. Adding a fifth means adding an icon here, which is the
+ * right amount of friction for a hero.
+ */
+const differentiatorIcons = [ShieldCheck, Users, CalendarClock, MessageSquareText] as const;
+
+/**
+ * Splits the accent phrase into "everything before the last word", "the last word", and any
+ * trailing punctuation.
+ *
+ * The underline is drawn on the last word alone and has to measure exactly that word on every
+ * viewport, so the word needs its own inline-block box — an absolutely positioned rule inside the
+ * whole accent span resolves against a fragmented containing block the moment the phrase wraps,
+ * which is why its width used to drift with the breakpoint.
+ *
+ * `\p{P}` rather than a hand-written character class: Armenian's վերջակետ (`։`, U+0589) is visually
+ * identical to a colon, and a mistyped lookalike would silently leave it inside the underline.
+ */
+function splitAccent(accent: string) {
+  const trimmed = accent.trim();
+  const punctuation = /\p{P}+$/u.exec(trimmed)?.[0] ?? "";
+  const words = trimmed.slice(0, trimmed.length - punctuation.length);
+  const boundary = words.lastIndexOf(" ");
+  return {
+    lead: boundary === -1 ? "" : words.slice(0, boundary + 1),
+    word: boundary === -1 ? words : words.slice(boundary + 1),
+    punctuation,
+  };
 }
 
 /** The headline and primary actions stay server-rendered; only the product demo hydrates. */
 export function Hero({
-  eyebrow,
   titleLead,
   titleAccent,
-  description,
-  primaryCta,
-  secondaryCta,
-  trust,
-  socialProof,
+  differentiators,
+  consultationCta,
+  coursesCta,
   classroom,
 }: HeroProps) {
+  const { lead, word, punctuation } = splitAccent(titleAccent);
+
   return (
     <section className={styles.hero} aria-labelledby="home-title">
       <div className={styles.heroBackdrop} aria-hidden="true">
@@ -39,54 +70,52 @@ export function Hero({
       <div className={styles.heroShell}>
         <div className={styles.heroLayout}>
           <div className={styles.heroCopy}>
-            <p className={styles.heroEyebrow}>
-              <span aria-hidden="true" />
-              {eyebrow}
-            </p>
             <h1 id="home-title" className={styles.heroTitle}>
               {titleLead}{" "}
-              <span>
-                {titleAccent}
-                <i aria-hidden="true" />
+              <span className={styles.heroAccent}>
+                {lead}
+                <span className={styles.heroAccentWord}>
+                  {word}
+                  <i aria-hidden="true" />
+                </span>
+                {punctuation}
               </span>
             </h1>
-            <p className={styles.heroDescription}>{description}</p>
-
-            <div className={styles.heroActions}>
-              <Link href={primaryCta.href} className={styles.primaryAction}>
-                {primaryCta.label}
-                <span>
-                  <ArrowRight size={18} aria-hidden="true" />
-                </span>
-              </Link>
-              <Link href={secondaryCta.href} className={styles.secondaryAction}>
-                <GraduationCap size={18} aria-hidden="true" />
-                {secondaryCta.label}
-              </Link>
-            </div>
-
-            <ul className={styles.trustList} aria-label="Why families choose 2tor">
-              {trust.map((item, index) => (
-                <li key={item}>
-                  {index === 1 ? (
-                    <ClipboardCheck size={15} aria-hidden="true" />
-                  ) : index === 3 ? (
-                    <ShieldCheck size={15} aria-hidden="true" />
-                  ) : (
-                    <Check size={15} aria-hidden="true" />
-                  )}
-                  {item}
-                </li>
-              ))}
+            <ul className={styles.heroPoints}>
+              {differentiators.map((point, index) => {
+                const Icon = differentiatorIcons[index] ?? ShieldCheck;
+                return (
+                  <li key={point}>
+                    <Icon size={17} aria-hidden="true" />
+                    {point}
+                  </li>
+                );
+              })}
             </ul>
 
-            <div className={styles.socialProof}>
-              <div className={styles.avatarStack} aria-hidden="true">
-                <span>MK</span>
-                <span>AS</span>
-                <span>NV</span>
-              </div>
-              <p>{socialProof}</p>
+            <div className={styles.heroActions}>
+              {/*
+               * Deliberately the header's own button, not a copy of it: `headerButtonClass` and
+               * `.buttonPrimary` are the exact two classes `HeaderActionsPanel` composes, so the
+               * accent pill, the travelling sheen, the arrow and the destination all stay in sync
+               * by construction.
+               *
+               * `.scope` has to come along. It is where `site.module.css` declares the
+               * `--site-*` tokens `.buttonPrimary` paints with, and outside the site chrome —
+               * which is exactly where this hero sits — they would otherwise resolve to nothing
+               * and the button would render as bare text.
+               */}
+              <Link
+                href={consultationCta.href}
+                className={`${siteStyles.scope} ${siteStyles.buttonPrimary} ${headerButtonClass} ${styles.heroConsultAction}`}
+              >
+                {consultationCta.label}
+                <ArrowUpRightIcon className={siteStyles.buttonIcon} />
+              </Link>
+              <Link href={coursesCta.href} className={styles.secondaryAction}>
+                {coursesCta.label}
+                <ArrowRight size={17} aria-hidden="true" />
+              </Link>
             </div>
           </div>
 

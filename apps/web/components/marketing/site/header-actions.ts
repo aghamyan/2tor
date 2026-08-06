@@ -1,14 +1,24 @@
 import type { Role, SessionRecord } from "@app/auth";
 
 /**
+ * The structural half of a header action button: layout, hit area and type scale. The visual half
+ * lives in `site.module.css` (`.buttonPrimary` / `.buttonSecondary`).
+ *
+ * Exported because the home hero reuses the consultation button verbatim — same classes, same
+ * styles, same destination — and a second hand-copied utility string would drift from this one the
+ * first time either is touched.
+ */
+export const headerButtonClass =
+  "inline-flex min-h-11 shrink-0 items-center justify-center whitespace-nowrap rounded-xl px-3 text-sm font-semibold";
+
+/**
  * Pure session -> header-state mapping, kept separate from JSX so it can be unit tested directly:
  * apps/web's Vitest config has no JSX transform (see tests/marketing/home/structure.test.ts's
  * file-level comment), so a component can't be rendered in a unit test to verify the
  * logged-in/logged-out branch. This function is what that branch actually depends on.
  */
 export type HeaderAuthState =
-  | { kind: "logged-out" }
-  | { kind: "logged-in"; dashboardHref: string; roleLabelKey: string };
+  { kind: "logged-out" } | { kind: "logged-in"; dashboardHref: string; roleLabelKey: string };
 
 const ROLE_LABEL_KEY: Record<Role, string> = {
   parent: "site.account.role.parent",
