@@ -15,6 +15,7 @@ import {
   type ParentPreviewCopy,
 } from "./home-sections";
 import { Hero } from "./hero";
+import type { ParentsCopy } from "../parents/parents-content";
 import styles from "./compact-home.module.css";
 
 /*
@@ -200,35 +201,37 @@ const copy: Record<Locale, HomeCopy> = {
     },
     group: {
       eyebrow: "Small-group learning",
-      title: "Or learn alongside two or three others.",
-      body: "Groups are matched by subject, level, and goal, not by whichever slot happened to be free. The same verified tutors, at around 40% less than one to one.",
+      title: "Learn alongside two or three others.",
+      titleAccent: "two or three",
+      body: "Every group is matched by subject, level, and goal, never by whichever slot happened to be free. The same verified tutors, at around 40% less than one to one.",
       points: [
         "Two to four students per group",
         "Matched by level, not by age",
         "Around 40% lower cost",
       ],
       cta: "See how matching works",
-      seatsLabel: "2 to 4 students",
-      seatsAriaLabel: "A group of two to four students, shown as four seats with three taken",
+      map: {
+        ariaLabel:
+          "Sample matching map: two students on the same topic, level and schedule, matched into one group with a verified tutor",
+        title: "Matching map",
+        status: "Comparing fit",
+        students: [
+          { initials: "AM", name: "Aram", detail: "Grade 6 · Fractions", tag: "Weekday evenings" },
+          { initials: "MK", name: "Maya", detail: "Grade 6 · Fractions", tag: "Weekday evenings" },
+        ],
+        tutorLabel: "Verified tutor",
+        result: "Group match found",
+        criteria: ["Same topic", "Similar level", "Compatible time"],
+      },
     },
     parents: {
       eyebrow: "For parents",
       title: "See what happened, without having to ask.",
+      titleAccent: "without having to ask",
       body: "The parent view gathers the next class, the current goal, homework status, and the tutor's latest note in one place, so you are not reconstructing the week out of messages.",
       cta: "See the parent view",
-      dashboard: {
-        ariaLabel:
-          "Sample parent view showing the next class, current goal, homework status, and latest tutor note",
-        label: "Parent view",
-        child: "Ani \u00b7 Grade 6",
-        tabs: ["Overview", "Feedback", "Homework", "Progress", "Schedule"],
-        rows: [
-          { label: "Next class", value: "Tomorrow, 4:00 PM" },
-          { label: "Current goal", value: "Fractions with unlike denominators" },
-          { label: "Homework", value: "Submitted, awaiting review" },
-          { label: "Latest note", value: "Solid grasp of the method." },
-        ],
-      },
+      dashboardAriaLabel:
+        "The parent workspace, shown with example content: the current goal and its progress, the next lesson, homework due, and the tutor's latest feedback",
     },
   },
   hy: {
@@ -385,61 +388,57 @@ const copy: Record<Locale, HomeCopy> = {
     group: {
       eyebrow:
         "\u0553\u0578\u0584\u0580 \u056d\u0574\u0562\u0578\u057e \u0578\u0582\u057d\u0578\u0582\u0581\u0578\u0582\u0574",
-      title:
-        "\u053f\u0561\u0574 \u057d\u0578\u057e\u0578\u0580\u056b\u0580 \u0587\u057d \u0565\u0580\u056f\u0578\u0582-\u0565\u0580\u0565\u0584 \u0570\u0578\u0563\u0578\u0582 \u0570\u0565\u057f\u0589",
-      body: "\u053d\u0574\u0562\u0565\u0580\u0568 \u056f\u0561\u0566\u0574\u057e\u0578\u0582\u0574 \u0565\u0576 \u0568\u057d\u057f \u0561\u057c\u0561\u0580\u056f\u0561\u0575\u056b, \u0574\u0561\u056f\u0561\u0580\u0564\u0561\u056f\u056b \u0587 \u0576\u057a\u0561\u057f\u0561\u056f\u056b, \u0578\u0579 \u0569\u0565 \u0568\u057d\u057f \u0561\u0566\u0561\u057f \u056a\u0561\u0574\u056b\u0589 \u0546\u0578\u0582\u0575\u0576 \u057d\u057f\u0578\u0582\u0563\u057e\u0561\u056e \u0578\u0582\u057d\u0578\u0582\u0581\u056b\u0579\u0576\u0565\u0580\u0568\u055d \u0574\u0578\u057f 40%-\u0578\u057e \u0561\u057e\u0565\u056c\u056b \u0574\u0561\u057f\u0579\u0565\u056c\u056b, \u0584\u0561\u0576 \u0561\u0576\u0570\u0561\u057f\u0561\u056f\u0561\u0576 \u0564\u0561\u057d\u0565\u0580\u0568\u0589",
+      title: "Սովորիր ևս երկու-երեք հոգու հետ։",
+      titleAccent: "երկու-երեք",
+      body: "Յուրաքանչյուր խումբ կազմվում է ըստ առարկայի, մակարդակի և նպատակի, ոչ թե ըստ ազատ ժամի։ Նույն ստուգված ուսուցիչները՝ մոտ 40%-ով ավելի մատչելի, քան անհատական դասերը։",
       points: [
         "\u0535\u0580\u056f\u0578\u0582\u057d\u056b\u0581 \u0579\u0578\u0580\u057d \u057d\u0578\u057e\u0578\u0580\u0578\u0572 \u056d\u0574\u0562\u0578\u0582\u0574",
         "\u0540\u0561\u0574\u0561\u057a\u0561\u057f\u0561\u057d\u056d\u0561\u0576\u0565\u0581\u0578\u0582\u0574 \u0568\u057d\u057f \u0574\u0561\u056f\u0561\u0580\u0564\u0561\u056f\u056b, \u0578\u0579 \u0569\u0565 \u057f\u0561\u0580\u056b\u0584\u056b",
         "\u0544\u0578\u057f 40%-\u0578\u057e \u0581\u0561\u056e\u0580 \u0561\u0580\u056a\u0565\u0584",
       ],
       cta: "\u054f\u0565\u057d\u0576\u0565\u056c, \u0569\u0565 \u056b\u0576\u0579\u057a\u0565\u057d \u0567 \u056f\u0561\u0566\u0574\u057e\u0578\u0582\u0574 \u056d\u0578\u0582\u0574\u0562\u0568",
-      seatsLabel: "2-\u056b\u0581 4 \u057d\u0578\u057e\u0578\u0580\u0578\u0572",
-      seatsAriaLabel:
-        "\u0535\u0580\u056f\u0578\u0582\u057d\u056b\u0581 \u0579\u0578\u0580\u057d \u057d\u0578\u057e\u0578\u0580\u0578\u0572\u056b \u056d\u0578\u0582\u0574\u0562\u055d \u0579\u0578\u0580\u057d \u057f\u0565\u0572\u0578\u057e, \u0578\u0580\u0578\u0576\u0581\u056b\u0581 \u0565\u0580\u0565\u0584\u0568 \u0566\u0562\u0561\u0572\u057e\u0561\u056e \u0567",
+      map: {
+        ariaLabel:
+          "\u0540\u0561\u0574\u0561\u0564\u0580\u0574\u0561\u0576 \u0584\u0561\u0580\u057f\u0565\u0566\u056b \u0585\u0580\u056b\u0576\u0561\u056f\u055d \u0576\u0578\u0582\u0575\u0576 \u0569\u0565\u0574\u0561\u0576, \u0574\u0561\u056f\u0561\u0580\u0564\u0561\u056f\u0568 \u0587 \u056a\u0561\u0574\u0565\u0580\u0576 \u0578\u0582\u0576\u0565\u0581\u0578\u0572 \u0565\u0580\u056f\u0578\u0582 \u057d\u0578\u057e\u0578\u0580\u0578\u0572\u055d \u0570\u0561\u0574\u0561\u0564\u0580\u057e\u0561\u056e \u0574\u0565\u056f \u056d\u0574\u0562\u0578\u0582\u0574 \u057d\u057f\u0578\u0582\u0563\u057e\u0561\u056e \u0564\u0561\u057d\u0561\u057e\u0561\u0576\u0564\u0578\u0572\u056b \u0570\u0565\u057f",
+        title:
+          "\u0540\u0561\u0574\u0561\u0564\u0580\u0574\u0561\u0576 \u0584\u0561\u0580\u057f\u0565\u0566",
+        status: "\u054d\u057f\u0578\u0582\u0563\u057e\u0578\u0582\u0574 \u0567",
+        students: [
+          {
+            // Latin initials in both locales, matching the same figures on `/group-lessons`.
+            initials: "AM",
+            name: "\u0531\u0580\u0561\u0574",
+            detail:
+              "6-\u0580\u0564 \u0564\u0561\u057d\u0561\u0580\u0561\u0576 \u00b7 \u053f\u0578\u057f\u0578\u0580\u0561\u056f\u0576\u0565\u0580",
+            tag: "\u0535\u0580\u0565\u056f\u0578\u0575\u0561\u0576",
+          },
+          {
+            initials: "MK",
+            name: "\u0544\u0561\u0575\u0561",
+            detail:
+              "6-\u0580\u0564 \u0564\u0561\u057d\u0561\u0580\u0561\u0576 \u00b7 \u053f\u0578\u057f\u0578\u0580\u0561\u056f\u0576\u0565\u0580",
+            tag: "\u0535\u0580\u0565\u056f\u0578\u0575\u0561\u0576",
+          },
+        ],
+        tutorLabel:
+          "\u054d\u057f\u0578\u0582\u0563\u057e\u0561\u056e \u0564\u0561\u057d\u0561\u057e\u0561\u0576\u0564\u0578\u0572",
+        result:
+          "\u053d\u0578\u0582\u0574\u0562\u0568 \u0570\u0561\u0574\u0561\u0564\u0580\u057e\u0561\u056e \u0567",
+        criteria: [
+          "\u0546\u0578\u0582\u0575\u0576 \u0569\u0565\u0574\u0561\u0576",
+          "\u0546\u0574\u0561\u0576 \u0574\u0561\u056f\u0561\u0580\u0564\u0561\u056f",
+          "\u0540\u0561\u0574\u0568\u0576\u056f\u0576\u0578\u0572 \u056a\u0561\u0574\u0565\u0580",
+        ],
+      },
     },
     parents: {
       eyebrow: "\u053e\u0576\u0578\u0572\u0576\u0565\u0580\u056b \u0570\u0561\u0574\u0561\u0580",
-      title:
-        "\u054f\u0565\u057d\u0565\u0584, \u0569\u0565 \u056b\u0576\u0579 \u0567 \u0565\u0572\u0565\u056c\u055d \u0561\u057c\u0561\u0576\u0581 \u0570\u0561\u0580\u0581\u0576\u0565\u056c\u0578\u0582\u0589",
+      title: "Տեսեք, թե ինչ է եղել՝ առանց հարցնելու։",
+      titleAccent: "առանց հարցնելու",
       body: "\u053e\u0576\u0578\u0572\u056b \u0567\u057b\u0578\u0582\u0574 \u0574\u0565\u056f \u057f\u0565\u0572\u0578\u0582\u0574 \u0570\u0561\u057e\u0561\u0584\u057e\u0561\u056e \u0565\u0576 \u0570\u0561\u057b\u0578\u0580\u0564 \u0564\u0561\u057d\u0568, \u0568\u0576\u0569\u0561\u0581\u056b\u056f \u0576\u057a\u0561\u057f\u0561\u056f\u0568, \u057f\u0576\u0561\u0575\u056b\u0576 \u0561\u0577\u056d\u0561\u057f\u0561\u0576\u0584\u056b \u056f\u0561\u0580\u0563\u0561\u057e\u056b\u0573\u0561\u056f\u0568 \u0587 \u0578\u0582\u057d\u0578\u0582\u0581\u0579\u056b \u057e\u0565\u0580\u057b\u056b\u0576 \u0576\u0577\u0578\u0582\u0574\u0568\u0589",
       cta: "\u054f\u0565\u057d\u0576\u0565\u056c \u056e\u0576\u0578\u0572\u056b \u0567\u057b\u0568",
-      dashboard: {
-        ariaLabel:
-          "\u053e\u0576\u0578\u0572\u056b \u0567\u057b\u056b \u0585\u0580\u056b\u0576\u0561\u056f\u055d \u0570\u0561\u057b\u0578\u0580\u0564 \u0564\u0561\u057d\u0578\u057e, \u0568\u0576\u0569\u0561\u0581\u056b\u056f \u0576\u057a\u0561\u057f\u0561\u056f\u0578\u057e, \u057f\u0576\u0561\u0575\u056b\u0576 \u0561\u0577\u056d\u0561\u057f\u0561\u0576\u0584\u056b \u056f\u0561\u0580\u0563\u0561\u057e\u056b\u0573\u0561\u056f\u0578\u057e \u0587 \u0578\u0582\u057d\u0578\u0582\u0581\u0579\u056b \u057e\u0565\u0580\u057b\u056b\u0576 \u0576\u0577\u0578\u0582\u0574\u0578\u057e",
-        label: "\u053e\u0576\u0578\u0572\u056b \u0567\u057b",
-        child:
-          "\u0531\u0576\u056b \u00b7 6-\u0580\u0564 \u0564\u0561\u057d\u0561\u0580\u0561\u0576",
-        tabs: [
-          "\u0538\u0576\u0564\u0570\u0561\u0576\u0578\u0582\u0580",
-          "\u0531\u0580\u0571\u0561\u0563\u0561\u0576\u0584",
-          "\u054f\u0576\u0561\u0575\u056b\u0576",
-          "\u0531\u057c\u0561\u057b\u0568\u0576\u0569\u0561\u0581",
-          "\u0534\u0561\u057d\u0561\u0581\u0578\u0582\u0581\u0561\u056f",
-        ],
-        rows: [
-          {
-            label: "\u0540\u0561\u057b\u0578\u0580\u0564 \u0564\u0561\u057d\u0568",
-            value: "\u054e\u0561\u0572\u0568\u055d 16\u056900",
-          },
-          {
-            label:
-              "\u0538\u0576\u0569\u0561\u0581\u056b\u056f \u0576\u057a\u0561\u057f\u0561\u056f\u0568",
-            value:
-              "\u054f\u0561\u0580\u0562\u0565\u0580 \u0570\u0561\u0575\u057f\u0561\u0580\u0561\u0580\u0576\u0565\u0580\u0578\u057e \u056f\u0578\u057f\u0578\u0580\u0561\u056f\u0576\u0565\u0580",
-          },
-          {
-            label: "\u054f\u0576\u0561\u0575\u056b\u0576",
-            value:
-              "\u0548\u0582\u0572\u0561\u0580\u056f\u057e\u0561\u056e \u0567, \u057d\u057a\u0561\u057d\u0578\u0582\u0574 \u0567 \u057d\u057f\u0578\u0582\u0563\u0574\u0561\u0576",
-          },
-          {
-            label: "\u054e\u0565\u0580\u057b\u056b\u0576 \u0576\u0577\u0578\u0582\u0574\u0568",
-            value:
-              "\u0535\u0572\u0561\u0576\u0561\u056f\u0568 \u0575\u0578\u0582\u0580\u0561\u0581\u0580\u0565\u056c \u0567 \u057e\u057d\u057f\u0561\u0570\u0589",
-          },
-        ],
-      },
+      dashboardAriaLabel:
+        "Ծնողի էջը՝ օրինակային բովանդակությամբ՝ ընթացիկ նպատակը և դրա առաջընթացը, հաջորդ դասը, տնային առաջադրանքը և ուսուցչի վերջին կարծիքը",
     },
   },
 };
@@ -474,6 +473,14 @@ export async function HomePageContent({ locale }: { locale: Locale }) {
    */
   const t = await getTranslations({ locale, namespace: "marketing" });
 
+  /*
+   * The workspace mock's own copy comes from the `parents` namespace rather than from this file's
+   * copy record: the home page shows the same component the `/parents` page shows, and duplicating
+   * its strings here is how the preview and the page it links to start describing different weeks.
+   */
+  const pt = await getTranslations({ locale, namespace: "parents" });
+  const parentDashboard = pt.raw("content.dashboard") as ParentsCopy["dashboard"];
+
   return (
     <div className={styles.page}>
       <Hero
@@ -490,7 +497,11 @@ export async function HomePageContent({ locale }: { locale: Locale }) {
       <SubjectExplorer copy={subjects} />
       <LearningBenefits copy={content.benefits} />
       <GroupLessonsStrip copy={content.group} href={localHref(locale, "/group-lessons")} />
-      <ParentPreviewStrip copy={content.parents} href={localHref(locale, "/parents")} />
+      <ParentPreviewStrip
+        copy={content.parents}
+        dashboard={parentDashboard}
+        href={localHref(locale, "/parents")}
+      />
     </div>
   );
 }

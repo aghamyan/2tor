@@ -77,12 +77,7 @@ export function LeadForm({
       </div>
       <div className={styles.field}>
         <label htmlFor="lead-interest">{t("interest")}</label>
-        <input
-          id="lead-interest"
-          name="interest"
-          maxLength={160}
-          defaultValue={defaultInterest}
-        />
+        <input id="lead-interest" name="interest" maxLength={160} defaultValue={defaultInterest} />
       </div>
       <div className={styles.field}>
         <label htmlFor="lead-message">{t("message")}</label>

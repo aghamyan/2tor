@@ -32,7 +32,11 @@ export function SubjectCurriculumPage({ slug }: { slug: SubjectCurriculumSlug })
   return <StandardSubjectCurriculumPage slug={slug} />;
 }
 
-function StandardSubjectCurriculumPage({ slug }: { slug: Exclude<SubjectCurriculumSlug, "mathematics"> }) {
+function StandardSubjectCurriculumPage({
+  slug,
+}: {
+  slug: Exclude<SubjectCurriculumSlug, "mathematics">;
+}) {
   const t = useTranslations("marketing");
   const key = SUBJECT_PAGE_KEY[slug];
   const modules = t.raw(`pages.${key}.modules`) as CurriculumModule[];

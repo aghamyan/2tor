@@ -1,4 +1,11 @@
-.page {
+/*
+ * The local token block is shared with `.dashboardFrame` because the workspace preview also renders
+ * on the home page, outside `.page`. Left on `.page` alone it silently picked up the HOME page's
+ * `--teal` / `--mint` / `--white` aliases instead, which is why its avatar, its attendance pill and
+ * its card icons came out inverted there. Declared once, applied to both.
+ */
+.page,
+.dashboardFrame {
   --navy: hsl(var(--vz-ink));
   --navy-soft: hsl(var(--vz-ink));
   --teal: hsl(var(--vz-accent));
@@ -18,6 +25,9 @@
   --line: hsl(var(--vz-line));
   --muted: hsl(var(--vz-muted));
   --shadow: 0 1.6rem 4rem hsl(var(--vz-ink) / 10%);
+}
+
+.page {
   background: var(--paper);
   color: var(--navy);
   overflow: clip;
@@ -25,7 +35,10 @@
 
 .page *,
 .page *::before,
-.page *::after {
+.page *::after,
+.dashboardFrame *,
+.dashboardFrame *::before,
+.dashboardFrame *::after {
   box-sizing: border-box;
 }
 
@@ -235,6 +248,7 @@
 
 .dashboardFrame {
   background: var(--white);
+  color: var(--navy);
   border: 1px solid hsl(var(--vz-line-soft));
   border-radius: var(--vz-r-card);
   box-shadow:
