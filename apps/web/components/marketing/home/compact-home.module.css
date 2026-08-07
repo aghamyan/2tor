@@ -877,7 +877,7 @@
  * beat `.subjectArrow`'s own `position: absolute` at (0,1,0), turning the invisible arrow into a
  * third grid row — every card carried a row of dead space under its description because of it.
  */
-.subjectIcon,
+.subjectPlate,
 .subjectText {
   position: relative;
   z-index: 1;
@@ -898,38 +898,39 @@
   transition-duration: 110ms;
 }
 
-.subjectIcon {
-  align-items: center;
-  background: hsl(0 0% 100% / 55%);
-  border-radius: var(--vz-r-input);
-  box-shadow:
-    inset 0 0 0 1px hsl(0 0% 100% / 65%),
-    0 6px 14px -8px hsl(var(--vz-ink) / 35%);
-  color: var(--indigo-dark);
-  display: flex;
-  height: 3.15rem;
-  justify-content: center;
-  transition: transform 320ms var(--vz-ease);
-  width: 3.15rem;
+/*
+ * The art plate. Full-bleed to the card's edges, which is why it carries negative margins equal to
+ * `.subjectCard`'s padding rather than the card dropping its padding — the text below still needs
+ * that inset, and only this child breaks out of it.
+ *
+ * The renders already sit on their own cream ground, so no fill or border is declared here; adding
+ * one would draw a second edge inside the card's own rounded corner.
+ */
+.subjectPlate {
+  border-radius: var(--vz-r-card) var(--vz-r-card) 0 0;
+  display: block;
+  margin: -1.35rem -1.25rem 0;
+  overflow: hidden;
 }
 
-.subjectCard:hover .subjectIcon {
-  transform: rotate(-6deg) scale(1.07);
+/*
+ * `aspect-ratio` on a 1:1 source cropped to a letterbox: the plates are square files, and this is
+ * where they become a band across the top of the card. Cropping in CSS rather than shipping a
+ * second set of files keeps one asset per subject.
+ */
+.subjectPlateArt {
+  aspect-ratio: 16 / 10;
+  display: block;
+  height: auto;
+  object-fit: cover;
+  transition: transform 420ms var(--vz-ease);
+  width: 100%;
 }
 
-/* One accent per subject, drawn from the same three field tints as the blooms behind them, so the
-   icons belong to the backdrop rather than introducing a fourth and fifth hue. */
-.subjectIcon.math {
-  color: color-mix(in srgb, hsl(var(--vz-positive)) 84%, hsl(var(--vz-ink)));
-}
-.subjectIcon.programming {
-  color: var(--indigo-dark);
-}
-.subjectIcon.armenian {
-  color: color-mix(in srgb, hsl(var(--vz-accent)) 78%, hsl(var(--vz-ink)));
-}
-.subjectIcon.chess {
-  color: color-mix(in srgb, hsl(38 63% 42%) 88%, hsl(var(--vz-ink)));
+/* The card lifts; the art inside it pushes in slightly against that lift. Scale only — a rotation
+   here would fight the object's own baked-in perspective and read as a crooked photograph. */
+.subjectCard:hover .subjectPlateArt {
+  transform: scale(1.045);
 }
 
 .subjectText {
@@ -2629,5 +2630,235 @@
 @media (min-width: 901px) and (max-height: 820px) {
   .heroTitle {
     font-size: clamp(2.6rem, min(5.8vw, 22.5svh - 105px), 6.5rem);
+  }
+}
+
+/* ── Closing call to action ───────────────────────────────────────────────────
+   The last band before the layout's footer, built on `.groupSection`'s surface: the same pine
+   fill, the same ruled grid faded at the edges, the same three blurred blooms.
+
+   The bloom POSITIONS are not copied. `.groupBloomOne`/`Two` are placed against that section's map
+   — "under the student cards", "under the hub" — and this band is a single centred column, so the
+   same coordinates would light the empty margins and leave the copy flat. They are re-aimed at the
+   headline, the buttons and the right margin instead. The grid's mask is re-centred to 50% for the
+   same reason: 68% is where the map sits, not where this content sits.
+
+   Every foreground tone here is `--vz-block-on` at some alpha. `--vz-muted` is not usable on this
+   background — see the note above `.noteMeta`, where it measures 2.25:1 and fails outright. The
+   blooms lighten the fill locally, which cuts into the light-on-dark ratios; the measured figures
+   on each rule below are taken over the BRIGHTEST point of the field, not over bare pine. */
+.closingSection {
+  background: hsl(var(--vz-block));
+  isolation: isolate;
+  overflow: hidden;
+  padding-block: clamp(4rem, 7vw, 7rem);
+  position: relative;
+}
+
+.closingField {
+  inset: 0;
+  pointer-events: none;
+  position: absolute;
+  z-index: 0;
+}
+
+.closingGrid {
+  background-image:
+    linear-gradient(hsl(var(--vz-block-on) / 7%) 1px, transparent 1px),
+    linear-gradient(90deg, hsl(var(--vz-block-on) / 7%) 1px, transparent 1px);
+  background-size: 46px 46px;
+  inset: 0;
+  mask-image: radial-gradient(110% 95% at 50% 44%, black 26%, transparent 78%);
+  position: absolute;
+}
+
+.closingBloomOne,
+.closingBloomTwo,
+.closingBloomThree {
+  border-radius: 50%;
+  filter: blur(78px);
+  position: absolute;
+}
+
+/* Behind the headline, off-centre so the field does not read as a symmetrical vignette. */
+.closingBloomOne {
+  background: hsl(var(--vz-field-1) / 32%);
+  height: 26rem;
+  left: 14%;
+  top: -36%;
+  width: 26rem;
+}
+
+/* Under the buttons, and the only warm one — the accent pill sits in its own light rather than on
+   flat fill. Held at 26% and pushed mostly below the band: at `.groupBloomTwo`'s 38% the wash came
+   up around the fine print and cost it more contrast than the effect was worth. */
+.closingBloomTwo {
+  background: hsl(var(--vz-accent) / 26%);
+  bottom: -44%;
+  height: 22rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 22rem;
+}
+
+.closingBloomThree {
+  background: hsl(var(--vz-field-2) / 20%);
+  height: 20rem;
+  right: 9%;
+  top: 16%;
+  width: 20rem;
+}
+
+/* Lifts the copy out of the field, same as `.groupSection .sectionShell`. */
+.closingSection .sectionShell {
+  position: relative;
+  z-index: 1;
+}
+
+.closingInner {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  margin: 0 auto;
+  max-width: 46rem;
+  text-align: center;
+}
+
+/* Tracks `.heroTitle`'s ramp one step down. It is the closing statement, not a second hero. */
+.closingTitle {
+  color: hsl(var(--vz-block-on));
+  font-size: clamp(2.1rem, 4.4vw, 3.5rem);
+  font-weight: 700;
+  line-height: 1.06;
+}
+
+/* 5.6:1 at the worst pixel of the field (390, where the blooms crowd the band), 5.7:1 at 1440.
+ * Was 82% before the field went in, which measured 4.19:1 at 390 and missed AA — the alpha and
+ * the mobile bloom damping in the `640px` block below were the two halves of that fix.
+ *
+ * Scoped through `.closingInner` for specificity, not for nesting: the `.page p` preflight near the
+ * top of this sheet sets `margin: 0` at (0,1,1) and lands earlier, so a lone `.closingLede` at
+ * (0,1,0) loses and the margin silently computes to 0px. Same family of trap as the `box-sizing`
+ * note on `.closingPrimaryAction svg`. `.closingNote` below needs the identical treatment. */
+.closingInner .closingLede {
+  color: hsl(var(--vz-block-on) / 86%);
+  font-size: clamp(1rem, 1.4vw, 1.12rem);
+  font-weight: 500;
+  line-height: 1.6;
+  margin-top: 1.6rem;
+}
+
+.closingActions {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  justify-content: center;
+  margin-top: 2.25rem;
+}
+
+/* Hero proportions, same as `.heroConsultAction`: this must not restate any of `.buttonPrimary`'s
+   own appearance, only its scale. */
+.closingPrimaryAction {
+  border-radius: var(--vz-r-pill) !important;
+  font-size: 0.9rem !important;
+  min-height: 3.4rem !important;
+  padding-left: 1.35rem !important;
+  padding-right: 1.15rem !important;
+}
+
+/* `.buttonIcon` sizes its arrow badge with `content-box` so the padding sits OUTSIDE the glyph.
+   The `.page *` reset is the same specificity and lands later in the sheet, which silently flips
+   it to `border-box` and collapses the arrow inside a circle that keeps its diameter. One class
+   deeper wins it back — the identical fix `.heroConsultAction svg` carries. */
+.closingPrimaryAction svg {
+  box-sizing: content-box;
+}
+
+/* Not `.secondaryAction`: that one paints `--ink` on `--line`, both tuned against paper, and would
+   be dark-on-dark here. Same geometry, block palette. */
+.closingSecondaryAction {
+  align-items: center;
+  border: 1px solid hsl(var(--vz-block-on) / 32%);
+  border-radius: var(--vz-r-pill);
+  color: hsl(var(--vz-block-on));
+  display: inline-flex;
+  font-size: 0.9rem;
+  font-weight: 700;
+  justify-content: center;
+  min-height: 3.4rem;
+  padding-inline: 1.35rem;
+  text-decoration: none;
+  transition:
+    background 200ms ease,
+    border-color 200ms ease,
+    transform 200ms ease;
+}
+
+.closingSecondaryAction:hover {
+  background: hsl(var(--vz-block-on) / 8%);
+  border-color: hsl(var(--vz-block-on) / 55%);
+  transform: translateY(-2px);
+}
+
+/*
+ * The page-wide `.page a:focus-visible` ring is the accent at 45% alpha, tuned against paper.
+ * Composited on this band it measures 1.38:1, where WCAG 2.4.11 asks 3:1 for a focus indicator —
+ * far enough below to read as no ring at all. White is the band's own foreground and measures
+ * 13.5:1 here.
+ *
+ * It covers BOTH buttons on purpose. The primary is `site.module.css`'s `.buttonPrimary`, whose
+ * own `.scope :focus-visible` is (0,2,0) and therefore loses to `.page a:focus-visible` at
+ * (0,2,1) — so it inherits the same unusable ring despite carrying its own. Scoping through
+ * `.closingInner` puts this at (0,3,1), which wins outright rather than on source order.
+ */
+.closingSection .closingInner a:focus-visible {
+  outline-color: hsl(var(--vz-block-on));
+}
+
+/* 5.7:1 at the worst pixel of the field — the lightest tone in this band that still clears AA for
+   text this size. It sits low in the band where only the tail of the warm bloom reaches. */
+.closingInner .closingNote {
+  color: hsl(var(--vz-block-on) / 72%);
+  font-size: 0.88rem;
+  font-weight: 500;
+  /* Clears `.buttonPrimary`'s accent glow, which extends past the pill's own box — at 1.4rem the
+     line sat inside the bloom and read as attached to the button rather than to the pair. */
+  margin-top: 1.9rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .closingSecondaryAction {
+    transition: none;
+  }
+
+  .closingSecondaryAction:hover {
+    transform: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .closingActions {
+    align-items: stretch;
+    flex-direction: column;
+    width: 100%;
+  }
+
+  /*
+   * The blooms are sized for a wide band. At 390 a 26rem circle spans the whole viewport, so the
+   * field stops reading as off-centre light and flattens into a full-width wash — which measured
+   * 4.19:1 under the lede, below AA for text this size. Damped rather than removed: the grid and
+   * the tint still carry the treatment, they just stop competing with the copy.
+   */
+  .closingBloomOne {
+    background: hsl(var(--vz-field-1) / 15%);
+  }
+
+  .closingBloomTwo {
+    background: hsl(var(--vz-accent) / 13%);
+  }
+
+  .closingBloomThree {
+    background: hsl(var(--vz-field-2) / 10%);
   }
 }

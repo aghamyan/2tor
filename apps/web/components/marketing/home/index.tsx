@@ -15,6 +15,7 @@ import {
   type ParentPreviewCopy,
 } from "./home-sections";
 import { Hero } from "./hero";
+import { ClosingCta, type ClosingCtaCopy } from "./closing-cta";
 import type { ParentsCopy } from "../parents/parents-content";
 import styles from "./compact-home.module.css";
 
@@ -45,6 +46,13 @@ interface HomeCopy {
   benefits: BenefitsCopy;
   group: GroupLessonsCopy;
   parents: ParentPreviewCopy;
+  /*
+   * The closing band's own copy. Its primary button label is NOT here — that is the header's
+   * button and comes from the shared catalogue, same as the hero's. Only `pricing` is local:
+   * the footer's `site.footer.pricing` is the bare noun "Pricing", which reads as a nav entry
+   * rather than as an action next to "Book a free consultation".
+   */
+  closing: ClosingCtaCopy & { pricing: string };
 }
 
 const copy: Record<Locale, HomeCopy> = {
@@ -232,6 +240,13 @@ const copy: Record<Locale, HomeCopy> = {
       cta: "See the parent view",
       dashboardAriaLabel:
         "The parent workspace, shown with example content: the current goal and its progress, the next lesson, homework due, and the tutor's latest feedback",
+    },
+    closing: {
+      title: "Start with one good lesson.",
+      description:
+        "Tell us where your child is stuck. We will suggest a tutor, a level, and a schedule — and you decide afterwards. We are taking 40 families this term.",
+      pricing: "See pricing",
+      note: "Free · 20 minutes · no card, no obligation",
     },
   },
   hy: {
@@ -440,6 +455,13 @@ const copy: Record<Locale, HomeCopy> = {
       dashboardAriaLabel:
         "Ծնողի էջը՝ օրինակային բովանդակությամբ՝ ընթացիկ նպատակը և դրա առաջընթացը, հաջորդ դասը, տնային առաջադրանքը և ուսուցչի վերջին կարծիքը",
     },
+    closing: {
+      title: "Սկսեք մեկ լավ դասից։",
+      description:
+        "Պատմեք, թե որտեղ է ձեր երեխան դժվարանում։ Մենք կառաջարկենք ուսուցիչ, մակարդակ և ժամանակացույց, իսկ որոշումը ձերն է։ Այս կիսամյակում ընդունում ենք 40 ընտանիք։",
+      pricing: "Տեսնել գները",
+      note: "Անվճար · 20 րոպե · առանց քարտի և պարտավորության",
+    },
   },
 };
 
@@ -501,6 +523,14 @@ export async function HomePageContent({ locale }: { locale: Locale }) {
         copy={content.parents}
         dashboard={parentDashboard}
         href={localHref(locale, "/parents")}
+      />
+      <ClosingCta
+        copy={content.closing}
+        consultationCta={{
+          label: t("site.actions.consultation"),
+          href: localHref(locale, "/consultation"),
+        }}
+        pricingCta={{ label: content.closing.pricing, href: localHref(locale, "/pricing") }}
       />
     </div>
   );

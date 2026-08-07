@@ -6,14 +6,11 @@ import {
   ArrowRight,
   BookOpenCheck,
   CalendarClock,
-  ChessKnight,
-  CodeXml,
   Presentation,
-  ScrollText,
   ShieldCheck,
-  SquareRadical,
   type LucideIcon,
 } from "lucide-react";
+import Image from "next/image";
 import { AnimatePresence } from "framer-motion";
 import { useEffect, useState, type MouseEvent } from "react";
 import { ClassroomBoard, type BoardKey } from "./classroom-boards";
@@ -411,16 +408,10 @@ export function ClassroomPreview({ copy }: { copy: ClassroomCopy }) {
 }
 
 /*
- * Chosen to name the subject rather than the tool. A line chart is data, not mathematics; bare
- * braces are a language's punctuation, not programming; and `Languages` is the glyph translation
- * apps use, which reads as "switch language" rather than "study this one".
+ * The lucide glyph map that used to live here is gone. These four subjects are now carried by
+ * rendered clay plates in `public/marketing/subjects/`, keyed by the same `subject.key`, so the
+ * mapping is the filename and there is nothing to keep in sync here.
  */
-const subjectIcons: Record<SubjectItem["key"], LucideIcon> = {
-  math: SquareRadical,
-  programming: CodeXml,
-  armenian: ScrollText,
-  chess: ChessKnight,
-};
 
 /**
  * The four courses, as glass.
@@ -456,7 +447,6 @@ export function SubjectExplorer({ copy }: { copy: SubjectCopy }) {
         </div>
         <ul className={styles.subjectRail}>
           {copy.items.map((subject, index) => {
-            const Icon = subjectIcons[subject.key];
             return (
               <motion.li
                 key={subject.key}
@@ -484,8 +474,25 @@ export function SubjectExplorer({ copy }: { copy: SubjectCopy }) {
               >
                 <Link href={subject.href} className={styles.subjectCard}>
                   <span className={styles.subjectSheen} aria-hidden="true" />
-                  <span className={`${styles.subjectIcon} ${styles[subject.key]}`}>
-                    <Icon size={22} aria-hidden="true" />
+                  {/*
+                   * `alt=""`, deliberately. The card states the subject's name and description as
+                   * real text directly below, so an alt string here would make a screen reader
+                   * announce the subject twice. These plates are decoration for a labelled link.
+                   *
+                   * Fixed 1000x1000 intrinsic size because that is what the renders are; `sizes`
+                   * is what actually governs the fetched width, and it has to track the rail's
+                   * breakpoints below (4-up → 2-up → 1-up) or Next ships a 4-up-sized image to a
+                   * phone showing one card per row.
+                   */}
+                  <span className={styles.subjectPlate}>
+                    <Image
+                      src={`/marketing/subjects/${subject.key}.webp`}
+                      alt=""
+                      width={1000}
+                      height={1000}
+                      sizes="(max-width: 640px) 92vw, (max-width: 1100px) 46vw, 23vw"
+                      className={styles.subjectPlateArt}
+                    />
                   </span>
                   <span className={styles.subjectText}>
                     <strong>{subject.name}</strong>
