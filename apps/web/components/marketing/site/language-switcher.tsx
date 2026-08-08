@@ -42,9 +42,9 @@ export function LanguageSwitcher({
 
   return (
     /*
-     * Keep the compact header control visually flat: a fine divider groups the two real links,
-     * while a short accent rule carries the selected state. This avoids stacking a raised pill
-     * inside a second pill next to an already outlined menu button.
+     * A segmented control rather than two loose text links: one recessed track holding two
+     * segments, with the active one raised onto a surface. That shape says "this is a choice
+     * between two states" at a glance, which two adjacent words do not.
      */
     <div
       role="group"

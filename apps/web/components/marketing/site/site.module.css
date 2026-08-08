@@ -467,62 +467,42 @@
 }
 
 /* ── Language switcher ─────────────────────────────────────────────────────────
-   A flat two-option switch. The restrained divider groups the choices and the
-   accent rule is the only selected-state decoration, keeping this secondary
-   control quieter than the adjacent menu. Both options remain real `<Link>`s,
-   and the group label supplies screen-reader context. */
+   A segmented control: a recessed track with the active locale raised onto a
+   surface. Both options stay real `<Link>`s, and the visible text is still the
+   whole accessible name — an `aria-label` override that did not contain the
+   visible "EN"/"HY" would fail WCAG 2.5.3 Label in Name, which the repo's axe
+   sweep checks on every public page. The `role="group"` label supplies context. */
 .localeSwitch {
   align-items: center;
+  background: hsl(var(--vz-ink) / 6%);
+  border: 1px solid hsl(var(--vz-line));
+  border-radius: var(--vz-r-pill);
   display: inline-flex;
-  gap: 0;
+  gap: 0.15rem;
+  padding: 0.18rem;
 }
 .localeSwitchOption {
-  align-items: center;
-  border-radius: 0.45rem;
+  border-radius: var(--vz-r-pill);
   color: hsl(var(--vz-muted));
-  display: inline-flex;
   font-family: var(--vz-display);
-  font-size: 0.7rem;
+  font-size: 0.72rem;
   font-weight: 600;
-  height: 2rem;
-  justify-content: center;
   letter-spacing: 0.02em;
-  min-width: 2.15rem;
-  position: relative;
+  padding: 0.28rem 0.6rem;
   transition:
     background 200ms var(--vz-ease),
+    box-shadow 200ms var(--vz-ease),
     color 200ms var(--vz-ease);
   white-space: nowrap;
 }
-.localeSwitchOption + .localeSwitchOption {
-  margin-left: 0.3rem;
-}
-.localeSwitchOption + .localeSwitchOption::before {
-  background: hsl(var(--vz-line));
-  content: "";
-  height: 0.85rem;
-  left: -0.18rem;
-  pointer-events: none;
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 1px;
-}
 .localeSwitchOption:hover {
-  background: hsl(var(--vz-ink) / 5%);
   color: hsl(var(--vz-ink));
 }
+/* 5.10:1 on the raised surface. */
 .localeSwitchOption[data-active="true"] {
+  background: hsl(var(--vz-surface));
+  box-shadow:
+    0 1px 2px hsl(var(--vz-ink) / 10%),
+    inset 0 0 0 1px hsl(var(--vz-line-soft));
   color: hsl(var(--vz-accent));
-}
-.localeSwitchOption[data-active="true"]::after {
-  background: currentColor;
-  border-radius: var(--vz-r-pill);
-  bottom: 0.2rem;
-  content: "";
-  height: 2px;
-  left: 50%;
-  position: absolute;
-  transform: translateX(-50%);
-  width: 0.9rem;
 }

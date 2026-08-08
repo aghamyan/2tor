@@ -5,15 +5,12 @@ import { motion, useMotionValue, useReducedMotion, useSpring } from "framer-moti
 import {
   ArrowRight,
   BookOpenCheck,
-  Braces,
-  Clock,
-  Languages,
-  LineChart,
+  CalendarClock,
+  Presentation,
   ShieldCheck,
-  Sparkles,
-  TrendingUp,
   type LucideIcon,
 } from "lucide-react";
+import Image from "next/image";
 import { AnimatePresence } from "framer-motion";
 import { useEffect, useState, type MouseEvent } from "react";
 import { ClassroomBoard, type BoardKey } from "./classroom-boards";
@@ -56,7 +53,6 @@ export interface ClassroomSubject {
   tutorInitial: string;
   topic: string;
   prompt: string;
-  confidence: string;
   note: ClassroomNote;
 }
 
@@ -64,13 +60,13 @@ export interface ClassroomSubject {
 export interface ClassroomCopy {
   ariaLabel: string;
   live: string;
-  wins: string;
-  streak: string;
+  /** Heading above the course list in the lesson sidebar. */
+  courses: string;
   subjects: readonly ClassroomSubject[];
 }
 
 export interface SubjectItem {
-  key: "math" | "armenian";
+  key: "math" | "programming" | "armenian" | "chess";
   name: string;
   description: string;
   href: string;
@@ -81,15 +77,10 @@ export interface SubjectCopy {
   title: string;
   hint: string;
   items: readonly SubjectItem[];
-  comingSoon: {
-    title: string;
-    description: string;
-    badge: string;
-  };
 }
 
 export interface BenefitItem {
-  key: "adaptive" | "parents" | "practice";
+  key: "adaptive" | "parents" | "practice" | "availability";
   title: string;
   body: string;
   signal: string;
@@ -103,10 +94,9 @@ export interface BenefitsCopy {
 }
 
 /**
- * The lesson card itself. The window frame, the sidebar chrome and the streak stay put across a
- * rotation; only the parts that are genuinely per-subject cross-fade. Swapping the whole card would
- * make the hero flicker on a six-second loop, and would re-run the sidebar's chart draw for a
- * figure that never changed.
+ * The lesson card itself. The window frame and the sidebar's course list stay put across a
+ * rotation; only the parts that are genuinely per-subject cross-fade, plus the marker that slides
+ * between courses. Swapping the whole card would make the hero flicker on a six-second loop.
  *
  * `first` is false once the card has rotated at least once, which compresses the board's stroke
  * timings — see `classroom-boards.tsx`.
@@ -115,10 +105,12 @@ function LessonWindow({
   copy,
   subject,
   first,
+  onSelect,
 }: {
   copy: ClassroomCopy;
   subject: ClassroomSubject;
   first: boolean;
+  onSelect: (index: number) => void;
 }) {
   const reduceMotion = useReducedMotion();
   const pace = first ? 1 : 0.42;
@@ -198,43 +190,50 @@ function LessonWindow({
           </div>
         </div>
 
+        {/*
+         * The courses the card teaches, with the one on screen marked. This replaced a progress
+         * sparkline, a "3 learning wins this week" figure and a streak row — three invented
+         * statistics about a fictional student, which is a lot of chrome to say nothing. The list
+         * of real subjects earns its space instead, and it tells you the card rotates, which
+         * nothing else on screen did.
+         */}
         <aside className={styles.lessonSidebar}>
-          <div className={styles.sidebarLabel}>
-            <TrendingUp size={13} aria-hidden="true" />
-            {copy.wins}
-          </div>
-          <div className={styles.miniChart} aria-label={subject.confidence}>
-            <svg viewBox="0 0 150 70" role="img">
-              <motion.path
-                d="M3 61 C25 57 26 45 46 47 S70 34 89 36 S113 16 147 10"
-                initial={{ pathLength: 0 }}
-                animate={{ pathLength: 1 }}
-                transition={reduceMotion ? { duration: 0 } : { duration: 1.05, delay: 0.9, ease }}
-              />
-            </svg>
-          </div>
-          <AnimatePresence mode="wait" initial={false}>
-            <motion.strong
-              key={subject.key}
-              className={styles.confidence}
-              initial={{ opacity: 0, y: 6 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -6 }}
-              transition={swap}
-            >
-              {subject.confidence}
-            </motion.strong>
-          </AnimatePresence>
-          <div className={styles.streakRow}>
-            <span>
-              <Sparkles size={13} aria-hidden="true" /> {copy.streak}
-            </span>
-            <div aria-hidden="true">
-              {[0, 1, 2, 3, 4].map((day) => (
-                <i key={day} className={day < 4 ? styles.streakDone : undefined} />
-              ))}
-            </div>
-          </div>
+          <p className={styles.sidebarLabel}>
+            <BookOpenCheck size={13} aria-hidden="true" />
+            {copy.courses}
+          </p>
+          {/*
+            Real buttons, not decoration. This list is the rotation's stop control — see
+            `useSubjectRotation` — so it has to be reachable by keyboard and operable by Enter.
+            Pressing one pins that lesson and ends the auto-advance.
+          */}
+          <ul className={styles.courseList}>
+            {copy.subjects.map((item, itemIndex) => {
+              const active = item.key === subject.key;
+              return (
+                <li key={item.key}>
+                  <button
+                    type="button"
+                    className={active ? styles.courseActive : undefined}
+                    /* `aria-current` is the announced equivalent of the accent bar and the weight
+                       change; `aria-live` is deliberately absent, since the card already narrates
+                       itself through its own labelled region. */
+                    aria-current={active ? "true" : undefined}
+                    onClick={() => onSelect(itemIndex)}
+                  >
+                    {active ? (
+                      <motion.i
+                        layoutId="course-marker"
+                        aria-hidden="true"
+                        transition={reduceMotion ? { duration: 0 } : { duration: 0.42, ease }}
+                      />
+                    ) : null}
+                    {item.label}
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
         </aside>
       </div>
     </div>
@@ -295,35 +294,40 @@ function TeacherNote({ note, swapKey }: { note: ClassroomNote; swapKey: string }
  * There is no manual control by design decision: the subject chips that used to pause and pin the
  * rotation were removed along with the three floating cards.
  *
- * That removal is why the rotation STOPS after showing each subject once, rather than looping.
- * WCAG 2.2.2 (Pause, Stop, Hide, Level A) requires a mechanism to pause anything that moves
- * automatically, indefinitely, alongside other content — and the chips were that mechanism.
- * Hovering pauses the timer, but hover is neither discoverable nor reachable by keyboard, so it
- * does not satisfy the criterion on its own. Content that comes to rest on its own does: after one
- * pass, roughly 12 seconds, the card is simply static. Every visitor still sees all three lessons.
- * Restoring an endless loop means restoring a visible pause control with it.
+ * The rotation LOOPS. It previously came to rest on the last subject, and that was not a style
+ * choice — WCAG 2.2.2 (Pause, Stop, Hide, Level A) requires a mechanism to pause anything that
+ * moves automatically and indefinitely alongside other content. The chips that used to provide it
+ * were gone, hover is neither discoverable nor keyboard-reachable, and content that stops on its
+ * own is the criterion's other escape hatch. So stopping was the only compliant option left.
+ *
+ * The sidebar's course list is that mechanism restored. Its rows are real buttons: clicking or
+ * tabbing to one and pressing Enter selects that lesson AND halts the auto-advance for good. That
+ * is a visible, keyboard-reachable stop control, which is precisely what the previous note said
+ * looping would require. Hover-pause and tab-visibility pause stay as conveniences on top; neither
+ * is load-bearing for compliance.
  *
  * Reduced motion does NOT stop the rotation, it only collapses every transition to zero duration.
- * Freezing it would mean a reduced-motion visitor never sees the Armenian or chess lessons at all,
- * now that there are no chips to reach them with. Reduced motion means do not animate, not do not
- * change.
+ * Freezing it would mean a reduced-motion visitor never sees the later lessons. Reduced motion
+ * means do not animate, not do not change.
  */
 function useSubjectRotation(count: number) {
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
+  // Set once the visitor picks a lesson, and never cleared: an auto-advance that resumed after an
+  // explicit choice would be overriding them, and would not be a "stop" in the WCAG sense.
+  const [stopped, setStopped] = useState(false);
   // Whether the card has ever left the first subject. Set where the change happens rather than
   // derived in an effect, which would cost a second render on every rotation.
   const [hasRotated, setHasRotated] = useState(false);
-  const settled = index >= count - 1;
 
   useEffect(() => {
-    if (paused || settled || count < 2) return;
+    if (paused || stopped || count < 2) return;
     const timer = window.setInterval(() => {
-      setIndex((i) => Math.min(i + 1, count - 1));
+      setIndex((i) => (i + 1) % count);
       setHasRotated(true);
     }, ROTATE_MS);
     return () => window.clearInterval(timer);
-  }, [paused, settled, count]);
+  }, [paused, stopped, count]);
 
   useEffect(() => {
     const onVisibility = () => setPaused(document.visibilityState === "hidden");
@@ -336,6 +340,11 @@ function useSubjectRotation(count: number) {
     hasRotated,
     pause: () => setPaused(true),
     resume: () => setPaused(false),
+    select: (next: number) => {
+      setStopped(true);
+      setHasRotated(true);
+      setIndex(next);
+    },
   };
 }
 
@@ -347,7 +356,7 @@ export function ClassroomPreview({ copy }: { copy: ClassroomCopy }) {
   const y = useSpring(rawY, { stiffness: 95, damping: 22, mass: 0.35 });
 
   // `hasRotated` drives the board's stroke pacing: unhurried on load, brisk once it is looping.
-  const { index, hasRotated, pause, resume } = useSubjectRotation(copy.subjects.length);
+  const { index, hasRotated, pause, resume, select } = useSubjectRotation(copy.subjects.length);
   const subject = copy.subjects[index];
 
   // `copy.subjects` is authored content, never empty — but the index signature says otherwise
@@ -390,7 +399,7 @@ export function ClassroomPreview({ copy }: { copy: ClassroomCopy }) {
       </div>
 
       <motion.div className={styles.lessonLayer} style={{ x, y }}>
-        <LessonWindow copy={copy} subject={subject} first={!hasRotated} />
+        <LessonWindow copy={copy} subject={subject} first={!hasRotated} onSelect={select} />
       </motion.div>
 
       <TeacherNote note={subject.note} swapKey={subject.key} />
@@ -398,86 +407,133 @@ export function ClassroomPreview({ copy }: { copy: ClassroomCopy }) {
   );
 }
 
-const subjectIcons: Record<SubjectItem["key"], LucideIcon> = {
-  math: LineChart,
-  armenian: Languages,
-};
+/*
+ * The lucide glyph map that used to live here is gone. These four subjects are now carried by
+ * rendered clay plates in `public/marketing/subjects/`, keyed by the same `subject.key`, so the
+ * mapping is the filename and there is nothing to keep in sync here.
+ */
 
+/**
+ * The four courses, as glass.
+ *
+ * `app/globals.css` sets the bar for adding a second glass surface to this site, and the first
+ * clause is the one that shapes this markup: "if the surface would look identical with
+ * `backdrop-filter: none`, it is not glass, it is a tinted div. Glass needs real content moving
+ * behind it." The section used to sit on flat paper, so glass cards on it would have been exactly
+ * that tinted div.
+ *
+ * Hence `subjectField` — an aria-hidden backdrop of colour blooms in the palette's three field
+ * tints (the tokens that exist, by their own definition, to be "placed BEHIND glass"), plus a
+ * ruled grid. It is not decoration for its own sake; it is the content the cards refract, and the
+ * reason each card picks up a different cast depending on where it sits over the field.
+ */
 export function SubjectExplorer({ copy }: { copy: SubjectCopy }) {
   const reduceMotion = useReducedMotion();
   return (
     <section id="courses" className={styles.subjectSection} aria-labelledby="subject-title">
+      <div className={styles.subjectField} aria-hidden="true">
+        <span className={styles.fieldGrid} />
+        <span className={styles.fieldBloomOne} />
+        <span className={styles.fieldBloomTwo} />
+        <span className={styles.fieldBloomThree} />
+      </div>
+
       <div className={styles.sectionShell}>
         <div className={styles.subjectHeading}>
           <div>
             <p className={styles.sectionEyebrow}>{copy.eyebrow}</p>
             <h2 id="subject-title">{copy.title}</h2>
           </div>
-          <span className={styles.swipeHint}>{copy.hint}</span>
         </div>
-        <div className={styles.subjectRail}>
+        <ul className={styles.subjectRail}>
           {copy.items.map((subject, index) => {
-            const Icon = subjectIcons[subject.key];
             return (
-              <motion.div
+              <motion.li
                 key={subject.key}
-                initial={{ opacity: 0, y: 18 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, amount: 0.3 }}
+                /*
+                 * "Materialize, don't just fade": the card scales and lifts as it arrives so the
+                 * glass reads as a physical surface settling into place rather than an opacity
+                 * ramp. Critically damped — nothing here was thrown, so nothing should overshoot.
+                 *
+                 * `initial` is NOT branched on `reduceMotion`, only `transition` is. This is the
+                 * convention every other motion element in this file follows, and it is load
+                 * bearing: `useReducedMotion()` reads a media query, so it is false during SSR and
+                 * true on a reduced-motion client. Branching a prop that renders inline styles
+                 * therefore ships different `style` attributes from the server and the client, and
+                 * React reports a hydration mismatch. `transition` renders no markup, so gating
+                 * the duration there collapses the motion without touching the HTML.
+                 */
+                initial={{ opacity: 0, y: 26, scale: 0.965 }}
+                whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                viewport={{ once: true, amount: 0.25 }}
                 transition={
-                  reduceMotion ? { duration: 0 } : { duration: 0.5, delay: index * 0.06, ease }
+                  reduceMotion
+                    ? { duration: 0 }
+                    : { type: "spring", bounce: 0, duration: 0.55, delay: index * 0.07 }
                 }
               >
                 <Link href={subject.href} className={styles.subjectCard}>
-                  <span className={`${styles.subjectIcon} ${styles[subject.key]}`}>
-                    <Icon size={19} aria-hidden="true" />
+                  <span className={styles.subjectSheen} aria-hidden="true" />
+                  {/*
+                   * `alt=""`, deliberately. The card states the subject's name and description as
+                   * real text directly below, so an alt string here would make a screen reader
+                   * announce the subject twice. These plates are decoration for a labelled link.
+                   *
+                   * Fixed 1000x1000 intrinsic size because that is what the renders are; `sizes`
+                   * is what actually governs the fetched width, and it has to track the rail's
+                   * breakpoints below (4-up → 2-up → 1-up) or Next ships a 4-up-sized image to a
+                   * phone showing one card per row.
+                   */}
+                  <span className={styles.subjectPlate}>
+                    <Image
+                      src={`/marketing/subjects/${subject.key}.webp`}
+                      alt=""
+                      width={1000}
+                      height={1000}
+                      sizes="(max-width: 640px) 92vw, (max-width: 1100px) 46vw, 23vw"
+                      className={styles.subjectPlateArt}
+                    />
                   </span>
                   <span className={styles.subjectText}>
                     <strong>{subject.name}</strong>
                     <small>{subject.description}</small>
                   </span>
-                  <ArrowRight className={styles.subjectArrow} size={18} aria-hidden="true" />
+                  <span className={styles.subjectArrow} aria-hidden="true">
+                    <ArrowRight size={16} />
+                  </span>
                 </Link>
-              </motion.div>
+              </motion.li>
             );
           })}
-          <motion.div
-            initial={{ opacity: 0, y: 18 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.3 }}
-            transition={
-              reduceMotion
-                ? { duration: 0 }
-                : { duration: 0.5, delay: copy.items.length * 0.06, ease }
-            }
-          >
-            <div className={styles.subjectCardComingSoon}>
-              <span className={styles.subjectComingSoonBadge}>
-                <Clock size={12} aria-hidden="true" />
-                {copy.comingSoon.badge}
-              </span>
-              <span className={styles.subjectText}>
-                <strong>{copy.comingSoon.title}</strong>
-                <small>{copy.comingSoon.description}</small>
-              </span>
-            </div>
-          </motion.div>
-        </div>
+        </ul>
       </div>
     </section>
   );
 }
 
+/*
+ * `adaptive` was `Braces`, which is the mark for code — it read as "programming" in a row about
+ * teaching, and doubly so now that the subject cards sit above it. A presentation board is what a
+ * live lesson actually looks like.
+ */
 const benefitIcons: Record<BenefitItem["key"], LucideIcon> = {
-  adaptive: Braces,
+  adaptive: Presentation,
   parents: ShieldCheck,
   practice: BookOpenCheck,
+  availability: CalendarClock,
 };
 
 export function LearningBenefits({ copy }: { copy: BenefitsCopy }) {
   const reduceMotion = useReducedMotion();
   return (
     <section className={styles.benefitsSection} aria-labelledby="benefits-title">
+      {/* Same job as `subjectField`: the thing the glass refracts. Without it these cards would be
+          tinted divs — see the header of `app/globals.css`. */}
+      <div className={styles.benefitsField} aria-hidden="true">
+        <span className={styles.benefitBloomOne} />
+        <span className={styles.benefitBloomTwo} />
+        <span className={styles.benefitBloomThree} />
+      </div>
       <div className={styles.sectionShell}>
         <div className={styles.benefitsIntro}>
           <p className={styles.sectionEyebrow}>{copy.eyebrow}</p>
@@ -485,30 +541,32 @@ export function LearningBenefits({ copy }: { copy: BenefitsCopy }) {
           <p>{copy.description}</p>
         </div>
 
+        {/*
+         * No connecting rail. It ran behind the icon nodes and read as a line struck THROUGH the
+         * row rather than a thread joining it, and it only ever worked because the nodes were
+         * pinned half-outside the cards to sit on top of it. With the cards on glass the icon
+         * belongs inside the card, like the subject cards above, and the rail has nothing left to
+         * connect.
+         */}
         <div className={styles.benefitTimeline}>
-          <motion.span
-            className={styles.timelineLine}
-            aria-hidden="true"
-            initial={{ scaleX: 0 }}
-            whileInView={{ scaleX: 1 }}
-            viewport={{ once: true, amount: 0.5 }}
-            transition={reduceMotion ? { duration: 0 } : { duration: 1.1, ease }}
-          />
           {copy.items.map((item, index) => {
             const Icon = benefitIcons[item.key];
             return (
               <motion.article
                 key={item.key}
                 className={styles.benefitCard}
-                initial={{ opacity: 0, y: 24 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, amount: 0.35 }}
+                initial={{ opacity: 0, y: 26, scale: 0.965 }}
+                whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                viewport={{ once: true, amount: 0.25 }}
                 transition={
-                  reduceMotion ? { duration: 0 } : { duration: 0.6, delay: index * 0.13, ease }
+                  reduceMotion
+                    ? { duration: 0 }
+                    : { type: "spring", bounce: 0, duration: 0.55, delay: index * 0.07 }
                 }
               >
-                <span className={styles.benefitNode}>
-                  <Icon size={20} aria-hidden="true" />
+                <span className={styles.benefitSheen} aria-hidden="true" />
+                <span className={`${styles.benefitNode} ${styles[item.key]}`}>
+                  <Icon size={21} aria-hidden="true" />
                 </span>
                 <span className={styles.benefitSignal}>{item.signal}</span>
                 <h3>{item.title}</h3>

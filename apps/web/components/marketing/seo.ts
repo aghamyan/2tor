@@ -5,6 +5,7 @@ export const pageSlugs = [
   "mathematics",
   "programming",
   "armenian-language-heritage",
+  "chess",
   "sat",
   "toefl",
   "group-lessons",

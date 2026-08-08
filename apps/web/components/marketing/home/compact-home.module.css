@@ -13,6 +13,13 @@
  * peach, gold), which exist in that system as the backdrop behind glass. That keeps the subject and
  * benefit icons visually distinguishable — a real job, since they label three different things —
  * without inventing brand hues the system doesn't have.
+ *
+ * TYPE: this page runs ONE face, `--vz-display` (Instrument Sans), for headings and body alike —
+ * the face the hero headline is set in. It is the only public surface that does; the header, the
+ * footer and every other page still pair it with `--vz-body` (Atkinson Hyperlegible). Both are
+ * loaded either way, so this costs no extra download. The individual `font-family: var(--vz-display)`
+ * declarations further down are now redundant, and are kept only so the rules stay readable in
+ * isolation.
  */
 .page {
   --ink: hsl(var(--vz-ink));
@@ -34,7 +41,7 @@
   --coral-soft: hsl(var(--vz-field-2) / 45%);
   background: var(--paper);
   color: var(--ink);
-  font-family: var(--vz-body);
+  font-family: var(--vz-display);
   overflow: clip;
 }
 
@@ -117,7 +124,6 @@
 
 .armenianGlyph {
   bottom: 12%;
-  font-family: var(--vz-body);
   font-size: 1.2rem;
   left: 3.5%;
   transform: rotate(-9deg);
@@ -162,27 +168,24 @@
   z-index: 4;
 }
 
-.heroEyebrow,
+/* The same framed pill as `.groupEyebrow`, in its light-background register: over paper the frame
+   is carried by the token's outer ink hairline rather than by its inner white line. Both sections
+   that use this lay a refractive field behind their content, so there is something real to bend. */
 .sectionEyebrow {
-  color: var(--indigo-dark);
-  font-size: 0.72rem;
-  font-weight: 850;
-  letter-spacing: 0.13em;
-  text-transform: uppercase;
-}
-
-.heroEyebrow {
   align-items: center;
-  display: flex;
-  gap: 0.65rem;
-}
-
-.heroEyebrow > span {
-  background: var(--coral);
-  border-radius: 50%;
-  box-shadow: 0 0 0 5px hsl(var(--vz-accent) / 14%);
-  height: 0.45rem;
-  width: 0.45rem;
+  align-self: flex-start;
+  backdrop-filter: var(--vz-fx-glass-blur);
+  background: var(--vz-fx-glass-bg);
+  border-radius: var(--vz-r-pill);
+  box-shadow: var(--vz-fx-glass-shadow);
+  color: var(--indigo-dark);
+  display: inline-flex;
+  font-size: 0.85rem;
+  font-weight: 850;
+  letter-spacing: 0.12em;
+  padding: 0.52rem 1rem;
+  text-transform: uppercase;
+  width: fit-content;
 }
 
 .heroTitle {
@@ -190,14 +193,25 @@
   font-weight: 720;
   letter-spacing: -0.071em;
   line-height: 0.94;
-  margin-top: 1.25rem !important;
   max-width: 10.8ch;
   text-wrap: balance;
 }
 
-.heroTitle > span {
+.heroAccent {
   color: var(--indigo);
   display: inline;
+}
+
+/*
+ * The underline's containing block, and the reason it is a box of its own rather than the whole
+ * accent phrase. `.heroAccent` is `display: inline` and wraps — at most breakpoints "one good
+ * lesson." runs to two lines — and an absolutely positioned child of a FRAGMENTED inline resolves
+ * its percentage width against something no two engines agree on. That is why the rule used to
+ * measure differently on every viewport. An `inline-block` around the single word is one unbroken
+ * box everywhere, so `width: 100%` is exactly the word.
+ */
+.heroAccentWord {
+  display: inline-block;
   position: relative;
 }
 
@@ -207,11 +221,11 @@
   border-radius: 99px;
   bottom: -0.11em;
   height: 0.085em;
-  left: 0.02em;
+  left: 0;
   opacity: 0.8;
   position: absolute;
   transform-origin: left;
-  width: 98%;
+  width: 100%;
 }
 
 @keyframes underline-in {
@@ -223,12 +237,36 @@
   }
 }
 
-.heroDescription {
-  color: var(--muted);
-  font-size: clamp(1.05rem, 1.35vw, 1.18rem);
-  line-height: 1.72;
-  margin-top: 1.65rem !important;
-  max-width: 38rem;
+/*
+ * What the hero paragraph became. Three lines of prose describing the category were doing less
+ * work than four fragments naming what this product does that others do not, and they cost the
+ * hero more vertical space than the whole list now does.
+ *
+ * Two columns, because four full-width rows would out-tall the paragraph they replaced. They
+ * collapse to one column below 35rem, where two columns would wrap every label anyway.
+ */
+.heroPoints {
+  column-gap: clamp(1rem, 2.2vw, 2rem);
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, auto));
+  justify-content: start;
+  margin-top: clamp(1.35rem, 2.4svh, 1.85rem) !important;
+  row-gap: 0.6rem;
+}
+
+.heroPoints li {
+  align-items: center;
+  color: var(--ink-soft);
+  display: flex;
+  font-size: clamp(0.82rem, 1vw, 0.92rem);
+  font-weight: 640;
+  gap: 0.5rem;
+  letter-spacing: -0.006em;
+}
+
+.heroPoints svg {
+  color: hsl(var(--vz-accent));
+  flex: 0 0 auto;
 }
 
 .heroActions {
@@ -239,69 +277,43 @@
   margin-top: 2rem;
 }
 
-.primaryAction,
+/*
+ * The hero's primary button is the site header's `.buttonPrimary`, imported straight from
+ * `site/site.module.css` — the accent pill, its travelling sheen and its arrow all come from
+ * there, so the two stay identical by construction rather than by discipline. This class only
+ * scales it up to hero proportions; it must not restate any of the button's own appearance.
+ */
+.heroConsultAction {
+  border-radius: var(--vz-r-pill) !important;
+  font-size: 0.9rem !important;
+  min-height: 3.4rem !important;
+  padding-left: 1.35rem !important;
+  padding-right: 1.15rem !important;
+}
+
+/*
+ * `.buttonIcon` sizes its arrow badge with `content-box` so the 0.32rem padding sits OUTSIDE the
+ * 0.9rem glyph. This page's `.page *` reset is the same specificity and lands later in the sheet,
+ * so it silently flipped that to `border-box` and collapsed the arrow to a quarter of its size
+ * inside a circle that kept its diameter. One class deeper is enough to win it back.
+ */
+.heroConsultAction svg {
+  box-sizing: content-box;
+}
+
 .secondaryAction {
   align-items: center;
+  border: 1px solid var(--line);
   border-radius: var(--vz-r-pill);
+  color: var(--ink);
   display: inline-flex;
   font-size: 0.9rem;
-  font-weight: 780;
-  gap: 0.7rem;
+  font-weight: 700;
+  gap: 0.55rem;
   justify-content: center;
-  min-height: 3.65rem;
+  min-height: 3.4rem;
+  padding-inline: 1.35rem;
   text-decoration: none;
-}
-
-/* The landing page's primary button: a flat accent pill whose depth comes from a hover lift and an
-   accent-tinted glow. The heavy 2.3rem drop shadow and white inset highlight it used to carry read
-   as a plastic 3D button, which is the opposite of this design language. */
-.primaryAction {
-  background: var(--indigo);
-  border: 1px solid transparent;
-  box-shadow: 0 1px 2px hsl(var(--vz-ink) / 8%);
-  color: var(--white);
-  font-family: var(--vz-display);
-  letter-spacing: -0.01em;
-  padding: 0.62rem 0.62rem 0.62rem 1.25rem;
-  transition:
-    box-shadow 220ms var(--vz-ease),
-    transform 220ms var(--vz-ease);
-}
-
-.primaryAction > span {
-  align-items: center;
-  background: rgb(255 255 255 / 15%);
-  border: 1px solid rgb(255 255 255 / 16%);
-  border-radius: 0.58rem;
-  display: flex;
-  height: 2.25rem;
-  justify-content: center;
-  width: 2.25rem;
-}
-
-.primaryAction svg {
-  transition: transform 200ms ease;
-}
-
-.primaryAction:hover {
-  box-shadow:
-    var(--vz-fx-glow),
-    0 1px 2px hsl(var(--vz-ink) / 10%);
-  transform: translateY(-2px);
-}
-
-.primaryAction:active {
-  transform: scale(0.975);
-}
-
-.primaryAction:hover svg {
-  transform: translateX(3px);
-}
-
-.secondaryAction {
-  border: 1px solid transparent;
-  color: var(--ink);
-  padding-inline: 1rem;
   transition:
     background 200ms ease,
     border-color 200ms ease,
@@ -310,81 +322,17 @@
 
 .secondaryAction svg {
   color: var(--indigo);
+  transition: transform 200ms ease;
 }
 
 .secondaryAction:hover {
   background: rgb(255 255 255 / 72%);
-  border-color: var(--line);
+  border-color: hsl(var(--vz-accent) / 45%);
   transform: translateY(-2px);
 }
 
-.trustList {
-  display: grid;
-  gap: 0.6rem 1rem;
-  grid-template-columns: repeat(2, minmax(0, auto));
-  margin-top: 1.6rem !important;
-}
-
-.trustList li {
-  align-items: center;
-  color: var(--ink-soft);
-  display: flex;
-  font-size: 0.73rem;
-  font-weight: 680;
-  gap: 0.45rem;
-}
-
-.trustList svg {
-  color: hsl(var(--vz-positive));
-  flex: 0 0 auto;
-}
-
-.socialProof {
-  align-items: center;
-  border-top: 1px solid var(--line);
-  display: flex;
-  gap: 0.8rem;
-  margin-top: 1.65rem;
-  padding-top: 1.15rem;
-  width: min(100%, 34rem);
-}
-
-.socialProof p {
-  color: var(--muted);
-  font-size: 0.69rem;
-  font-weight: 650;
-  line-height: 1.4;
-  max-width: 15rem;
-}
-
-.avatarStack {
-  display: flex;
-  padding-left: 0.55rem;
-}
-
-.avatarStack span {
-  align-items: center;
-  background: var(--indigo-soft);
-  border: 2px solid var(--paper);
-  border-radius: 50%;
-  color: var(--indigo-dark);
-  display: flex;
-  font-size: 0.48rem;
-  font-weight: 850;
-  height: 2rem;
-  justify-content: center;
-  margin-left: -0.55rem;
-  width: 2rem;
-}
-
-.avatarStack span:nth-child(2) {
-  background: var(--coral-soft);
-  color: hsl(var(--vz-accent));
-}
-
-.avatarStack span:nth-child(3) {
-  background: var(--mint-soft);
-  color: hsl(var(--vz-positive));
+.secondaryAction:hover svg {
+  transform: translateX(3px);
 }
 
 /* Product lesson preview */
@@ -558,7 +506,10 @@
 
 .lessonBody {
   display: grid;
-  grid-template-columns: minmax(0, 1.75fr) minmax(9.25rem, 0.75fr);
+  /* The sidebar floor is set by its longest course name, not by a round number: Armenian's
+     "Մաթեմատիկա" is a single unbreakable word, so a column too narrow for it overflows rather than
+     wrapping. 10.5rem clears it at the list's 0.84rem type with the panel's padding. */
+  grid-template-columns: minmax(0, 1.75fr) minmax(10.5rem, 0.75fr);
   min-height: 23.5rem;
 }
 
@@ -671,81 +622,102 @@
 
 .sidebarLabel {
   align-items: center;
-  color: var(--ink-soft);
+  color: var(--muted);
   display: flex;
-  font-size: 0.6rem;
+  font-size: 0.58rem;
   font-weight: 800;
   gap: 0.35rem;
+  letter-spacing: 0.09em;
   line-height: 1.35;
+  text-transform: uppercase;
 }
 
 .sidebarLabel svg {
-  color: hsl(var(--vz-positive));
+  color: hsl(var(--vz-accent));
   flex: 0 0 auto;
 }
 
-.miniChart {
-  background: linear-gradient(to bottom, var(--mint-soft), transparent);
-  border-bottom: 1px solid hsl(var(--vz-line-soft));
-  height: 5.75rem;
-  margin-top: 1rem;
-}
-
-.miniChart svg {
-  height: 100%;
-  overflow: visible;
-  width: 100%;
-}
-.miniChart path {
-  fill: none;
-  stroke: hsl(var(--vz-positive));
-  stroke-linecap: round;
-  stroke-width: 3;
-}
-
-.confidence {
-  color: hsl(var(--vz-positive));
-  font-size: 0.64rem;
-  line-height: 1.4;
-  margin-top: 0.75rem;
-}
-
-.streakRow {
-  border-top: 1px solid hsl(var(--vz-line-soft));
-  margin-top: auto;
-  padding-top: 1rem;
-}
-
-.streakRow > span {
-  align-items: center;
-  color: var(--ink-soft);
+.courseList {
   display: flex;
-  font-size: 0.6rem;
-  font-weight: 750;
-  gap: 0.3rem;
-}
-
-.streakRow svg {
-  color: hsl(var(--vz-accent));
-}
-.streakRow > div {
-  display: flex;
+  flex-direction: column;
   gap: 0.28rem;
-  margin-top: 0.65rem;
-}
-.streakRow i {
-  background: hsl(var(--vz-surface-2));
-  border-radius: 50%;
-  height: 0.48rem;
-  width: 0.48rem;
-}
-.streakRow .streakDone {
-  background: var(--yellow);
+  margin-top: 1rem !important;
 }
 
-/* Subject explorer */
+/*
+ * These rows are `<button>`s — they are the rotation's stop control, not labels — so this resets
+ * the UA button styling before restating the row. The left padding is permanent, reserved on every
+ * row rather than only the active one, so labels do not jump sideways when the card rotates.
+ */
+.courseList button {
+  appearance: none;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+  width: 100%;
+  align-items: center;
+  border-radius: var(--vz-r-input);
+  color: var(--muted);
+  display: flex;
+  font-size: 0.84rem;
+  font-weight: 650;
+  min-height: 2.3rem;
+  padding-left: 0.8rem;
+  position: relative;
+  transition:
+    color 260ms var(--vz-ease),
+    background 260ms var(--vz-ease);
+}
+
+.courseList button:hover {
+  background: hsl(var(--vz-accent) / 6%);
+  color: var(--indigo-dark);
+}
+
+.courseList button:focus-visible {
+  outline: 2px solid hsl(var(--vz-accent) / 55%);
+  outline-offset: 1px;
+}
+
+.courseList .courseActive {
+  background: hsl(var(--vz-accent) / 8%);
+  color: var(--indigo-dark);
+  font-weight: 780;
+}
+
+/* Slides between rows via framer's `layoutId` rather than fading in place, so the eye follows the
+   rotation instead of re-finding it. */
+.courseList i {
+  background: var(--coral);
+  border-radius: 99px;
+  bottom: 0.32rem;
+  left: 0;
+  position: absolute;
+  top: 0.32rem;
+  width: 0.16rem;
+}
+
+/* ── Subject explorer ─────────────────────────────────────────────────────────
+   The site's second glass surface. `app/globals.css` documents what that costs and requires; this
+   block is the receipt.
+
+   1. GLASS NEEDS SOMETHING BEHIND IT. Its test — "if the surface would look identical with
+      `backdrop-filter: none`, it is not glass, it is a tinted div" — is why `.subjectField` exists.
+      The section used to be flat `--paper`, on which any amount of blur is a no-op.
+   2. TOKENS ARE COMPOSED, NOT COPIED. `--vz-fx-glass-*` are used directly, the way
+      `site.module.css` uses them on the header, so the two surfaces cannot drift.
+   3. THE LENS HALO IS A RADIAL MASK, never a `content-box` XOR mask, which draws a hard rectangle
+      inside the card.
+   4. `prefers-reduced-transparency` IS A REAL CODE PATH. The rim here is an inset shadow rather
+      than a border, so the fallback has to draw one.
+   5. NO HAND-WRITTEN `-webkit-` PREFIXES. lightningcss emits them; authoring both collapses the
+      pair to the prefixed form alone, which computes to `none`. */
 .subjectSection {
   background: var(--paper);
+  isolation: isolate;
+  overflow: hidden;
   padding-bottom: clamp(5rem, 8vw, 8rem);
   position: relative;
   scroll-margin-top: 5.5rem;
@@ -759,149 +731,326 @@
   position: absolute;
   right: 0;
   top: 0;
+  z-index: 2;
+}
+
+/*
+ * The refractive field. Three blooms in the palette's field tints — the tokens whose own comment
+ * says they are "placed BEHIND glass" — over a ruled grid. Positioned so no two cards sit over the
+ * same colour, which is what makes the row read as four panes of one material rather than four
+ * copies of one card.
+ */
+.subjectField {
+  inset: 0;
+  pointer-events: none;
+  position: absolute;
+  z-index: 0;
+}
+
+.fieldGrid {
+  background-image:
+    linear-gradient(hsl(var(--vz-ink) / 5%) 1px, transparent 1px),
+    linear-gradient(90deg, hsl(var(--vz-ink) / 5%) 1px, transparent 1px);
+  background-size: 46px 46px;
+  inset: 0;
+  mask-image: radial-gradient(120% 90% at 50% 45%, black 30%, transparent 78%);
+  position: absolute;
+}
+
+.fieldBloomOne,
+.fieldBloomTwo,
+.fieldBloomThree {
+  border-radius: 50%;
+  filter: blur(70px);
+  position: absolute;
+}
+
+.fieldBloomOne {
+  background: hsl(var(--vz-field-1) / 62%);
+  height: 24rem;
+  left: -4%;
+  top: 24%;
+  width: 34rem;
+}
+
+.fieldBloomTwo {
+  background: hsl(var(--vz-field-2) / 55%);
+  height: 22rem;
+  left: 34%;
+  top: 12%;
+  width: 32rem;
+}
+
+.fieldBloomThree {
+  background: hsl(var(--vz-field-3) / 58%);
+  height: 25rem;
+  right: -3%;
+  top: 30%;
+  width: 33rem;
 }
 
 .subjectHeading {
   align-items: flex-end;
   display: flex;
   justify-content: space-between;
-  padding-block: 2.5rem 1.25rem;
+  padding-block: 2.5rem 1.6rem;
+  position: relative;
+  z-index: 2;
 }
 
+/*
+ * `font-weight` is the whole fix for "this doesn't look like the hero headline". The family was
+ * already Instrument Sans everywhere on this page; what differed was weight — Tailwind's preflight
+ * sets `h1..h6 { font-weight: inherit }`, so this h2 was landing on the body's 400 while
+ * `.heroTitle` declares 720. Matching it makes the two headings read as one voice.
+ */
 .subjectHeading h2 {
   font-size: clamp(1.8rem, 3vw, 2.8rem);
+  font-weight: 720;
   letter-spacing: -0.05em;
   line-height: 1.05;
   margin-top: 0.4rem !important;
 }
 
-.swipeHint {
-  color: var(--muted);
-  display: none;
-  font-size: 0.68rem;
-  font-weight: 650;
-}
-
 .subjectRail {
   display: grid;
-  gap: 0.65rem;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(0.7rem, 1.1vw, 1rem);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  position: relative;
+  z-index: 2;
+}
+
+.subjectRail > li {
+  display: flex;
+  min-width: 0;
+}
+
+/*
+ * The pane. Everything visual here is a `--vz-fx-glass-*` token except the layout, so a change to
+ * the material in `globals.css` reaches the header and these cards together.
+ */
+/*
+ * ONE recipe for this module's two glass surfaces. `globals.css` refuses to ship a shared
+ * `.vz-glass` class — "a second, unexercised copy of the recipe is how the two drift apart" — and
+ * that argument applies just as much within a file: the subject cards and the benefit cards are
+ * the same material and must stay so. Layout stays per-card below.
+ */
+.subjectCard,
+.benefitCard {
+  backdrop-filter: var(--vz-fx-glass-blur);
+  background: var(--vz-fx-glass-bg);
+  border-radius: var(--vz-r-card);
+  box-shadow: var(--vz-fx-glass-shadow);
+  isolation: isolate;
+  overflow: hidden;
+  position: relative;
+  transition:
+    box-shadow 320ms var(--vz-ease),
+    transform 320ms var(--vz-ease);
+}
+
+.subjectSheen,
+.benefitSheen {
+  background: var(--vz-fx-glass-sheen);
+  inset: 0;
+  mask-image: radial-gradient(120% 120% at 8% 0%, black 12%, transparent 62%);
+  opacity: 0.5;
+  pointer-events: none;
+  position: absolute;
+  transition: opacity 320ms var(--vz-ease);
+  z-index: 0;
 }
 
 .subjectCard {
-  background: rgb(255 255 255 / 70%);
-  border: 1px solid var(--line);
-  border-radius: var(--vz-r-input);
+  align-content: start;
   color: var(--ink);
   display: grid;
-  gap: 0.8rem;
-  grid-template-columns: auto 1fr;
-  min-height: 9.7rem;
-  padding: 1rem;
-  position: relative;
+  gap: 1.05rem;
+  min-height: 12.5rem;
+  padding: 1.35rem 1.25rem 1.45rem;
   text-decoration: none;
-  transition:
-    background 200ms ease,
-    border-color 200ms ease,
-    box-shadow 200ms ease,
-    transform 200ms ease;
+  width: 100%;
+}
+
+/*
+ * Named explicitly rather than `.subjectCard > *:not(.subjectSheen)`. That form is (0,2,0) and so
+ * beat `.subjectArrow`'s own `position: absolute` at (0,1,0), turning the invisible arrow into a
+ * third grid row — every card carried a row of dead space under its description because of it.
+ */
+.subjectPlate,
+.subjectText {
+  position: relative;
+  z-index: 1;
 }
 
 .subjectCard:hover {
-  background: var(--white);
-  border-color: hsl(var(--vz-line));
-  box-shadow: 0 1rem 2.2rem hsl(var(--vz-ink) / 10%);
-  transform: translateY(-4px);
+  box-shadow: var(--vz-fx-glass-shadow), var(--vz-fx-glow);
+  transform: translateY(-5px);
 }
 
-.subjectIcon {
-  align-items: center;
-  background: var(--indigo-soft);
-  border: 1px solid hsl(var(--vz-accent) / 26%);
-  border-radius: var(--vz-r-input);
-  color: var(--indigo-dark);
-  display: flex;
-  height: 2.65rem;
-  justify-content: center;
-  transition: transform 200ms ease;
-  width: 2.65rem;
+.subjectCard:hover .subjectSheen {
+  opacity: 0.85;
 }
 
-.subjectCard:hover .subjectIcon {
-  transform: rotate(-5deg) scale(1.06);
-}
-.subjectIcon.armenian {
-  background: var(--coral-soft);
-  border-color: hsl(var(--vz-accent) / 30%);
-  color: hsl(var(--vz-accent));
+/* Feedback on press, not on release. */
+.subjectCard:active {
+  transform: translateY(-5px) scale(0.985);
+  transition-duration: 110ms;
 }
 
-.subjectCardComingSoon {
-  background: transparent;
-  border: 1px dashed var(--line);
-  border-radius: var(--vz-r-input);
-  display: flex;
-  flex-direction: column;
-  gap: 0.8rem;
-  justify-content: center;
-  min-height: 9.7rem;
-  padding: 1rem;
+/*
+ * The art plate. Full-bleed to the card's edges, which is why it carries negative margins equal to
+ * `.subjectCard`'s padding rather than the card dropping its padding — the text below still needs
+ * that inset, and only this child breaks out of it.
+ *
+ * The renders already sit on their own cream ground, so no fill or border is declared here; adding
+ * one would draw a second edge inside the card's own rounded corner.
+ */
+.subjectPlate {
+  border-radius: var(--vz-r-card) var(--vz-r-card) 0 0;
+  display: block;
+  margin: -1.35rem -1.25rem 0;
+  overflow: hidden;
 }
 
-.subjectComingSoonBadge {
-  align-items: center;
-  background: var(--paper);
-  border: 1px solid var(--line);
-  border-radius: 99px;
-  color: var(--muted);
-  display: inline-flex;
-  font-size: 0.58rem;
-  font-weight: 800;
-  gap: 0.35rem;
-  letter-spacing: 0.02em;
-  padding: 0.3rem 0.55rem;
-  text-transform: uppercase;
-  width: fit-content;
+/*
+ * `aspect-ratio` on a 1:1 source cropped to a letterbox: the plates are square files, and this is
+ * where they become a band across the top of the card. Cropping in CSS rather than shipping a
+ * second set of files keeps one asset per subject.
+ */
+.subjectPlateArt {
+  aspect-ratio: 16 / 10;
+  display: block;
+  height: auto;
+  object-fit: cover;
+  transition: transform 420ms var(--vz-ease);
+  width: 100%;
 }
 
-.subjectCardComingSoon .subjectText strong {
-  color: var(--muted);
+/* The card lifts; the art inside it pushes in slightly against that lift. Scale only — a rotation
+   here would fight the object's own baked-in perspective and read as a crooked photograph. */
+.subjectCard:hover .subjectPlateArt {
+  transform: scale(1.045);
 }
 
 .subjectText {
   display: flex;
   flex-direction: column;
-  grid-column: 1 / -1;
 }
 
+/*
+ * Vibrancy: text over a translucent, moving backdrop needs more weight and contrast than text on
+ * paper, so these are heavier and darker than the old opaque card's, not lighter.
+ */
+/*
+ * Accent, but through `--indigo-dark` rather than `--vz-accent` raw. This is the file's own
+ * established move for accent-as-text (see `--indigo-dark`'s definition and `.tutorAvatar`): at
+ * full strength the accent measures ~3.6:1 on these glass tints, which only clears AA because the
+ * title happens to be large and bold. Darkened toward ink it reaches ~5:1 and still reads as the
+ * same vermillion — the section eyebrow above uses exactly this colour.
+ */
 .subjectText strong {
-  font-size: 0.88rem;
+  color: var(--indigo-dark);
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: -0.024em;
+  line-height: 1.22;
+  /* "Armenian Language & Culture" cannot fit one line at this size in a quarter-width card, so it
+     is going to wrap; balancing decides where. */
+  text-wrap: balance;
 }
+
 .subjectText small {
-  color: var(--muted);
-  font-size: 0.68rem;
-  line-height: 1.48;
-  margin-top: 0.3rem;
+  color: hsl(var(--vz-ink) / 78%);
+  font-size: 0.87rem;
+  font-weight: 500;
+  line-height: 1.5;
+  margin-top: 0.5rem;
 }
+
 .subjectArrow {
+  align-items: center;
+  background: hsl(0 0% 100% / 45%);
+  border-radius: var(--vz-r-pill);
+  box-shadow: inset 0 0 0 1px hsl(0 0% 100% / 60%);
   color: var(--indigo);
+  display: flex;
+  height: 1.9rem;
+  justify-content: center;
   opacity: 0;
   position: absolute;
-  right: 0.9rem;
+  right: 1.1rem;
   top: 1.35rem;
-  transform: translateX(-4px);
+  transform: translateX(-6px);
   transition:
-    opacity 180ms ease,
-    transform 180ms ease;
+    opacity 260ms var(--vz-ease),
+    transform 260ms var(--vz-ease);
+  width: 1.9rem;
+  z-index: 1;
 }
-.subjectCard:hover .subjectArrow {
+
+.subjectCard:hover .subjectArrow,
+.subjectCard:focus-visible .subjectArrow {
   opacity: 1;
   transform: translateX(0);
 }
 
-/* Connected benefits */
+/*
+ * Reduced transparency: an opaque surface with a DRAWN border, because the rim above is an inset
+ * shadow and would vanish with the rest of the material. The field behind is dropped too — its
+ * only job was to be refracted.
+ */
+@media (prefers-reduced-transparency: reduce) {
+  .subjectField,
+  .benefitsField,
+  .parentField {
+    display: none;
+  }
+  /* The eyebrow pills lose the material but keep the frame — see `.sectionEyebrow`. */
+  .sectionEyebrow {
+    backdrop-filter: none;
+    background: hsl(var(--vz-surface));
+    box-shadow:
+      inset 0 0 0 1px hsl(var(--vz-line)),
+      var(--vz-fx-shadow);
+  }
+  .subjectCard,
+  .benefitCard {
+    backdrop-filter: none;
+    background: hsl(var(--vz-surface));
+    box-shadow:
+      inset 0 0 0 1px hsl(var(--vz-line)),
+      var(--vz-fx-shadow);
+  }
+  .subjectSheen,
+  .benefitSheen {
+    display: none;
+  }
+  .subjectIcon,
+  .benefitNode,
+  .subjectArrow {
+    background: hsl(var(--vz-accent) / 10%);
+    box-shadow: inset 0 0 0 1px hsl(var(--vz-accent) / 22%);
+  }
+}
+
+/* High contrast: near-solid surface with a defined border. */
+@media (prefers-contrast: more) {
+  .subjectCard,
+  .benefitCard {
+    background: hsl(var(--vz-surface));
+    box-shadow: inset 0 0 0 2px hsl(var(--vz-ink) / 55%);
+  }
+  .subjectText small,
+  .benefitCard p {
+    color: hsl(var(--vz-ink) / 88%);
+  }
+}
+
 .benefitsSection {
   background: var(--white);
+  isolation: isolate;
+  overflow: hidden;
   padding-block: clamp(5.5rem, 9vw, 9rem);
   position: relative;
 }
@@ -915,15 +1064,62 @@
   opacity: 0.5;
   pointer-events: none;
   position: absolute;
+  z-index: 0;
+}
+
+/* What the benefit cards refract. Placed on the card band rather than the section's full height —
+   a bloom above the row tints the heading and leaves the glass with nothing to bend. */
+.benefitsField {
+  inset: 0;
+  pointer-events: none;
+  position: absolute;
+  z-index: 0;
+}
+
+.benefitBloomOne,
+.benefitBloomTwo,
+.benefitBloomThree {
+  border-radius: 50%;
+  filter: blur(78px);
+  position: absolute;
+}
+
+.benefitBloomOne {
+  background: hsl(var(--vz-field-2) / 58%);
+  bottom: 8%;
+  height: 28rem;
+  left: -4%;
+  width: 38rem;
+}
+
+.benefitBloomTwo {
+  background: hsl(var(--vz-field-3) / 55%);
+  bottom: 12%;
+  height: 26rem;
+  left: 36%;
+  width: 32rem;
+}
+
+.benefitBloomThree {
+  background: hsl(var(--vz-field-1) / 55%);
+  bottom: 9%;
+  height: 28rem;
+  right: -4%;
+  width: 36rem;
 }
 
 .benefitsIntro {
   max-width: 50rem;
   position: relative;
+  z-index: 2;
 }
 
+/* Weight 720, matching `.heroTitle` and `.subjectHeading h2`. Tailwind's preflight sets
+   `h1..h6 { font-weight: inherit }`, so every heading on this page lands on the body's 400 unless
+   it says otherwise — this one was the last still doing that. */
 .benefitsIntro h2 {
   font-size: clamp(2.55rem, 5vw, 5rem);
+  font-weight: 720;
   letter-spacing: -0.064em;
   line-height: 0.98;
   margin-top: 0.9rem !important;
@@ -932,85 +1128,867 @@
 
 .benefitsIntro > p:last-child {
   color: var(--muted);
-  font-size: 1rem;
-  line-height: 1.7;
+  font-size: 1.12rem;
+  font-weight: 520;
+  line-height: 1.68;
   margin-top: 1.25rem;
   max-width: 40rem;
 }
 
 .benefitTimeline {
   display: grid;
-  gap: 1rem;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(0.7rem, 1.1vw, 1rem);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   margin-top: clamp(3rem, 6vw, 5.5rem);
   position: relative;
+  z-index: 2;
 }
 
-/* Two stops, not three. The old rail ran indigo -> coral -> green; with indigo and coral now the
-   same accent, a three-stop version would read as a flat accent that inexplicably turns green
-   halfway. Accent -> positive says what the row actually shows: the lesson leading to progress. */
-.timelineLine {
-  background: linear-gradient(90deg, hsl(var(--vz-accent)), hsl(var(--vz-positive)));
-  height: 2px;
-  left: 8%;
-  position: absolute;
-  right: 8%;
-  top: 1.45rem;
-  transform-origin: left;
-}
-
+/* The material comes from the shared rule further up; this is layout only. */
 .benefitCard {
-  background: var(--white);
-  border: 1px solid var(--line);
-  border-radius: var(--vz-r-card);
-  min-height: 16.5rem;
-  padding: 3.8rem 1.35rem 1.35rem;
-  position: relative;
+  align-content: start;
+  display: grid;
+  gap: 1.05rem;
+  min-height: 15rem;
+  padding: 1.5rem 1.35rem 1.6rem;
 }
 
+.benefitCard:hover {
+  box-shadow: var(--vz-fx-glass-shadow), var(--vz-fx-glow);
+  transform: translateY(-4px);
+}
+
+.benefitCard:hover .benefitSheen {
+  opacity: 0.85;
+}
+
+.benefitNode,
+.benefitSignal,
+.benefitCard h3,
+.benefitCard p {
+  position: relative;
+  z-index: 1;
+}
+
+/* In the card now, not pinned half outside it on a rail. Same tile as the subject cards, so the
+   two rows read as one system. */
 .benefitNode {
   align-items: center;
-  background: var(--indigo-soft);
-  border: 5px solid var(--white);
-  border-radius: 50%;
+  background: hsl(0 0% 100% / 55%);
+  border-radius: var(--vz-r-input);
   box-shadow:
-    0 0 0 1px var(--line),
-    0 0.5rem 1.2rem hsl(var(--vz-ink) / 12%);
-  color: var(--indigo);
+    inset 0 0 0 1px hsl(0 0% 100% / 65%),
+    0 6px 14px -8px hsl(var(--vz-ink) / 35%);
+  color: var(--indigo-dark);
   display: flex;
-  height: 3.35rem;
+  height: 3.15rem;
   justify-content: center;
-  left: 1.25rem;
-  position: absolute;
-  top: -0.2rem;
-  width: 3.35rem;
+  transition: transform 320ms var(--vz-ease);
+  width: 3.15rem;
 }
 
-.benefitCard:nth-of-type(2) .benefitNode {
-  background: var(--coral-soft);
-  color: hsl(var(--vz-accent));
+.benefitCard:hover .benefitNode {
+  transform: rotate(-6deg) scale(1.07);
 }
-.benefitCard:nth-of-type(3) .benefitNode {
-  background: var(--mint-soft);
-  color: hsl(var(--vz-positive));
+
+.benefitNode.parents {
+  color: color-mix(in srgb, hsl(var(--vz-positive)) 88%, hsl(var(--vz-ink)));
 }
+.benefitNode.practice {
+  color: color-mix(in srgb, hsl(38 63% 42%) 88%, hsl(var(--vz-ink)));
+}
+.benefitNode.availability {
+  color: color-mix(in srgb, hsl(var(--vz-accent)) 78%, hsl(var(--vz-ink)));
+}
+
 .benefitSignal {
   color: var(--indigo-dark);
-  font-size: 0.63rem;
+  font-size: 0.66rem;
   font-weight: 850;
   letter-spacing: 0.09em;
   text-transform: uppercase;
 }
+
+/*
+ * Bold and accent-coloured, matching the course cards. Both properties are stated because neither
+ * arrives on its own: preflight zeroes the heading weight, and `--indigo-dark` rather than raw
+ * `--vz-accent` is what clears AA on a translucent surface (measured, see `.subjectText strong`).
+ */
 .benefitCard h3 {
-  font-size: 1.15rem;
-  letter-spacing: -0.035em;
-  margin-top: 0.75rem !important;
+  color: var(--indigo-dark);
+  font-size: 1.3rem;
+  font-weight: 700;
+  letter-spacing: -0.028em;
+  line-height: 1.24;
+  margin-top: 0 !important;
+  text-wrap: balance;
 }
+
 .benefitCard p {
+  color: hsl(var(--vz-ink) / 78%);
+  font-size: 0.93rem;
+  font-weight: 500;
+  line-height: 1.55;
+  margin-top: 0;
+}
+
+/* ── Group lessons ────────────────────────────────────────────────────────────
+   A full-bleed pine band, the same brand surface as the teacher's note in the hero, running edge to
+   edge between two paper sections. It used to be a rounded pine card floating on paper; as a band it
+   reads as a change of room rather than as one more card in a column of cards.
+
+   Because the band is dark, the map's panes are the page's third glass surface. That is only honest
+   if something sits behind them — see `.groupField` — and the contrast note above `.mapStudent`
+   records what the material costs on this background. */
+.groupSection {
+  background: hsl(var(--vz-block));
+  isolation: isolate;
+  overflow: hidden;
+  padding-block: clamp(3.5rem, 6vw, 6rem);
+  position: relative;
+}
+
+/* Same construction as `.subjectField`, in the block palette: a ruled grid faded at the edges plus
+   three blurred blooms. The pane over a warm bloom and the pane over a cool one are what make the
+   material read as glass rather than as translucency. */
+.groupField {
+  inset: 0;
+  pointer-events: none;
+  position: absolute;
+  z-index: 0;
+}
+
+.groupGrid {
+  background-image:
+    linear-gradient(hsl(var(--vz-block-on) / 7%) 1px, transparent 1px),
+    linear-gradient(90deg, hsl(var(--vz-block-on) / 7%) 1px, transparent 1px);
+  background-size: 46px 46px;
+  inset: 0;
+  mask-image: radial-gradient(115% 95% at 68% 46%, black 24%, transparent 76%);
+  position: absolute;
+}
+
+.groupBloomOne,
+.groupBloomTwo,
+.groupBloomThree {
+  border-radius: 50%;
+  filter: blur(78px);
+  position: absolute;
+}
+
+/* Under the student cards. */
+.groupBloomOne {
+  background: hsl(var(--vz-field-1) / 40%);
+  height: 24rem;
+  right: 6%;
+  top: -32%;
+  width: 24rem;
+}
+
+/* Under the hub, so the two rows of the map are not lit by the same colour. */
+.groupBloomTwo {
+  background: hsl(var(--vz-accent) / 38%);
+  bottom: -38%;
+  height: 22rem;
+  right: 24%;
+  width: 22rem;
+}
+
+.groupBloomThree {
+  background: hsl(var(--vz-field-2) / 24%);
+  height: 20rem;
+  left: -7%;
+  top: 14%;
+  width: 20rem;
+}
+
+.groupSection .sectionShell {
+  position: relative;
+  z-index: 1;
+}
+
+/* Capped well inside the 88rem shell. This is one of the page's two SMALL sections; run full width
+   and the copy strands its diagram against the far edge with 600px of band between them. */
+.groupBlock {
+  display: grid;
+  gap: clamp(1.75rem, 3vw, 2.75rem);
+  grid-template-columns: minmax(0, 1fr) minmax(0, 32rem);
+  margin-inline: auto;
+  max-width: 72rem;
+  position: relative;
+}
+
+.groupCopy {
+  position: relative;
+  z-index: 1;
+}
+
+/* A glass pill rather than bare text. It sits over `.groupBloomThree`, so there is something real
+   behind it to bend — the same condition the map's panes have to satisfy.
+
+   The tint is INK, not white. Glass lightens what is behind it, and `--vz-fx-glass-blur` carries a
+   `brightness(1.06)` on top of that; a white tint measured 3.87:1 under the pale coral at 1440 and
+   1.06:1 at 390, where the pill lands on the coral bloom. Tinting dark keeps the material — blur,
+   saturation, specular rim — while leaving the text somewhere it can be read. */
+.groupEyebrow {
+  align-items: center;
+  backdrop-filter: var(--vz-fx-glass-blur);
+  background: hsl(var(--vz-ink) / 52%);
+  border-radius: var(--vz-r-pill);
+  box-shadow:
+    inset 0 0 0 1px hsl(var(--vz-field-2) / 34%),
+    inset 2px 3px 0 -2px hsl(0 0% 100% / 42%),
+    inset -2px -3px 0 -2px hsl(0 0% 100% / 16%);
+  color: hsl(var(--vz-field-2));
+  display: inline-flex;
+  font-size: 0.82rem;
+  font-weight: 850;
+  letter-spacing: 0.1em;
+  padding: 0.5rem 0.95rem;
+  text-transform: uppercase;
+}
+
+.groupSection h2 {
+  color: hsl(var(--vz-block-on));
+  font-size: clamp(2.15rem, 4vw, 3.3rem);
+  font-weight: 720;
+  letter-spacing: -0.04em;
+  line-height: 1.06;
+  margin-top: 1rem !important;
+  max-width: 18ch;
+  text-wrap: balance;
+}
+
+/* `--vz-field-2`, not `--vz-accent`: the accent's #C2401F is a deep brick that all but disappears on
+   pine, which is why the eyebrow uses the pale coral too. Measured on the rendered band, not picked
+   by eye. */
+.groupTitleAccent {
+  color: hsl(var(--vz-field-2));
+}
+
+.groupBody {
+  color: hsl(var(--vz-block-on) / 90%);
+  font-size: 1.08rem;
+  font-weight: 520;
+  line-height: 1.6;
+  margin-top: 1.15rem !important;
+  max-width: 50ch;
+}
+
+.groupPoints {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem 1.6rem;
+  margin-top: 1.6rem !important;
+}
+
+.groupPoints li {
+  align-items: center;
+  color: hsl(var(--vz-block-on));
+  display: flex;
+  font-size: 0.95rem;
+  font-weight: 640;
+  gap: 0.5rem;
+}
+
+.groupPoints svg {
+  color: hsl(var(--vz-field-1));
+  flex: 0 0 auto;
+}
+
+.groupCta {
+  align-items: center;
+  background: hsl(0 0% 100% / 10%);
+  border-radius: var(--vz-r-pill);
+  box-shadow: inset 0 0 0 1px hsl(var(--vz-block-on) / 30%);
+  color: hsl(var(--vz-block-on));
+  display: inline-flex;
+  font-size: 0.87rem;
+  font-weight: 700;
+  gap: 0.55rem;
+  margin-top: 1.7rem;
+  min-height: 2.9rem;
+  padding-inline: 1.25rem;
+  text-decoration: none;
+  transition:
+    background 220ms var(--vz-ease),
+    transform 220ms var(--vz-ease);
+}
+
+.groupCta:hover {
+  background: hsl(0 0% 100% / 18%);
+  transform: translateY(-2px);
+}
+
+.groupCta svg {
+  transition: transform 200ms var(--vz-ease);
+}
+.groupCta:hover svg {
+  transform: translateX(3px);
+}
+
+/* ── The matching map ─────────────────────────────────────────────────────────
+   Three stacked rows on the pine — students, wire, hub — so the diagram's geometry is layout-driven
+   and cannot drift out of alignment. See `GroupMatchMap` in `home-sections.tsx` for why this is not
+   the absolutely positioned canvas the `/group-lessons` page uses.
+
+   The pine is the canvas: no inset panel behind these cards. A near-black box floated inside the
+   block would read as a hole punched through it rather than as a surface sitting on it. */
+/* The map is now one framed glass panel rather than loose parts on the band: the header row and the
+   wire used to sit on bare pine while only the cards were glass, which read as three objects instead
+   of one instrument. Ink-tinted for the same reason the eyebrow is — glass lightens what is behind
+   it, and the panes nested inside need a darker ground to stay distinct from their own frame. */
+.groupMap {
+  align-content: center;
+  backdrop-filter: var(--vz-fx-glass-blur);
+  background: hsl(var(--vz-ink) / 30%);
+  border-radius: calc(var(--vz-r-card) + 6px);
+  box-shadow: var(--vz-fx-glass-shadow);
+  display: grid;
+  padding: 1.15rem 1.15rem 1.35rem;
+  position: relative;
+  z-index: 1;
+}
+
+.mapHead {
+  align-items: center;
+  border-bottom: 1px solid hsl(var(--vz-block-on) / 20%);
+  display: flex;
+  gap: 0.75rem;
+  justify-content: space-between;
+  padding-bottom: 0.85rem;
+}
+
+.mapTitle {
+  align-items: center;
+  color: hsl(var(--vz-block-on));
+  display: flex;
+  font-size: 1.02rem;
+  font-weight: 800;
+  gap: 0.55rem;
+  letter-spacing: -0.01em;
+}
+
+.mapTitle svg {
+  color: hsl(var(--vz-field-1));
+  flex: 0 0 auto;
+}
+
+/* The hero's `.liveStatus` in miniature, retoned for pine: its `--vz-positive` green is a dark ink
+   colour and would vanish against this block, so the pale `--vz-field-1` carries it instead. */
+.mapStatus {
+  align-items: center;
+  /* Same lesson as the eyebrow: visibility here comes from the rim and the text, not from a bright
+     fill. A `--vz-field-1 / 26%` fill measured 3.80:1 under this label; darkening it and pushing the
+     border and the text up instead makes the chip read harder AND clear AA. */
+  background: hsl(var(--vz-ink) / 34%);
+  border: 1px solid hsl(var(--vz-field-1) / 72%);
+  border-radius: var(--vz-r-pill);
+  color: color-mix(in srgb, hsl(var(--vz-field-1)) 30%, #fff);
+  display: flex;
+  flex: 0 0 auto;
+  font-size: 0.72rem;
+  font-weight: 800;
+  gap: 0.45rem;
+  letter-spacing: 0.06em;
+  padding: 0.4rem 0.75rem;
+  text-transform: uppercase;
+}
+
+.mapStatus i {
+  animation: map-pulse 1.8s ease-in-out infinite;
+  background: hsl(var(--vz-field-1));
+  border-radius: 50%;
+  flex: 0 0 auto;
+  height: 0.48rem;
+  width: 0.48rem;
+}
+
+@keyframes map-pulse {
+  50% {
+    box-shadow: 0 0 0 5px hsl(var(--vz-field-1) / 22%);
+  }
+}
+
+.mapStudents {
+  display: grid;
+  gap: 0.55rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-top: 0.95rem;
+}
+
+/* The reveal wrapper. It carries framer's inline transform so the card below is free to hold the
+   hover one — see `GroupMatchMap`. It must stretch, or the two cards stop matching heights. */
+.mapStudents > * {
+  align-content: stretch;
+  display: grid;
+}
+
+/*
+ * The map's two pane types, one recipe — the same argument `.subjectCard`/`.benefitCard` make above,
+ * applied to this section's material.
+ *
+ * `--vz-fx-glass-*` are used verbatim, the way `site.module.css` uses them on the header, so this
+ * surface cannot drift from the other two.
+ *
+ * The wash is the one addition, and it is PREPENDED, not appended. `--vz-fx-glass-bg` ends in a
+ * COLOUR, and a colour is legal only in the final position of a `background` list — put anything
+ * after it and the whole declaration is dropped at parse time. That failure is silent and looks
+ * plausible: the rim and the sheen still paint, so the pane still reads as a pane, just far too
+ * dark. Only image layers may precede it, which is why the wash is a two-stop gradient.
+ *
+ * It exists because the token was tuned against paper. Over pine its `--vz-paper / 42%` base
+ * composites to L≈0.37, a mid-tone that is hostile in both directions: measured on the rendered
+ * pixels, `--vz-positive` (the tags and the criteria chips) lands at 2.8:1 and white would land at
+ * 2.6:1. The wash lifts the pane to L≈0.63 and the section's greens clear AA again, while the
+ * blooms behind still tint it and the specular rim still reads.
+ */
+.mapStudent,
+.mapHub {
+  backdrop-filter: var(--vz-fx-glass-blur);
+  background:
+    linear-gradient(hsl(var(--vz-surface) / 55%), hsl(var(--vz-surface) / 55%)),
+    var(--vz-fx-glass-bg);
+  box-shadow: var(--vz-fx-glass-shadow);
+  isolation: isolate;
+  position: relative;
+}
+
+/* The lens halo, as a radial mask — never a `content-box` XOR mask, which draws a hard rectangle
+   inside the pane. An `::after` rather than a `<span>`: nothing else in the map needs the node, and
+   the hub cannot take `overflow: hidden` because its tutor circle deliberately breaks the top edge. */
+.mapStudent::after,
+.mapHub::after {
+  background: var(--vz-fx-glass-sheen);
+  border-radius: inherit;
+  content: "";
+  inset: 0;
+  mask-image: radial-gradient(120% 120% at 8% 0%, black 12%, transparent 62%);
+  opacity: 0.5;
+  pointer-events: none;
+  position: absolute;
+  transition: opacity 320ms var(--vz-ease);
+  z-index: 0;
+}
+
+.groupMap:hover .mapStudent::after,
+.groupMap:hover .mapHub::after {
+  opacity: 0.85;
+}
+
+/* Named one by one rather than `> *:not(::after)`. The `:not()` form is (0,2,0) and outranks
+   `.mapTutor`'s own `position: absolute` at (0,1,0) — the exact shape of the bug that put a dead
+   grid row in every subject card. */
+.mapAvatar,
+.mapTag,
+.mapStudent > div,
+.mapHub > small,
+.mapHub > strong,
+.mapCriteria {
+  position: relative;
+  z-index: 1;
+}
+
+.mapStudent {
+  border-radius: var(--vz-r-input);
+  display: grid;
+  gap: 0.55rem 0.6rem;
+  grid-template-columns: auto minmax(0, 1fr);
+  /* Identity row takes the slack so the tag stays on the card's bottom edge when one student's
+     subject line wraps to two lines and the other's does not. */
+  grid-template-rows: 1fr auto;
+  padding: 0.75rem;
+  transition:
+    transform 260ms var(--vz-ease),
+    box-shadow 260ms var(--vz-ease);
+}
+
+.mapStudent > div {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.mapStudent strong {
+  color: var(--ink);
+  font-size: 0.98rem;
+  letter-spacing: -0.015em;
+}
+
+/* Not `--muted`: on the wash it measures 3.96:1, just under AA for text this size. Darkened toward
+   ink until the rendered pixels clear 4.5:1, the same way the benefit card body was resolved. */
+.mapStudent small {
+  color: color-mix(in srgb, hsl(var(--vz-muted)) 70%, hsl(var(--vz-ink)));
+  font-size: 0.82rem;
+  line-height: 1.38;
+}
+
+.mapAvatar {
+  align-items: center;
+  background: hsl(var(--vz-positive) / 10%);
+  border-radius: var(--vz-r-input);
+  box-shadow: inset 0 0 0 1px hsl(var(--vz-positive) / 20%);
+  color: hsl(var(--vz-positive));
+  display: flex;
+  flex: 0 0 auto;
+  font-size: 0.78rem;
+  font-weight: 850;
+  height: 2.5rem;
+  justify-content: center;
+  width: 2.5rem;
+}
+
+.mapTag {
+  background: hsl(var(--vz-positive) / 11%);
+  border-radius: var(--vz-r-pill);
+  color: hsl(var(--vz-positive));
+  font-size: 0.78rem;
+  font-weight: 780;
+  grid-column: 1 / -1;
+  padding: 0.35rem 0.55rem;
+  text-align: center;
+}
+
+/* Its own row, so the curves always span exactly the gap between the cards and the hub. */
+.mapWire {
+  display: block;
+  height: 3rem;
+  width: 100%;
+}
+
+.mapWire path {
+  fill: none;
+  stroke: hsl(var(--vz-field-1) / 82%);
+  stroke-dasharray: 6 5;
+  stroke-linecap: round;
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+}
+
+/* Dashes travel student -> tutor. Three passes, then it settles: a permanent loop next to the copy
+   would be motion nobody asked for, and 4.2s stays inside WCAG 2.2.2's five-second allowance. The
+   offset step is a whole number of 6+5 dash periods so each pass joins the last seamlessly. */
+.groupMapLive .mapWire path {
+  animation: wire-flow 1.4s linear 3 both;
+}
+
+@keyframes wire-flow {
+  from {
+    stroke-dashoffset: 22;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* Hover restarts the flow and holds it for as long as the pointer is there — user-initiated, and it
+   stops the moment they leave, so the loop is theirs to end. */
+.groupMap:hover .mapWire path {
+  animation: wire-flow 1.05s linear infinite;
+  stroke: hsl(var(--vz-field-1));
+}
+
+/* The lift composes the glass shadow rather than replacing it: swap it out and the specular rim and
+   the chromatic fringing go with it, and the pane stops being glass for as long as you point at it. */
+.groupMap:hover .mapStudent {
+  box-shadow:
+    var(--vz-fx-glass-shadow),
+    0 14px 32px -10px hsl(var(--vz-ink) / 55%);
+  transform: translateY(-3px);
+}
+
+/* The second card follows the first rather than moving with it — the diagram reads left to right.
+   `nth-child` counts the reveal wrappers, not the cards: each card is an only child of its own. */
+.mapStudents > *:nth-child(2) .mapStudent {
+  transition-delay: 70ms;
+}
+
+.groupMap:hover .mapHub {
+  box-shadow:
+    var(--vz-fx-glass-shadow),
+    0 20px 44px -12px hsl(var(--vz-ink) / 58%);
+  transform: translateY(-2px);
+}
+
+/* Pointing at one card lifts it further than the pair. Written with the ancestor still in the
+   selector because `.mapStudent:hover` alone is one class short of the rule above and would lose. */
+.groupMap:hover .mapStudent:hover {
+  transform: translateY(-6px);
+  transition-delay: 0ms;
+}
+
+/* Same split as the student cards: framer's transform on the wrapper, the hover lift on the card. */
+.mapHubEntry {
+  margin-inline: auto;
+  width: min(100%, 20rem);
+}
+
+.mapHub {
+  align-items: center;
+  border-radius: var(--vz-r-card);
+  display: flex;
+  flex-direction: column;
+  padding: 1.9rem 1rem 1.15rem;
+  position: relative;
+  text-align: center;
+  transition:
+    transform 260ms var(--vz-ease),
+    box-shadow 260ms var(--vz-ease);
+}
+
+/* Centred on the hub's top edge, which is exactly where both curves terminate: the tutor is the
+   node the wire runs to, so the avatar covers the junction instead of sitting next to it. */
+.mapTutor {
+  align-items: center;
+  background: hsl(var(--vz-positive));
+  border-radius: 50%;
+  box-shadow: 0 0 0 4px hsl(var(--vz-positive) / 16%);
+  color: hsl(var(--vz-block-on));
+  display: flex;
+  height: 3.4rem;
+  justify-content: center;
+  left: 50%;
+  position: absolute;
+  /* Exactly half the height, so the circle's centre sits on the hub's top edge — the point both
+     curves terminate at. Any other value and the wire visibly misses the node. */
+  top: -1.7rem;
+  transform: translateX(-50%);
+  width: 3.4rem;
+  z-index: 2;
+}
+
+.mapHub > small {
+  color: color-mix(in srgb, hsl(var(--vz-muted)) 70%, hsl(var(--vz-ink)));
+  font-size: 0.82rem;
+}
+
+.mapHub > strong {
+  color: var(--ink);
+  font-size: 1.12rem;
+  letter-spacing: -0.02em;
+  margin-top: 0.15rem;
+}
+
+.mapCriteria {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  justify-content: center;
+  margin-top: 0.65rem;
+}
+
+.mapCriteria span {
+  align-items: center;
+  background: hsl(var(--vz-positive) / 9%);
+  border-radius: var(--vz-r-pill);
+  color: hsl(var(--vz-positive));
+  display: flex;
+  font-size: 0.78rem;
+  font-weight: 760;
+  gap: 0.28rem;
+  padding: 0.35rem 0.6rem;
+}
+
+/*
+ * The map's accessibility fallbacks live HERE, not in the shared blocks further up beside the
+ * subject and benefit cards. A media query adds no specificity, so a `@media` rule can only beat a
+ * plain rule by coming later in the file — and every `.mapStudent` / `.mapHub` declaration above is
+ * later than those blocks. Placed up there these silently did nothing, which is exactly how they
+ * were found: the panes kept their `backdrop-filter` with `prefers-reduced-transparency: reduce`
+ * emulated on.
+ */
+@media (prefers-reduced-transparency: reduce) {
+  .groupField {
+    display: none;
+  }
+  .mapStudent,
+  .mapHub {
+    backdrop-filter: none;
+    background: hsl(var(--vz-surface));
+    box-shadow:
+      inset 0 0 0 1px hsl(var(--vz-line)),
+      var(--vz-fx-shadow);
+  }
+  .mapStudent::after,
+  .mapHub::after {
+    display: none;
+  }
+  /* Opaque surface, so the greens no longer need the darkening the wash forced on them. */
+  .mapStudent small,
+  .mapHub > small {
+    color: var(--muted);
+  }
+}
+
+@media (prefers-contrast: more) {
+  .mapStudent,
+  .mapHub {
+    background: hsl(var(--vz-surface));
+    box-shadow: inset 0 0 0 2px hsl(var(--vz-ink) / 55%);
+  }
+  .mapStudent::after,
+  .mapHub::after {
+    display: none;
+  }
+}
+
+/* ── Parent view ──────────────────────────────────────────────────────────────
+   Paper and a product mock, matching the hero's lesson window rather than any of the surfaces
+   between. The panel is a picture of the signed-in parent dashboard, so it is `role="img"` with one
+   label and everything inside it hidden: a screen reader should hear "sample parent view showing…"
+   once, not walk a fake tab strip and a definition list of invented data. */
+.parentSection {
+  background: var(--white);
+  isolation: isolate;
+  overflow: hidden;
+  padding-block: clamp(3.5rem, 6vw, 6rem);
+  position: relative;
+}
+
+/* This section's only glass is its eyebrow pill, but one pane is enough to need a field: over a flat
+   white fill the blur has nothing to sample and the pill would be a tinted div wearing a frame.
+   Quieter than `.subjectField` — there are no cards here for it to light. */
+.parentField {
+  inset: 0;
+  pointer-events: none;
+  position: absolute;
+  z-index: 0;
+}
+
+.parentField > span:first-child {
+  background-image:
+    linear-gradient(hsl(var(--vz-ink) / 4%) 1px, transparent 1px),
+    linear-gradient(90deg, hsl(var(--vz-ink) / 4%) 1px, transparent 1px);
+  background-size: 46px 46px;
+  inset: 0;
+  mask-image: radial-gradient(110% 85% at 30% 40%, black 26%, transparent 74%);
+  position: absolute;
+}
+
+.parentBloomOne,
+.parentBloomTwo {
+  border-radius: 50%;
+  filter: blur(76px);
+  position: absolute;
+}
+
+.parentBloomOne {
+  background: hsl(var(--vz-field-2) / 34%);
+  height: 22rem;
+  left: -5%;
+  top: -18%;
+  width: 22rem;
+}
+
+.parentBloomTwo {
+  background: hsl(var(--vz-field-1) / 30%);
+  bottom: -30%;
+  height: 20rem;
+  left: 26%;
+  width: 20rem;
+}
+
+.parentSection .sectionShell {
+  position: relative;
+  z-index: 1;
+}
+
+.parentLayout {
+  align-items: center;
+  display: grid;
+  gap: clamp(2rem, 4vw, 3.5rem);
+  grid-template-columns: minmax(0, 0.75fr) minmax(0, 1.25fr);
+  margin-inline: auto;
+  max-width: 76rem;
+}
+
+.parentSection h2 {
+  font-size: clamp(2.15rem, 4vw, 3.3rem);
+  font-weight: 720;
+  letter-spacing: -0.04em;
+  line-height: 1.06;
+  margin-top: 1rem !important;
+  max-width: 16ch;
+  text-wrap: balance;
+}
+
+/* The same coral run as the group band's headline, in its light-background register: `--vz-accent`
+   rather than `--vz-field-2`, because the pale coral that carries on pine measures ~1.7:1 on paper
+   while the brick reads at 4.68:1 there. Same idea, opposite end of the ramp. */
+.parentTitleAccent {
+  color: hsl(var(--vz-accent));
+}
+
+.parentCopy > p:last-of-type {
   color: var(--muted);
-  font-size: 0.83rem;
-  line-height: 1.65;
-  margin-top: 0.75rem;
+  font-size: 1.12rem;
+  font-weight: 520;
+  line-height: 1.66;
+  margin-top: 1.15rem;
+  max-width: 40ch;
+}
+
+.parentCta {
+  align-items: center;
+  border-radius: var(--vz-r-pill);
+  box-shadow: inset 0 0 0 1px var(--line);
+  color: var(--ink);
+  display: inline-flex;
+  font-size: 0.95rem;
+  font-weight: 700;
+  gap: 0.55rem;
+  margin-top: 1.6rem;
+  min-height: 2.9rem;
+  padding-inline: 1.25rem;
+  text-decoration: none;
+  transition:
+    background 220ms var(--vz-ease),
+    box-shadow 220ms var(--vz-ease),
+    transform 220ms var(--vz-ease);
+}
+
+.parentCta svg {
+  color: var(--indigo);
+  transition: transform 200ms var(--vz-ease);
+}
+
+.parentCta:hover {
+  background: var(--paper);
+  box-shadow: inset 0 0 0 1px hsl(var(--vz-accent) / 45%);
+  transform: translateY(-2px);
+}
+.parentCta:hover svg {
+  transform: translateX(3px);
+}
+
+/*
+ * Holds the `/parents` workspace preview. Only positioning lives here — the mock brings its own
+ * `parents-page.module.css` styles, which is the point of rendering the real component rather than
+ * a second sketch of it. `min-width: 0` because that component's card grid would otherwise refuse
+ * to shrink below its content and blow out the column.
+ */
+.parentPreviewEntry {
+  min-width: 0;
+  position: relative;
+  z-index: 1;
+}
+
+.parentPreview {
+  min-width: 0;
+}
+
+/*
+ * The mock's own type is set in rem by `parents-page.module.css`, so a wider column cannot make it
+ * read any larger — the only lever that moves all of it at once is scale. Applied on the wrapper
+ * rather than on `.dashboardFrame`, which already spends its transform on the 0.35deg tilt.
+ *
+ * Gated to widths where the page gutter can absorb it: `transform` does not change layout size, so
+ * the extra 5% spills outward, and below this breakpoint there is nothing for it to spill into.
+ */
+@media (min-width: 76rem) {
+  .parentPreview {
+    transform: scale(1.05);
+  }
 }
 
 @media (max-width: 75rem) {
@@ -1024,13 +2002,18 @@
   .classroomStage {
     height: auto;
   }
-  .subjectCard,
-  .subjectCardComingSoon {
-    min-height: 10.6rem;
+  .subjectRail {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .subjectCard {
+    min-height: 9.5rem;
   }
 }
 
 @media (max-width: 64rem) {
+  .benefitTimeline {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
   .hero {
     min-height: auto;
   }
@@ -1045,11 +2028,8 @@
   .heroTitle {
     font-size: clamp(3rem, 5.8vw, 4.4rem);
   }
-  .heroDescription {
-    font-size: 0.98rem;
-  }
   .lessonBody {
-    grid-template-columns: minmax(0, 1fr) 8.5rem;
+    grid-template-columns: minmax(0, 1fr) 10.5rem;
   }
   .classroomStage {
     height: auto;
@@ -1058,25 +2038,31 @@
     height: 27rem;
     width: 29rem;
   }
+  /* Two up rather than a scroll rail. Four cards divide evenly, and a 2x2 block of glass reads as
+     one material; a rail that cuts the last pane in half does not. */
   .subjectRail {
-    grid-template-columns: repeat(3, 15.5rem);
-    overflow-x: auto;
-    padding-bottom: 1rem;
-    scroll-snap-type: x proximity;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
-  .subjectRail > div {
-    scroll-snap-align: start;
-  }
-  .subjectCard,
-  .subjectCardComingSoon {
+  .subjectCard {
     min-height: 9.5rem;
-  }
-  .swipeHint {
-    display: inline;
   }
 }
 
 @media (max-width: 53rem) {
+  .groupBlock,
+  .parentLayout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .groupBlock {
+    gap: 1.75rem;
+  }
+  /* Stacked, the map follows the copy rather than leading it: it is a diagram of a claim, and a
+     reader meeting it before the headline has nothing to read it against. */
+  .groupMap {
+    margin-inline: auto;
+    max-width: 33rem;
+    width: 100%;
+  }
   .heroShell {
     padding-block: 3.5rem 4rem;
   }
@@ -1106,26 +2092,11 @@
     font-size: clamp(3.15rem, 11.5vw, 4.6rem);
   }
   .benefitTimeline {
-    grid-template-columns: 1fr;
-    padding-left: 1.4rem;
-  }
-  .timelineLine {
-    background: linear-gradient(hsl(var(--vz-accent)), hsl(var(--vz-positive)));
-    bottom: 8%;
-    height: auto;
-    left: 0.25rem;
-    right: auto;
-    top: 1rem;
-    transform-origin: top;
-    width: 2px;
+    grid-template-columns: minmax(0, 1fr);
   }
   .benefitCard {
-    min-height: auto;
-    padding: 2rem 1.1rem 1.3rem;
-  }
-  .benefitNode {
-    left: -2.9rem;
-    top: 1.1rem;
+    min-height: 0;
+    padding: 1.3rem 1.15rem 1.4rem;
   }
   .benefitsIntro h2 {
     font-size: clamp(2.5rem, 10vw, 4rem);
@@ -1144,10 +2115,6 @@
     font-size: clamp(3rem, 14vw, 4rem);
     line-height: 0.96;
   }
-  .heroDescription {
-    font-size: 0.96rem;
-    line-height: 1.65;
-  }
   .heroActions {
     align-items: stretch;
     flex-direction: column;
@@ -1156,17 +2123,8 @@
   .heroActions a {
     width: 100%;
   }
-  .primaryAction {
-    padding-left: 1rem;
-  }
-  .primaryAction > span {
-    margin-left: auto;
-  }
-  .trustList {
-    grid-template-columns: 1fr;
-  }
-  .socialProof {
-    align-items: flex-start;
+  .heroPoints {
+    grid-template-columns: minmax(0, 1fr);
   }
   .classroomStage {
     height: auto;
@@ -1206,8 +2164,27 @@
   .whiteboard {
     min-height: 18rem;
   }
+  /* The sidebar used to be hidden here: a sparkline, a stat and a streak row were too much to
+     stack under an 18rem whiteboard on a phone. Three course names are not, and they are the one
+     thing in that panel a visitor actually needs — so on mobile it turns into a single row under
+     the board rather than disappearing. */
   .lessonSidebar {
-    display: none;
+    border-left: none;
+    border-top: 1px solid hsl(var(--vz-line-soft));
+    padding: 0.85rem 0.9rem 0.95rem;
+  }
+  .courseList {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    margin-top: 0.6rem !important;
+  }
+  .courseList span {
+    min-height: 2.05rem;
+    padding-inline: 0.75rem;
+  }
+  .courseList .courseActive {
+    padding-left: 0.85rem;
   }
   .learningPath {
     display: none;
@@ -1217,31 +2194,37 @@
     padding-top: 2rem;
   }
   .subjectRail {
-    grid-template-columns: repeat(3, 14.75rem);
-    margin-right: -1rem;
-    padding-right: 1rem;
-    scrollbar-width: none;
+    grid-template-columns: minmax(0, 1fr);
   }
-  .subjectRail::-webkit-scrollbar {
-    display: none;
-  }
-  .subjectCard,
-  .subjectCardComingSoon {
-    min-height: 9.2rem;
+  .subjectCard {
+    min-height: 0;
+    padding: 1.15rem 1.1rem 1.25rem;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .heroTitle i,
-  .liveStatus i {
+  .liveStatus i,
+  .mapStatus i,
+  .groupMapLive .mapWire path,
+  .groupMap:hover .mapWire path {
     animation: none;
     transform: none;
   }
-  .primaryAction,
-  .primaryAction svg,
+  .mapStudent,
+  .mapHub,
   .secondaryAction,
+  .secondaryAction svg,
+  .groupCta,
+  .groupCta svg,
+  .parentCta,
+  .parentCta svg,
   .subjectCard,
+  .benefitCard,
   .subjectIcon,
+  .benefitNode,
+  .subjectSheen,
+  .benefitSheen,
   .subjectArrow {
     transition: none;
   }
@@ -1307,6 +2290,38 @@
   stroke: hsl(var(--vz-accent) / 55%);
   stroke-linecap: round;
   stroke-width: 3;
+}
+
+/* Programming: an editor fragment, drawn rather than typed. Shares the stroke weights and the
+   single-accent rule with the other three boards. */
+.codeBoard {
+  bottom: 1rem;
+  left: 2%;
+  position: absolute;
+  width: 96%;
+}
+.codeTick {
+  fill: hsl(var(--vz-accent) / 32%);
+}
+.codeLine,
+.codeLineAccent {
+  fill: none;
+  stroke: hsl(var(--vz-ink) / 42%);
+  stroke-linecap: round;
+  stroke-width: 7;
+}
+/* Exactly one accented stroke per board — here the loop body. */
+.codeLineAccent {
+  stroke: hsl(var(--vz-accent));
+}
+.codeBrace {
+  fill: hsl(var(--vz-accent) / 72%);
+  font-family: var(--vz-display);
+  font-size: 34px;
+  font-weight: 500;
+}
+.codeCaret {
+  fill: hsl(var(--vz-accent));
 }
 
 /* Chess: a four-square board fragment with the knight's L drawn onto it. */
@@ -1387,7 +2402,7 @@
      three-line one read as the same object rather than two different cards. */
   min-height: 17rem;
   overflow: hidden;
-  padding: 2rem 2rem 2.1rem;
+  padding: 2rem clamp(1.5rem, 2.4vw, 2.25rem) 2.1rem;
   position: relative;
   width: 100%;
   z-index: 6;
@@ -1464,10 +2479,19 @@
   /* Held to a reading measure rather than the full card width. At 669px the note ran to a single
      line, which left the block a squat 3.9:1 bar; wrapping to two gives it the proportion the
      reference has and stops the eye travelling the whole width for one sentence. */
-  margin: 1.35rem 0 0;
   max-width: 32ch;
   position: relative;
   text-wrap: balance;
+}
+
+/*
+ * Two classes deep for the same reason `.noteTags` below is, and it is worth stating twice because
+ * the failure is invisible: `.page p { margin: 0 }` is (0,1,1) and beat the `margin: 1.35rem 0 0`
+ * this rule used to carry at (0,1,0). The declaration was in the file, looked right, and computed
+ * to 0 on every viewport — the sentence sat flush against the divider above it.
+ */
+.noteInner .noteBody {
+  margin: 1.35rem 0 0;
 }
 
 /*
@@ -1507,7 +2531,7 @@
 
 @media (max-width: 900px) {
   .teacherNote {
-    padding: 1.15rem 1.2rem 1.3rem;
+    padding: 1.4rem 1.4rem 1.5rem;
     width: 100%;
   }
   .noteTags li {
@@ -1516,96 +2540,325 @@
   }
 }
 
-/* Short laptop viewports.
-   The hero is `min-height: 100svh`, but Armenian sets the headline to four lines and the note body
-   to three, which pushed the note's tag row 103px below the fold on a 1440x800 screen — measured,
-   not guessed. Tightening the headline and the stage brings it back without touching the layout at
-   taller sizes. Scoped above the mobile breakpoint, where the hero stacks and the problem does not
-   arise. */
-@media (min-width: 901px) and (max-height: 780px) {
-  /* The hero's own vertical padding is the biggest single lever here: at 800px tall it reserves
-     ~120px that the Armenian layout needs back. */
+/* ── Fitting the stage to the viewport ────────────────────────────────────────
+   Above 900px the hero is side by side and `min-height: 100svh`, so the lesson window and the
+   teacher's note have to share ONE screen height. Every part of that column used to be sized in
+   fixed `rem`: header 4.5 + body 23.5 + gap 1.15 + note 17 ≈ 46rem of content, which only fits a
+   viewport around 1080px tall. Measured on the real page, the note's bottom edge landed 72px below
+   the fold at 1280x800 in English and 90px below in Armenian — the note was cut in half.
+
+   This used to be handled by a single `max-height: 780px` breakpoint, which is why the complaint
+   survived it: nothing fired between 781px and ~1080px, exactly the band where most laptops live.
+   The rules below replace that step with `svh`-proportional `clamp()`s, so the column shrinks
+   continuously with the screen instead of jumping at one threshold.
+
+   The `svh` coefficients are chosen so each value lands on its old maximum at 1080px tall — a
+   1920x1080 or larger screen renders identically to before — and bottoms out on a floor that keeps
+   the note legible on a short laptop. Below 901px the hero stacks and scrolls, so none of this
+   applies there. */
+@media (min-width: 901px) {
+  /* The hero's own vertical padding is the single biggest lever: the old `3.5rem/4.5rem` floors
+     alone reserved 128px on an 800px screen. */
   .heroShell {
-    padding-block: 2rem 2.3rem;
+    padding-block: clamp(1.25rem, 5.6svh, 6.5rem) clamp(1.4rem, 6.4svh, 7rem);
   }
   .classroomStage {
-    gap: 0.8rem;
+    gap: clamp(0.55rem, 1.55svh, 1.15rem);
+  }
+  .lessonHeader {
+    min-height: clamp(2.9rem, 6.7svh, 4.5rem);
+  }
+  /* The note can only fit if the window above it yields, so the board is on the same proportional
+     footing. Part fixed, part proportional: a purely proportional board would collapse on a short
+     screen, and the whiteboard artwork inside it is absolutely positioned against this box. */
+  .lessonBody {
+    min-height: clamp(11rem, calc(34svh + 1.5rem), 23.5rem);
+  }
+
+  .teacherNote {
+    min-height: clamp(9rem, 25svh, 17rem);
+    /* Block padding answers to viewport HEIGHT, inline padding to WIDTH. Keying both to `svh` — as
+       this rule used to — narrowed the side gutters on a short screen, which is a dimension the
+       screen's height says nothing about, and it was the main reason the block read as cramped. */
+    padding: clamp(1.1rem, 3.2svh, 2.15rem) clamp(1.5rem, 2.4vw, 2.25rem)
+      clamp(1.15rem, 3.35svh, 2.25rem);
   }
   .noteHead {
-    gap: 0.8rem;
-    padding-bottom: 0.85rem;
+    gap: clamp(0.75rem, 1.5svh, 1.05rem);
+    padding-bottom: clamp(0.85rem, 2.45svh, 1.6rem);
   }
   .noteAvatar {
-    height: 2.5rem;
-    width: 2.5rem;
+    font-size: clamp(0.72rem, 1.36svh, 0.92rem);
+    height: clamp(2.05rem, 4.45svh, 3rem);
+    width: clamp(2.05rem, 4.45svh, 3rem);
   }
   .noteWho strong {
-    font-size: 1rem;
+    font-size: clamp(0.88rem, 1.63svh, 1.1rem);
+  }
+  .noteWho small {
+    font-size: clamp(0.7rem, 1.25svh, 0.84rem);
+  }
+  /* The one value that answers to both axes: `vw` keeps the sentence in proportion to the block's
+     width, `svh` stops three Armenian lines from eating the height the tags need. */
+  .noteInner .noteBody {
+    font-size: clamp(0.92rem, min(1.6vw, 2.15svh), 1.45rem);
+    margin-top: clamp(0.9rem, 2.5svh, 1.6rem);
+  }
+  .noteInner .noteTags {
+    padding-top: clamp(0.9rem, 2.8svh, 1.85rem);
   }
   .noteTags li {
-    font-size: 0.78rem;
-    padding: 0.36rem 0.8rem;
+    font-size: clamp(0.7rem, 1.23svh, 0.83rem);
+    padding: clamp(0.28rem, 0.71svh, 0.48rem) clamp(0.6rem, 1.41svh, 0.95rem);
   }
+
+  /* The headline is on this list because measurement said so, not for its own sake: the hero is a
+     two-column grid on `align-items: center`, so the TALLER column sets the row height and centres
+     the other inside it. At 1280x720 the Armenian headline wraps to five lines — `.heroCopy` came
+     to 708px against the stage's 564 — and those 144px of surplus were pushing the note below the
+     fold from the opposite side of the layout. Capping the headline against `svh` as well as `vw`
+     is what lets the note sit on screen. `9.7svh` is picked to land on the existing `6.5rem`
+     maximum at 1080px tall, so nothing changes on a full-height screen. */
   .heroTitle {
-    font-size: clamp(2.7rem, 4.2vw, 4.4rem);
-  }
-  .heroDescription {
-    margin-top: 1.1rem !important;
-  }
-  .heroActions {
-    margin-top: 1.5rem;
-  }
-  .teacherNote {
-    padding: 1rem 1.15rem 1.1rem;
-  }
-  .noteBody {
-    font-size: 0.99rem;
-    margin-top: 0.8rem;
-  }
-  .noteTags {
-    margin-top: 0.8rem;
+    font-size: clamp(2.6rem, min(5.8vw, 9.7svh), 6.5rem);
   }
 }
 
-/* Anti-Cheating teaser */
-.antiCheatingSection {
-  background: var(--paper);
-  padding-block: clamp(5.5rem, 9vw, 9rem);
+/* Continues the ramp above at a steeper slope. The two formulas agree at exactly 820px tall
+   (79.5px), so this is a change of gradient rather than the visible jump the old single
+   `max-height: 780px` breakpoint produced. */
+@media (min-width: 901px) and (max-height: 820px) {
+  .heroTitle {
+    font-size: clamp(2.6rem, min(5.8vw, 22.5svh - 105px), 6.5rem);
+  }
+}
+
+/* ── Closing call to action ───────────────────────────────────────────────────
+   The last band before the layout's footer, built on `.groupSection`'s surface: the same pine
+   fill, the same ruled grid faded at the edges, the same three blurred blooms.
+
+   The bloom POSITIONS are not copied. `.groupBloomOne`/`Two` are placed against that section's map
+   — "under the student cards", "under the hub" — and this band is a single centred column, so the
+   same coordinates would light the empty margins and leave the copy flat. They are re-aimed at the
+   headline, the buttons and the right margin instead. The grid's mask is re-centred to 50% for the
+   same reason: 68% is where the map sits, not where this content sits.
+
+   Every foreground tone here is `--vz-block-on` at some alpha. `--vz-muted` is not usable on this
+   background — see the note above `.noteMeta`, where it measures 2.25:1 and fails outright. The
+   blooms lighten the fill locally, which cuts into the light-on-dark ratios; the measured figures
+   on each rule below are taken over the BRIGHTEST point of the field, not over bare pine. */
+.closingSection {
+  background: hsl(var(--vz-block));
+  isolation: isolate;
+  overflow: hidden;
+  padding-block: clamp(4rem, 7vw, 7rem);
   position: relative;
 }
 
-.antiCheatingGrid {
+.closingField {
+  inset: 0;
+  pointer-events: none;
+  position: absolute;
+  z-index: 0;
+}
+
+.closingGrid {
+  background-image:
+    linear-gradient(hsl(var(--vz-block-on) / 7%) 1px, transparent 1px),
+    linear-gradient(90deg, hsl(var(--vz-block-on) / 7%) 1px, transparent 1px);
+  background-size: 46px 46px;
+  inset: 0;
+  mask-image: radial-gradient(110% 95% at 50% 44%, black 26%, transparent 78%);
+  position: absolute;
+}
+
+.closingBloomOne,
+.closingBloomTwo,
+.closingBloomThree {
+  border-radius: 50%;
+  filter: blur(78px);
+  position: absolute;
+}
+
+/* Behind the headline, off-centre so the field does not read as a symmetrical vignette. */
+.closingBloomOne {
+  background: hsl(var(--vz-field-1) / 32%);
+  height: 26rem;
+  left: 14%;
+  top: -36%;
+  width: 26rem;
+}
+
+/* Under the buttons, and the only warm one — the accent pill sits in its own light rather than on
+   flat fill. Held at 26% and pushed mostly below the band: at `.groupBloomTwo`'s 38% the wash came
+   up around the fine print and cost it more contrast than the effect was worth. */
+.closingBloomTwo {
+  background: hsl(var(--vz-accent) / 26%);
+  bottom: -44%;
+  height: 22rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 22rem;
+}
+
+.closingBloomThree {
+  background: hsl(var(--vz-field-2) / 20%);
+  height: 20rem;
+  right: 9%;
+  top: 16%;
+  width: 20rem;
+}
+
+/* Lifts the copy out of the field, same as `.groupSection .sectionShell`. */
+.closingSection .sectionShell {
+  position: relative;
+  z-index: 1;
+}
+
+.closingInner {
   align-items: center;
-  display: grid;
-  gap: clamp(2.5rem, 6vw, 5rem);
-  grid-template-columns: 1fr 1fr;
+  display: flex;
+  flex-direction: column;
+  margin: 0 auto;
+  max-width: 46rem;
+  text-align: center;
 }
 
-.antiCheatingCopy h2 {
-  font-size: clamp(2.1rem, 4vw, 3.1rem);
-  letter-spacing: -0.03em;
-  line-height: 1.05;
-  margin-top: 0.75rem !important;
-  text-wrap: balance;
+/* Tracks `.heroTitle`'s ramp one step down. It is the closing statement, not a second hero. */
+.closingTitle {
+  color: hsl(var(--vz-block-on));
+  font-size: clamp(2.1rem, 4.4vw, 3.5rem);
+  font-weight: 700;
+  line-height: 1.06;
 }
 
-.antiCheatingBody {
-  color: var(--muted);
-  font-size: 1.05rem;
-  line-height: 1.65;
-  margin-top: 1.1rem;
-  max-width: 32rem;
+/* 5.6:1 at the worst pixel of the field (390, where the blooms crowd the band), 5.7:1 at 1440.
+ * Was 82% before the field went in, which measured 4.19:1 at 390 and missed AA — the alpha and
+ * the mobile bloom damping in the `640px` block below were the two halves of that fix.
+ *
+ * Scoped through `.closingInner` for specificity, not for nesting: the `.page p` preflight near the
+ * top of this sheet sets `margin: 0` at (0,1,1) and lands earlier, so a lone `.closingLede` at
+ * (0,1,0) loses and the margin silently computes to 0px. Same family of trap as the `box-sizing`
+ * note on `.closingPrimaryAction svg`. `.closingNote` below needs the identical treatment. */
+.closingInner .closingLede {
+  color: hsl(var(--vz-block-on) / 86%);
+  font-size: clamp(1rem, 1.4vw, 1.12rem);
+  font-weight: 500;
+  line-height: 1.6;
+  margin-top: 1.6rem;
 }
 
-.antiCheatingActions {
+.closingActions {
+  align-items: center;
   display: flex;
   flex-wrap: wrap;
-  gap: 0.85rem;
-  margin-top: 1.85rem;
+  gap: 0.8rem;
+  justify-content: center;
+  margin-top: 2.25rem;
 }
 
-@media (max-width: 64rem) {
-  .antiCheatingGrid {
-    grid-template-columns: 1fr;
+/* Hero proportions, same as `.heroConsultAction`: this must not restate any of `.buttonPrimary`'s
+   own appearance, only its scale. */
+.closingPrimaryAction {
+  border-radius: var(--vz-r-pill) !important;
+  font-size: 0.9rem !important;
+  min-height: 3.4rem !important;
+  padding-left: 1.35rem !important;
+  padding-right: 1.15rem !important;
+}
+
+/* `.buttonIcon` sizes its arrow badge with `content-box` so the padding sits OUTSIDE the glyph.
+   The `.page *` reset is the same specificity and lands later in the sheet, which silently flips
+   it to `border-box` and collapses the arrow inside a circle that keeps its diameter. One class
+   deeper wins it back — the identical fix `.heroConsultAction svg` carries. */
+.closingPrimaryAction svg {
+  box-sizing: content-box;
+}
+
+/* Not `.secondaryAction`: that one paints `--ink` on `--line`, both tuned against paper, and would
+   be dark-on-dark here. Same geometry, block palette. */
+.closingSecondaryAction {
+  align-items: center;
+  border: 1px solid hsl(var(--vz-block-on) / 32%);
+  border-radius: var(--vz-r-pill);
+  color: hsl(var(--vz-block-on));
+  display: inline-flex;
+  font-size: 0.9rem;
+  font-weight: 700;
+  justify-content: center;
+  min-height: 3.4rem;
+  padding-inline: 1.35rem;
+  text-decoration: none;
+  transition:
+    background 200ms ease,
+    border-color 200ms ease,
+    transform 200ms ease;
+}
+
+.closingSecondaryAction:hover {
+  background: hsl(var(--vz-block-on) / 8%);
+  border-color: hsl(var(--vz-block-on) / 55%);
+  transform: translateY(-2px);
+}
+
+/*
+ * The page-wide `.page a:focus-visible` ring is the accent at 45% alpha, tuned against paper.
+ * Composited on this band it measures 1.38:1, where WCAG 2.4.11 asks 3:1 for a focus indicator —
+ * far enough below to read as no ring at all. White is the band's own foreground and measures
+ * 13.5:1 here.
+ *
+ * It covers BOTH buttons on purpose. The primary is `site.module.css`'s `.buttonPrimary`, whose
+ * own `.scope :focus-visible` is (0,2,0) and therefore loses to `.page a:focus-visible` at
+ * (0,2,1) — so it inherits the same unusable ring despite carrying its own. Scoping through
+ * `.closingInner` puts this at (0,3,1), which wins outright rather than on source order.
+ */
+.closingSection .closingInner a:focus-visible {
+  outline-color: hsl(var(--vz-block-on));
+}
+
+/* 5.7:1 at the worst pixel of the field — the lightest tone in this band that still clears AA for
+   text this size. It sits low in the band where only the tail of the warm bloom reaches. */
+.closingInner .closingNote {
+  color: hsl(var(--vz-block-on) / 72%);
+  font-size: 0.88rem;
+  font-weight: 500;
+  /* Clears `.buttonPrimary`'s accent glow, which extends past the pill's own box — at 1.4rem the
+     line sat inside the bloom and read as attached to the button rather than to the pair. */
+  margin-top: 1.9rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .closingSecondaryAction {
+    transition: none;
+  }
+
+  .closingSecondaryAction:hover {
+    transform: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .closingActions {
+    align-items: stretch;
+    flex-direction: column;
+    width: 100%;
+  }
+
+  /*
+   * The blooms are sized for a wide band. At 390 a 26rem circle spans the whole viewport, so the
+   * field stops reading as off-centre light and flattens into a full-width wash — which measured
+   * 4.19:1 under the lede, below AA for text this size. Damped rather than removed: the grid and
+   * the tint still carry the treatment, they just stop competing with the copy.
+   */
+  .closingBloomOne {
+    background: hsl(var(--vz-field-1) / 15%);
+  }
+
+  .closingBloomTwo {
+    background: hsl(var(--vz-accent) / 13%);
+  }
+
+  .closingBloomThree {
+    background: hsl(var(--vz-field-2) / 10%);
   }
 }

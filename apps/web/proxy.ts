@@ -61,6 +61,7 @@ const PUBLIC_PATHS = new Set<string>([
   "/mathematics",
   "/programming",
   "/armenian-language-heritage",
+  "/chess",
   "/sat",
   "/toefl",
   "/group-lessons",

@@ -425,6 +425,12 @@
         "ctaHeading": "Request a free 30-minute class",
         "ctaBody": "See how a lesson works before you commit to anything. Share a few details and we will schedule a free 30-minute Armenian language & culture class."
       },
+      "chess": {
+        "eyebrow": "Subject learning",
+        "title": "Chess",
+        "description": "Think two moves ahead.",
+        "body": "Chess teaches a habit that outlasts the board: look before you move, weigh the options, and own the consequence. Lessons pair tactical patterns with real games, and every session ends with a note on what your child saw and what they missed."
+      },
       "sat": {
         "eyebrow": "Test preparation",
         "title": "SAT",

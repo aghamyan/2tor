@@ -4,12 +4,9 @@ import type { Locale } from "@app/i18n/config";
 
 import { AccountMenu } from "./account-menu";
 import { ArrowUpRightIcon } from "./icons";
-import type { HeaderAuthState } from "./header-actions";
+import { headerButtonClass as buttonClass, type HeaderAuthState } from "./header-actions";
 import { localizedHref } from "./nav-items";
 import styles from "./site.module.css";
-
-const buttonClass =
-  "inline-flex min-h-11 shrink-0 items-center justify-center whitespace-nowrap rounded-xl px-3 text-sm font-semibold";
 
 /**
  * Server-rendered from an already-resolved `authState` — no client-side auth check, no flicker.
