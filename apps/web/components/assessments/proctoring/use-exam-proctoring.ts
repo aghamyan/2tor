@@ -104,8 +104,11 @@ export function useExamProctoring(options: ExamProctoringOptions): ExamProctorin
     // strict-mode session that reaches here still not in fullscreen (e.g. the exam tab's own
     // fullscreen request was rejected — see exam-run.tsx) would otherwise never trip the banner
     // below. Reflect that starting state directly rather than waiting for a transition that will
-    // never fire.
+    // never fire. This has to run client-side post-hydration (reading `document`), so it can't
+    // move into the `useState` initializer without breaking SSR.
     if (strict && typeof document !== "undefined" && !document.fullscreenElement) {
+      // One-shot sync of DOM state captured at mount, not a cascading-render pattern.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setFullscreenExited(true);
     }
     return installFocusGuard(bus, {

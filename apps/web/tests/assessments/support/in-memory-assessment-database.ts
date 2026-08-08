@@ -105,7 +105,10 @@ export class InMemoryAssessmentDatabase implements AssessmentDatabase {
       );
     }
     attempts = attempts.sort((left, right) => (left.id < right.id ? 1 : -1));
-    if (options.cursor) attempts = attempts.filter((attempt) => attempt.id < options.cursor!);
+    if (options.cursor) {
+      const cursor = options.cursor;
+      attempts = attempts.filter((attempt) => attempt.id < cursor);
+    }
     return attempts.slice(0, options.limit).map((attempt) => ({
       id: attempt.id,
       studentProfileId: attempt.studentProfileId,

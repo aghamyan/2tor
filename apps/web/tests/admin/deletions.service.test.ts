@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import {
   decideMassDeletion,
@@ -8,12 +8,24 @@ import { FakeAuditPort } from "./support/fake-audit-port";
 import { InMemoryAdministrationDatabase } from "./support/in-memory-administration-database";
 
 const FRESH_MFA = new Date("2026-07-29T11:55:00.000Z");
+const NOW = new Date("2026-07-29T12:00:00.000Z");
 
 function staffActor(userId: string, mfaVerifiedAt: Date | null = FRESH_MFA) {
   return { userId, roles: ["administrator"] as const, mfaVerifiedAt };
 }
 
 describe("mass deletion two-person approval", () => {
+  // requireStepUpFresh() checks mfaVerifiedAt against a live `new Date()`, so FRESH_MFA only
+  // stays within its 15-minute window if the clock is pinned to NOW for the test's duration.
+  beforeEach(() => {
+    vi.useFakeTimers();
+    vi.setSystemTime(NOW);
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
   it("creates the job already blocked, pending a second administrator's approval", async () => {
     const database = new InMemoryAdministrationDatabase();
     const audit = new FakeAuditPort();

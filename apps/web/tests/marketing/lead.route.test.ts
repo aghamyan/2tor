@@ -1,6 +1,22 @@
 import { NextRequest } from "next/server";
-import { describe, expect, it } from "vitest";
-import { POST } from "../../app/api/leads/route";
+import { describe, expect, it, vi } from "vitest";
+import type { MarketingLead, MarketingLeadDatabase } from "../../../../packages/domain/marketing/models";
+
+// The route hard-codes marketingLeadStore(), which opens a real Postgres connection — mock it
+// with an in-memory fake so this test doesn't depend on a database being reachable (there is
+// none in the GitHub Actions CI environment).
+class InMemoryMarketingLeadDatabase implements MarketingLeadDatabase {
+  leads: MarketingLead[] = [];
+  async saveLead(lead: MarketingLead): Promise<void> {
+    this.leads.push(lead);
+  }
+}
+
+vi.mock("../../app/api/leads/store", () => ({
+  marketingLeadStore: () => new InMemoryMarketingLeadDatabase(),
+}));
+
+const { POST } = await import("../../app/api/leads/route");
 
 function request(body: unknown, ip: string) {
   return new NextRequest("https://example.test/api/leads", {

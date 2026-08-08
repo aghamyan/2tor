@@ -1,4 +1,5 @@
 import { getTranslations } from "next-intl/server";
+import Link from "next/link";
 
 import type { TutorProfileRecord } from "../../../../packages/domain/tutors/models";
 import styles from "./tutors.module.css";
@@ -21,9 +22,9 @@ export async function ZoomSettingsOrLocked({ profile }: { profile: TutorProfileR
         <div className={styles.emptyState}>
           <h3>{t("lockedTitle")}</h3>
           <p>{t("lockedBody")}</p>
-          <a className={styles.buttonSecondary} href="/tutors#teaching-profile">
+          <Link className={styles.buttonSecondary} href="/tutors#teaching-profile">
             {t("lockedCta")}
-          </a>
+          </Link>
         </div>
       </div>
     );
