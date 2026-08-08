@@ -41,10 +41,15 @@ export function LanguageSwitcher({
   const pathname = usePathname() ?? "/";
 
   return (
+    /*
+     * Keep the compact header control visually flat: a fine divider groups the two real links,
+     * while a short accent rule carries the selected state. This avoids stacking a raised pill
+     * inside a second pill next to an already outlined menu button.
+     */
     <div
       role="group"
       aria-label={t("site.languageSwitcher.label")}
-      className={`flex items-center gap-1 ${className ?? ""}`}
+      className={`${styles.localeSwitch} ${className ?? ""}`}
     >
       {locales.map((candidate) => {
         const active = candidate === locale;
@@ -53,14 +58,15 @@ export function LanguageSwitcher({
             key={candidate}
             href={buildLocaleSwitchHref(pathname, candidate)}
             aria-current={active ? "true" : undefined}
+            data-active={active ? "true" : "false"}
             onClick={() => {
               document.cookie = `${LOCALE_COOKIE_NAME}=${candidate}; path=/; max-age=${LOCALE_COOKIE_MAX_AGE}; samesite=lax`;
             }}
-            className={`${styles.languageSwitcherLink} ${
-              active ? styles.languageSwitcherLinkActive : ""
-            } shrink-0 whitespace-nowrap rounded-md px-2 py-1 text-xs font-medium`}
+            className={styles.localeSwitchOption}
           >
-            {variant === "compact" ? candidate.toUpperCase() : t(`site.languageSwitcher.${candidate}`)}
+            {variant === "compact"
+              ? candidate.toUpperCase()
+              : t(`site.languageSwitcher.${candidate}`)}
           </Link>
         );
       })}

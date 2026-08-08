@@ -1,5 +1,8 @@
 import { redirect } from "next/navigation";
 
+import { AcademicError } from "../../../../../packages/domain/academics/errors";
+import type { ParentVisibleFeedback } from "../../../../../packages/domain/academics/models";
+import { getParentVisibleFeedback } from "../../../../../packages/domain/academics/services";
 import { SchedulingError } from "../../../../../packages/domain/scheduling/errors";
 import type {
   LessonDetail,
@@ -13,6 +16,7 @@ import {
   listSchedulableAssignments,
   listSchedulableSubjects,
 } from "../../../../../packages/domain/scheduling/services";
+import { currentAcademicContext } from "../academics/context";
 import { currentSchedulingContext } from "./context";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -114,16 +118,49 @@ export interface LessonDetailForViewer {
   detail: LessonDetail;
   viewerUserId: string;
   isStaff: boolean;
+  /** The tutor's published recap for this lesson, already filtered to what this viewer is allowed to see (visibility flags, staff-only note stripped) — `null` if none exists yet, or none is visible to this viewer. */
+  feedback: ParentVisibleFeedback | null;
+}
+
+/**
+ * `getFeedbackForLesson` finds the record; `getParentVisibleFeedback` re-checks per-viewer access
+ * (role, family link, and the tutor's parent/student visibility choice) and strips staff-only
+ * content. A viewer with no access — including "the record exists but wasn't shared with you" —
+ * sees `null` here rather than an error, matching how the rest of this page treats absent detail.
+ * `studentProfileId` comes from the scheduling actor rather than the academic session (which never
+ * carries it for a real request) so a student viewer's half of the tutor's visibility choice
+ * actually has an effect, not just the parent half.
+ */
+async function loadLessonFeedbackForViewer(
+  lessonId: string,
+  studentProfileId: string | null,
+): Promise<ParentVisibleFeedback | null> {
+  try {
+    const academicContext = await currentAcademicContext();
+    const record = await academicContext.database.getFeedbackForLesson(lessonId);
+    if (!record) return null;
+    const actor = studentProfileId
+      ? { ...academicContext.actor, studentProfileId }
+      : academicContext.actor;
+    return await getParentVisibleFeedback(academicContext.database, actor, record.id);
+  } catch (error: unknown) {
+    if (error instanceof AcademicError) return null;
+    throw error;
+  }
 }
 
 export async function loadLessonDetailForViewer(lessonId: string): Promise<LessonDetailForViewer> {
   try {
     const context = await currentSchedulingContext();
-    const detail = await getLessonDetail(context.database, context.actor, lessonId);
+    const [detail, studentProfileId] = await Promise.all([
+      getLessonDetail(context.database, context.actor, lessonId),
+      context.database.resolveStudentProfileIdForUser(context.actor.userId),
+    ]);
+    const feedback = await loadLessonFeedbackForViewer(lessonId, studentProfileId);
     const isStaff =
       context.actor.roles.includes("administrator") ||
       context.actor.roles.includes("super_administrator");
-    return { detail, viewerUserId: context.actor.userId, isStaff };
+    return { detail, viewerUserId: context.actor.userId, isStaff, feedback };
   } catch (error: unknown) {
     return redirectIfUnauthenticated(error);
   }

@@ -91,6 +91,21 @@ function repository(executor: Executor, root: Database, insideTransaction: boole
       if (!account) throw new TutorError("TUTOR_NOT_FOUND", "Tutor account was not found.", 404);
       return mapProfile(row, account.timeZone);
     },
+    async updateZoomDefaults(profileId, values) {
+      const [row] = await executor
+        .update(tutorProfiles)
+        .set({ ...values, updatedAt: new Date() })
+        .where(eq(tutorProfiles.id, profileId))
+        .returning();
+      if (!row) throw new TutorError("TUTOR_NOT_FOUND", "Tutor profile was not found.", 404);
+      const [account] = await executor
+        .select({ timeZone: users.primaryTimezone })
+        .from(users)
+        .where(eq(users.id, row.userId))
+        .limit(1);
+      if (!account) throw new TutorError("TUTOR_NOT_FOUND", "Tutor account was not found.", 404);
+      return mapProfile(row, account.timeZone);
+    },
     async listSubjects(profileId) {
       const rows = await executor
         .select({

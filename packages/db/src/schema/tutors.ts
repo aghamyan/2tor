@@ -84,6 +84,9 @@ export const tutorProfiles = pgTable("tutor_profiles", {
   educationSummary: text("education_summary"),
   /** E.164, plaintext (see `parentProfiles.phone`'s equivalent note in families.ts). Optional — only needed for WhatsApp group membership. */
   phone: text("phone"),
+  /** Manual entry, reused for every new lesson unless that lesson's Zoom details are set/overridden individually (`zoom_meetings` in scheduling.ts) — see `packages/domain/scheduling/services.ts`'s auto-assign-on-create path. */
+  defaultZoomJoinUrl: text("default_zoom_join_url"),
+  defaultZoomPasscode: text("default_zoom_passcode"),
   status: tutorProfileStatusEnum("status").notNull().default("pending"),
   publicProfileApprovedAt: utcTimestamp("public_profile_approved_at"),
   ...timestamps,

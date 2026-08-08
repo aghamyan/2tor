@@ -6,6 +6,7 @@ import { AdministrationError } from "../../../../../packages/domain/administrati
 import {
   listDeletionJobs,
   listExports,
+  listMarketingLeads,
   listOpenDisputes,
   listOpenSupportTickets,
   listModerationQueue,
@@ -32,6 +33,7 @@ async function loadDashboard(): Promise<DashboardCard[]> {
     disputes,
     moderation,
     support,
+    requests,
     exportsList,
     deletions,
     privacyRequests,
@@ -41,6 +43,7 @@ async function loadDashboard(): Promise<DashboardCard[]> {
     listOpenDisputes(context.database, context.actor),
     listModerationQueue(context.database, context.actor),
     listOpenSupportTickets(context.database, context.actor),
+    listMarketingLeads(context.database, context.actor),
     listExports(context.database, context.actor),
     listDeletionJobs(context.database, context.actor),
     listPrivacyRequests(context.database, context.actor),
@@ -52,6 +55,7 @@ async function loadDashboard(): Promise<DashboardCard[]> {
     { href: "/admin/disputes", labelKey: "cards.disputes", count: disputes.length },
     { href: "/admin/moderation", labelKey: "cards.moderation", count: moderation.length },
     { href: "/admin/support", labelKey: "cards.support", count: support.length },
+    { href: "/admin/requests", labelKey: "cards.requests", count: requests.length },
     {
       href: "/admin/exports",
       labelKey: "cards.exports",

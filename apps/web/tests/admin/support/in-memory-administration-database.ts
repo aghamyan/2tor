@@ -5,12 +5,14 @@ import type {
   DeletionJobRecord,
   DiscountRecord,
   ExportRecord,
+  MarketingLeadSummary,
   NewDeletionJobValues,
   NewDiscountValues,
   NewExportValues,
   PrivacyRequestRecord,
   SupportTicketSummary,
   SystemSettingRecord,
+  TutorContentUploadSummary,
   TutorDocumentSummary,
   TutorSuspensionRecord,
   TutorVerificationSummary,
@@ -42,12 +44,14 @@ export class InMemoryAdministrationDatabase implements AdministrationDatabase {
   readonly tutorProfileStatus = new Map<string, "active" | "suspended">();
   readonly abuseReports = new Map<string, AbuseReportSummary>();
   readonly contentReports = new Map<string, ContentReportSummary>();
+  readonly tutorContentUploads = new Map<string, TutorContentUploadSummary>();
   readonly supportTickets = new Map<string, SupportTicketSummary>();
   readonly exports = new Map<string, ExportRecord>();
   readonly deletionJobs = new Map<string, DeletionJobRecord>();
   readonly privacyRequests = new Map<string, PrivacyRequestRecord>();
   readonly discounts = new Map<string, DiscountRecord>();
   readonly systemSettings = new Map<string, SystemSettingRecord>();
+  readonly marketingLeads = new Map<string, MarketingLeadSummary>();
   readonly incidents: Array<{ id: string; title: string; severity: string }> = [];
 
   async transaction<T>(operation: (database: AdministrationDatabase) => Promise<T>): Promise<T> {
@@ -222,6 +226,25 @@ export class InMemoryAdministrationDatabase implements AdministrationDatabase {
       resolvedByUserId: values.resolvedByUserId,
     };
     this.contentReports.set(reportId, updated);
+    return updated;
+  }
+
+  async listPendingTutorContentUploads() {
+    return [...this.tutorContentUploads.values()].filter((u) => u.status === "pending_review");
+  }
+
+  async findTutorContentUploadById(uploadId: string) {
+    return this.tutorContentUploads.get(uploadId) ?? null;
+  }
+
+  async decideTutorContentUpload(
+    uploadId: string,
+    values: { status: "approved" | "rejected"; reviewedByUserId: string },
+  ) {
+    const current = this.tutorContentUploads.get(uploadId);
+    if (!current) throw new Error("upload missing");
+    const updated: TutorContentUploadSummary = { ...current, status: values.status };
+    this.tutorContentUploads.set(uploadId, updated);
     return updated;
   }
 
@@ -414,6 +437,10 @@ export class InMemoryAdministrationDatabase implements AdministrationDatabase {
     };
     this.systemSettings.set(values.key, record);
     return record;
+  }
+
+  async listMarketingLeads() {
+    return [...this.marketingLeads.values()];
   }
 
   async createIncident(values: {

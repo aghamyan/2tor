@@ -1,22 +1,40 @@
+/*
+ * This page used to carry its own indigo/coral/mint/yellow palette. It now maps onto the Varzharan
+ * design system (`app/globals.css`, `[data-surface="vz"]`), so the home page, the site chrome and
+ * every other public page share one set of colours.
+ *
+ * The local names are kept so the ~1300 rules below don't need touching, but several of them now
+ * resolve to the same value on purpose. The landing page runs ONE brand accent plus `--positive`
+ * strictly for semantic status; variety there comes from surface treatment (a filled pine block, a
+ * photo tile, a plain card), not from a fourth and fifth hue. So `--indigo`, `--coral` and
+ * `--yellow` all collapse onto the accent.
+ *
+ * Their soft counterparts do NOT collapse: those become the landing's `--field-*` tints (green,
+ * peach, gold), which exist in that system as the backdrop behind glass. That keeps the subject and
+ * benefit icons visually distinguishable — a real job, since they label three different things —
+ * without inventing brand hues the system doesn't have.
+ */
 .page {
-  --ink: #0d1d38;
-  --ink-soft: #263754;
-  --muted: #647089;
-  --line: #dce2ee;
-  --paper: #f7f8fc;
-  --white: #ffffff;
-  --indigo: #4657db;
-  --indigo-dark: #3041bd;
-  --indigo-soft: #e9ecff;
-  --yellow: #f3ca58;
-  --yellow-soft: #fff6d9;
-  --mint: #9ddcc0;
-  --mint-soft: #e7f7ef;
-  --coral: #ef8b71;
-  --coral-soft: #ffebe5;
+  --ink: hsl(var(--vz-ink));
+  --ink-soft: hsl(var(--vz-ink) / 82%);
+  --muted: hsl(var(--vz-muted));
+  --line: hsl(var(--vz-line));
+  --paper: hsl(var(--vz-paper));
+  --white: hsl(var(--vz-surface));
+  --indigo: hsl(var(--vz-accent));
+  /* No darker accent exists in the system — its buttons take a hover lift and an accent glow
+     instead. This is only for the few rules that need a pressed/darker text tone. */
+  --indigo-dark: color-mix(in srgb, hsl(var(--vz-accent)) 82%, hsl(var(--vz-ink)));
+  --indigo-soft: hsl(var(--vz-accent) / 12%);
+  --yellow: hsl(var(--vz-accent));
+  --yellow-soft: hsl(var(--vz-field-3) / 45%);
+  --mint: hsl(var(--vz-positive));
+  --mint-soft: hsl(var(--vz-field-1) / 45%);
+  --coral: hsl(var(--vz-accent));
+  --coral-soft: hsl(var(--vz-field-2) / 45%);
   background: var(--paper);
   color: var(--ink);
-  font-family: var(--home-font-body), "Noto Sans Armenian", ui-sans-serif, system-ui, sans-serif;
+  font-family: var(--vz-body);
   overflow: clip;
 }
 
@@ -42,19 +60,20 @@
 .page h1,
 .page h2,
 .page h3 {
-  font-family:
-    var(--home-font-display), var(--home-font-body), ui-sans-serif, system-ui, sans-serif;
+  font-family: var(--vz-display);
+  letter-spacing: -0.028em;
 }
 
 .page a:focus-visible {
-  outline: 3px solid rgb(70 87 219 / 34%);
+  outline: 3px solid hsl(var(--vz-accent) / 45%);
   outline-offset: 4px;
 }
 
 .hero {
   background:
-    radial-gradient(circle at 82% 26%, rgb(109 124 239 / 15%), transparent 29rem),
-    radial-gradient(circle at 18% 92%, rgb(157 220 192 / 13%), transparent 24rem), var(--paper);
+    radial-gradient(circle at 82% 26%, hsl(var(--vz-accent) / 15%), transparent 29rem),
+    radial-gradient(circle at 18% 92%, hsl(var(--vz-positive) / 13%), transparent 24rem),
+    var(--paper);
   min-height: calc(100svh - 4.75rem);
   overflow: hidden;
   position: relative;
@@ -70,14 +89,14 @@
 
 .heroGrid {
   background-image:
-    linear-gradient(rgb(13 29 56 / 4.5%) 1px, transparent 1px),
-    linear-gradient(90deg, rgb(13 29 56 / 4.5%) 1px, transparent 1px);
+    linear-gradient(hsl(var(--vz-ink) / 4.5%) 1px, transparent 1px),
+    linear-gradient(90deg, hsl(var(--vz-ink) / 4.5%) 1px, transparent 1px);
   background-size: 40px 40px;
   mask-image: linear-gradient(to bottom, black, transparent 86%);
 }
 
 .pathLine {
-  border: 1px dashed rgb(70 87 219 / 12%);
+  border: 1px dashed hsl(var(--vz-accent) / 12%);
   border-left-color: transparent;
   border-radius: 50%;
   height: 44rem;
@@ -90,15 +109,15 @@
 
 .armenianGlyph,
 .codeGlyph {
-  color: rgb(70 87 219 / 12%);
-  font-family: var(--home-font-display), sans-serif;
+  color: hsl(var(--vz-accent) / 12%);
+  font-family: var(--vz-display);
   font-weight: 800;
   position: absolute;
 }
 
 .armenianGlyph {
   bottom: 12%;
-  font-family: var(--home-font-body), sans-serif;
+  font-family: var(--vz-body);
   font-size: 1.2rem;
   left: 3.5%;
   transform: rotate(-9deg);
@@ -161,7 +180,7 @@
 .heroEyebrow > span {
   background: var(--coral);
   border-radius: 50%;
-  box-shadow: 0 0 0 5px rgb(239 139 113 / 14%);
+  box-shadow: 0 0 0 5px hsl(var(--vz-accent) / 14%);
   height: 0.45rem;
   width: 0.45rem;
 }
@@ -223,7 +242,7 @@
 .primaryAction,
 .secondaryAction {
   align-items: center;
-  border-radius: 0.8rem;
+  border-radius: var(--vz-r-pill);
   display: inline-flex;
   font-size: 0.9rem;
   font-weight: 780;
@@ -233,17 +252,20 @@
   text-decoration: none;
 }
 
+/* The landing page's primary button: a flat accent pill whose depth comes from a hover lift and an
+   accent-tinted glow. The heavy 2.3rem drop shadow and white inset highlight it used to carry read
+   as a plastic 3D button, which is the opposite of this design language. */
 .primaryAction {
   background: var(--indigo);
-  border: 1px solid var(--indigo-dark);
-  box-shadow:
-    0 1rem 2.3rem rgb(70 87 219 / 24%),
-    inset 0 1px rgb(255 255 255 / 20%);
+  border: 1px solid transparent;
+  box-shadow: 0 1px 2px hsl(var(--vz-ink) / 8%);
   color: var(--white);
+  font-family: var(--vz-display);
+  letter-spacing: -0.01em;
   padding: 0.62rem 0.62rem 0.62rem 1.25rem;
   transition:
-    box-shadow 200ms ease,
-    transform 200ms ease;
+    box-shadow 220ms var(--vz-ease),
+    transform 220ms var(--vz-ease);
 }
 
 .primaryAction > span {
@@ -263,9 +285,13 @@
 
 .primaryAction:hover {
   box-shadow:
-    0 1.2rem 2.8rem rgb(70 87 219 / 31%),
-    0 0 0 5px rgb(70 87 219 / 8%);
+    var(--vz-fx-glow),
+    0 1px 2px hsl(var(--vz-ink) / 10%);
   transform: translateY(-2px);
+}
+
+.primaryAction:active {
+  transform: scale(0.975);
 }
 
 .primaryAction:hover svg {
@@ -309,7 +335,7 @@
 }
 
 .trustList svg {
-  color: #168462;
+  color: hsl(var(--vz-positive));
   flex: 0 0 auto;
 }
 
@@ -353,17 +379,23 @@
 
 .avatarStack span:nth-child(2) {
   background: var(--coral-soft);
-  color: #a84c35;
+  color: hsl(var(--vz-accent));
 }
 
 .avatarStack span:nth-child(3) {
   background: var(--mint-soft);
-  color: #127657;
+  color: hsl(var(--vz-positive));
 }
 
 /* Product lesson preview */
+/* A column, not a fixed-height canvas with absolutely-placed children. The lesson window and the
+   teacher's note stack in flow, which is what guarantees the note sits UNDER the card at exactly
+   the same width instead of being positioned near it and hoping. The aura and the dashed path are
+   still absolute decorations behind both. */
 .classroomStage {
-  height: clamp(36rem, 48vw, 41rem);
+  display: flex;
+  flex-direction: column;
+  gap: 1.15rem;
   min-width: 0;
   position: relative;
   z-index: 2;
@@ -382,7 +414,7 @@
 }
 
 .learningPath {
-  border: 1px dashed rgb(70 87 219 / 20%);
+  border: 1px dashed hsl(var(--vz-accent) / 20%);
   border-radius: 50%;
   height: 31rem;
   left: 50%;
@@ -397,9 +429,9 @@
   background: var(--paper);
   border: 1px solid var(--line);
   border-radius: 50%;
-  color: rgb(70 87 219 / 58%);
+  color: hsl(var(--vz-accent) / 58%);
   display: flex;
-  font-family: var(--home-font-display), sans-serif;
+  font-family: var(--vz-display);
   font-size: 0.7rem;
   font-weight: 800;
   height: 2.25rem;
@@ -422,20 +454,18 @@
 }
 
 .lessonLayer {
-  left: 3%;
-  position: absolute;
-  top: 7%;
-  width: 94%;
+  position: relative;
+  width: 100%;
   z-index: 2;
 }
 
 .lessonWindow {
   background: rgb(255 255 255 / 97%);
-  border: 1px solid #cfd6e5;
-  border-radius: 1.25rem;
+  border: 1px solid hsl(var(--vz-line));
+  border-radius: var(--vz-r-card);
   box-shadow:
-    0 3.2rem 6rem rgb(42 55 103 / 18%),
-    0 0.4rem 1rem rgb(42 55 103 / 7%),
+    0 3.2rem 6rem hsl(var(--vz-ink) / 18%),
+    0 0.4rem 1rem hsl(var(--vz-ink) / 7%),
     inset 0 1px var(--white);
   overflow: hidden;
   transform: perspective(1100px) rotateY(-2deg) rotateX(1deg);
@@ -443,7 +473,7 @@
 
 .lessonHeader {
   align-items: center;
-  border-bottom: 1px solid #e7eaf1;
+  border-bottom: 1px solid hsl(var(--vz-line-soft));
   display: flex;
   justify-content: space-between;
   min-height: 4.5rem;
@@ -469,11 +499,14 @@
 .tutorAvatar {
   align-items: center;
   background: var(--coral-soft);
-  border: 1px solid #f2c5b9;
-  border-radius: 0.72rem;
-  color: #a84831;
+  border: 1px solid hsl(var(--vz-accent) / 30%);
+  border-radius: var(--vz-r-input);
+  /* Accent at full strength measures 3.74:1 on this peach tint. Darkened toward ink it reaches
+     5.04:1 and still reads as the same warm family. The monogram is `aria-hidden` and the tutor's
+     name sits beside it, but a legible initial costs nothing. */
+  color: color-mix(in srgb, hsl(var(--vz-accent)) 75%, hsl(var(--vz-ink)));
   display: flex;
-  font-family: var(--home-font-display), sans-serif;
+  font-family: var(--vz-display);
   font-size: 0.82rem;
   font-weight: 800;
   height: 2.6rem;
@@ -497,9 +530,9 @@
 .liveStatus {
   align-items: center;
   background: var(--mint-soft);
-  border: 1px solid #c2e9d6;
+  border: 1px solid hsl(var(--vz-positive) / 30%);
   border-radius: 99px;
-  color: #0e7556;
+  color: hsl(var(--vz-positive));
   display: flex;
   flex: 0 0 auto;
   font-size: 0.58rem;
@@ -511,7 +544,7 @@
 
 .liveStatus i {
   animation: live-pulse 1.8s ease-in-out infinite;
-  background: #1c9b72;
+  background: hsl(var(--vz-positive));
   border-radius: 50%;
   height: 0.42rem;
   width: 0.42rem;
@@ -519,7 +552,7 @@
 
 @keyframes live-pulse {
   50% {
-    box-shadow: 0 0 0 5px rgb(28 155 114 / 13%);
+    box-shadow: 0 0 0 5px hsl(var(--vz-positive) / 13%);
   }
 }
 
@@ -530,7 +563,7 @@
 }
 
 .whiteboard {
-  background: #f3f4ff;
+  background: hsl(var(--vz-accent) / 6%);
   min-width: 0;
   overflow: hidden;
   position: relative;
@@ -538,8 +571,8 @@
 
 .whiteboard::before {
   background-image:
-    linear-gradient(rgb(70 87 219 / 7%) 1px, transparent 1px),
-    linear-gradient(90deg, rgb(70 87 219 / 7%) 1px, transparent 1px);
+    linear-gradient(hsl(var(--vz-accent) / 7%) 1px, transparent 1px),
+    linear-gradient(90deg, hsl(var(--vz-accent) / 7%) 1px, transparent 1px);
   background-size: 23px 23px;
   content: "";
   inset: 0;
@@ -565,7 +598,7 @@
 }
 
 .boardHeading strong {
-  font-family: var(--home-font-display), sans-serif;
+  font-family: var(--vz-display);
   font-size: clamp(1.25rem, 2vw, 1.7rem);
   letter-spacing: -0.045em;
   margin-top: 0.25rem;
@@ -603,8 +636,8 @@
 .boardTools {
   align-items: center;
   background: rgb(255 255 255 / 82%);
-  border: 1px solid #d8dcee;
-  border-radius: 0.65rem;
+  border: 1px solid hsl(var(--vz-line));
+  border-radius: var(--vz-r-input);
   bottom: 0.75rem;
   display: flex;
   flex-direction: column;
@@ -630,7 +663,7 @@
 
 .lessonSidebar {
   background: var(--white);
-  border-left: 1px solid #e7eaf1;
+  border-left: 1px solid hsl(var(--vz-line-soft));
   display: flex;
   flex-direction: column;
   padding: 1.1rem 0.9rem;
@@ -647,13 +680,13 @@
 }
 
 .sidebarLabel svg {
-  color: #168462;
+  color: hsl(var(--vz-positive));
   flex: 0 0 auto;
 }
 
 .miniChart {
   background: linear-gradient(to bottom, var(--mint-soft), transparent);
-  border-bottom: 1px solid #dfe8e3;
+  border-bottom: 1px solid hsl(var(--vz-line-soft));
   height: 5.75rem;
   margin-top: 1rem;
 }
@@ -665,20 +698,20 @@
 }
 .miniChart path {
   fill: none;
-  stroke: #24a87f;
+  stroke: hsl(var(--vz-positive));
   stroke-linecap: round;
   stroke-width: 3;
 }
 
 .confidence {
-  color: #127657;
+  color: hsl(var(--vz-positive));
   font-size: 0.64rem;
   line-height: 1.4;
   margin-top: 0.75rem;
 }
 
 .streakRow {
-  border-top: 1px solid #e7eaf1;
+  border-top: 1px solid hsl(var(--vz-line-soft));
   margin-top: auto;
   padding-top: 1rem;
 }
@@ -693,7 +726,7 @@
 }
 
 .streakRow svg {
-  color: #d4a51c;
+  color: hsl(var(--vz-accent));
 }
 .streakRow > div {
   display: flex;
@@ -701,124 +734,13 @@
   margin-top: 0.65rem;
 }
 .streakRow i {
-  background: #e6e8ee;
+  background: hsl(var(--vz-surface-2));
   border-radius: 50%;
   height: 0.48rem;
   width: 0.48rem;
 }
 .streakRow .streakDone {
   background: var(--yellow);
-}
-
-.feedbackCard,
-.parentCard,
-.homeworkCard {
-  backdrop-filter: blur(14px);
-  background: rgb(255 255 255 / 93%);
-  border: 1px solid rgb(205 212 228 / 92%);
-  box-shadow: 0 1rem 2.7rem rgb(42 55 103 / 14%);
-  position: absolute;
-  z-index: 5;
-}
-
-.feedbackCard {
-  align-items: flex-start;
-  border-radius: 0.95rem;
-  bottom: 5%;
-  display: flex;
-  gap: 0.7rem;
-  left: -1%;
-  max-width: 16.5rem;
-  padding: 0.8rem;
-}
-
-.feedbackIcon,
-.parentIcon {
-  align-items: center;
-  border-radius: 0.65rem;
-  display: flex;
-  flex: 0 0 auto;
-  height: 2.3rem;
-  justify-content: center;
-  width: 2.3rem;
-}
-
-.feedbackIcon {
-  background: var(--yellow-soft);
-  color: #ad7f0b;
-}
-.feedbackCard > span:last-child,
-.parentCard > span:last-child {
-  display: flex;
-  flex-direction: column;
-}
-.feedbackCard small,
-.homeworkCard small,
-.parentCard small {
-  color: var(--muted);
-  font-size: 0.56rem;
-  font-weight: 650;
-}
-.feedbackCard strong {
-  font-size: 0.64rem;
-  line-height: 1.42;
-  margin-top: 0.2rem;
-}
-
-.parentCard {
-  align-items: center;
-  border-radius: 0.85rem;
-  display: flex;
-  gap: 0.65rem;
-  padding: 0.72rem 0.85rem;
-  right: -2%;
-  top: 4%;
-}
-
-.parentIcon {
-  background: var(--mint-soft);
-  color: #137657;
-  height: 2rem;
-  width: 2rem;
-}
-.parentCard strong {
-  font-size: 0.64rem;
-}
-.parentCard small {
-  margin-top: 0.1rem;
-}
-
-.homeworkCard {
-  align-items: center;
-  border-radius: 0.85rem;
-  bottom: 0;
-  display: flex;
-  gap: 0.65rem;
-  padding: 0.7rem 0.8rem;
-  right: 2%;
-}
-
-.homeworkCard > svg {
-  color: var(--indigo);
-}
-.homeworkCard > span:nth-child(2) {
-  display: flex;
-  flex-direction: column;
-}
-.homeworkCard strong {
-  font-size: 0.62rem;
-  margin-top: 0.08rem;
-}
-.completeMark {
-  align-items: center;
-  background: var(--mint-soft);
-  border-radius: 50%;
-  color: #137657;
-  display: flex;
-  height: 1.5rem;
-  justify-content: center;
-  margin-left: 0.2rem;
-  width: 1.5rem;
 }
 
 /* Subject explorer */
@@ -869,7 +791,7 @@
 .subjectCard {
   background: rgb(255 255 255 / 70%);
   border: 1px solid var(--line);
-  border-radius: 0.9rem;
+  border-radius: var(--vz-r-input);
   color: var(--ink);
   display: grid;
   gap: 0.8rem;
@@ -887,16 +809,16 @@
 
 .subjectCard:hover {
   background: var(--white);
-  border-color: #bdc6dc;
-  box-shadow: 0 1rem 2.2rem rgb(42 55 103 / 10%);
+  border-color: hsl(var(--vz-line));
+  box-shadow: 0 1rem 2.2rem hsl(var(--vz-ink) / 10%);
   transform: translateY(-4px);
 }
 
 .subjectIcon {
   align-items: center;
   background: var(--indigo-soft);
-  border: 1px solid #d3d8ff;
-  border-radius: 0.7rem;
+  border: 1px solid hsl(var(--vz-accent) / 26%);
+  border-radius: var(--vz-r-input);
   color: var(--indigo-dark);
   display: flex;
   height: 2.65rem;
@@ -910,14 +832,14 @@
 }
 .subjectIcon.armenian {
   background: var(--coral-soft);
-  border-color: #f3ccc2;
-  color: #ad4d35;
+  border-color: hsl(var(--vz-accent) / 30%);
+  color: hsl(var(--vz-accent));
 }
 
 .subjectCardComingSoon {
   background: transparent;
   border: 1px dashed var(--line);
-  border-radius: 0.9rem;
+  border-radius: var(--vz-r-input);
   display: flex;
   flex-direction: column;
   gap: 0.8rem;
@@ -985,7 +907,7 @@
 }
 
 .benefitsSection::before {
-  background-image: radial-gradient(rgb(70 87 219 / 8%) 0.7px, transparent 0.7px);
+  background-image: radial-gradient(hsl(var(--vz-accent) / 8%) 0.7px, transparent 0.7px);
   background-size: 24px 24px;
   content: "";
   inset: 0;
@@ -1024,8 +946,11 @@
   position: relative;
 }
 
+/* Two stops, not three. The old rail ran indigo -> coral -> green; with indigo and coral now the
+   same accent, a three-stop version would read as a flat accent that inexplicably turns green
+   halfway. Accent -> positive says what the row actually shows: the lesson leading to progress. */
 .timelineLine {
-  background: linear-gradient(90deg, var(--indigo), var(--coral) 50%, #2a9b76);
+  background: linear-gradient(90deg, hsl(var(--vz-accent)), hsl(var(--vz-positive)));
   height: 2px;
   left: 8%;
   position: absolute;
@@ -1037,7 +962,7 @@
 .benefitCard {
   background: var(--white);
   border: 1px solid var(--line);
-  border-radius: 1rem;
+  border-radius: var(--vz-r-card);
   min-height: 16.5rem;
   padding: 3.8rem 1.35rem 1.35rem;
   position: relative;
@@ -1050,7 +975,7 @@
   border-radius: 50%;
   box-shadow:
     0 0 0 1px var(--line),
-    0 0.5rem 1.2rem rgb(42 55 103 / 12%);
+    0 0.5rem 1.2rem hsl(var(--vz-ink) / 12%);
   color: var(--indigo);
   display: flex;
   height: 3.35rem;
@@ -1063,11 +988,11 @@
 
 .benefitCard:nth-of-type(2) .benefitNode {
   background: var(--coral-soft);
-  color: #b05038;
+  color: hsl(var(--vz-accent));
 }
 .benefitCard:nth-of-type(3) .benefitNode {
   background: var(--mint-soft);
-  color: #147557;
+  color: hsl(var(--vz-positive));
 }
 .benefitSignal {
   color: var(--indigo-dark);
@@ -1097,13 +1022,7 @@
     font-size: clamp(3.4rem, 6.1vw, 5.4rem);
   }
   .classroomStage {
-    height: 36rem;
-  }
-  .parentCard {
-    right: 0;
-  }
-  .feedbackCard {
-    left: 0;
+    height: auto;
   }
   .subjectCard,
   .subjectCardComingSoon {
@@ -1133,14 +1052,11 @@
     grid-template-columns: minmax(0, 1fr) 8.5rem;
   }
   .classroomStage {
-    height: 33rem;
+    height: auto;
   }
   .learningPath {
     height: 27rem;
     width: 29rem;
-  }
-  .feedbackCard {
-    max-width: 14rem;
   }
   .subjectRail {
     grid-template-columns: repeat(3, 15.5rem);
@@ -1175,7 +1091,7 @@
     max-width: 11ch;
   }
   .classroomStage {
-    height: 37rem;
+    height: auto;
     margin-inline: auto;
     max-width: 40rem;
     width: 100%;
@@ -1194,7 +1110,7 @@
     padding-left: 1.4rem;
   }
   .timelineLine {
-    background: linear-gradient(var(--indigo), var(--coral), #2a9b76);
+    background: linear-gradient(hsl(var(--vz-accent)), hsl(var(--vz-positive)));
     bottom: 8%;
     height: auto;
     left: 0.25rem;
@@ -1253,7 +1169,7 @@
     align-items: flex-start;
   }
   .classroomStage {
-    height: 30rem;
+    height: auto;
     margin-top: 1rem;
   }
   .lessonLayer {
@@ -1262,7 +1178,7 @@
     width: 100%;
   }
   .lessonWindow {
-    border-radius: 1rem;
+    border-radius: var(--vz-r-card);
     transform: none;
   }
   .lessonHeader {
@@ -1292,60 +1208,6 @@
   }
   .lessonSidebar {
     display: none;
-  }
-  .feedbackCard {
-    bottom: 1%;
-    left: 0;
-    max-width: none;
-    padding: 0.58rem;
-    width: calc(53% - 0.25rem);
-  }
-  .feedbackIcon {
-    height: 1.85rem;
-    width: 1.85rem;
-  }
-  .feedbackCard strong {
-    display: -webkit-box;
-    font-size: 0.59rem;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 2;
-    overflow: hidden;
-  }
-  .parentCard {
-    right: -0.2rem;
-    top: 0;
-  }
-  .parentCard small {
-    display: none;
-  }
-  .homeworkCard {
-    bottom: 0;
-    gap: 0.4rem;
-    padding: 0.58rem;
-    right: 0;
-    width: calc(47% - 0.25rem);
-  }
-  .homeworkCard > svg {
-    flex: 0 0 auto;
-    height: 1rem;
-    width: 1rem;
-  }
-  .homeworkCard > span:nth-child(2) {
-    min-width: 0;
-  }
-  .homeworkCard small,
-  .homeworkCard strong {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-  .homeworkCard strong {
-    max-width: 5.5rem;
-  }
-  .completeMark {
-    height: 1.25rem;
-    margin-left: auto;
-    width: 1.25rem;
   }
   .learningPath {
     display: none;
@@ -1382,5 +1244,368 @@
   .subjectIcon,
   .subjectArrow {
     transition: none;
+  }
+}
+
+/* ── Rotating classroom card ───────────────────────────────────────────────────
+   The hero lesson cycles through mathematics, Armenian and chess. Only the
+   per-subject parts cross-fade; the window frame holds still so the hero does not
+   flicker on a six-second loop. See `classroom-boards.tsx` for the artwork. */
+
+/* Each swapped block is absolutely stacked so the outgoing and incoming copy
+   overlap during the cross-fade instead of collapsing the row's height. */
+.lessonTitles {
+  display: grid;
+  min-width: 0;
+}
+.lessonTitles > * {
+  grid-area: 1 / 1;
+}
+.lessonTitleSwap {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.boardArt {
+  inset: 0;
+  position: absolute;
+}
+
+/* Armenian: the word is real text, not traced paths — Armenian letterforms are
+   easy to get subtly wrong in béziers, and this is the script the brand is named
+   in. The stagger is what makes it read as writing. */
+.boardWord {
+  align-items: center;
+  bottom: 2.2rem;
+  display: flex;
+  flex-direction: column;
+  left: 2%;
+  position: absolute;
+  width: 96%;
+}
+.boardWordRow {
+  color: var(--indigo);
+  display: flex;
+  font-family: var(--vz-display);
+  font-size: clamp(3rem, 6vw, 4.6rem);
+  font-weight: 600;
+  gap: 0.06em;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+/* Sized to the word, not to the board — a rule running the full width would read as a divider
+   and would collide with the tool dots in the bottom-left corner. */
+.boardWordRule {
+  margin-top: 0.3rem;
+  width: 58%;
+}
+/* `.answerStroke` only gets its colour inside `.equation`, so this underline needs its own —
+   without it the stroke resolves to `none` and the rule is invisible. */
+.boardWordRule path {
+  fill: none;
+  stroke: hsl(var(--vz-accent) / 55%);
+  stroke-linecap: round;
+  stroke-width: 3;
+}
+
+/* Chess: a four-square board fragment with the knight's L drawn onto it. */
+.chessBoard {
+  bottom: 0.6rem;
+  left: 2%;
+  position: absolute;
+  width: 96%;
+}
+.chessSquareDark {
+  fill: hsl(var(--vz-accent) / 12%);
+}
+.chessFrame {
+  fill: none;
+  stroke: hsl(var(--vz-accent) / 30%);
+  stroke-width: 2;
+}
+.chessKnight {
+  fill: hsl(var(--vz-ink) / 82%);
+  stroke: none;
+}
+.chessMove {
+  fill: none;
+  stroke: hsl(var(--vz-accent));
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 3.5;
+}
+.chessTarget {
+  fill: none;
+  stroke: hsl(var(--vz-accent));
+  stroke-dasharray: 4 5;
+  stroke-width: 2.5;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+/* Subject switcher. Real buttons: the card is on a timer, so there has to be a way
+   to stop it on the subject you actually want. */
+/* Centred with `left/right: 0` + `justify-content`, deliberately NOT `left: 50%` +
+   `translateX(-50%)`. This is a framer-motion element, and its entrance animates `y` — which means
+   framer writes the `transform` property and silently drops any translate declared here. The same
+   collision put the chess knight off the board; see `classroom-boards.tsx`. */
+/* Clears the mini-project card, which is pinned to `bottom: 0` of the same stage. Measured: at
+   -1.35rem the chips clipped its lower edge by 9px in both locales, and the Armenian card is wider
+   still. */
+/* Dwell indicator: fills across the active chip over one rotation interval, so the
+   change is anticipated rather than abrupt. */
+@media (max-width: 900px) {
+}
+
+/* ── Teacher's note ───────────────────────────────────────────────────────────
+   One block replacing four floating cards. A filled pine surface, which is how
+   this design language marks a brand object rather than another card: the lesson
+   window above is paper, this is ink, and the contrast is what makes it read as
+   the thing the lesson produced instead of more chrome.
+
+   Deliberately identical in both themes for the same reason `--vz-block` is.
+
+   Contrast, computed against BOTH the flat block and the accent bloom below,
+   which is the worse of the two backdrops:
+     name + body    white          13.34:1 · 11.88:1
+     role           white 76%       8.37:1 ·  7.63:1
+     neutral tags   white 86%      10.27:1 ·  9.26:1
+     avatar/action  --vz-field-2    6.40:1 ·  5.70:1
+     action tag on its accent-16% fill        5.93:1
+   All clear AA. `--vz-muted` measures 2.25:1 here and must never be used. */
+.teacherNote {
+  background: hsl(var(--vz-block));
+  border-radius: var(--vz-r-card);
+  box-shadow:
+    0 2rem 4.5rem hsl(var(--vz-ink) / 26%),
+    inset 0 0 0 1px hsl(0 0% 100% / 8%);
+  display: flex;
+  flex-direction: column;
+  /* A floor, so the block keeps a deliberate proportion instead of collapsing to whatever one
+     sentence happens to need. Combined with the tags anchored to the bottom, a two-line note and a
+     three-line one read as the same object rather than two different cards. */
+  min-height: 17rem;
+  overflow: hidden;
+  padding: 2rem 2rem 2.1rem;
+  position: relative;
+  width: 100%;
+  z-index: 6;
+}
+
+.noteInner {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+}
+
+/* A single warm bloom in the top-right, so the block is not a flat rectangle. */
+.teacherNote::before {
+  background: radial-gradient(120% 90% at 88% -10%, hsl(var(--vz-accent) / 22%), transparent 62%);
+  content: "";
+  inset: 0;
+  pointer-events: none;
+  position: absolute;
+}
+
+.noteHead {
+  align-items: center;
+  border-bottom: 1px solid hsl(0 0% 100% / 12%);
+  display: flex;
+  gap: 0.95rem;
+  padding-bottom: 1.45rem;
+  position: relative;
+}
+
+/* A monogram, not a stock headshot. On a page whose pitch is vetted Armenian teachers, a
+   photo of a stranger is worse than an honest placeholder. */
+.noteAvatar {
+  align-items: center;
+  background: hsl(var(--vz-accent) / 22%);
+  border-radius: var(--vz-r-pill);
+  color: hsl(var(--vz-field-2));
+  display: flex;
+  flex: none;
+  font-family: var(--vz-display);
+  font-size: 0.92rem;
+  font-weight: 700;
+  height: 3rem;
+  justify-content: center;
+  letter-spacing: -0.02em;
+  width: 3rem;
+}
+
+.noteWho {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.noteWho strong {
+  color: hsl(var(--vz-block-on));
+  font-family: var(--vz-display);
+  font-size: 1.1rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+/* 8.4:1 on the pine block. `--vz-muted` would be 2.25:1 here and fail outright. */
+.noteWho small {
+  color: hsl(var(--vz-block-on) / 76%);
+  font-size: 0.84rem;
+  margin-top: 0.1rem;
+}
+
+.noteBody {
+  color: hsl(var(--vz-block-on));
+  font-family: var(--vz-display);
+  font-size: clamp(1.14rem, 1.6vw, 1.45rem);
+  font-weight: 500;
+  letter-spacing: -0.022em;
+  line-height: 1.36;
+  /* Held to a reading measure rather than the full card width. At 669px the note ran to a single
+     line, which left the block a squat 3.9:1 bar; wrapping to two gives it the proportion the
+     reference has and stops the eye travelling the whole width for one sentence. */
+  margin: 1.35rem 0 0;
+  max-width: 32ch;
+  position: relative;
+  text-wrap: balance;
+}
+
+/*
+ * Two classes deep on purpose. `.page ul { margin: 0; padding: 0 }` further up is (0,1,1) and beats
+ * a bare `.noteTags` (0,1,0) — it was silently zeroing both the `auto` margin and the padding here,
+ * which is why the tags sat under the body with dead space beneath them instead of at the floor.
+ */
+.noteInner .noteTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  list-style: none;
+  /* Anchors the row to the bottom of the block, so a two-line note and a three-line one put their
+     tags in the same place. */
+  margin: 1.6rem 0 0;
+  margin-top: auto;
+  padding: 1.6rem 0 0;
+  position: relative;
+}
+.noteTags li {
+  border: 1px solid hsl(var(--vz-block-on) / 26%);
+  border-radius: var(--vz-r-pill);
+  color: hsl(var(--vz-block-on) / 86%);
+  font-family: var(--vz-display);
+  font-size: 0.83rem;
+  font-weight: 600;
+  padding: 0.48rem 0.95rem;
+  white-space: nowrap;
+}
+/* Exactly one accented tag: the thing the student has to go and do. Three equally loud
+   chips would flatten the hierarchy the note is trying to express. */
+.noteTags li.noteTagAction {
+  background: hsl(var(--vz-accent) / 16%);
+  border-color: hsl(var(--vz-accent) / 55%);
+  color: hsl(var(--vz-field-2));
+}
+
+@media (max-width: 900px) {
+  .teacherNote {
+    padding: 1.15rem 1.2rem 1.3rem;
+    width: 100%;
+  }
+  .noteTags li {
+    font-size: 0.74rem;
+    padding: 0.34rem 0.7rem;
+  }
+}
+
+/* Short laptop viewports.
+   The hero is `min-height: 100svh`, but Armenian sets the headline to four lines and the note body
+   to three, which pushed the note's tag row 103px below the fold on a 1440x800 screen — measured,
+   not guessed. Tightening the headline and the stage brings it back without touching the layout at
+   taller sizes. Scoped above the mobile breakpoint, where the hero stacks and the problem does not
+   arise. */
+@media (min-width: 901px) and (max-height: 780px) {
+  /* The hero's own vertical padding is the biggest single lever here: at 800px tall it reserves
+     ~120px that the Armenian layout needs back. */
+  .heroShell {
+    padding-block: 2rem 2.3rem;
+  }
+  .classroomStage {
+    gap: 0.8rem;
+  }
+  .noteHead {
+    gap: 0.8rem;
+    padding-bottom: 0.85rem;
+  }
+  .noteAvatar {
+    height: 2.5rem;
+    width: 2.5rem;
+  }
+  .noteWho strong {
+    font-size: 1rem;
+  }
+  .noteTags li {
+    font-size: 0.78rem;
+    padding: 0.36rem 0.8rem;
+  }
+  .heroTitle {
+    font-size: clamp(2.7rem, 4.2vw, 4.4rem);
+  }
+  .heroDescription {
+    margin-top: 1.1rem !important;
+  }
+  .heroActions {
+    margin-top: 1.5rem;
+  }
+  .teacherNote {
+    padding: 1rem 1.15rem 1.1rem;
+  }
+  .noteBody {
+    font-size: 0.99rem;
+    margin-top: 0.8rem;
+  }
+  .noteTags {
+    margin-top: 0.8rem;
+  }
+}
+
+/* Anti-Cheating teaser */
+.antiCheatingSection {
+  background: var(--paper);
+  padding-block: clamp(5.5rem, 9vw, 9rem);
+  position: relative;
+}
+
+.antiCheatingGrid {
+  align-items: center;
+  display: grid;
+  gap: clamp(2.5rem, 6vw, 5rem);
+  grid-template-columns: 1fr 1fr;
+}
+
+.antiCheatingCopy h2 {
+  font-size: clamp(2.1rem, 4vw, 3.1rem);
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+  margin-top: 0.75rem !important;
+  text-wrap: balance;
+}
+
+.antiCheatingBody {
+  color: var(--muted);
+  font-size: 1.05rem;
+  line-height: 1.65;
+  margin-top: 1.1rem;
+  max-width: 32rem;
+}
+
+.antiCheatingActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.85rem;
+  margin-top: 1.85rem;
+}
+
+@media (max-width: 64rem) {
+  .antiCheatingGrid {
+    grid-template-columns: 1fr;
   }
 }

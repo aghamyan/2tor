@@ -7,6 +7,8 @@ export default async function LessonDetailPage({
   params: Promise<{ lessonId: string }>;
 }) {
   const { lessonId } = await params;
-  const { detail, viewerUserId, isStaff } = await loadLessonDetailForViewer(lessonId);
-  return <LessonDetailView detail={detail} viewerUserId={viewerUserId} isStaff={isStaff} />;
+  const { detail, viewerUserId, isStaff, feedback } = await loadLessonDetailForViewer(lessonId);
+  return (
+    <LessonDetailView detail={detail} viewerUserId={viewerUserId} isStaff={isStaff} feedback={feedback} />
+  );
 }

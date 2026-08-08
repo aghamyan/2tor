@@ -1,4 +1,3 @@
-import { Noto_Sans_Armenian, Plus_Jakarta_Sans } from "next/font/google";
 import type { Locale } from "@app/i18n/config";
 import { localHref } from "./content";
 import {
@@ -9,22 +8,15 @@ import {
   type SubjectCopy,
 } from "./compact-home";
 import { Hero } from "./hero";
+import { AntiCheatingTeaser, type AntiCheatingTeaserCopy } from "./anti-cheating-teaser";
 import styles from "./compact-home.module.css";
 
-const displayFont = Plus_Jakarta_Sans({
-  subsets: ["latin"],
-  weight: ["500", "600", "700", "800"],
-  display: "swap",
-  variable: "--home-font-display",
-});
-
-const bodyFont = Noto_Sans_Armenian({
-  subsets: ["armenian", "latin"],
-  weight: "variable",
-  display: "swap",
-  variable: "--home-font-body",
-});
-
+/*
+ * The type stack is no longer declared here. Plus Jakarta Sans belonged to this page's own visual
+ * identity; the public surfaces now share one stack (Instrument Sans / Atkinson Hyperlegible /
+ * Noto Sans Armenian) loaded once in `app/(marketing)/layout.tsx` from `../fonts.ts`. Loading a
+ * fourth family here would have shipped an extra font download for a page that no longer uses it.
+ */
 interface HomeCopy {
   hero: {
     eyebrow: string;
@@ -41,6 +33,7 @@ interface HomeCopy {
     items: readonly Omit<SubjectCopy["items"][number], "href">[];
   };
   benefits: BenefitsCopy;
+  antiCheating: AntiCheatingTeaserCopy;
 }
 
 const copy: Record<Locale, HomeCopy> = {
@@ -63,20 +56,69 @@ const copy: Record<Locale, HomeCopy> = {
     },
     classroom: {
       ariaLabel:
-        "Interactive 2tor classroom preview showing a live algebra lesson and parent progress tools",
+        "2tor classroom preview, cycling through a mathematics, Armenian, and chess lesson with parent progress tools",
       live: "Live lesson",
-      lesson: "Algebra: Visual equations",
-      tutor: "Anna · Today at 4:00 PM",
-      topic: "Visual equations",
-      prompt: "Balance both sides",
-      feedback: "Tutor feedback",
-      feedbackBody: "Maya explained why the equation stays balanced.",
-      parentReady: "Parent summary ready",
       wins: "3 learning wins this week",
-      confidence: "Confidence improved by 18%",
       streak: "4 week streak",
-      homework: "Mini project",
-      homeworkStatus: "Equation explorer · Complete",
+      subjects: [
+        {
+          key: "math",
+          label: "Mathematics",
+          lesson: "Algebra: Visual equations",
+          tutor: "Anna · Today at 4:00 PM",
+          tutorInitial: "A",
+          topic: "Visual equations",
+          prompt: "Balance both sides",
+          confidence: "Confidence improved by 18%",
+          note: {
+            author: "Anna Ghazaryan",
+            initials: "AG",
+            role: "Note after today's lesson",
+            body: "Solid grasp of the method. Still slow when the denominators differ.",
+            action: "10 practice problems",
+            topic: "Fractions",
+            status: "Summary sent to parents",
+          },
+        },
+        {
+          key: "armenian",
+          label: "Armenian",
+          lesson: "Armenian: Reading and writing",
+          tutor: "Siranush · Today at 5:30 PM",
+          tutorInitial: "Ս",
+          topic: "The alphabet",
+          prompt: "Sound out each letter",
+          confidence: "Reading fluency improved by 22%",
+          note: {
+            author: "Siranush Petrosyan",
+            initials: "SP",
+            role: "Note after today's lesson",
+            body: "Read a full sentence unaided today. The letter shapes still need work.",
+            action: "15 minutes of reading",
+            topic: "The alphabet",
+            status: "Summary sent to parents",
+          },
+        },
+        {
+          key: "chess",
+          label: "Chess",
+          lesson: "Chess: Knight tactics",
+          tutor: "Tigran · Tomorrow at 6:00 PM",
+          tutorInitial: "Տ",
+          topic: "Knight tactics",
+          prompt: "Find the fork",
+          confidence: "Puzzle accuracy improved by 15%",
+          note: {
+            author: "Tigran Hakobyan",
+            initials: "TH",
+            role: "Note after today's lesson",
+            body: "Spotted the fork two moves ahead. Still rushes the endgame.",
+            action: "8 tactics puzzles",
+            topic: "Knight forks",
+            status: "Summary sent to parents",
+          },
+        },
+      ],
     },
     subjects: {
       eyebrow: "Find the right starting point",
@@ -126,6 +168,13 @@ const copy: Record<Locale, HomeCopy> = {
         },
       ],
     },
+    antiCheating: {
+      eyebrow: "Anti-Cheating technology",
+      title: "Homework without shortcuts.",
+      body: "Busy at work? Let your child complete homework independently while our Anti-Cheating system helps identify possible use of phones, AI tools, outside websites, and other unauthorized resources.",
+      primary: "Explore Anti-Cheating",
+      secondary: "See How It Works",
+    },
   },
   hy: {
     hero: {
@@ -146,20 +195,69 @@ const copy: Record<Locale, HomeCopy> = {
     },
     classroom: {
       ariaLabel:
-        "2tor-ի ինտերակտիվ դասասենյակի օրինակ՝ հանրահաշվի ուղիղ դասով և առաջընթացի գործիքներով",
+        "2tor-ի դասասենյակի օրինակ՝ մաթեմատիկայի, հայերենի և շախմատի դասերով և առաջընթացի գործիքներով",
       live: "Ուղիղ դաս",
-      lesson: "Հանրահաշիվ․ տեսողական հավասարումներ",
-      tutor: "Աննա · Այսօր՝ 16։00",
-      topic: "Տեսողական հավասարումներ",
-      prompt: "Հավասարակշռիր երկու կողմերը",
-      feedback: "Ուսուցչի արձագանք",
-      feedbackBody: "Մայան բացատրեց, թե ինչու է հավասարումը մնում հավասարակշռված։",
-      parentReady: "Ծնողի ամփոփումը պատրաստ է",
       wins: "3 ուսումնական հաջողություն այս շաբաթ",
-      confidence: "Վստահությունն աճել է 18%-ով",
       streak: "4 շաբաթ անընդմեջ",
-      homework: "Փոքր նախագիծ",
-      homeworkStatus: "Հավասարումների հետազոտող · Ավարտված",
+      subjects: [
+        {
+          key: "math",
+          label: "Մաթեմատիկա",
+          lesson: "Հանրահաշիվ․ տեսողական հավասարումներ",
+          tutor: "Աննա · Այսօր՝ 16։00",
+          tutorInitial: "Ա",
+          topic: "Տեսողական հավասարումներ",
+          prompt: "Հավասարակշռիր երկու կողմերը",
+          confidence: "Վստահությունն աճել է 18%-ով",
+          note: {
+            author: "Աննա Ղազարյան",
+            initials: "ԱՂ",
+            role: "Նշում այսօրվա դասից հետո",
+            body: "Եղանակը յուրացրել է վստահ։ Դեռ դանդաղում է, երբ հայտարարները տարբեր են։",
+            action: "10 վարժություն",
+            topic: "Կոտորակներ",
+            status: "Ամփոփումն ուղարկված է ծնողին",
+          },
+        },
+        {
+          key: "armenian",
+          label: "Հայերեն",
+          lesson: "Հայերեն․ ընթերցանություն և գիր",
+          tutor: "Սիրանուշ · Այսօր՝ 17։30",
+          tutorInitial: "Ս",
+          topic: "Այբուբենը",
+          prompt: "Հնչյունավորիր յուրաքանչյուր տառը",
+          confidence: "Ընթերցանության սահունությունն աճել է 22%-ով",
+          note: {
+            author: "Սիրանուշ Պետրոսյան",
+            initials: "ՍՊ",
+            role: "Նշում այսօրվա դասից հետո",
+            body: "Այսօր ինքնուրույն կարդաց ամբողջական նախադասություն։ Տառերի ձևերը դեռ վարժանք են պահանջում։",
+            action: "15 րոպե ընթերցանություն",
+            topic: "Այբուբենը",
+            status: "Ամփոփումն ուղարկված է ծնողին",
+          },
+        },
+        {
+          key: "chess",
+          label: "Շախմատ",
+          lesson: "Շախմատ․ ձիու մարտավարություն",
+          tutor: "Տիգրան · Վաղը՝ 18։00",
+          tutorInitial: "Տ",
+          topic: "Ձիու մարտավարություն",
+          prompt: "Գտիր պատառաքաղը",
+          confidence: "Խնդիրների ճշգրտությունն աճել է 15%-ով",
+          note: {
+            author: "Տիգրան Հակոբյան",
+            initials: "ՏՀ",
+            role: "Նշում այսօրվա դասից հետո",
+            body: "Պատառաքաղը նկատեց երկու քայլ շուտ։ Դեռ շտապում է վերջնախաղում։",
+            action: "8 մարտավարական խնդիր",
+            topic: "Ձիու պատառաքաղ",
+            status: "Ամփոփումն ուղարկված է ծնողին",
+          },
+        },
+      ],
     },
     subjects: {
       eyebrow: "Գտեք ճիշտ մեկնարկը",
@@ -209,6 +307,13 @@ const copy: Record<Locale, HomeCopy> = {
         },
       ],
     },
+    antiCheating: {
+      eyebrow: "Խաբեության դեմ տեխնոլոգիա",
+      title: "Տնային աշխատանք՝ առանց դյուրին ուղիների։",
+      body: "Զբաղվա՞ծ եք աշխատանքով։ Թողեք, որ ձեր զավակն ինքնուրույն կատարի տնային աշխատանքը, մինչ մեր Խաբեության դեմ համակարգն օգնում է հայտնաբերել հեռախոսների, AI գործիքների, արտաքին կայքերի և այլ չթույլատրված ռեսուրսների հնարավոր օգտագործումը։",
+      primary: "Բացահայտել Խաբեության դեմ պաշտպանությունը",
+      secondary: "Տեսնել, թե ինչպես է աշխատում",
+    },
   },
 };
 
@@ -228,7 +333,7 @@ export function HomePageContent({ locale }: { locale: Locale }) {
   };
 
   return (
-    <div className={`${styles.page} ${displayFont.variable} ${bodyFont.variable}`}>
+    <div className={styles.page}>
       <Hero
         eyebrow={content.hero.eyebrow}
         titleLead={content.hero.titleLead}
@@ -245,6 +350,11 @@ export function HomePageContent({ locale }: { locale: Locale }) {
       />
       <SubjectExplorer copy={subjects} />
       <LearningBenefits copy={content.benefits} />
+      <AntiCheatingTeaser
+        copy={content.antiCheating}
+        exploreHref={localHref(locale, "/anti-cheating")}
+        howItWorksHref={localHref(locale, "/anti-cheating#how-it-works")}
+      />
     </div>
   );
 }

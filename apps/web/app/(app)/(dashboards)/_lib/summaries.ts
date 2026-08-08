@@ -126,7 +126,11 @@ export async function loadParentDashboardSummary(
     family.students.map(async (student) => {
       const records = await academicContext.database.listFeedbackForStudent(student.id);
       const feedback = records
-        .filter((record) => record.status === "published" || record.status === "revised")
+        .filter(
+          (record) =>
+            (record.status === "published" || record.status === "revised") &&
+            record.visibleToParent,
+        )
         .map(({ staffOnlyNote, ...visible }) => {
           void staffOnlyNote;
           return visible;

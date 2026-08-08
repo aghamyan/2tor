@@ -6,9 +6,12 @@ import {
   cancelLesson,
   completeLesson,
   createLessonSeries,
+  deleteLesson,
+  deleteLessonSeries,
   listLessonsForActor,
   listSchedulableAssignments,
   listSchedulableSubjects,
+  materializeUpcomingLessons,
   recordAttendance,
   recordNoShow,
   rescheduleLesson,
@@ -333,6 +336,228 @@ describe("rescheduleLesson", () => {
       reason: "Family trip planned.",
     });
     expect(next.status).toBe("scheduled");
+  });
+});
+
+describe("deleteLesson", () => {
+  it("removes a one-time scheduled lesson from every viewer's schedule — tutor, student, and parent alike", async () => {
+    const db = database();
+    const lesson = await scheduleLesson(db, 48);
+    const range = { from: hoursFromNow(-1), to: hoursFromNow(200) };
+
+    const result = await deleteLesson(db, tutorActor, lesson.id, {});
+    expect(result.lesson.id).toBe(lesson.id);
+
+    expect(await db.findLessonById(lesson.id)).toBeNull();
+    expect(await listLessonsForActor(db, tutorActor, range)).toEqual([]);
+    expect(await listLessonsForActor(db, studentActor, range)).toEqual([]);
+    expect(await listLessonsForActor(db, parentActor, range)).toEqual([]);
+    expect(db.audits.some((a) => a.action === "scheduling.lesson.deleted")).toBe(true);
+  });
+
+  it("lets staff delete any tutor's scheduled lesson", async () => {
+    const db = database();
+    const lesson = await scheduleLesson(db, 48);
+    await deleteLesson(db, adminActor, lesson.id, {});
+    expect(await db.findLessonById(lesson.id)).toBeNull();
+  });
+
+  it("denies a parent or student deleting a lesson", async () => {
+    const db = database();
+    const lesson = await scheduleLesson(db, 48);
+    await expect(deleteLesson(db, parentActor, lesson.id, {})).rejects.toMatchObject({
+      code: "FORBIDDEN",
+      status: 403,
+    });
+    await expect(deleteLesson(db, studentActor, lesson.id, {})).rejects.toMatchObject({
+      code: "FORBIDDEN",
+      status: 403,
+    });
+    expect(await db.findLessonById(lesson.id)).not.toBeNull();
+  });
+
+  it("refuses to delete a lesson that already resolved, keeping its history intact", async () => {
+    const db = database();
+    const lesson = await scheduleLesson(db, 3);
+    await cancelLesson(db, tutorActor, lesson.id, {
+      category: "tutor_request",
+      reason: "Tutor has a conflict.",
+    });
+    await expect(deleteLesson(db, tutorActor, lesson.id, {})).rejects.toMatchObject({
+      code: "LESSON_ALREADY_RESOLVED",
+      status: 409,
+    });
+    expect(await db.findLessonById(lesson.id)).not.toBeNull();
+  });
+
+  it("refuses to hard-delete a single occurrence of an active series", async () => {
+    const db = database();
+    const { lessons } = await createLessonSeries(db, tutorActor, {
+      tutorStudentAssignmentId: assignment.id,
+      subjectId: "subject-math",
+      startDate: formatDateOnly(new Date()),
+      endDate: null,
+      durationMinutes: 45,
+      recurrence: {
+        interval: 1,
+        byDay: ["MO", "WE", "FR"],
+        hour: 14,
+        minute: 0,
+        timezone: "America/Los_Angeles",
+      },
+      additionalParticipantUserIds: [],
+    });
+    const [firstLesson] = lessons;
+    if (!firstLesson) throw new Error("expected at least one materialized lesson");
+    await expect(deleteLesson(db, tutorActor, firstLesson.id, {})).rejects.toMatchObject({
+      code: "LESSON_PART_OF_SERIES",
+      status: 409,
+    });
+    expect(await db.findLessonById(firstLesson.id)).not.toBeNull();
+  });
+});
+
+describe("deleteLessonSeries", () => {
+  it("ends the series and removes only its still-scheduled occurrences, keeping resolved ones", async () => {
+    const db = database();
+    const { series, lessons } = await createLessonSeries(db, tutorActor, {
+      tutorStudentAssignmentId: assignment.id,
+      subjectId: "subject-math",
+      startDate: formatDateOnly(new Date()),
+      endDate: null,
+      durationMinutes: 45,
+      recurrence: {
+        interval: 1,
+        byDay: ["MO", "WE", "FR"],
+        hour: 14,
+        minute: 0,
+        timezone: "America/Los_Angeles",
+      },
+      additionalParticipantUserIds: [],
+    });
+    expect(lessons.length).toBeGreaterThan(1);
+    const [firstLesson] = lessons;
+    if (!firstLesson) throw new Error("expected at least one materialized lesson");
+    const canceledLessonId = firstLesson.id;
+    await cancelLesson(db, tutorActor, canceledLessonId, {
+      category: "tutor_request",
+      reason: "One-off conflict.",
+    });
+
+    const result = await deleteLessonSeries(db, tutorActor, series.id, {});
+    expect(result.series.status).toBe("cancelled");
+    expect(result.deletedLessonIds).not.toContain(canceledLessonId);
+
+    // The canceled occurrence keeps its history…
+    const canceledLesson = await db.findLessonById(canceledLessonId);
+    expect(canceledLesson?.status).toBe("canceled");
+    // …but every other, still-scheduled occurrence is gone for every viewer.
+    for (const lesson of lessons.filter((l) => l.id !== canceledLessonId)) {
+      expect(await db.findLessonById(lesson.id)).toBeNull();
+    }
+    const range = { from: hoursFromNow(-1), to: hoursFromNow(24 * 60) };
+    expect((await listLessonsForActor(db, studentActor, range)).map((l) => l.id)).toEqual([
+      canceledLessonId,
+    ]);
+  });
+
+  it("keeps a past occurrence still stuck at 'scheduled' — never auto-transitioned, may carry real history", async () => {
+    const db = database();
+    const { series, lessons } = await createLessonSeries(db, tutorActor, {
+      tutorStudentAssignmentId: assignment.id,
+      subjectId: "subject-math",
+      startDate: formatDateOnly(new Date()),
+      endDate: null,
+      durationMinutes: 45,
+      recurrence: {
+        interval: 1,
+        byDay: ["MO", "WE", "FR"],
+        hour: 14,
+        minute: 0,
+        timezone: "America/Los_Angeles",
+      },
+      additionalParticipantUserIds: [],
+    });
+    expect(lessons.length).toBeGreaterThan(0);
+    // A lesson from three days ago that the tutor never marked complete or no-show — nothing in
+    // this domain auto-transitions status on the clock, so it's still "scheduled" today.
+    const pastLesson = await db.createLesson({
+      id: "past-lesson-1",
+      lessonSeriesId: series.id,
+      tutorStudentAssignmentId: assignment.id,
+      subjectId: "subject-math",
+      scheduledStartAt: hoursFromNow(-72),
+      scheduledEndAt: hoursFromNow(-71),
+      timezoneAtBooking: "America/Los_Angeles",
+      isTrial: false,
+      status: "scheduled",
+    });
+
+    const result = await deleteLessonSeries(db, tutorActor, series.id, {});
+    expect(result.series.status).toBe("cancelled");
+    expect(result.deletedLessonIds).not.toContain(pastLesson.id);
+    expect(await db.findLessonById(pastLesson.id)).not.toBeNull();
+    for (const lesson of lessons) {
+      expect(await db.findLessonById(lesson.id)).toBeNull();
+    }
+  });
+
+  it("stops the deleted series from being re-materialized by the worker job (no resurrection)", async () => {
+    const db = database();
+    const { series, lessons } = await createLessonSeries(db, tutorActor, {
+      tutorStudentAssignmentId: assignment.id,
+      subjectId: "subject-math",
+      startDate: formatDateOnly(new Date()),
+      endDate: null,
+      durationMinutes: 45,
+      recurrence: {
+        interval: 1,
+        byDay: ["MO", "WE", "FR"],
+        hour: 14,
+        minute: 0,
+        timezone: "America/Los_Angeles",
+      },
+      additionalParticipantUserIds: [],
+    });
+    expect(lessons.length).toBeGreaterThan(0);
+
+    await deleteLessonSeries(db, tutorActor, series.id, {});
+    for (const lesson of lessons) {
+      expect(await db.findLessonById(lesson.id)).toBeNull();
+    }
+
+    const horizonEnd = formatDateOnly(new Date(Date.now() + 180 * 24 * 60 * 60 * 1000));
+    const recreated = await materializeUpcomingLessons(db, series.id, horizonEnd);
+    expect(recreated).toEqual([]);
+    for (const lesson of lessons) {
+      expect(await db.findLessonById(lesson.id)).toBeNull();
+    }
+  });
+
+  it("denies a parent or an unrelated tutor deleting the series", async () => {
+    const db = database();
+    const { series } = await createLessonSeries(db, tutorActor, {
+      tutorStudentAssignmentId: assignment.id,
+      subjectId: "subject-math",
+      startDate: formatDateOnly(new Date()),
+      endDate: null,
+      durationMinutes: 45,
+      recurrence: {
+        interval: 1,
+        byDay: ["MO"],
+        hour: 14,
+        minute: 0,
+        timezone: "America/Los_Angeles",
+      },
+      additionalParticipantUserIds: [],
+    });
+    await expect(deleteLessonSeries(db, parentActor, series.id, {})).rejects.toMatchObject({
+      code: "FORBIDDEN",
+      status: 403,
+    });
+    await expect(
+      deleteLessonSeries(db, { userId: "other-tutor", roles: ["tutor"] as const }, series.id, {}),
+    ).rejects.toMatchObject({ code: "FORBIDDEN", status: 403 });
   });
 });
 

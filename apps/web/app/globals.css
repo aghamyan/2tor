@@ -1,1 +1,178 @@
 @import "tailwindcss";
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Varzharan design system — public surfaces only
+   ═══════════════════════════════════════════════════════════════════════════
+
+   Ported from `landing/styles.css`, the approved static landing page. Scoped to
+   `[data-surface="vz"]`, which `app/(marketing)/layout.tsx` sets on its root
+   element. That covers every marketing page plus `/login` (which renders inside
+   the same layout) and cannot reach `app/(app)/*`, whose dashboards keep their
+   existing palette until they get their own pass.
+
+   Two token classes live here, and mixing them fails silently to `initial`:
+
+     --vz-<name>      a BARE HSL TRIPLET, e.g. `162 45% 14%`. Always used
+                      wrapped: `hsl(var(--vz-ink))`, `hsl(var(--vz-ink) / 12%)`.
+                      Marketing CSS modules alias their own local tokens onto
+                      these, so `hsl(var(--site-foreground))` still resolves.
+     --vz-fx-<name>   a COMPLETE value (shadow lists, gradients, glass fills)
+                      that no triplet can express. Used unwrapped.
+
+   Scalars (`--vz-r-*`, `--vz-ease`, `--vz-section-y`) are unambiguous.
+
+   Palette   Pine green + warm bone + vermillion, carried over verbatim from the
+             landing page. Navy+gold is the reflex pick for anything academic and
+             the brass/ochre accent it drags in is a documented AI tell, so the
+             direction is deliberate. Contrast was recomputed for this file rather
+             than assumed from the landing page's own numbers:
+
+               ink/paper 12.02:1 · ink/surface 13.13:1 · ink/surface-2 11.09:1
+               muted/paper 5.34:1 · muted/surface 5.83:1 · muted/surface-2 4.93:1
+               accent/paper 4.68:1 · accent/surface 5.10:1 · white/accent 5.19:1
+               positive/paper 6.42:1 · positive/surface 7.01:1
+
+             Composited, worst case — ink on the glass header over the most
+             saturated thing that scrolls beneath it (the vermillion hero block on
+             /mathematics), through the white fill gradient and the paper base:
+
+               over paper 12.31:1 · over vermillion 6.33:1
+
+             All clear WCAG AA for body text. Recompute — including alpha
+             compositing — before shipping any new pairing.
+
+   Radius    One system: pills for buttons/chips/avatars, 18px for cards and
+             media, 12px for inputs.
+
+   Theme     Light only, in both themes. See the note above the (absent) `.dark`
+             block below for the measurement behind that, and for what adding dark
+             would actually require.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+[data-surface="vz"] {
+  /* ── Colour, as bare HSL triplets ──────────────────────────────────────── */
+  --vz-paper: 45 29% 95%; /* #F5F3ED */
+  --vz-surface: 43 100% 99%; /* #FFFDF8 */
+  --vz-surface-2: 45 25% 91%; /* #EDEAE1 */
+  --vz-ink: 162 45% 14%; /* #14352B */
+  --vz-muted: 141 9% 37%; /* #57685D */
+  --vz-accent: 12 72% 44%; /* #C2401F */
+  --vz-accent-on: 0 0% 100%;
+  /* Semantic status, deliberately NOT the brand accent: vermillion on a rising
+     score reads as a warning, and a gain has to look like a gain. */
+  --vz-positive: 156 61% 24%; /* #186445 */
+
+  /* Brand colour blocks. Identical in both themes on purpose — a filled tile is a
+     brand surface, not a themed one, so it reads the same on paper and on ink. */
+  --vz-block: 162 45% 14%;
+  --vz-block-on: 0 0% 100%;
+
+  /* Backdrop field colours, placed BEHIND glass. Light yet saturated on purpose:
+     glass needs colour to refract, but text on top still has to clear AA.
+     Secondary use: at FULL opacity these are the palette's only light green and
+     light peach, so they are also the correct text colour for a status chip on the
+     dark pine block (6.22:1 and 6.40:1 there). Never as text on a light surface,
+     and never at partial alpha on the block — that measures ~2.5:1. */
+  --vz-field-1: 145 24% 65%; /* #8FBBA1 */
+  --vz-field-2: 15 78% 73%; /* #F0A085 */
+  --vz-field-3: 38 63% 77%; /* #E9CE9E */
+
+  /* Hairlines. The landing page draws these as ink at 15%/8% over paper; these are those
+     pairs pre-composited to solid triplets. Solid rather than alpha because call sites apply
+     their own alpha (`hsl(var(--vz-line) / 76%)`), and a token that already carried one would
+     produce a double-slash colour that fails silently to `initial`. */
+  --vz-line: 90 8% 83%; /* #D3D6D0 = ink 15% over paper */
+  --vz-line-soft: 68 10% 88%; /* #E3E4DD = ink 8% over paper */
+
+  /* ── Composite values ──────────────────────────────────────────────────── */
+  --vz-fx-shadow: 0 1px 2px hsl(var(--vz-ink) / 5%), 0 12px 32px -12px hsl(var(--vz-ink) / 18%);
+  --vz-fx-shadow-lg: 0 2px 4px hsl(var(--vz-ink) / 6%), 0 28px 60px -20px hsl(var(--vz-ink) / 28%);
+  --vz-fx-glow: 0 10px 26px -8px hsl(var(--vz-accent) / 16%);
+
+  /* Liquid glass. Apple's is a real-time refraction shader; the web has no
+     equivalent, and `feDisplacementMap` through `backdrop-filter` was tested on
+     the landing page and produces wobble, not glass. So this is blur + saturation
+     + an offset specular rim + chromatic fringing. Only use it where real content
+     sits behind — over a flat fill it is just a tinted div. */
+  --vz-fx-glass-bg:
+    linear-gradient(140deg, hsl(0 0% 100% / 34%), hsl(0 0% 100% / 10%)), hsl(var(--vz-paper) / 42%);
+  --vz-fx-glass-blur: blur(12px) saturate(200%) brightness(1.06);
+  --vz-fx-glass-shadow:
+    inset 0 0 0 1px hsl(0 0% 100% / 48%),
+    /* the money detail: a crisp specular line just inside the top-left edge and a
+       dimmer bounce bottom-right. Negative spread keeps them hairline thin. */
+    inset 2px 3px 0 -2px hsl(0 0% 100% / 98%),
+    inset -2px -3px 0 -2px hsl(0 0% 100% / 55%),
+    /* chromatic fringing: warm one edge, cool the other, the way a real lens
+       splits light. Constant across themes because it is optics, not palette. */
+    inset 3px 0 12px -7px rgb(255 140 90 / 55%),
+    inset -3px 0 12px -7px rgb(90 170 255 / 50%), inset 0 0 18px 3px hsl(0 0% 100% / 20%),
+    0 1px 2px hsl(var(--vz-ink) / 5%), 0 16px 40px -12px hsl(var(--vz-ink) / 22%);
+  --vz-fx-glass-sheen: radial-gradient(
+    150% 200% at 12% -52%,
+    hsl(0 0% 100% / 95%),
+    transparent 44%
+  );
+
+  /* ── Scalars ───────────────────────────────────────────────────────────── */
+  --vz-r-card: 18px;
+  --vz-r-input: 12px;
+  --vz-r-pill: 999px;
+  --vz-wrap: 1200px;
+  --vz-gutter: clamp(20px, 4vw, 40px);
+  --vz-section-y: clamp(80px, 10vw, 148px);
+  --vz-ease: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* ── Type ──────────────────────────────────────────────────────────────── */
+  /* The three `--vz-font-*` variables are injected by next/font — see
+     `components/marketing/fonts.ts`, applied at the layout root. They hold
+     generated family names, so they must be referenced as variables rather than
+     quoted by name. The Armenian face sits second in BOTH stacks: neither Latin
+     family covers Armenian, `hy` is a first-class locale, and without it Վարժարան
+     falls back to an arbitrary system face. */
+  --vz-display:
+    var(--vz-font-display), var(--vz-font-armenian), ui-sans-serif, system-ui, sans-serif;
+  --vz-body: var(--vz-font-body), var(--vz-font-armenian), ui-sans-serif, system-ui, sans-serif;
+}
+
+/*
+ * There is deliberately NO `.dark [data-surface="vz"]` block.
+ *
+ * Not an omission — a scope decision, and reversing it without doing the work below would ship a
+ * broken page. Every marketing CSS module is written light-only: a grep for `:global(.dark)` and
+ * `prefers-color-scheme` across `components/marketing/**` and `components/auth/login.module.css`
+ * returns nothing. There is also no theme toggle anywhere in the public chrome; the `.dark` class
+ * only ever arrives from the `theme` cookie set inside the authenticated app.
+ *
+ * Flipping these tokens under `.dark` was tried and measured. The page ground and the chrome
+ * inverted correctly, but every surface the modules paint themselves — the hero's classroom card,
+ * the tutor-feedback and mini-project chips — kept their hardcoded light fills while their text
+ * followed the token to near-white, so the card headings and chip body copy rendered
+ * white-on-white. Half a design system inverting is worse than none.
+ *
+ * So the public surface is light in both themes, which is also what it rendered as before this
+ * change. To add dark properly: give each marketing module a `:global(.dark)` path for the fills it
+ * hardcodes, then reinstate the token block here (the landing page's dark values are the intended
+ * source — paper #0B1410, surface #14201B, ink #E9EEE9, muted #93A398, accent #F4744F,
+ * positive #5FD1A0) and recompute contrast for every pairing before shipping.
+ */
+
+/*
+ * There is no shared `.vz-glass` class. An earlier revision of this file defined one; it was
+ * removed because nothing used it — the site header is the only glass surface on these pages and it
+ * composes the `--vz-fx-glass-*` tokens directly in `components/marketing/site/site.module.css`.
+ * A second, unexercised copy of the recipe is how the two drift apart.
+ *
+ * To add a second glass surface, compose the tokens the way the header does, and apply the landing
+ * page's own test first: if the surface would look identical with `backdrop-filter: none`, it is not
+ * glass, it is a tinted div. Glass needs real content moving behind it. Two things that recipe needs
+ * and the tokens do not carry: a radially-masked `::after` lens halo (never a `content-box` XOR
+ * mask, which draws a hard rectangle inside the card) and a `prefers-reduced-transparency` fallback
+ * to an opaque surface with a drawn border, since the rim is an inset shadow rather than a border.
+ *
+ * Do not hand-write `-webkit-` prefixes for `backdrop-filter` or `mask`. Next runs lightningcss
+ * with the project's browser targets and emits prefixes itself; authoring the standard property
+ * first and the prefixed one second makes it collapse the pair and keep ONLY the prefixed form,
+ * which computes to `none`. That bug shipped here once and was caught by measuring the computed
+ * value, not by reading the CSS.
+ */

@@ -17,6 +17,7 @@ import type {
   SchedulableAssignmentOption,
   SchedulingDatabase,
   SubjectOption,
+  TutorZoomDefaults,
   ZoomMeetingRecord,
 } from "../../../../../packages/domain/scheduling/models";
 
@@ -47,6 +48,7 @@ export class InMemorySchedulingDatabase implements SchedulingDatabase {
 
   readonly schedulableAssignmentsByTutor = new Map<string, SchedulableAssignmentOption[]>();
   readonly schedulableSubjectsByTutor = new Map<string, SubjectOption[]>();
+  readonly zoomDefaultsByTutorProfile = new Map<string, TutorZoomDefaults>();
 
   async transaction<T>(operation: (database: SchedulingDatabase) => Promise<T>): Promise<T> {
     return operation(this);
@@ -109,6 +111,14 @@ export class InMemorySchedulingDatabase implements SchedulingDatabase {
     return [...this.schedulableSubjectsByTutor.values()].flat();
   }
 
+  seedTutorZoomDefaults(tutorProfileId: string, defaults: TutorZoomDefaults): void {
+    this.zoomDefaultsByTutorProfile.set(tutorProfileId, defaults);
+  }
+
+  async findTutorZoomDefaults(tutorProfileId: string) {
+    return this.zoomDefaultsByTutorProfile.get(tutorProfileId) ?? null;
+  }
+
   async createLessonSeries(values: NewLessonSeriesValues) {
     const record: LessonSeriesRecord = { ...values, createdAt: now(), updatedAt: now() };
     this.series.set(values.id, record);
@@ -128,6 +138,12 @@ export class InMemorySchedulingDatabase implements SchedulingDatabase {
     return [...this.lessons.values()]
       .filter((lesson) => lesson.lessonSeriesId === seriesId)
       .map((lesson) => lesson.scheduledStartAt);
+  }
+
+  async listLessonsForSeries(seriesId: string) {
+    return [...this.lessons.values()]
+      .filter((lesson) => lesson.lessonSeriesId === seriesId)
+      .sort((a, b) => a.scheduledStartAt.getTime() - b.scheduledStartAt.getTime());
   }
 
   async findMostRecentLessonForSeries(seriesId: string) {
@@ -153,6 +169,14 @@ export class InMemorySchedulingDatabase implements SchedulingDatabase {
     const updated: LessonRecord = { ...existing, status, updatedAt: now() };
     this.lessons.set(id, updated);
     return updated;
+  }
+
+  async deleteLesson(id: string) {
+    this.lessons.delete(id);
+    this.participants.delete(id);
+    this.zoomMeetings.delete(id);
+    this.cancellations.delete(id);
+    this.attendance.delete(id);
   }
 
   async listLessonsForScope(scope: LessonListScope, range: LessonListRange) {

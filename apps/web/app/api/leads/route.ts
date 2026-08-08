@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
         { status: 202, headers: { "cache-control": "no-store" } },
       );
     }
-    await createMarketingLead(marketingLeadStore, body);
+    await createMarketingLead(marketingLeadStore(), body);
     return NextResponse.json(
       { data: { received: true }, requestId },
       { status: 201, headers: { "cache-control": "no-store" } },

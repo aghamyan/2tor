@@ -1,0 +1,2 @@
+ALTER TABLE "lesson_feedback" ADD COLUMN "visible_to_parent" boolean DEFAULT true NOT NULL;--> statement-breakpoint
+ALTER TABLE "lesson_feedback" ADD COLUMN "visible_to_student" boolean DEFAULT true NOT NULL;

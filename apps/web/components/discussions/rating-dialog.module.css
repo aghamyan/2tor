@@ -1,0 +1,198 @@
+/*
+ * `@app/ui`'s Dialog* components rely on Tailwind utility classes (`fixed`, `inset-0`,
+ * `bg-background`, ...) that only resolve when a consuming app's Tailwind content-scanner reaches
+ * into `packages/ui/src` — verified against `apps/web`'s actual compiled CSS output that it does
+ * not (no `.fixed{position:fixed}` rule is emitted there at all), so those classes are dead weight
+ * here. `DialogContent`'s `className` prop is the one override point exposed — `.content` below
+ * supplies its own fixed/centered positioning and all real visual styling from scratch, using the
+ * same `--shell-*`/`--do-*` tokens as the rest of MathOverflow. `DialogOverlay` (the dimming
+ * backdrop) has no such override point, so the backdrop renders without visual dimming — a known,
+ * minor gap; Radix still supplies the real modal behavior (focus trap, ESC, click-outside-to-close,
+ * focus restore) regardless, since that's JS behavior, not CSS.
+ */
+.root {
+  --do-green: #1c7a4d;
+  --do-green-soft: #e3f5ea;
+}
+
+:global(.dark) .root {
+  --do-green: #4fd897;
+  --do-green-soft: #123626;
+}
+
+.content {
+  background: var(--shell-panel);
+  border: 1px solid var(--shell-line);
+  border-radius: 0.9rem;
+  box-shadow: var(--shell-shadow, 0 12px 32px rgba(0, 0, 0, 0.22));
+  color: var(--shell-ink);
+  display: grid;
+  gap: 1rem;
+  left: 50%;
+  max-width: min(28rem, calc(100vw - 2rem));
+  padding: 1.5rem;
+  position: fixed;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  z-index: 60;
+}
+
+.description {
+  color: var(--shell-muted);
+  font-size: 0.88rem;
+  margin: 0;
+}
+
+.form {
+  display: grid;
+  gap: 0.7rem;
+}
+
+.starGroup {
+  display: flex;
+  gap: 0.3rem;
+}
+
+.starButton {
+  background: none;
+  border: none;
+  color: color-mix(in srgb, var(--shell-signal) 80%, black 10%);
+  padding: 0.15rem;
+}
+
+:global(.dark) .starButton {
+  color: var(--shell-signal);
+}
+
+.starButton:focus-visible {
+  border-radius: 0.3rem;
+  outline: 2px solid var(--shell-primary);
+  outline-offset: 2px;
+}
+
+.feedbackLabel {
+  font-size: 0.85rem;
+  font-weight: 650;
+}
+
+.form textarea {
+  background: var(--shell-panel-soft);
+  border: 1px solid var(--shell-line);
+  border-radius: 0.55rem;
+  color: var(--shell-ink);
+  font: inherit;
+  padding: 0.6rem 0.75rem;
+  resize: vertical;
+}
+
+.hint {
+  color: var(--shell-muted);
+  font-size: 0.78rem;
+  margin: -0.3rem 0 0;
+}
+
+.trigger {
+  background: var(--shell-panel);
+  border: 1px solid var(--shell-line);
+  border-radius: 0.55rem;
+  color: var(--shell-ink);
+  font-size: 0.82rem;
+  font-weight: 650;
+  padding: 0.4rem 0.75rem;
+}
+
+.trigger:hover {
+  border-color: var(--shell-primary);
+}
+
+.cancelButton {
+  background: var(--shell-panel-soft);
+  border: 1px solid var(--shell-line);
+  border-radius: 0.55rem;
+  color: var(--shell-ink);
+  font-weight: 600;
+  padding: 0.55rem 1rem;
+}
+
+.submitButton {
+  background: var(--shell-primary);
+  border: none;
+  border-radius: 0.55rem;
+  color: white;
+  font-weight: 650;
+  padding: 0.55rem 1.1rem;
+}
+
+.breakdown {
+  display: grid;
+  gap: 0.5rem;
+  margin-top: 0.6rem;
+}
+
+.breakdownSummary {
+  align-items: baseline;
+  display: flex;
+  gap: 0.5rem;
+}
+
+.breakdownAverage {
+  font-size: 1.3rem;
+  font-weight: 700;
+}
+
+.breakdownCount {
+  color: var(--shell-muted);
+  font-size: 0.82rem;
+}
+
+.distribution {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.distributionRow {
+  align-items: center;
+  display: grid;
+  font-size: 0.76rem;
+  gap: 0.5rem;
+  grid-template-columns: 3rem 1fr 1.5rem;
+}
+
+.distributionTrack {
+  background: var(--shell-panel-soft);
+  border-radius: 999px;
+  height: 0.4rem;
+  overflow: hidden;
+}
+
+.distributionFill {
+  background: color-mix(in srgb, var(--shell-signal) 80%, black 10%);
+  height: 100%;
+}
+
+:global(.dark) .distributionFill {
+  background: var(--shell-signal);
+}
+
+.ratingEntries {
+  display: grid;
+  gap: 0.5rem;
+  list-style: none;
+  margin: 0.4rem 0 0;
+  padding: 0;
+}
+
+.ratingEntry {
+  border-top: 1px solid var(--shell-line);
+  font-size: 0.85rem;
+  padding-top: 0.5rem;
+}
+
+.ratingEntryMeta {
+  align-items: center;
+  color: var(--shell-muted);
+  display: flex;
+  font-size: 0.78rem;
+  gap: 0.4rem;
+}

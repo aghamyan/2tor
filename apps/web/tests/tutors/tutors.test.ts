@@ -23,6 +23,8 @@ const profile: TutorProfileRecord = {
   country: "AM",
   yearsExperience: 4,
   educationSummary: "BSc",
+  defaultZoomJoinUrl: null,
+  defaultZoomPasscode: null,
   status: "active",
   publicProfileApprovedAt: new Date(),
   createdAt: new Date(),
@@ -50,6 +52,7 @@ function database(overrides: Partial<TutorDatabase> = {}): TutorDatabase {
     findTutorProfileById: async () => profile,
     createTutorProfile: unsupported as never,
     updateTutorProfile: unsupported as never,
+    updateZoomDefaults: unsupported as never,
     listSubjects: async () => [
       { subjectId: "math", key: "math", name: "Mathematics", isPrimary: true },
     ],

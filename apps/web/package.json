@@ -31,12 +31,18 @@
     "@sentry/nextjs": "catalog:",
     "framer-motion": "catalog:",
     "ioredis": "catalog:",
+    "katex": "catalog:",
     "lucide-react": "catalog:",
     "next": "catalog:",
     "next-intl": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
     "react-hook-form": "catalog:",
+    "react-markdown": "catalog:",
+    "rehype-katex": "catalog:",
+    "rehype-sanitize": "catalog:",
+    "remark-gfm": "catalog:",
+    "remark-math": "catalog:",
     "zod": "catalog:"
   },
   "devDependencies": {

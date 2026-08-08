@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { GRADE_LEVEL_OPTIONS } from "./models";
 
 const requiredText = (max = 4_000) => z.string().trim().min(1).max(max);
 const optionalText = (max = 4_000) =>
@@ -22,6 +23,9 @@ export const createResourceSchema = z
       .array(z.object({ url: z.string().url().max(2_000), title: optionalText(500) }).strict())
       .max(5)
       .default([]),
+    visibility: z.enum(["everyone", "grades", "students"]).default("everyone"),
+    gradeLevels: z.array(z.enum(GRADE_LEVEL_OPTIONS)).max(GRADE_LEVEL_OPTIONS.length).default([]),
+    studentProfileIds: z.array(requiredText(100)).max(200).default([]),
   })
   .strict()
   .superRefine((value, context) => {
@@ -31,11 +35,29 @@ export const createResourceSchema = z
         path: ["links"],
         message: "A video resource needs exactly one YouTube link.",
       });
-    if (value.type !== "video" && value.links.length > 0)
+    if (value.type === "link" && value.links.length !== 1)
       context.addIssue({
         code: "custom",
         path: ["links"],
-        message: "Only video resources may include external links.",
+        message: "A link resource needs exactly one URL.",
+      });
+    if (value.type !== "video" && value.type !== "link" && value.links.length > 0)
+      context.addIssue({
+        code: "custom",
+        path: ["links"],
+        message: "Only video or link resources may include external links.",
+      });
+    if (value.visibility === "grades" && value.gradeLevels.length === 0)
+      context.addIssue({
+        code: "custom",
+        path: ["gradeLevels"],
+        message: "Choose at least one grade level.",
+      });
+    if (value.visibility === "students" && value.studentProfileIds.length === 0)
+      context.addIssue({
+        code: "custom",
+        path: ["studentProfileIds"],
+        message: "Choose at least one student.",
       });
   });
 export const assignResourceSchema = z
@@ -62,4 +84,4 @@ export const tutorUploadSchema = z
     rightsConfirmed: z.boolean(),
   })
   .strict();
-export type CreateResourceInput = z.infer<typeof createResourceSchema>;
+export type CreateResourceInput = z.input<typeof createResourceSchema>;

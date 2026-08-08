@@ -1,0 +1,132 @@
+.queueList,
+.queueEmpty {
+  margin-top: 1.25rem;
+}
+
+.card {
+  background: var(--shell-panel);
+  border: 1px solid var(--shell-line);
+  border-radius: 0.8rem;
+  display: grid;
+  gap: 0.6rem;
+  padding: 0.9rem 1rem;
+}
+
+.cardTop {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  justify-content: space-between;
+}
+
+.badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.targetPreview {
+  color: var(--shell-ink);
+  font-size: 0.88rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.targetPreview:hover {
+  color: var(--shell-primary);
+}
+
+.reportReason {
+  color: var(--shell-ink);
+  font-size: 0.85rem;
+  margin: 0;
+}
+
+.reportDetails {
+  color: var(--shell-muted);
+  font-size: 0.82rem;
+  margin: 0.2rem 0 0;
+}
+
+.metaRow {
+  color: var(--shell-muted);
+  display: flex;
+  flex-wrap: wrap;
+  font-size: 0.78rem;
+  gap: 0.9rem;
+}
+
+.actions {
+  align-items: flex-start;
+  border-top: 1px solid var(--shell-line);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  padding-top: 0.6rem;
+}
+
+.assignButton {
+  background: var(--shell-panel-soft);
+  border: 1px solid var(--shell-line);
+  border-radius: 0.55rem;
+  color: var(--shell-ink);
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding: 0.4rem 0.75rem;
+}
+
+.assignButton:hover {
+  border-color: var(--shell-primary);
+}
+
+.resolveForm {
+  display: grid;
+  gap: 0.5rem;
+  min-width: 16rem;
+}
+
+.resolveFields {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.fieldLabel {
+  color: var(--shell-muted);
+  display: grid;
+  font-size: 0.78rem;
+  font-weight: 600;
+  gap: 0.25rem;
+}
+
+.fieldLabel select,
+.fieldLabel textarea {
+  background: var(--shell-panel);
+  border: 1px solid var(--shell-line);
+  border-radius: 0.5rem;
+  color: var(--shell-ink);
+  font: inherit;
+  font-size: 0.84rem;
+  padding: 0.4rem 0.55rem;
+}
+
+.fieldLabel textarea {
+  min-width: 16rem;
+  resize: vertical;
+}
+
+.resolveButton {
+  background: var(--shell-primary);
+  border: none;
+  border-radius: 0.55rem;
+  color: white;
+  font-size: 0.84rem;
+  font-weight: 650;
+  justify-self: start;
+  padding: 0.45rem 0.9rem;
+}
+
+.resolveButton:disabled {
+  opacity: 0.6;
+}

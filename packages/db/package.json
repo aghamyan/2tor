@@ -18,7 +18,8 @@
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio",
     "migrate:check": "drizzle-kit check",
-    "seed": "tsx src/seed.ts"
+    "seed": "tsx src/seed.ts",
+    "seed:curriculum": "tsx scripts/seed-curriculum.ts"
   },
   "dependencies": {
     "drizzle-orm": "catalog:",

@@ -12,6 +12,7 @@
         "disputes": "Open disputes",
         "moderation": "Content moderation queue",
         "support": "Open support tickets",
+        "requests": "Consultation & class requests",
         "exports": "Pending export approvals",
         "deletions": "Pending deletion approvals",
         "privacyRequests": "Open privacy requests"
@@ -80,7 +81,15 @@
       "empty": "No open content reports.",
       "resolve": "Resolve",
       "dismiss": "Dismiss",
-      "deciding": "Saving…"
+      "deciding": "Saving…",
+      "uploads": {
+        "title": "Resource files awaiting approval",
+        "intro": "Tutor-uploaded files stay hidden from the resource library until approved.",
+        "empty": "No uploads are waiting for review.",
+        "unnamed": "Untitled file",
+        "approve": "Approve",
+        "reject": "Reject"
+      }
     },
     "support": {
       "title": "Support tickets",
@@ -100,6 +109,30 @@
         "normal": "Normal",
         "high": "High",
         "urgent": "Urgent"
+      }
+    },
+    "requests": {
+      "title": "Consultation & class requests",
+      "intro": "Everyone who registered for a consultation, booked a free class, or asked to join group lessons — contact details and what they told us, newest first.",
+      "empty": "No requests yet.",
+      "kind": {
+        "consultation": "Consultation",
+        "trial_class": "Free class",
+        "group_matching": "Group lessons",
+        "assessment": "Assessment",
+        "contact": "Contact",
+        "tutor_application": "Tutor application"
+      },
+      "locale": {
+        "en": "English",
+        "hy": "Armenian"
+      },
+      "ageBand": {
+        "under_8": "Under 8",
+        "8_10": "8–10",
+        "11_13": "11–13",
+        "14_17": "14–17",
+        "adult": "Adult"
       }
     },
     "suspensions": {
@@ -211,6 +244,7 @@
       "suspensionLifted": "Suspension lifted.",
       "disputeDecided": "Dispute updated.",
       "moderationDecided": "Report updated.",
+      "uploadDecided": "Upload decision saved.",
       "ticketResolved": "Ticket resolved.",
       "exportRequested": "Export requested — awaiting a second administrator's approval.",
       "exportDecided": "Export decision saved.",

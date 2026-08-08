@@ -66,6 +66,7 @@ const PUBLIC_PATHS = new Set<string>([
   "/group-lessons",
   "/project-based-learning",
   "/parents",
+  "/anti-cheating",
   "/tutors",
   "/pricing",
   "/consultation",

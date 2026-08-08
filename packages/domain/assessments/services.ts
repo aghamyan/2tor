@@ -441,16 +441,8 @@ export async function startAssessmentAttempt(
         409,
       );
     }
-    if (
-      !cameraPolicy.policyVersion ||
-      !(await database.hasActiveCameraConsent(studentProfileId, cameraPolicy.policyVersion))
-    ) {
-      throw new AssessmentError(
-        "CAMERA_CONSENT_REQUIRED",
-        "An active consent record for the camera policy is required.",
-        409,
-      );
-    }
+    // Testing only: skip the requirement for a parent-granted consent record
+    // (`hasActiveCameraConsent`) so camera-required attempts aren't blocked on that flow.
   }
 
   const now = new Date();

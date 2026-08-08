@@ -1,0 +1,342 @@
+{
+  "antiCheating": {
+    "content": {
+      "meta": {
+        "title": "Anti-Cheating homework sessions",
+        "description": "Start a protected homework session and receive a calm, evidence-based integrity report when your child finishes independent work."
+      },
+      "severity": {
+        "info": "Info",
+        "notice": "Notice",
+        "warning": "Review"
+      },
+      "hero": {
+        "eyebrow": "Anti-Cheating technology",
+        "title": "Homework without shortcuts.",
+        "body": "Start a protected homework session and let our system watch for unusual activity while your child works independently.",
+        "note": "If you're at work or away from home, you can still understand how the homework was completed.",
+        "primary": "Start Protected Homework",
+        "secondary": "Watch Demo",
+        "trust": [
+          "Detects suspicious activity",
+          "Records session events",
+          "Parent-reviewed, not automatic verdicts"
+        ]
+      },
+      "visual": {
+        "ariaLabel": "Animated preview of a monitored homework session, showing detection signals appear around a laptop workspace",
+        "workspaceLabel": "Student homework",
+        "questionProgress": "Question 4 of 12",
+        "sequence": [
+          { "key": "present", "label": "Student present" },
+          { "key": "started", "label": "Homework started" },
+          { "key": "focus", "label": "Focus maintained" },
+          { "key": "phone", "label": "Phone detected" },
+          { "key": "logged", "label": "Event logged" },
+          { "key": "report", "label": "Parent report updated" }
+        ],
+        "statusTrusted": "Trusted session",
+        "statusIntegrity": "92% Integrity"
+      },
+      "watch": {
+        "eyebrow": "Independent, not unattended",
+        "title": "You don't have to sit beside them.",
+        "body": "You may be at work, driving, cooking, or simply giving your child space to work independently. Start an Anti-Cheating session and review the integrity report when they're finished.",
+        "steps": [
+          {
+            "number": "01",
+            "title": "Start homework session",
+            "body": "Pick the child, the assignment, and which signals to monitor."
+          },
+          {
+            "number": "02",
+            "title": "Our system monitors session activity",
+            "body": "Homework runs in a focused, distraction-free view while activity is logged quietly in the background."
+          },
+          {
+            "number": "03",
+            "title": "Receive the integrity report",
+            "body": "A clear summary and timeline arrive as soon as the session ends."
+          }
+        ]
+      },
+      "capabilities": {
+        "eyebrow": "Session signals",
+        "title": "What the system can monitor",
+        "body": "Browsers can only see what happens inside the tab and window they run in. Signals below are labeled by what's actually running today versus what needs a future integration.",
+        "statusLabels": {
+          "real": "Live in your browser",
+          "camera": "Needs camera permission",
+          "future": "Planned integration"
+        },
+        "boundaryNote": "Signals marked “Live in your browser” run today, without a camera. Camera-based and network-level signals are being developed and will always require explicit, disclosed permission before they can activate.",
+        "items": [
+          {
+            "key": "phone-detected",
+            "title": "Phone Detection",
+            "body": "Detect possible phone usage during the homework session using on-device camera analysis.",
+            "status": "camera"
+          },
+          {
+            "key": "tab-switch",
+            "title": "Tab Switching",
+            "body": "Record when the student leaves the homework page for another browser tab.",
+            "status": "real"
+          },
+          {
+            "key": "window-blur",
+            "title": "Window Switching",
+            "body": "Identify when another application or browser window becomes active.",
+            "status": "real"
+          },
+          {
+            "key": "external-resource",
+            "title": "External Website Activity",
+            "body": "Identify attempts to access unauthorized resources outside the homework page.",
+            "status": "future"
+          },
+          {
+            "key": "ai-resource",
+            "title": "AI Tool Activity",
+            "body": "Flag possible attempts to access AI assistants or related tools.",
+            "status": "future"
+          },
+          {
+            "key": "copy-paste",
+            "title": "Copy / Paste Activity",
+            "body": "Record suspicious copying or pasting within the homework page.",
+            "status": "real"
+          },
+          {
+            "key": "student-absent",
+            "title": "Student Presence",
+            "body": "Detect whether the student appears to remain present during the session.",
+            "status": "camera"
+          },
+          {
+            "key": "multiple-persons",
+            "title": "Multiple Person Detection",
+            "body": "Flag situations where another person may enter the working area.",
+            "status": "camera"
+          },
+          {
+            "key": "session-timeline",
+            "title": "Session Timeline",
+            "body": "Generate a timestamped timeline of every important event for parent review.",
+            "status": "real"
+          }
+        ]
+      },
+      "liveDemo": {
+        "eyebrow": "See it in action",
+        "title": "Homework Integrity Session",
+        "body": "This is a demonstration using scripted, deterministic sample events — not a live surveillance feed.",
+        "studentLabel": "Student",
+        "studentName": "Alex",
+        "assignmentLabel": "Assignment",
+        "assignmentName": "Fractions Practice",
+        "startedLabel": "Started",
+        "startedValue": "4:32 PM",
+        "statusLabel": "Status",
+        "statusActive": "Session Active",
+        "statusPaused": "Demo Paused",
+        "integrityLabel": "Integrity Score",
+        "integrityRating": "Excellent session integrity",
+        "activityHeading": "Live activity",
+        "pauseLabel": "Pause Demo",
+        "resumeLabel": "Resume Demo",
+        "restartLabel": "Restart Demo",
+        "demoTag": "Demonstration UI — not an active session",
+        "parentStatusHeading": "Parent live status",
+        "parentStatusStudent": "Alex is working",
+        "parentStatusStarted": "Homework started {minutes} minutes ago",
+        "parentStatusCurrent": "Current status",
+        "parentStatusFocused": "Focused",
+        "parentStatusRecentEvent": "Recent event",
+        "events": [
+          { "id": "e1", "type": "session-started", "time": "4:32 PM", "description": "Homework started" },
+          { "id": "e2", "type": "student-present", "time": "4:34 PM", "description": "Student present" },
+          { "id": "e3", "type": "tab-switch", "time": "4:37 PM", "description": "Tab switched for 6 seconds" },
+          { "id": "e4", "type": "phone-detected", "time": "4:41 PM", "description": "Possible phone detected" },
+          { "id": "e5", "type": "focus-resumed", "time": "4:42 PM", "description": "Homework resumed" },
+          { "id": "e6", "type": "focus-maintained", "time": "4:48 PM", "description": "Focus maintained" }
+        ]
+      },
+      "report": {
+        "eyebrow": "After the session",
+        "title": "Homework Integrity Report",
+        "subject": "Fractions Homework",
+        "durationLabel": "Duration",
+        "duration": "42 min",
+        "completedLabel": "Completed",
+        "completed": "12 / 12 questions",
+        "integrityLabel": "Integrity Score",
+        "integrityRating": "Strong session integrity",
+        "focusTimeLabel": "Focus time",
+        "focusTime": "38 min",
+        "tabChangesLabel": "Tab changes",
+        "tabChanges": "2",
+        "phoneEventsLabel": "Phone events",
+        "phoneEvents": "1",
+        "externalLabel": "External resources",
+        "external": "0",
+        "aiLabel": "AI tool attempts",
+        "ai": "0",
+        "timelineHeading": "Session timeline",
+        "summaryHeading": "Summary",
+        "summaryBody": "Homework was completed with strong focus. One possible phone-use event was detected at 5:21 PM and the student returned to the assignment after approximately 14 seconds. Review recommended if this pattern continues.",
+        "disclaimer": "This report summarizes detected session events. It is a review aid for parents, not proof of cheating.",
+        "downloadLabel": "Sample report — illustrative data"
+      },
+      "integrityScore": {
+        "heading": "Integrity score",
+        "tooltip": "Integrity Score is an indicator based on available session signals. It is not definitive proof of cheating.",
+        "categories": {
+          "focus": "Focus",
+          "device": "Device behavior",
+          "resources": "External resources",
+          "consistency": "Session consistency"
+        }
+      },
+      "privacy": {
+        "eyebrow": "Built on consent",
+        "title": "Designed with student privacy in mind.",
+        "body": "Anti-Cheating sessions are visible, not hidden. Every safeguard below is a default, not an option to configure away.",
+        "points": [
+          "Parents knowingly start every monitoring session — there is no silent or background mode.",
+          "The student is informed on-screen when monitoring is active, before the session begins.",
+          "Camera-based signals are off by default and always require explicit browser permission.",
+          "Monitoring ends the moment the homework session ends — nothing continues in the background.",
+          "No hidden monitoring, and no attempt to activate camera or microphone without permission.",
+          "Reports capture useful events, not continuous recordings.",
+          "Session data is handled under 2tor's privacy policy, with the same protections as the rest of the platform."
+        ],
+        "indicator": {
+          "activeLabel": "Monitoring Active",
+          "cameraOnLabel": "Camera permission granted",
+          "cameraOffLabel": "Camera not in use"
+        },
+        "policyLink": "Read the full privacy policy"
+      },
+      "setup": {
+        "eyebrow": "Get started",
+        "title": "Start a protected homework session",
+        "launchHint": "Opens a short setup — choose a child, an assignment, and what to monitor. Takes under a minute.",
+        "progress": "Step {current} of {total}",
+        "steps": {
+          "child": {
+            "legend": "Select child",
+            "intro": "Choose who this homework session is for."
+          },
+          "assignment": {
+            "legend": "Choose assignment",
+            "intro": "Pick what your child will be working on."
+          },
+          "options": {
+            "legend": "Monitoring options",
+            "intro": "Choose which signals to monitor during this session. Camera-based options need explicit permission before they can turn on."
+          },
+          "duration": {
+            "legend": "Estimated homework time",
+            "intro": "This sets the countdown your child sees — it can always be extended."
+          },
+          "review": {
+            "legend": "Start session",
+            "intro": "Review the session before handing over the device."
+          }
+        },
+        "children": [
+          { "id": "erik", "name": "Erik", "detail": "Grade 6" },
+          { "id": "lucy", "name": "Lucy", "detail": "Grade 4" }
+        ],
+        "assignments": [
+          { "id": "math-homework", "name": "Math Homework" },
+          { "id": "fractions-practice", "name": "Fractions Practice" },
+          { "id": "custom", "name": "Custom Homework" }
+        ],
+        "customAssignmentLabel": "Describe the assignment",
+        "customAssignmentPlaceholder": "e.g. Chapter 4 reading and short-answer questions",
+        "options": [
+          {
+            "key": "student-absent",
+            "label": "Student presence",
+            "description": "Camera checks that a student appears to remain present.",
+            "requiresCamera": true
+          },
+          {
+            "key": "tab-switch",
+            "label": "Tab switching",
+            "description": "Notes when the homework tab loses focus to another tab.",
+            "requiresCamera": false
+          },
+          {
+            "key": "window-blur",
+            "label": "Window focus",
+            "description": "Notes when another application or window becomes active.",
+            "requiresCamera": false
+          },
+          {
+            "key": "copy-paste",
+            "label": "Copy/paste",
+            "description": "Notes copy and paste activity inside the homework page.",
+            "requiresCamera": false
+          },
+          {
+            "key": "phone-detected",
+            "label": "Camera-based phone detection",
+            "description": "Camera checks for a phone appearing in view.",
+            "requiresCamera": true
+          },
+          {
+            "key": "multiple-persons",
+            "label": "Multiple-person detection",
+            "description": "Camera checks whether another person enters the frame.",
+            "requiresCamera": true
+          }
+        ],
+        "cameraRequiredBadge": "Requires camera permission",
+        "durations": [
+          { "id": "30", "label": "30 min" },
+          { "id": "45", "label": "45 min" },
+          { "id": "60", "label": "60 min" },
+          { "id": "custom", "label": "Custom" }
+        ],
+        "customDurationLabel": "Custom minutes",
+        "back": "Back",
+        "next": "Next",
+        "start": "Start Session",
+        "handoff": {
+          "title": "Give this device to {name}.",
+          "body": "{name} will see a focused homework view with a visible monitoring indicator. This is a product demonstration — no real session data is recorded or sent anywhere.",
+          "begin": "Begin Homework",
+          "cancel": "Cancel"
+        }
+      },
+      "studentMode": {
+        "subjectLabel": "Math Homework",
+        "questionLabel": "Question {current} of {total}",
+        "timeRemaining": "{time} remaining",
+        "monitoringActive": "Monitoring Active",
+        "infoTitle": "About this session",
+        "infoBody": "This homework session uses activity monitoring. Your parent will receive an integrity report after completion.",
+        "workspacePlaceholder": "Work through the problem here. Typing, switching tabs, and pasting in this demo are logged in the activity feed on the right, exactly like a real session would.",
+        "liveSignalsHeading": "Detected this session",
+        "exitDemo": "Exit demo",
+        "endSession": "End Session (Demo)",
+        "questionPrompt": "Simplify the fraction 18/24 and show your work.",
+        "detectedTabSwitch": "Tab switched away from homework",
+        "detectedWindowBlur": "Window lost focus",
+        "detectedCopy": "Text copied from the homework page",
+        "detectedPaste": "Text pasted into the homework page",
+        "detectedFullscreenExit": "Left full-screen mode",
+        "noEventsYet": "No activity detected yet. Try switching tabs or pasting text to see a live signal appear."
+      },
+      "finalCta": {
+        "title": "Let them work independently.",
+        "body": "Start a protected homework session and review their work when you're ready.",
+        "primary": "Start Protected Homework",
+        "secondary": "Learn how monitoring works"
+      }
+    }
+  }
+}

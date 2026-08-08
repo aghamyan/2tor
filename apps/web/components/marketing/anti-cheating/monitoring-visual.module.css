@@ -1,0 +1,187 @@
+/*
+ * Self-contained visual, reused on both the homepage teaser and the dedicated page's hero — see
+ * each caller's own module for surrounding layout. Colour and radius come straight from the
+ * shared `--vz-*` tokens (`app/globals.css`) so this never introduces a second palette.
+ */
+.stage {
+  position: relative;
+  width: 100%;
+  max-width: 30rem;
+  margin-inline: auto;
+  padding: 3.5rem 3rem;
+}
+
+.stageCompact {
+  max-width: 24rem;
+  padding: 2.75rem 2.25rem;
+}
+
+.laptop {
+  position: relative;
+  z-index: 2;
+  background: hsl(var(--vz-surface));
+  border: 1px solid hsl(var(--vz-line));
+  border-radius: var(--vz-r-card);
+  box-shadow: var(--vz-fx-shadow-lg);
+  padding: 0.6rem;
+  transform-style: preserve-3d;
+}
+
+.screen {
+  position: relative;
+  overflow: hidden;
+  background: hsl(var(--vz-paper));
+  border-radius: calc(var(--vz-r-card) - 6px);
+  padding: 0.85rem 1.1rem 1.4rem;
+}
+
+.screenChrome {
+  display: flex;
+  gap: 0.32rem;
+  margin-bottom: 0.9rem;
+}
+
+.screenChrome span {
+  width: 0.44rem;
+  height: 0.44rem;
+  border-radius: 50%;
+  background: hsl(var(--vz-ink) / 14%);
+}
+
+.workspaceLabel {
+  margin: 0;
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: hsl(var(--vz-muted));
+}
+
+.questionProgress {
+  margin: 0.2rem 0 1rem;
+  font-family: var(--vz-display);
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: hsl(var(--vz-ink));
+}
+
+.workLines {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.workLines span {
+  display: block;
+  height: 0.5rem;
+  border-radius: 999px;
+  background: hsl(var(--vz-ink) / 8%);
+}
+
+.workLines .short {
+  width: 55%;
+}
+
+.scanLine {
+  position: absolute;
+  inset-inline: 0.4rem;
+  height: 2px;
+  border-radius: 999px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    hsl(var(--vz-accent) / 55%),
+    transparent
+  );
+  pointer-events: none;
+}
+
+.base {
+  height: 0.55rem;
+  margin-top: 0.5rem;
+  border-radius: 0 0 10px 10px;
+  background: linear-gradient(180deg, hsl(var(--vz-ink) / 10%), transparent);
+}
+
+.signalCard {
+  position: absolute;
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 0.7rem;
+  border-radius: var(--vz-r-pill);
+  border: 1px solid hsl(var(--vz-line));
+  background: hsl(var(--vz-surface) / 96%);
+  box-shadow: var(--vz-fx-shadow);
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: hsl(var(--vz-ink));
+  white-space: nowrap;
+}
+
+.signalCard svg {
+  color: hsl(var(--vz-positive));
+  flex-shrink: 0;
+}
+
+.signalCard[data-variant="notice"] {
+  border-color: hsl(var(--vz-accent) / 35%);
+  background: hsl(var(--vz-accent) / 10%);
+}
+
+.signalCard[data-variant="notice"] svg {
+  color: hsl(var(--vz-accent));
+}
+
+.trustBadge {
+  position: absolute;
+  left: 50%;
+  bottom: -1.1rem;
+  z-index: 3;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.55rem 1rem;
+  border-radius: var(--vz-r-pill);
+  background: hsl(var(--vz-block));
+  color: hsl(var(--vz-block-on));
+  box-shadow: var(--vz-fx-shadow-lg);
+  font-size: 0.78rem;
+  white-space: nowrap;
+}
+
+.trustBadge strong {
+  font-family: var(--vz-display);
+  font-size: 0.92rem;
+}
+
+@media (max-width: 47rem) {
+  .stage {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.65rem;
+    padding: 1rem 0.5rem 2.25rem;
+  }
+
+  .laptop {
+    width: 100%;
+    max-width: 22rem;
+  }
+
+  .signalCard,
+  .trustBadge {
+    position: static;
+    transform: none;
+  }
+
+  .trustBadge {
+    margin-top: 0.4rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scanLine {
+    display: none;
+  }
+}

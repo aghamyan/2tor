@@ -54,10 +54,10 @@ export async function TutorDashboard({
           <h1>{t("tutor.title")}</h1>
           <p className={styles.learningIntro}>{t("tutor.intro")}</p>
         </div>
-        <div className={styles.tutorMark} aria-hidden="true">
-          <span>teach</span>
-          <i>✓</i>
-        </div>
+        <Link className={styles.tutorMark} href="#recap-queue-title" aria-label={t("tutor.heroCta")}>
+          <span aria-hidden="true">teach</span>
+          <i aria-hidden="true">✓</i>
+        </Link>
       </header>
 
       {summary}
@@ -117,7 +117,6 @@ export async function TutorDashboardSignals() {
           {nextLesson ? (
             <>
               <strong>{dateTime(nextLesson.scheduledStartAt, nextLesson.timezoneAtBooking)}</strong>
-              <p>{t("tutor.nextClassBody")}</p>
               <LessonCountdown
                 startAt={nextLesson.scheduledStartAt.toISOString()}
                 endAt={nextLesson.scheduledEndAt.toISOString()}
@@ -144,7 +143,6 @@ export async function TutorDashboardSignals() {
           <div>
             <dt>{t("tutor.todayClasses")}</dt>
             <dd>{summary.todayLessonCount}</dd>
-            <span>{t("tutor.todayClassesHint")}</span>
           </div>
           <div data-attention={summary.feedbackQueue.length > 0}>
             <dt>{t("tutor.recapsDue")}</dt>
@@ -154,7 +152,6 @@ export async function TutorDashboardSignals() {
           <div>
             <dt>{t("tutor.weekClasses")}</dt>
             <dd>{summary.weekLessonCount}</dd>
-            <span>{t("tutor.weekClassesHint")}</span>
           </div>
           <div>
             <dt>{t("tutor.expected")}</dt>
@@ -175,8 +172,12 @@ export async function TutorDashboardSignals() {
 
         {summary.feedbackQueue.length > 0 ? (
           <div className={styles.queueList}>
-            {summary.feedbackQueue.map((item, index) => (
-              <details className={styles.queueItem} key={item.lessonId} open={index === 0}>
+            {summary.feedbackQueue.map((item) => (
+              <details
+                className={styles.queueItem}
+                key={item.lessonId}
+                open={summary.feedbackQueue.length === 1}
+              >
                 <summary>
                   <span className={styles.queueAvatar}>
                     {item.studentName.slice(0, 1).toUpperCase()}

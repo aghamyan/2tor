@@ -72,6 +72,9 @@ export const lessonFeedbackSchema = z
     tutorConfidence: z.enum(["low", "medium", "high"]),
     freeTextComment: requiredText(),
     staffOnlyNote: nullableText(),
+    /** Defaults preserve the pre-existing behavior of every recap being visible to both. */
+    visibleToParent: z.boolean().default(true),
+    visibleToStudent: z.boolean().default(true),
     status: z.enum(["draft", "published"]).default("published"),
   })
   .strict()
@@ -144,9 +147,59 @@ export const progressReviewSchema = z
   })
   .strict();
 
+const skillMasteryStatusValues = [
+  "mastered",
+  "secure",
+  "developing",
+  "needs_attention",
+  "not_demonstrated",
+  "not_assessed",
+  "in_progress",
+  "upcoming",
+] as const;
+
+const skillAssessmentEntrySchema = z
+  .object({
+    skillId: requiredText(100),
+    score: z.number().min(0).max(10).multipleOf(0.1).nullable().default(null),
+    status: z.enum(skillMasteryStatusValues),
+    confidence: z.enum(["low", "medium", "high"]).nullable().default(null),
+    note: nullableText(2_000),
+  })
+  .strict();
+
+/** Backs the tutor "class review" bulk-recording flow — one shared context, several topic entries. */
+export const recordSkillAssessmentsSchema = z
+  .object({
+    studentProfileId: requiredText(100),
+    lessonId: z.string().trim().min(1).max(100).nullable().default(null),
+    sharedNote: nullableText(2_000),
+    evidenceType: z.enum([
+      "tutor_observation",
+      "homework",
+      "lesson_activity",
+      "diagnostic",
+      "assessment",
+    ]),
+    visibleToParent: z.boolean().default(true),
+    visibleToStudent: z.boolean().default(true),
+    entries: z.array(skillAssessmentEntrySchema).min(1).max(50),
+  })
+  .strict();
+
+export const createCustomSkillSchema = z
+  .object({
+    subjectId: requiredText(100),
+    name: requiredText(180),
+    description: nullableText(1_000),
+  })
+  .strict();
+
 export type CreateLearningPlanInput = z.infer<typeof createLearningPlanSchema>;
 export type ReviseLearningPlanInput = z.infer<typeof reviseLearningPlanSchema>;
 export type LessonFeedbackInput = z.infer<typeof lessonFeedbackSchema>;
 export type MilestoneInput = z.infer<typeof milestoneSchema>;
 export type MilestoneEvidenceInput = z.infer<typeof milestoneEvidenceSchema>;
 export type ProgressReviewInput = z.infer<typeof progressReviewSchema>;
+export type RecordSkillAssessmentsInput = z.infer<typeof recordSkillAssessmentsSchema>;
+export type CreateCustomSkillInput = z.infer<typeof createCustomSkillSchema>;

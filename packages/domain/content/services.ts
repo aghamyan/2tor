@@ -7,6 +7,7 @@ import type {
   ContentReportRecord,
   ResourceLinkRecord,
   ResourceRecord,
+  ResourceViewer,
   TutorUploadRecord,
 } from "./models";
 import { createResourceSchema, type CreateResourceInput } from "./schemas";
@@ -17,6 +18,19 @@ const roles = (actor: ContentActor, ...allowed: ContentActor["roles"][number][])
 const staff = (actor: ContentActor) => roles(actor, "administrator", "super_administrator");
 function actorRequired(actor: ContentActor | null | undefined): asserts actor is ContentActor {
   if (!actor) throw new ContentError("UNAUTHENTICATED", "A signed-in actor is required.", 401);
+}
+/** Tutors/staff manage the whole library; everyone else is scoped to what `visibility` admits them to. */
+function resolveViewer(actor: ContentActor): ResourceViewer {
+  if (roles(actor, "tutor", "administrator", "super_administrator", "finance"))
+    return { scope: "all" };
+  if (roles(actor, "student") && actor.studentProfileId)
+    return {
+      scope: "student",
+      studentProfileId: actor.studentProfileId,
+      gradeLevel: actor.gradeLevel ?? null,
+    };
+  if (roles(actor, "parent")) return { scope: "parent", students: actor.guardianStudents ?? [] };
+  return { scope: "student", studentProfileId: "", gradeLevel: null };
 }
 function youtube(url: string): boolean {
   try {
@@ -42,7 +56,7 @@ function videoEmbedUrl(url: string): string {
   return `https://www.youtube.com/embed/${id}`;
 }
 
-/** Creates metadata and an embed reference only. This service intentionally has no fetch/download capability. */
+/** Creates metadata and an embed/link reference only. This service intentionally has no fetch/download capability. */
 export async function createResource(
   database: ContentDatabase,
   actor: ContentActor | null | undefined,
@@ -54,17 +68,28 @@ export async function createResource(
   const values = createResourceSchema.parse(input);
   const now = new Date();
   const links: ResourceLinkRecord[] = values.links.map((link) => {
-    if (!youtube(link.url))
-      throw new ContentError("INVALID_VIDEO_URL", "Video resources may only reference YouTube.");
+    if (values.type === "video") {
+      if (!youtube(link.url))
+        throw new ContentError("INVALID_VIDEO_URL", "Video resources may only reference YouTube.");
+      return {
+        id: ulid(),
+        resourceId: "",
+        url: videoEmbedUrl(link.url),
+        provider: "youtube",
+        title: link.title,
+        createdAt: now,
+      };
+    }
     return {
       id: ulid(),
       resourceId: "",
-      url: videoEmbedUrl(link.url),
-      provider: "youtube",
+      url: link.url,
+      provider: youtube(link.url) ? "youtube" : "other",
       title: link.title,
       createdAt: now,
     };
   });
+  const studentProfileIds = [...new Set(values.studentProfileIds)];
   const resource: ResourceRecord = {
     id: ulid(),
     title: values.title,
@@ -74,13 +99,29 @@ export async function createResource(
     createdByUserId: actor.userId,
     ownership: values.ownership,
     status: values.status,
+    visibility: values.visibility,
+    gradeLevels: values.visibility === "grades" ? [...new Set(values.gradeLevels)] : [],
     links: [],
     tags: [...new Set(values.tags.map((tag) => tag.toLocaleLowerCase()))],
+    file: null,
     createdAt: now,
     updatedAt: now,
   };
   resource.links = links.map((link) => ({ ...link, resourceId: resource.id }));
-  await database.saveResource(resource);
+  await database.transaction(async (tx) => {
+    await tx.saveResource(resource);
+    if (values.visibility === "students")
+      for (const studentProfileId of studentProfileIds)
+        await tx.saveAssignment({
+          id: ulid(),
+          resourceId: resource.id,
+          studentProfileId,
+          courseId: null,
+          assignedByUserId: actor.userId,
+          assignedAt: now,
+          createdAt: now,
+        });
+  });
   return resource;
 }
 export async function listResources(
@@ -89,7 +130,12 @@ export async function listResources(
   filters?: { tag?: string; subjectId?: string | null },
 ) {
   actorRequired(actor);
-  return database.listPublishedResources(filters);
+  const canAuthor = roles(actor, "tutor", "administrator", "super_administrator");
+  return database.listPublishedResources({
+    ...filters,
+    viewer: resolveViewer(actor),
+    includeDraftsByUserId: canAuthor ? actor.userId : undefined,
+  });
 }
 export async function listResourceSubjects(
   database: ContentDatabase,
@@ -114,7 +160,12 @@ export async function bookmarkResource(
   actorRequired(actor);
   if (!actor.studentProfileId || !roles(actor, "student"))
     throw new ContentError("FORBIDDEN", "Only students can bookmark resources.", 403);
-  if (!(await database.getResource(resourceId)))
+  const resource = await database.getResource(resourceId);
+  if (!resource) throw new ContentError("RESOURCE_NOT_FOUND", "Resource not found.", 404);
+  if (
+    resource.status !== "published" ||
+    !(await database.isResourceVisibleToViewer(resourceId, resolveViewer(actor)))
+  )
     throw new ContentError("RESOURCE_NOT_FOUND", "Resource not found.", 404);
   await database.addBookmark(actor.studentProfileId, resourceId);
 }
@@ -228,8 +279,13 @@ export async function uploadTutorMaterial(
     tutorProfileId,
     resourceId: input.resourceId,
     fileKey,
+    fileName: input.fileName.trim(),
+    mimeType: checked.mimeType,
+    sizeBytes: checked.safeBytes.byteLength,
     rightsConfirmedAt: now,
     status: "pending_review",
+    reviewedByUserId: null,
+    reviewedAt: null,
     createdAt: now,
     updatedAt: now,
   };
@@ -255,6 +311,56 @@ export async function listModerationContentReports(
   if (!staff(actor))
     throw new ContentError("FORBIDDEN", "Only administrators can view moderation reports.", 403);
   return database.listOpenReports(Math.min(Math.max(limit, 1), 500));
+}
+/** Uploads stay quarantined until an administrator reviews them — a resource's file never surfaces to viewers before then. */
+export async function listPendingTutorUploads(
+  database: ContentDatabase,
+  actor: ContentActor | null | undefined,
+  limit = 100,
+) {
+  actorRequired(actor);
+  if (!staff(actor))
+    throw new ContentError("FORBIDDEN", "Only administrators can review uploads.", 403);
+  return database.listPendingTutorUploads(Math.min(Math.max(limit, 1), 500));
+}
+export async function reviewTutorUpload(
+  database: ContentDatabase,
+  actor: ContentActor | null | undefined,
+  uploadId: string,
+  status: "approved" | "rejected",
+) {
+  actorRequired(actor);
+  if (!staff(actor))
+    throw new ContentError("FORBIDDEN", "Only administrators can review uploads.", 403);
+  const upload = await database.getTutorUpload(uploadId);
+  if (!upload) throw new ContentError("UPLOAD_NOT_FOUND", "Upload not found.", 404);
+  if (upload.status !== "pending_review")
+    throw new ContentError("UPLOAD_ALREADY_REVIEWED", "This upload was already reviewed.", 409);
+  await database.reviewTutorUpload(uploadId, {
+    status,
+    reviewedByUserId: actor.userId,
+    reviewedAt: new Date(),
+  });
+}
+/** Streams only after: signed-URL ownership check (route layer), approval, and the same visibility rule the library list uses. */
+export async function getDownloadableResourceUpload(
+  database: ContentDatabase,
+  actor: ContentActor | null | undefined,
+  uploadId: string,
+): Promise<TutorUploadRecord> {
+  actorRequired(actor);
+  const upload = await database.getTutorUpload(uploadId);
+  if (!upload || !upload.fileKey)
+    throw new ContentError("UPLOAD_NOT_FOUND", "Upload not found.", 404);
+  if (upload.status !== "approved")
+    throw new ContentError("UPLOAD_NOT_READY", "This file is still under review.", 409);
+  if (staff(actor) || roles(actor, "tutor")) return upload;
+  if (
+    !upload.resourceId ||
+    !(await database.isResourceVisibleToViewer(upload.resourceId, resolveViewer(actor)))
+  )
+    throw new ContentError("UPLOAD_NOT_FOUND", "Upload not found.", 404);
+  return upload;
 }
 /** Removes unavailable external references; it never fetches or mirrors media. */
 export async function removeDeadLinks(

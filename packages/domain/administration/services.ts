@@ -24,6 +24,7 @@ import {
   suspendTutorInputSchema,
   tutorDocumentDecisionInputSchema,
   tutorVerificationDecisionInputSchema,
+  uploadDecisionInputSchema,
   type CreateDiscountInput,
   type DecideBulkExportInput,
   type DecideMassDeletionInput,
@@ -39,6 +40,7 @@ import {
   type SuspendTutorInput,
   type TutorDocumentDecisionInput,
   type TutorVerificationDecisionInput,
+  type UploadDecisionInput,
 } from "./schemas";
 
 function requireActor(
@@ -445,6 +447,43 @@ export async function decideModerationItem(
   return updated;
 }
 
+/** Uploads stay quarantined until staff clear them — see `packages/domain/content/README.md`. */
+export function listPendingTutorContentUploads(
+  database: AdministrationDatabase,
+  actor: AdministrationActor | null | undefined,
+) {
+  requireStaff(actor);
+  return database.listPendingTutorContentUploads();
+}
+
+export async function decideTutorContentUpload(
+  database: AdministrationDatabase,
+  audit: AuditPort,
+  actor: AdministrationActor | null | undefined,
+  input: UploadDecisionInput,
+) {
+  requireStaff(actor);
+  const values = uploadDecisionInputSchema.parse(input);
+  const upload = await database.findTutorContentUploadById(values.uploadId);
+  if (!upload) throw new AdministrationError("NOT_FOUND", "Upload was not found.", 404);
+  if (upload.status !== "pending_review")
+    throw new AdministrationError("INVALID_TRANSITION", "This upload was already reviewed.", 409);
+  const updated = await database.decideTutorContentUpload(values.uploadId, {
+    status: values.status,
+    reviewedByUserId: actor.userId,
+  });
+  await audit.recordAudit({
+    actorUserId: actor.userId,
+    action: `content_upload.${values.status}`,
+    resourceType: "tutor_content_uploads",
+    resourceId: values.uploadId,
+    reason: `Marked ${values.status}.`,
+    previousValue: { status: upload.status },
+    newValue: { status: values.status },
+  });
+  return updated;
+}
+
 export function listOpenSupportTickets(
   database: AdministrationDatabase,
   actor: AdministrationActor | null | undefined,
@@ -474,6 +513,18 @@ export async function resolveSupportTicket(
     newValue: { status: "resolved" },
   });
   return updated;
+}
+
+// -------------------------------------------------------------------------------------------
+// Marketing leads (consultation requests / free-class bookings / contact submissions)
+// -------------------------------------------------------------------------------------------
+
+export function listMarketingLeads(
+  database: AdministrationDatabase,
+  actor: AdministrationActor | null | undefined,
+) {
+  requireStaff(actor);
+  return database.listMarketingLeads();
 }
 
 // -------------------------------------------------------------------------------------------

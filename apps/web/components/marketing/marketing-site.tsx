@@ -11,6 +11,7 @@ import { GroupLessonsPage } from "./group-lessons/group-lessons";
 import { ParentsPage } from "./parents/parents-page";
 import { HowItWorksPage } from "./how-it-works/how-it-works-page";
 import { ConsultationPage } from "./consultation/consultation-page";
+import { AntiCheatingPage } from "./anti-cheating/anti-cheating-page";
 export { pageSlugs, faqJsonLd, type MarketingSlug } from "./seo";
 
 export const pageKey: Record<MarketingSlug, string> = {
@@ -23,6 +24,7 @@ export const pageKey: Record<MarketingSlug, string> = {
   "group-lessons": "groupLessons",
   "project-based-learning": "projectLearning",
   parents: "parents",
+  "anti-cheating": "antiCheating",
   tutors: "tutors",
   pricing: "pricing",
   consultation: "consultation",
@@ -175,6 +177,13 @@ export function StandardPage({
     return (
       <MarketingChrome locale={locale} fullBleed>
         <HowItWorksPage locale={locale} />
+      </MarketingChrome>
+    );
+  }
+  if (slug === "anti-cheating") {
+    return (
+      <MarketingChrome locale={locale} fullBleed>
+        <AntiCheatingPage locale={locale} />
       </MarketingChrome>
     );
   }

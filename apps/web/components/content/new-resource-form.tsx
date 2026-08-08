@@ -6,15 +6,17 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import styles from "./content.module.css";
 
-type ResourceType = "video" | "document" | "worksheet" | "interactive";
+type ResourceType = "video" | "link" | "document" | "worksheet" | "interactive";
 type ResourceOwnership = "tutor_created" | "third_party_licensed" | "company";
+type ResourceVisibility = "everyone" | "grades" | "students";
 
-const RESOURCE_TYPES: ResourceType[] = ["video", "document", "worksheet", "interactive"];
+const RESOURCE_TYPES: ResourceType[] = ["video", "link", "document", "worksheet", "interactive"];
 const OWNERSHIP_OPTIONS: ResourceOwnership[] = [
   "tutor_created",
   "third_party_licensed",
   "company",
 ];
+const VISIBILITY_OPTIONS: ResourceVisibility[] = ["everyone", "grades", "students"];
 
 function messageFromResponse(payload: unknown, fallback: string) {
   if (
@@ -31,7 +33,15 @@ function messageFromResponse(payload: unknown, fallback: string) {
   return fallback;
 }
 
-export function NewResourceForm({ subjects }: { subjects: { id: string; name: string }[] }) {
+export function NewResourceForm({
+  subjects,
+  students,
+  gradeLevels,
+}: {
+  subjects: { id: string; name: string }[];
+  students: { studentProfileId: string; studentName: string }[];
+  gradeLevels: readonly string[];
+}) {
   const t = useTranslations("content");
   const idPrefix = useId();
   const router = useRouter();
@@ -44,12 +54,28 @@ export function NewResourceForm({ subjects }: { subjects: { id: string; name: st
   const [tags, setTags] = useState("");
   const [videoUrl, setVideoUrl] = useState("");
   const [videoLinkTitle, setVideoLinkTitle] = useState("");
+  const [visibility, setVisibility] = useState<ResourceVisibility>("everyone");
+  const [selectedGradeLevels, setSelectedGradeLevels] = useState<string[]>([]);
+  const [selectedStudentIds, setSelectedStudentIds] = useState<string[]>([]);
   const [publish, setPublish] = useState(true);
   const [file, setFile] = useState<File | null>(null);
   const [rightsConfirmed, setRightsConfirmed] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [createdResourceId, setCreatedResourceId] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+
+  function toggleGradeLevel(grade: string) {
+    setSelectedGradeLevels((current) =>
+      current.includes(grade) ? current.filter((g) => g !== grade) : [...current, grade],
+    );
+  }
+  function toggleStudent(studentProfileId: string) {
+    setSelectedStudentIds((current) =>
+      current.includes(studentProfileId)
+        ? current.filter((id) => id !== studentProfileId)
+        : [...current, studentProfileId],
+    );
+  }
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -59,12 +85,20 @@ export function NewResourceForm({ subjects }: { subjects: { id: string; name: st
       setError(t("newResource.validation.title"));
       return;
     }
-    if (type === "video" && !videoUrl.trim()) {
-      setError(t("newResource.validation.videoUrl"));
+    if ((type === "video" || type === "link") && !videoUrl.trim()) {
+      setError(type === "video" ? t("newResource.validation.videoUrl") : t("newResource.validation.linkUrl"));
       return;
     }
     if (file && !rightsConfirmed) {
       setError(t("newResource.validation.rights"));
+      return;
+    }
+    if (visibility === "grades" && selectedGradeLevels.length === 0) {
+      setError(t("newResource.validation.gradeLevels"));
+      return;
+    }
+    if (visibility === "students" && selectedStudentIds.length === 0) {
+      setError(t("newResource.validation.students"));
       return;
     }
 
@@ -85,7 +119,12 @@ export function NewResourceForm({ subjects }: { subjects: { id: string; name: st
             .map((tag) => tag.trim())
             .filter(Boolean),
           links:
-            type === "video" ? [{ url: videoUrl.trim(), title: videoLinkTitle.trim() || null }] : [],
+            type === "video" || type === "link"
+              ? [{ url: videoUrl.trim(), title: videoLinkTitle.trim() || null }]
+              : [],
+          visibility,
+          gradeLevels: visibility === "grades" ? selectedGradeLevels : [],
+          studentProfileIds: visibility === "students" ? selectedStudentIds : [],
         }),
       });
       const payload = (await response.json()) as unknown;
@@ -218,20 +257,24 @@ export function NewResourceForm({ subjects }: { subjects: { id: string; name: st
           <p className={styles.hint}>{t("newResource.tagsHint")}</p>
         </div>
 
-        {type === "video" ? (
+        {type === "video" || type === "link" ? (
           <div className={styles.formGrid}>
             <div className={styles.field}>
               <label className={styles.label} htmlFor={`${idPrefix}-video-url`}>
-                {t("newResource.videoUrl")}
+                {type === "video" ? t("newResource.videoUrl") : t("newResource.linkUrl")}
               </label>
               <input
                 className={styles.input}
                 id={`${idPrefix}-video-url`}
                 onChange={(event) => setVideoUrl(event.target.value)}
-                placeholder="https://www.youtube.com/watch?v=…"
+                placeholder={
+                  type === "video" ? "https://www.youtube.com/watch?v=…" : "https://example.com/…"
+                }
                 value={videoUrl}
               />
-              <p className={styles.hint}>{t("newResource.videoUrlHint")}</p>
+              <p className={styles.hint}>
+                {type === "video" ? t("newResource.videoUrlHint") : t("newResource.linkUrlHint")}
+              </p>
             </div>
             <div className={styles.field}>
               <label className={styles.label} htmlFor={`${idPrefix}-video-link-title`}>
@@ -266,6 +309,65 @@ export function NewResourceForm({ subjects }: { subjects: { id: string; name: st
             ) : null}
           </div>
         )}
+
+        <div className={styles.field}>
+          <p className={styles.label}>{t("newResource.visibility.label")}</p>
+          <p className={styles.hint}>{t("newResource.visibility.hint")}</p>
+          <div className={styles.visibilityOptions}>
+            {VISIBILITY_OPTIONS.map((option) => (
+              <label className={styles.radioRow} key={option}>
+                <input
+                  checked={visibility === option}
+                  name={`${idPrefix}-visibility`}
+                  onChange={() => setVisibility(option)}
+                  type="radio"
+                  value={option}
+                />
+                <span>
+                  <b>{t(`newResource.visibility.option.${option}`)}</b>
+                  <br />
+                  {t(`newResource.visibility.optionHint.${option}`)}
+                </span>
+              </label>
+            ))}
+          </div>
+          {visibility === "grades" ? (
+            <div className={styles.chipGroup} role="group" aria-label={t("newResource.visibility.label")}>
+              {gradeLevels.map((grade) => (
+                <label className={styles.chip} key={grade} data-checked={selectedGradeLevels.includes(grade)}>
+                  <input
+                    checked={selectedGradeLevels.includes(grade)}
+                    onChange={() => toggleGradeLevel(grade)}
+                    type="checkbox"
+                  />
+                  {t("newResource.visibility.grade", { grade })}
+                </label>
+              ))}
+            </div>
+          ) : null}
+          {visibility === "students" ? (
+            students.length === 0 ? (
+              <p className={styles.hint}>{t("newResource.visibility.noStudents")}</p>
+            ) : (
+              <div className={styles.chipGroup} role="group" aria-label={t("newResource.visibility.label")}>
+                {students.map((option) => (
+                  <label
+                    className={styles.chip}
+                    key={option.studentProfileId}
+                    data-checked={selectedStudentIds.includes(option.studentProfileId)}
+                  >
+                    <input
+                      checked={selectedStudentIds.includes(option.studentProfileId)}
+                      onChange={() => toggleStudent(option.studentProfileId)}
+                      type="checkbox"
+                    />
+                    {option.studentName}
+                  </label>
+                ))}
+              </div>
+            )
+          ) : null}
+        </div>
 
         <div className={styles.checkboxRow}>
           <input

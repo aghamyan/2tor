@@ -1,0 +1,290 @@
+/*
+ * Reads the shared shell design tokens (--shell-primary, --shell-ink, ...) directly, rather than
+ * redefining a local copy the way some older modules do — this is the one place in the app whose
+ * spec requires the exact brand teal and stays correct automatically under `:global(.dark) .scope`
+ * (see apps/web/components/app-shell/app-shell.module.css) without any dark-mode rules of our own.
+ * The one addition the shared system doesn't provide is green (verified/correct answers).
+ */
+.page {
+  --do-green: #1c7a4d;
+  --do-green-soft: #e3f5ea;
+  --do-blue: #356a9b;
+  --do-blue-soft: #e9f2fb;
+  --do-amber: #9a5b0d;
+  --do-amber-soft: #fff3d6;
+  color: var(--shell-ink);
+  margin: 0 auto;
+  max-width: 80rem;
+  padding: 0 1.25rem 4rem;
+}
+
+:global(.dark) .page {
+  --do-green: #4fd897;
+  --do-green-soft: #123626;
+  --do-blue: #8fc8ff;
+  --do-blue-soft: #172f49;
+  --do-amber: #ffc979;
+  --do-amber-soft: #3b2c18;
+}
+
+.header {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  justify-content: space-between;
+  overflow: hidden;
+  padding: 2rem 0 1.25rem;
+  position: relative;
+}
+
+.header::after {
+  color: color-mix(in srgb, var(--shell-primary) 8%, transparent);
+  content: "∑   √   π   x²";
+  font-family: Georgia, serif;
+  font-size: clamp(3rem, 7vw, 6.5rem);
+  letter-spacing: 0.2em;
+  line-height: 1;
+  pointer-events: none;
+  position: absolute;
+  right: 8rem;
+  top: 0.75rem;
+  transform: rotate(-2deg);
+  white-space: nowrap;
+}
+
+.headerCopy {
+  min-width: 0;
+  position: relative;
+  z-index: 1;
+}
+
+.headerKicker {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.eyebrow {
+  color: var(--shell-primary);
+  font-size: 0.72rem;
+  font-weight: 750;
+  letter-spacing: 0.14em;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.roleLabel {
+  border-left: 1px solid var(--shell-line);
+  color: var(--shell-muted);
+  font-size: 0.7rem;
+  font-weight: 720;
+  letter-spacing: 0.08em;
+  padding-left: 0.6rem;
+  text-transform: uppercase;
+}
+
+.title {
+  font-size: clamp(2rem, 4vw, 2.55rem);
+  font-weight: 720;
+  letter-spacing: -0.04em;
+  line-height: 1.05;
+  margin: 0.55rem 0 0;
+}
+
+.tagline {
+  color: var(--shell-ink);
+  font-size: 0.96rem;
+  font-weight: 560;
+  margin: 0.55rem 0 0;
+  max-width: 42rem;
+}
+
+.context {
+  color: var(--shell-muted);
+  font-size: 0.84rem;
+  line-height: 1.5;
+  margin: 0.25rem 0 0;
+  max-width: 45rem;
+}
+
+.askButton {
+  align-items: center;
+  background: var(--shell-primary);
+  border: 1px solid var(--shell-primary);
+  border-radius: 0.7rem;
+  box-shadow: 0 8px 20px -12px color-mix(in srgb, var(--shell-primary) 80%, transparent);
+  color: white;
+  display: inline-flex;
+  flex-shrink: 0;
+  gap: 0.45rem;
+  font-weight: 600;
+  min-height: 2.8rem;
+  padding: 0.65rem 0.9rem;
+  position: relative;
+  text-decoration: none;
+  transition:
+    background-color 160ms ease,
+    box-shadow 160ms ease,
+    transform 160ms ease;
+  white-space: nowrap;
+  z-index: 1;
+}
+
+.askButton:hover {
+  background: var(--shell-primary-dark);
+  box-shadow: 0 12px 24px -12px color-mix(in srgb, var(--shell-primary) 90%, transparent);
+  transform: translateY(-1px);
+}
+
+.askArrow {
+  opacity: 0.72;
+}
+
+.stats {
+  background: var(--shell-panel);
+  border: 1px solid var(--shell-line);
+  border-radius: 0.8rem;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin: 0 0 0.75rem;
+  overflow: hidden;
+}
+
+.stat {
+  align-items: center;
+  color: var(--shell-muted);
+  display: grid;
+  gap: 0 0.5rem;
+  grid-template-columns: 1fr auto;
+  min-height: 3.15rem;
+  padding: 0.55rem 0.85rem;
+}
+
+.stat + .stat {
+  border-left: 1px solid var(--shell-line);
+}
+
+.stat dd {
+  color: var(--shell-ink);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.9rem;
+  font-variant-numeric: tabular-nums;
+  font-weight: 750;
+  margin: 0;
+}
+
+.stat dt {
+  align-items: center;
+  display: flex;
+  font-size: 0.75rem;
+  font-weight: 580;
+  gap: 0.45rem;
+  min-width: 0;
+}
+
+.stat svg {
+  color: var(--shell-muted);
+  flex: 0 0 auto;
+}
+
+.stat[data-tone="attention"] svg,
+.stat[data-tone="attention"] dd {
+  color: var(--do-amber);
+}
+
+.stat[data-tone="primary"] svg,
+.stat[data-tone="primary"] dd {
+  color: var(--shell-primary-dark);
+}
+
+.stat[data-tone="verified"] svg,
+.stat[data-tone="verified"] dd {
+  color: var(--do-green);
+}
+
+.tabs {
+  background: var(--shell-panel);
+  border-bottom: 1px solid var(--shell-line);
+  border-top: 1px solid var(--shell-line);
+  display: flex;
+  gap: 0.15rem;
+  overflow-x: auto;
+  padding: 0 0.25rem;
+  scrollbar-width: none;
+}
+
+.tab {
+  border-bottom: 2px solid transparent;
+  color: var(--shell-muted);
+  font-size: 0.92rem;
+  font-weight: 600;
+  margin-bottom: -1px;
+  padding: 0.72rem 0.85rem 0.68rem;
+  text-decoration: none;
+  transition:
+    color 140ms ease,
+    border-color 140ms ease;
+}
+
+.tab:hover {
+  color: var(--shell-ink);
+}
+
+.tab[aria-current="page"] {
+  border-color: var(--shell-primary);
+  color: var(--shell-primary);
+}
+
+.body {
+  padding-top: 1.25rem;
+}
+
+@media (max-width: 760px) {
+  .page {
+    padding: 0 1rem 6rem;
+  }
+
+  .header {
+    align-items: stretch;
+    padding-top: 1.4rem;
+  }
+
+  .header::after {
+    right: -2rem;
+  }
+
+  .askButton {
+    justify-content: center;
+    width: 100%;
+  }
+
+  .stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .stat:nth-child(3) {
+    border-left: 0;
+  }
+
+  .stat:nth-child(n + 3) {
+    border-top: 1px solid var(--shell-line);
+  }
+
+  .tabs {
+    margin-inline: -1rem;
+    padding-inline: 0.75rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .askButton,
+  .tab {
+    transition: none;
+  }
+
+  .askButton:hover {
+    transform: none;
+  }
+}

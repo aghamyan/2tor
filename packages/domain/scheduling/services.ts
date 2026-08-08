@@ -22,6 +22,7 @@ import type {
   SchedulingActor,
   SchedulingDatabase,
   SubjectOption,
+  TutorZoomDefaults,
   ZoomMeetingRecord,
 } from "./models";
 import {
@@ -34,6 +35,8 @@ import {
   cancelLessonInputSchema,
   createLessonSeriesInputSchema,
   createOneTimeLessonInputSchema,
+  deleteLessonInputSchema,
+  deleteLessonSeriesInputSchema,
   recordAttendanceInputSchema,
   recordNoShowInputSchema,
   rescheduleLessonInputSchema,
@@ -41,6 +44,8 @@ import {
   type CancelLessonInput,
   type CreateLessonSeriesInput,
   type CreateOneTimeLessonInput,
+  type DeleteLessonInput,
+  type DeleteLessonSeriesInput,
   type RecordAttendanceInput,
   type RecordNoShowInput,
   type RescheduleLessonInput,
@@ -155,6 +160,47 @@ function addDays(date: Date, days: number): Date {
   return new Date(date.getTime() + days * 24 * 60 * 60 * 1000);
 }
 
+/**
+ * Provisions `lesson` from the tutor's default Zoom settings (`/settings/zoom` in the web layer,
+ * `packages/domain/tutors`), the same `ZoomLinkProvider` seam `setLessonZoomMeeting` uses for a
+ * manual per-lesson entry. Audited under a distinct action (`scheduling.zoom.auto_assigned`) so it
+ * stays separable from a tutor manually setting/overriding one lesson's link. Attributed to the
+ * tutor even though no human actor triggered this particular call (new-series materialization runs
+ * from the worker job with no request-scoped actor) — the tutor is who configured the default this
+ * traces back to.
+ */
+async function autoAssignZoomFromDefaults(
+  database: SchedulingDatabase,
+  lesson: LessonRecord,
+  tutorUserId: string,
+  defaults: TutorZoomDefaults,
+  provider: ZoomLinkProvider,
+): Promise<void> {
+  const details = await provider.provision({
+    lessonId: lesson.id,
+    scheduledStartAt: lesson.scheduledStartAt,
+    scheduledEndAt: lesson.scheduledEndAt,
+    topic: `Lesson ${lesson.id}`,
+    manualEntry: { joinUrl: defaults.joinUrl, passcode: defaults.passcode },
+  });
+  await database.upsertZoomMeeting({
+    lessonId: lesson.id,
+    zoomMeetingId: details.zoomMeetingId,
+    joinUrl: details.joinUrl,
+    startUrl: details.startUrl,
+    passcode: details.passcode,
+  });
+  await database.appendAudit({
+    id: ulid(),
+    actorUserId: tutorUserId,
+    action: "scheduling.zoom.auto_assigned",
+    resourceType: "zoom_meetings",
+    resourceId: lesson.id,
+    reason: "Zoom meeting auto-assigned from the tutor's default meeting settings.",
+    newValue: { zoomMeetingId: details.zoomMeetingId },
+  });
+}
+
 function minCalendarDate(a: string, b: string): string {
   return a < b ? a : b;
 }
@@ -168,6 +214,7 @@ export async function scheduleOneTimeLesson(
   database: SchedulingDatabase,
   actor: SchedulingActor | null | undefined,
   input: CreateOneTimeLessonInput,
+  zoomProvider: ZoomLinkProvider = createManualZoomLinkProvider(),
 ): Promise<LessonRecord> {
   requireAuthenticated(actor);
   const values = createOneTimeLessonInputSchema.parse(input);
@@ -189,6 +236,16 @@ export async function scheduleOneTimeLesson(
       status: "scheduled",
     });
     await seedParticipants(transaction, lesson.id, assignment, values.additionalParticipantUserIds);
+    const zoomDefaults = await transaction.findTutorZoomDefaults(assignment.tutorProfileId);
+    if (zoomDefaults) {
+      await autoAssignZoomFromDefaults(
+        transaction,
+        lesson,
+        assignment.tutorUserId,
+        zoomDefaults,
+        zoomProvider,
+      );
+    }
     await transaction.appendAudit({
       id: ulid(),
       actorUserId: actor.userId,
@@ -215,6 +272,7 @@ export async function createLessonSeries(
   database: SchedulingDatabase,
   actor: SchedulingActor | null | undefined,
   input: CreateLessonSeriesInput,
+  zoomProvider: ZoomLinkProvider = createManualZoomLinkProvider(),
 ): Promise<{ series: LessonSeriesRecord; lessons: LessonRecord[] }> {
   requireAuthenticated(actor);
   const values = createLessonSeriesInputSchema.parse(input);
@@ -248,6 +306,7 @@ export async function createLessonSeries(
       windowEndDate: horizonEnd,
       durationMinutes: values.durationMinutes,
       additionalParticipantUserIds: values.additionalParticipantUserIds,
+      zoomProvider,
     });
 
     await transaction.appendAudit({
@@ -276,6 +335,7 @@ async function materializeSeriesOccurrences(
     windowEndDate: string;
     durationMinutes: number;
     additionalParticipantUserIds: readonly string[];
+    zoomProvider: ZoomLinkProvider;
   },
 ): Promise<LessonRecord[]> {
   const todayDate = formatCalendarDate(new Date());
@@ -290,6 +350,9 @@ async function materializeSeriesOccurrences(
   const existingStarts = new Set(
     (await database.listLessonStartTimesForSeries(series.id)).map((date) => date.getTime()),
   );
+  // Resolved once per materialization batch, not per lesson — the tutor's default can't change
+  // mid-loop, and re-querying it per occurrence would be wasted round trips against the same row.
+  const zoomDefaults = await database.findTutorZoomDefaults(assignment.tutorProfileId);
 
   const created: LessonRecord[] = [];
   for (const occurrence of occurrences) {
@@ -306,6 +369,15 @@ async function materializeSeriesOccurrences(
       status: "scheduled",
     });
     await seedParticipants(database, lesson.id, assignment, options.additionalParticipantUserIds);
+    if (zoomDefaults) {
+      await autoAssignZoomFromDefaults(
+        database,
+        lesson,
+        assignment.tutorUserId,
+        zoomDefaults,
+        options.zoomProvider,
+      );
+    }
     created.push(lesson);
   }
   return created;
@@ -322,6 +394,7 @@ export async function materializeUpcomingLessons(
   database: SchedulingDatabase,
   seriesId: string,
   horizonEndDate: string,
+  zoomProvider: ZoomLinkProvider = createManualZoomLinkProvider(),
 ): Promise<LessonRecord[]> {
   return database.transaction(async (transaction) => {
     const series = await transaction.findLessonSeriesById(seriesId);
@@ -338,12 +411,13 @@ export async function materializeUpcomingLessons(
       windowEndDate: horizonEndDate,
       durationMinutes,
       additionalParticipantUserIds: [],
+      zoomProvider,
     });
   });
 }
 
 // ---------------------------------------------------------------------------
-// Reschedule / cancel / no-show
+// Reschedule / cancel / delete / no-show
 // ---------------------------------------------------------------------------
 
 /**
@@ -506,6 +580,171 @@ export async function cancelLesson(
       },
     });
     return { lesson, cancellation };
+  });
+}
+
+/**
+ * Translates a raw FK-violation from `transaction.deleteLesson()` into a typed, user-facing
+ * error. A `"scheduled"` lesson is never expected to have a `lesson_charges`/`lesson_feedback`/
+ * `assignments`/`tutor_notes` row pointing at it (those all attach after a lesson resolves), but
+ * those four tables reference `lessons` with `onDelete: "restrict"` (see
+ * packages/db/src/schema/{finance,academic,assignments}.ts) — this is the defensive fallback for
+ * that edge case, not the primary guard (the primary guard is the `status !== "scheduled"` check).
+ * Postgres's SQLSTATE for a foreign-key violation (`23503`) is driver-independent; postgres.js
+ * attaches it as `.code` on the thrown error.
+ */
+function mapDeleteConflict(error: unknown): never {
+  if (error && typeof error === "object" && "code" in error && error.code === "23503") {
+    throw new SchedulingError(
+      "LESSON_HAS_DEPENDENT_RECORDS",
+      "This class has related records (homework, feedback, or a charge) and can't be deleted. Cancel it instead.",
+      409,
+    );
+  }
+  throw error;
+}
+
+/**
+ * Hard-removes a one-time, still-`"scheduled"` lesson — a real delete, not a status change, so it
+ * disappears from every viewer's schedule (tutor, student, parent, staff) since they all read the
+ * same `lessons` row. Deliberately narrower than `cancelLesson`:
+ *
+ * - Only the assignment's own tutor or staff (never a parent/student — matches `recordNoShow`).
+ * - Only a `"scheduled"` lesson (a completed/canceled/no-show/rescheduled one already has
+ *   dependent history — attendance, a charge, a cancellation record — that a hard delete would
+ *   either orphan or destroy; use `cancelLesson` for those).
+ * - Never a lesson still linked to an *active* series (`lessonSeriesId !== null`): the daily
+ *   `scheduling.materialize-lessons` worker job dedupes purely by start time
+ *   (`listLessonStartTimesForSeries`), so deleting one occurrence's row would make that start time
+ *   re-appear as "unmaterialized" and the job would silently recreate it tomorrow. Cancel the
+ *   occurrence instead (its row survives with `status: "canceled"`, which still dedupes), or call
+ *   `deleteLessonSeries` to remove the whole recurring booking.
+ */
+export async function deleteLesson(
+  database: SchedulingDatabase,
+  actor: SchedulingActor | null | undefined,
+  lessonId: string,
+  input: DeleteLessonInput = {},
+): Promise<{ lesson: LessonRecord }> {
+  requireAuthenticated(actor);
+  const values = deleteLessonInputSchema.parse(input);
+
+  return database.transaction(async (transaction) => {
+    const access = await requireLessonAccess(transaction, actor, lessonId);
+    if (!access.isTutor && !access.isStaff) {
+      throw new SchedulingError(
+        "FORBIDDEN",
+        "Only the assigned tutor or staff can delete this class.",
+        403,
+      );
+    }
+    if (access.lesson.status !== "scheduled") {
+      throw new SchedulingError(
+        "LESSON_ALREADY_RESOLVED",
+        "Only a scheduled class can be deleted. Completed, canceled, or no-show classes keep their history.",
+        409,
+      );
+    }
+    if (access.lesson.lessonSeriesId !== null) {
+      throw new SchedulingError(
+        "LESSON_PART_OF_SERIES",
+        "This class is part of a recurring series. Cancel just this occurrence, or delete the entire series.",
+        409,
+      );
+    }
+
+    await transaction.appendAudit({
+      id: ulid(),
+      actorUserId: actor.userId,
+      action: "scheduling.lesson.deleted",
+      resourceType: "lessons",
+      resourceId: access.lesson.id,
+      reason: values.reason ?? "Deleted by tutor.",
+      previousValue: {
+        status: access.lesson.status,
+        scheduledStartAt: access.lesson.scheduledStartAt,
+        tutorStudentAssignmentId: access.lesson.tutorStudentAssignmentId,
+      },
+    });
+
+    try {
+      await transaction.deleteLesson(access.lesson.id);
+    } catch (error: unknown) {
+      mapDeleteConflict(error);
+    }
+
+    return { lesson: access.lesson };
+  });
+}
+
+/**
+ * Ends a recurring series (halting further materialization — `materializeUpcomingLessons` skips
+ * any series whose `status !== "active"`) and hard-deletes every still-`"scheduled"`, still-*in
+ * the future* occurrence already materialized for it. Past occurrences are left untouched even if
+ * they're still `"scheduled"` (nothing auto-transitions a lesson the tutor never marked
+ * complete/no-show, and it may carry real attendance history) — same rationale as `deleteLesson`.
+ */
+export async function deleteLessonSeries(
+  database: SchedulingDatabase,
+  actor: SchedulingActor | null | undefined,
+  seriesId: string,
+  input: DeleteLessonSeriesInput = {},
+): Promise<{ series: LessonSeriesRecord; deletedLessonIds: string[] }> {
+  requireAuthenticated(actor);
+  const values = deleteLessonSeriesInputSchema.parse(input);
+
+  return database.transaction(async (transaction) => {
+    const series = await transaction.findLessonSeriesById(seriesId);
+    if (!series) {
+      throw new SchedulingError("LESSON_SERIES_NOT_FOUND", "Lesson series was not found.", 404);
+    }
+    const assignment = await requireAssignment(transaction, series.tutorStudentAssignmentId);
+    if (
+      !isStaff(actor) &&
+      !(actor.roles.includes("tutor") && actor.userId === assignment.tutorUserId)
+    ) {
+      throw new SchedulingError(
+        "FORBIDDEN",
+        "Only the assigned tutor or staff can delete this series.",
+        403,
+      );
+    }
+
+    const seriesLessons = await transaction.listLessonsForSeries(series.id);
+    const now = new Date();
+    // `status === "scheduled"` alone isn't enough: a past occurrence the tutor never marked
+    // complete/no-show still sits at "scheduled" forever (nothing transitions it automatically),
+    // and it may carry real attendance/feedback/charge history. Only a *future* scheduled
+    // occurrence is safe to hard-delete — same rule `deleteLesson` applies to a standalone lesson.
+    const toDelete = seriesLessons.filter(
+      (lesson) => lesson.status === "scheduled" && lesson.scheduledStartAt > now,
+    );
+
+    await transaction.updateLessonSeriesStatus(series.id, "cancelled");
+    await transaction.appendAudit({
+      id: ulid(),
+      actorUserId: actor.userId,
+      action: "scheduling.lesson_series.deleted",
+      resourceType: "lesson_series",
+      resourceId: series.id,
+      reason: values.reason ?? "Deleted by tutor.",
+      previousValue: { status: series.status, occurrenceCount: seriesLessons.length },
+      newValue: { deletedLessonCount: toDelete.length },
+    });
+
+    for (const lesson of toDelete) {
+      try {
+        await transaction.deleteLesson(lesson.id);
+      } catch (error: unknown) {
+        mapDeleteConflict(error);
+      }
+    }
+
+    const updated = await transaction.findLessonSeriesById(series.id);
+    return {
+      series: updated ?? { ...series, status: "cancelled" },
+      deletedLessonIds: toDelete.map((lesson) => lesson.id),
+    };
   });
 }
 
@@ -703,6 +942,40 @@ export async function setLessonZoomMeeting(
       newValue: { zoomMeetingId: details.zoomMeetingId },
     });
     return zoom;
+  });
+}
+
+/**
+ * Called right after a tutor saves their default Zoom settings (`updateTutorZoomDefaults` in
+ * `packages/domain/tutors/services.ts`, from the `/api/tutors/me/zoom` route). Series lessons are
+ * materialized ahead of time (`materializeSeriesOccurrences` above), so most of what's already on a
+ * tutor's calendar was created *before* they ever set a default — without this, "automatically
+ * assigned to each class" would only be true for classes booked after this moment. Scoped to
+ * `"scheduled"` lessons with no Zoom row yet: a lesson someone already gave its own link via
+ * `setLessonZoomMeeting` (a manual per-lesson override) is left alone. `180` mirrors
+ * `createLessonSeriesInputSchema`'s `materializeHorizonDays` max — nothing is ever materialized
+ * further out than that, so nothing meaningful is missed past it.
+ */
+export async function applyTutorZoomDefaultsToUpcomingLessons(
+  database: SchedulingDatabase,
+  tutorProfileId: string,
+  tutorUserId: string,
+  defaults: TutorZoomDefaults,
+  provider: ZoomLinkProvider = createManualZoomLinkProvider(),
+): Promise<number> {
+  return database.transaction(async (transaction) => {
+    const lessons = await transaction.listLessonsForScope(
+      { kind: "tutor", tutorProfileId },
+      { from: new Date(), to: addDays(new Date(), 180), limit: 500 },
+    );
+    let assignedCount = 0;
+    for (const lesson of lessons) {
+      if (lesson.status !== "scheduled") continue;
+      if (await transaction.findZoomMeetingByLessonId(lesson.id)) continue;
+      await autoAssignZoomFromDefaults(transaction, lesson, tutorUserId, defaults, provider);
+      assignedCount += 1;
+    }
+    return assignedCount;
   });
 }
 

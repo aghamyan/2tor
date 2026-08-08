@@ -11,6 +11,7 @@ import type {
   ReplaceAvailabilityInput,
   TutorCapabilitiesInput,
   TutorProfileInput,
+  TutorZoomDefaultsInput,
   VerificationReviewInput,
 } from "./schemas";
 import {
@@ -19,6 +20,7 @@ import {
   replaceAvailabilityInputSchema,
   tutorCapabilitiesInputSchema,
   tutorProfileInputSchema,
+  tutorZoomDefaultsInputSchema,
   verificationReviewInputSchema,
 } from "./schemas";
 import type {
@@ -104,6 +106,18 @@ export async function updateTutorProfile(
   const values = tutorProfileInputSchema.parse(input);
   const profile = await requireOwnProfile(database, actor);
   return database.updateTutorProfile(profile.id, values);
+}
+
+/** The default a lesson is auto-provisioned with at creation time — see `packages/domain/scheduling/services.ts`'s auto-assign path. Saving here also backfills any of the tutor's already-scheduled lessons that have no Zoom row yet (see the web layer's `/api/tutors/me/zoom` route, which calls into the scheduling domain right after this resolves). */
+export async function updateTutorZoomDefaults(
+  database: TutorDatabase,
+  actor: TutorActor | null | undefined,
+  input: TutorZoomDefaultsInput,
+): Promise<TutorProfileRecord> {
+  requireTutor(actor);
+  const values = tutorZoomDefaultsInputSchema.parse(input);
+  const profile = await requireOwnProfile(database, actor);
+  return database.updateZoomDefaults(profile.id, values);
 }
 
 export async function updateTutorCapabilities(

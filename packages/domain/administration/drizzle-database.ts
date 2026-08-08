@@ -5,10 +5,12 @@ import {
   discounts,
   exports as exportsTable,
   incidents,
+  marketingLeads,
   privacyRequests,
   roles,
   supportTickets,
   systemSettings,
+  tutorContentUploads,
   tutorDocuments,
   tutorProfiles,
   tutorSuspensions,
@@ -18,7 +20,7 @@ import {
   type Database,
   type Transaction,
 } from "@app/db";
-import { and, desc, eq, inArray, isNull } from "drizzle-orm";
+import { and, desc, eq, gt, inArray, isNull } from "drizzle-orm";
 import { ulid } from "ulid";
 
 import type {
@@ -28,12 +30,14 @@ import type {
   DeletionJobRecord,
   DiscountRecord,
   ExportRecord,
+  MarketingLeadSummary,
   NewDeletionJobValues,
   NewDiscountValues,
   NewExportValues,
   PrivacyRequestRecord,
   SupportTicketSummary,
   SystemSettingRecord,
+  TutorContentUploadSummary,
   TutorDocumentSummary,
   TutorSuspensionRecord,
   TutorVerificationSummary,
@@ -125,6 +129,21 @@ function mapContentReport(row: typeof contentReports.$inferSelect): ContentRepor
   };
 }
 
+function mapTutorContentUpload(
+  row: typeof tutorContentUploads.$inferSelect,
+): TutorContentUploadSummary {
+  return {
+    id: row.id,
+    tutorProfileId: row.tutorProfileId,
+    resourceId: row.resourceId,
+    fileName: row.fileName,
+    mimeType: row.mimeType,
+    sizeBytes: row.sizeBytes,
+    status: row.status,
+    createdAt: row.createdAt,
+  };
+}
+
 function mapTicket(row: typeof supportTickets.$inferSelect): SupportTicketSummary {
   return {
     id: row.id,
@@ -195,6 +214,21 @@ function mapDiscount(row: typeof discounts.$inferSelect): DiscountRecord {
     endsAt: row.endsAt,
     isActive: row.isActive,
     createdByUserId: row.createdByUserId,
+  };
+}
+
+function mapMarketingLead(row: typeof marketingLeads.$inferSelect): MarketingLeadSummary {
+  return {
+    id: row.id,
+    kind: row.kind,
+    parentName: row.parentName,
+    email: row.email,
+    phone: row.phone,
+    learnerAgeBand: row.learnerAgeBand,
+    interest: row.interest,
+    message: row.message,
+    locale: row.locale,
+    createdAt: row.createdAt,
   };
 }
 
@@ -503,6 +537,40 @@ function repository(
       return mapContentReport(row);
     },
 
+    async listPendingTutorContentUploads() {
+      const rows = await executor
+        .select()
+        .from(tutorContentUploads)
+        .where(eq(tutorContentUploads.status, "pending_review"))
+        .orderBy(desc(tutorContentUploads.createdAt))
+        .limit(100);
+      return rows.map(mapTutorContentUpload);
+    },
+
+    async findTutorContentUploadById(uploadId) {
+      const [row] = await executor
+        .select()
+        .from(tutorContentUploads)
+        .where(eq(tutorContentUploads.id, uploadId))
+        .limit(1);
+      return row ? mapTutorContentUpload(row) : null;
+    },
+
+    async decideTutorContentUpload(uploadId, values) {
+      const [row] = await executor
+        .update(tutorContentUploads)
+        .set({
+          status: values.status,
+          reviewedByUserId: values.reviewedByUserId,
+          reviewedAt: new Date(),
+          updatedAt: new Date(),
+        })
+        .where(eq(tutorContentUploads.id, uploadId))
+        .returning();
+      if (!row) throw new Error("tutor_content_uploads update did not return a row.");
+      return mapTutorContentUpload(row);
+    },
+
     async listOpenSupportTickets() {
       const rows = await executor
         .select()
@@ -715,6 +783,17 @@ function repository(
         .returning();
       if (!row) throw new Error("system_settings insert did not return a row.");
       return mapSetting(row);
+    },
+
+    // -- Marketing leads --------------------------------------------------------------------
+    async listMarketingLeads() {
+      const rows = await executor
+        .select()
+        .from(marketingLeads)
+        .where(gt(marketingLeads.retentionUntil, new Date()))
+        .orderBy(desc(marketingLeads.createdAt))
+        .limit(200);
+      return rows.map(mapMarketingLead);
     },
 
     async createIncident(values) {

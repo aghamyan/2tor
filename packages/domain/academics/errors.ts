@@ -9,6 +9,7 @@ export const ACADEMIC_ERROR_CODES = [
   "MILESTONE_NOT_FOUND",
   "EVIDENCE_REQUIRED",
   "INVALID_INPUT",
+  "SKILL_NOT_FOUND",
 ] as const;
 
 export type AcademicErrorCode = (typeof ACADEMIC_ERROR_CODES)[number];

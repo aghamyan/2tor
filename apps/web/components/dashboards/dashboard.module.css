@@ -2109,3 +2109,34 @@
     grid-column: auto;
   }
 }
+
+/* Tutor overview: the hero carries the one large editorial headline on this
+   page. Secondary sections (recap queue, quick tools) use a quieter section
+   label instead of repeating the same jumbo serif beat. */
+.tutorLearningShell .sectionHeadingRow h2 {
+  font-family:
+    var(--learning-font-body), "Noto Sans Armenian", ui-sans-serif, system-ui, sans-serif;
+  font-size: clamp(1.15rem, 1.8vw, 1.5rem);
+  font-weight: 750;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+  margin-top: 0.3rem;
+}
+
+.tutorLearningShell .recapQueue,
+.tutorLearningShell .quickSection {
+  padding-top: clamp(2.5rem, 5vw, 4rem);
+}
+
+.tutorLearningShell .tutorMark {
+  cursor: pointer;
+  transition:
+    transform 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.tutorLearningShell .tutorMark:hover,
+.tutorLearningShell .tutorMark:focus-visible {
+  box-shadow: 0 10px 24px rgba(23, 35, 60, 0.22);
+  transform: translateY(-2px) rotate(-2deg);
+}

@@ -1,12 +1,12 @@
 .site {
-  --ink: #102b3c;
-  --muted: #526776;
-  --paper: #f7fbfc;
-  --line: #cfe0e5;
-  --sea: #007d86;
-  --sea-dark: #005c64;
-  --apricot: #ffb56b;
-  --blue: #c7eaf1;
+  --ink: hsl(var(--vz-ink));
+  --muted: hsl(var(--vz-muted));
+  --paper: hsl(var(--vz-paper));
+  --line: hsl(var(--vz-line));
+  --sea: hsl(var(--vz-accent));
+  --sea-dark: hsl(var(--vz-accent));
+  --apricot: hsl(var(--vz-accent));
+  --blue: hsl(var(--vz-accent) / 12%);
   background: var(--paper);
   color: var(--ink);
 }
@@ -15,11 +15,11 @@
   box-sizing: border-box;
 }
 .site :focus-visible {
-  outline: 3px solid #e87526;
+  outline: 3px solid hsl(var(--vz-accent));
   outline-offset: 3px;
 }
 .header {
-  background: rgb(247 251 252 / 94%);
+  background: hsl(var(--vz-surface) / 94%);
   border-bottom: 1px solid var(--line);
   position: sticky;
   top: 0;
@@ -42,7 +42,7 @@
 }
 .brand {
   color: var(--ink);
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--vz-display);
   font-size: 1.3rem;
   font-weight: 700;
   letter-spacing: -0.045em;
@@ -93,7 +93,7 @@
 }
 .hero h1,
 .pageHeading {
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--vz-display);
   font-size: clamp(2.8rem, 7vw, 5.8rem);
   font-weight: 500;
   letter-spacing: -0.068em;
@@ -114,25 +114,40 @@
   gap: 0.75rem;
   margin-top: 1.8rem;
 }
+/* Shared button shape for the standard marketing pages. Pills, per the system's radius rule —
+   these were 0.45rem rounded rects, which read as a different site from the header's CTA. */
 .primary,
 .secondary {
   align-items: center;
-  border-radius: 0.45rem;
+  border-radius: var(--vz-r-pill);
   display: inline-flex;
+  font-family: var(--vz-display);
   font-size: 0.94rem;
-  font-weight: 760;
+  font-weight: 600;
   justify-content: center;
+  letter-spacing: -0.01em;
   min-height: 3rem;
-  padding: 0.7rem 1rem;
+  padding: 0.7rem 1.4rem;
   text-decoration: none;
+  transition:
+    box-shadow 220ms var(--vz-ease),
+    transform 220ms var(--vz-ease);
 }
 .primary {
   background: var(--sea);
-  border: 1px solid var(--sea);
-  color: white;
+  border: 1px solid transparent;
+  box-shadow: 0 1px 2px hsl(var(--vz-ink) / 8%);
+  color: hsl(var(--vz-accent-on));
 }
+/* Lift plus an accent glow, not a darker fill — the system has no darker accent step. */
 .primary:hover {
-  background: var(--sea-dark);
+  box-shadow:
+    var(--vz-fx-glow),
+    0 1px 2px hsl(var(--vz-ink) / 10%);
+  transform: translateY(-2px);
+}
+.primary:active {
+  transform: scale(0.975);
 }
 .secondary {
   background: transparent;
@@ -140,7 +155,7 @@
   color: var(--ink);
 }
 .secondary:hover {
-  background: #e7f2f4;
+  background: hsl(var(--vz-surface));
 }
 .learningMap {
   align-self: center;
@@ -204,7 +219,7 @@
 }
 .mapNote {
   bottom: 1.45rem;
-  color: #b7d8dd;
+  color: hsl(var(--vz-line));
   font-size: 0.82rem;
   left: 1.4rem;
   margin: 0;
@@ -216,7 +231,7 @@
   padding: 3.5rem 0;
 }
 .section h2 {
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--vz-display);
   font-size: clamp(2rem, 4vw, 3.25rem);
   font-weight: 500;
   letter-spacing: -0.05em;
@@ -272,7 +287,7 @@
   max-width: 62ch;
 }
 .aside {
-  background: #dff2f4;
+  background: hsl(var(--vz-surface-2));
   border-left: 5px solid var(--sea);
   padding: 1.25rem;
 }
@@ -280,13 +295,13 @@
   display: block;
 }
 .aside p {
-  color: #274c58;
+  color: hsl(var(--vz-ink));
   font-size: 0.9rem;
   line-height: 1.55;
   margin: 0.5rem 0 0;
 }
 .audienceCallout {
-  background: #fff4e8;
+  background: hsl(var(--vz-accent) / 10%);
   border-left: 5px solid var(--apricot);
   margin-top: 1.6rem;
   padding: 1.1rem 1.25rem;
@@ -302,7 +317,7 @@
   margin: 0.4rem 0 0;
 }
 .curriculumHeading {
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--vz-display);
   font-size: clamp(1.5rem, 3vw, 2rem);
   font-weight: 500;
   letter-spacing: -0.03em;
@@ -360,13 +375,13 @@
   margin: 0.8rem 0 0;
 }
 .testimonial {
-  background: #fff4e8;
+  background: hsl(var(--vz-accent) / 10%);
   border-left: 5px solid var(--apricot);
   margin-top: 1.8rem;
   padding: 1.2rem;
 }
 .testimonial blockquote {
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--vz-display);
   font-size: 1.15rem;
   line-height: 1.45;
   margin: 0;
@@ -398,7 +413,7 @@
 .field input,
 .field select,
 .field textarea {
-  border: 1px solid #99b5bd;
+  border: 1px solid hsl(var(--vz-line));
   border-radius: 0.25rem;
   color: var(--ink);
   font: inherit;
@@ -427,13 +442,13 @@
   position: absolute;
 }
 .formError {
-  color: #a82d25;
+  color: hsl(var(--vz-accent));
   font-size: 0.9rem;
   margin: 0;
 }
 .formSuccess {
-  background: #e5f5ed;
-  color: #1c5d43;
+  background: hsl(var(--vz-positive) / 12%);
+  color: hsl(var(--vz-positive));
   padding: 0.8rem;
 }
 .footer {

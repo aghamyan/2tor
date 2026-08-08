@@ -3,6 +3,7 @@ import {
   date,
   integer,
   jsonb,
+  numeric,
   pgEnum,
   pgTable,
   text,
@@ -47,6 +48,8 @@ export const learningPlanItemStatusEnum = pgEnum("learning_plan_item_status", [
 ]);
 export const goalSourceEnum = pgEnum("goal_source", ["parent", "student", "tutor"]);
 export const goalStatusEnum = pgEnum("goal_status", ["active", "achieved", "abandoned"]);
+/** Superseded by `skillMasteryStatusEnum`/`skillEvidenceTypeEnum` below — kept only so this
+ * migration is a pure addition (no enum rename/drop for drizzle-kit to disambiguate interactively). */
 export const skillLevelEnum = pgEnum("skill_level", [
   "needs_support",
   "developing",
@@ -58,6 +61,35 @@ export const skillRecordSourceEnum = pgEnum("skill_record_source", [
   "assessment",
   "assignment",
 ]);
+/**
+ * Mastery status is always tutor-selected, never derived from a score (same "no fabricated
+ * judgment" rule as `progress_reviews.evidence_notes`). `not_assessed` is distinct from a zero
+ * score — missing evidence is never treated as failure.
+ */
+export const skillMasteryStatusEnum = pgEnum("skill_mastery_status", [
+  "mastered",
+  "secure",
+  "developing",
+  "needs_attention",
+  "not_demonstrated",
+  "not_assessed",
+  "in_progress",
+  "upcoming",
+]);
+export const skillConfidenceEnum = pgEnum("skill_confidence", ["low", "medium", "high"]);
+export const skillEvidenceTypeEnum = pgEnum("skill_evidence_type", [
+  "tutor_observation",
+  "homework",
+  "lesson_activity",
+  "diagnostic",
+  "assessment",
+]);
+/** `automatic` is reserved for a future graded-homework integration; nothing writes it yet. */
+export const skillCalculationMethodEnum = pgEnum("skill_calculation_method", [
+  "tutor",
+  "automatic",
+]);
+export const skillTrendEnum = pgEnum("skill_trend", ["up", "down", "steady", "new"]);
 export const tutorNoteVisibilityEnum = pgEnum("tutor_note_visibility", [
   "parent_visible",
   "staff_only",
@@ -93,9 +125,13 @@ export const courses = pgTable("courses", {
   subjectId: ulidFk("subject_id")
     .notNull()
     .references(() => subjects.id, { onDelete: "restrict" }),
+  /** Curriculum syllabus code, e.g. "MTH-G5" (see curriculum/README.md). Null for ad-hoc courses. */
+  code: text("code").unique(),
   title: text("title").notNull(),
   description: text("description"),
   level: text("level"),
+  gradeLabel: text("grade_label"),
+  hours: integer("hours"),
   isGroup: boolean("is_group").notNull().default(false),
   ...timestamps,
 });
@@ -126,6 +162,24 @@ export const curriculumFrameworks = pgTable("curriculum_frameworks", {
   source: text("source"),
   ...timestamps,
 });
+
+/** One row per curriculum unit within a course (`units[]` in curriculum/_build/c_*.py). */
+export const curriculumUnits = pgTable(
+  "curriculum_units",
+  {
+    id: ulidPk(),
+    courseId: ulidFk("course_id")
+      .notNull()
+      .references(() => courses.id, { onDelete: "cascade" }),
+    orderIndex: integer("order_index").notNull(),
+    nameEn: text("name_en").notNull(),
+    nameHy: text("name_hy"),
+    lessons: integer("lessons"),
+    note: text("note"),
+    createdAt: timestamps.createdAt,
+  },
+  (table) => [uniqueIndex("curriculum_units_unique").on(table.courseId, table.orderIndex)],
+);
 
 /**
  * The tutor owns day-to-day adjustment; major changes require parent visibility/acknowledgment
@@ -190,6 +244,8 @@ export const learningPlanItems = pgTable("learning_plan_items", {
   description: text("description"),
   orderIndex: integer("order_index").notNull().default(0),
   status: learningPlanItemStatusEnum("status").notNull().default("planned"),
+  /** Links a "module_topic" item to the skills taxonomy so the mastery map can drive plan grouping. */
+  skillId: ulidFk("skill_id").references(() => skills.id, { onDelete: "set null" }),
   ...timestamps,
 });
 
@@ -205,16 +261,53 @@ export const goals = pgTable("goals", {
   ...timestamps,
 });
 
+/**
+ * The codebase's "topic" table (see `discussion_questions.topicId` in communication.ts, which
+ * points here). Seeded from curriculum/_build/c_*.py via packages/db/scripts/seed-curriculum.ts,
+ * or created ad hoc by a tutor (`unitId: null`, `createdByUserId` set) when no seeded topic fits.
+ */
 export const skills = pgTable("skills", {
   id: ulidPk(),
   subjectId: ulidFk("subject_id").references(() => subjects.id, { onDelete: "restrict" }),
+  unitId: ulidFk("unit_id").references(() => curriculumUnits.id, { onDelete: "set null" }),
+  orderIndex: integer("order_index").notNull().default(0),
+  /** Curriculum reference code, e.g. "5.NF.5". Null for tutor-created topics. */
+  code: text("code"),
   key: text("key").notNull().unique(),
   name: text("name").notNull(),
   description: text("description"),
+  /** Observable, countable mastery criteria (curriculum/_build/schema.md `mastery: [...]`). */
+  masteryCriteria: jsonb("mastery_criteria").$type<string[]>(),
+  /** `{issue, response}` pairs (curriculum/_build/schema.md `misconceptions: [(...), ...]`). */
+  misconceptions: jsonb("misconceptions").$type<{ issue: string; response: string }[]>(),
+  createdByUserId: ulidFk("created_by_user_id").references(() => users.id),
   createdAt: timestamps.createdAt,
 });
 
-export const studentSkillRecords = pgTable("student_skill_records", {
+/** A pragmatic linear chain derived from curriculum ordering, not an authored prerequisite DAG. */
+export const skillPrerequisites = pgTable(
+  "skill_prerequisites",
+  {
+    id: ulidPk(),
+    skillId: ulidFk("skill_id")
+      .notNull()
+      .references(() => skills.id, { onDelete: "cascade" }),
+    prerequisiteSkillId: ulidFk("prerequisite_skill_id")
+      .notNull()
+      .references(() => skills.id, { onDelete: "cascade" }),
+    createdAt: timestamps.createdAt,
+  },
+  (table) => [
+    uniqueIndex("skill_prerequisites_unique").on(table.skillId, table.prerequisiteSkillId),
+  ],
+);
+
+/**
+ * Append-only ledger (mirrors `point_events`). Every tutor "class review" entry becomes one row
+ * here; `student_skill_records` is the maintained rollup, same relationship as
+ * `student_point_balances` to `point_events`.
+ */
+export const skillAssessmentEvents = pgTable("skill_assessment_events", {
   id: ulidPk(),
   studentProfileId: ulidFk("student_profile_id")
     .notNull()
@@ -222,12 +315,58 @@ export const studentSkillRecords = pgTable("student_skill_records", {
   skillId: ulidFk("skill_id")
     .notNull()
     .references(() => skills.id, { onDelete: "restrict" }),
-  level: skillLevelEnum("level").notNull(),
-  lastAssessedAt: utcTimestamp("last_assessed_at"),
-  source: skillRecordSourceEnum("source").notNull(),
-  notes: text("notes"),
-  ...timestamps,
+  lessonId: ulidFk("lesson_id").references(() => lessons.id, { onDelete: "set null" }),
+  feedbackId: ulidFk("feedback_id").references((): AnyPgColumn => lessonFeedback.id, {
+    onDelete: "set null",
+  }),
+  /** 0.0-10.0, one decimal place. Always tutor-entered in this build (see calculation_method). */
+  score: numeric("score", { precision: 3, scale: 1 }),
+  /** Always tutor-selected — never derived from `score` (spec: no fabricated judgment). */
+  status: skillMasteryStatusEnum("status").notNull(),
+  confidence: skillConfidenceEnum("confidence"),
+  evidenceType: skillEvidenceTypeEnum("evidence_type").notNull(),
+  calculationMethod: skillCalculationMethodEnum("calculation_method").notNull().default("tutor"),
+  note: text("note"),
+  visibleToParent: boolean("visible_to_parent").notNull().default(true),
+  visibleToStudent: boolean("visible_to_student").notNull().default(true),
+  recordedByUserId: ulidFk("recorded_by_user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "restrict" }),
+  createdAt: timestamps.createdAt,
 });
+
+/** Maintained rollup of `skill_assessment_events` (mirrors `student_point_balances`). */
+export const studentSkillRecords = pgTable(
+  "student_skill_records",
+  {
+    id: ulidPk(),
+    studentProfileId: ulidFk("student_profile_id")
+      .notNull()
+      .references(() => studentProfiles.id, { onDelete: "restrict" }),
+    skillId: ulidFk("skill_id")
+      .notNull()
+      .references(() => skills.id, { onDelete: "restrict" }),
+    status: skillMasteryStatusEnum("status").notNull().default("not_assessed"),
+    score: numeric("score", { precision: 3, scale: 1 }),
+    confidence: skillConfidenceEnum("confidence"),
+    trend: skillTrendEnum("trend").notNull().default("new"),
+    evidenceCount: integer("evidence_count").notNull().default(0),
+    /** Denormalized from the latest event's `note` — the map/table views show this without a per-topic event fetch. */
+    lastNote: text("last_note"),
+    /** Denormalized from the latest event — lets a parent/student read filter without re-joining events. */
+    visibleToParent: boolean("visible_to_parent").notNull().default(true),
+    visibleToStudent: boolean("visible_to_student").notNull().default(true),
+    lastAssessedAt: utcTimestamp("last_assessed_at"),
+    lastEventId: ulidFk("last_event_id").references(
+      (): AnyPgColumn => skillAssessmentEvents.id,
+      { onDelete: "set null" },
+    ),
+    updatedAt: utcTimestamp("updated_at").notNull().defaultNow(),
+  },
+  (table) => [
+    uniqueIndex("student_skill_records_unique").on(table.studentProfileId, table.skillId),
+  ],
+);
 
 /** `staff_only` notes are never surfaced to parents (spec §4.1 "Cannot: View internal tutor notes marked staff-only"). */
 export const tutorNotes = pgTable("tutor_notes", {
@@ -275,6 +414,9 @@ export const lessonFeedback = pgTable(
     milestoneProgressNote: text("milestone_progress_note"),
     tutorConfidence: feedbackConfidenceEnum("tutor_confidence").notNull().default("medium"),
     freeTextComment: text("free_text_comment"),
+    /** Tutor-selected recipients for this feedback — parent, student, or both (spec: tutor chooses who sees it). */
+    visibleToParent: boolean("visible_to_parent").notNull().default(true),
+    visibleToStudent: boolean("visible_to_student").notNull().default(true),
     version: integer("version").notNull().default(1),
     supersedesFeedbackId: ulidFk("supersedes_feedback_id").references(
       (): AnyPgColumn => lessonFeedback.id,

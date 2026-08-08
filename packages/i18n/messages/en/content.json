@@ -34,6 +34,11 @@
         "empty": "No resources are available yet. Tutors can post one from this page.",
         "noDescription": "Open this resource for more detail.",
         "subject": "Subject: {subject}",
+        "visibilityEveryone": "Visible to everyone",
+        "visibilityGrades": "Visible to grades: {grades}",
+        "visibilityStudents": "Visible to specific students",
+        "openLink": "Open link",
+        "download": "Download {fileName}",
         "report": "Report this resource",
         "reportPlaceholder": "Why are you reporting this?",
         "reportSubmit": "Send report",
@@ -64,10 +69,28 @@
       "tagsHint": "Separate tags with commas. Tags help students find this resource.",
       "videoUrl": "YouTube URL",
       "videoUrlHint": "Only YouTube links are supported. The video stays on YouTube; we never download or host it.",
+      "linkUrl": "Link URL",
+      "linkUrlHint": "Any external website — it opens in a new tab; we never mirror or host it.",
       "videoLinkTitle": "Link title (optional)",
       "attachMaterial": "Attach a file (optional)",
       "attachMaterialHint": "Files are reviewed by an administrator before publication and won't appear in the library until approved. Video files are not accepted — use a YouTube link instead.",
       "rightsConfirm": "I confirm I have the rights to share this file.",
+      "visibility": {
+        "label": "Who can see this",
+        "hint": "Choose who this resource appears for once it's published.",
+        "option": {
+          "everyone": "Everyone",
+          "grades": "Specific grades",
+          "students": "Specific students"
+        },
+        "optionHint": {
+          "everyone": "Every student and parent can see this in the library.",
+          "grades": "Only students in the grades you choose (and their parents) can see this.",
+          "students": "Only the students you choose (and their parents) can see this."
+        },
+        "grade": "Grade {grade}",
+        "noStudents": "You don't have any students assigned yet, so there's no one to target directly. Choose \"Specific grades\" or \"Everyone\" instead."
+      },
       "publishNow": "Publish now",
       "publishHint": "Save a draft to keep refining it — drafts aren't shown in the resource library until you publish.",
       "post": "Post resource",
@@ -76,7 +99,10 @@
       "validation": {
         "title": "Add a title.",
         "videoUrl": "Add a YouTube URL for this video.",
-        "rights": "Confirm you have the rights to share this file, or remove it."
+        "linkUrl": "Add a URL for this link.",
+        "rights": "Confirm you have the rights to share this file, or remove it.",
+        "gradeLevels": "Choose at least one grade level.",
+        "students": "Choose at least one student."
       }
     },
     "errors": {

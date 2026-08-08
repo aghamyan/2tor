@@ -28,6 +28,7 @@
         },
         "groupLessons": "Group lessons",
         "forParents": "For parents",
+        "antiCheating": "Anti-Cheating",
         "tutors": "Tutors",
         "pricing": "Pricing",
         "safety": "Safety"
@@ -75,6 +76,7 @@
         "pricing": "Pricing",
         "safety": "Safety",
         "forParents": "For parents",
+        "antiCheating": "Anti-Cheating",
         "tutors": "Tutors",
         "tutorApplication": "Apply to teach",
         "privacy": "Privacy",
@@ -508,6 +510,12 @@
         "title": "For parents",
         "description": "Understand the learning without having to manage every lesson.",
         "body": "We communicate clearly about goals, participation, and next steps. You will see what the learner is practising and how you can support a steady routine without turning home into another classroom."
+      },
+      "antiCheating": {
+        "eyebrow": "Anti-Cheating technology",
+        "title": "Homework without shortcuts",
+        "description": "Let your child work independently while our system helps identify unusual activity and creates a homework integrity report.",
+        "body": "Start a protected homework session and let your child complete the assignment on their own. Our system watches for signals like tab switching, lost focus, and copy-paste activity, then puts everything into one calm report you can review together."
       },
       "tutors": {
         "eyebrow": "Our educators",

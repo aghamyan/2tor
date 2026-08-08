@@ -212,6 +212,18 @@ export interface ContentReportSummary {
   createdAt: Date;
 }
 
+/** A tutor-uploaded file quarantined until staff clear it — see `packages/domain/content/README.md`. */
+export interface TutorContentUploadSummary {
+  id: string;
+  tutorProfileId: string;
+  resourceId: string | null;
+  fileName: string | null;
+  mimeType: string | null;
+  sizeBytes: number | null;
+  status: "pending_review" | "approved" | "rejected";
+  createdAt: Date;
+}
+
 export type SupportTicketStatus =
   "open" | "in_progress" | "waiting_on_customer" | "resolved" | "closed";
 
@@ -320,6 +332,29 @@ export interface NewDiscountValues {
   createdByUserId: string;
 }
 
+/** Mirrors `packages/domain/marketing/models.ts`'s `LeadKind` — duplicated for the same import-boundary reason as `AdministrationRole`. */
+export type MarketingLeadKind =
+  | "consultation"
+  | "assessment"
+  | "contact"
+  | "tutor_application"
+  | "trial_class"
+  | "group_matching";
+
+/** A public consultation/free-class/contact submission, for the staff "requests" queue. */
+export interface MarketingLeadSummary {
+  id: string;
+  kind: MarketingLeadKind;
+  parentName: string;
+  email: string;
+  phone: string | null;
+  learnerAgeBand: string | null;
+  interest: string | null;
+  message: string | null;
+  locale: "en" | "hy";
+  createdAt: Date;
+}
+
 export interface SystemSettingRecord {
   id: string;
   key: string;
@@ -391,6 +426,13 @@ export interface AdministrationDatabase {
     values: { status: ReportStatus; resolvedByUserId: string },
   ): Promise<ContentReportSummary>;
 
+  listPendingTutorContentUploads(): Promise<TutorContentUploadSummary[]>;
+  findTutorContentUploadById(uploadId: string): Promise<TutorContentUploadSummary | null>;
+  decideTutorContentUpload(
+    uploadId: string,
+    values: { status: "approved" | "rejected"; reviewedByUserId: string },
+  ): Promise<TutorContentUploadSummary>;
+
   listOpenSupportTickets(): Promise<SupportTicketSummary[]>;
   findSupportTicketById(ticketId: string): Promise<SupportTicketSummary | null>;
   resolveSupportTicket(
@@ -441,6 +483,9 @@ export interface AdministrationDatabase {
     description: string | null;
     updatedByUserId: string;
   }): Promise<SystemSettingRecord>;
+
+  // Marketing leads (consultation requests / free-class bookings / contact submissions)
+  listMarketingLeads(): Promise<MarketingLeadSummary[]>;
 
   // Incidents (used by apps/worker/src/jobs/admin/backup-verification-alert.job.ts)
   createIncident(values: {

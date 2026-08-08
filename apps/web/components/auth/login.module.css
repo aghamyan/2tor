@@ -1,10 +1,19 @@
+/*
+ * Sign-in form. Colours and shapes come from the Varzharan design system (`app/globals.css`,
+ * scoped to `[data-surface="vz"]` by `app/(marketing)/layout.tsx`, which this page renders under).
+ *
+ * The radius scale is the system's, applied literally: cards 18px, inputs 12px, buttons a full
+ * pill. It was arbitrary here before (0.25rem inputs, 0.35rem button, square card).
+ */
 .form {
-  background: #fff;
-  border: 1px solid #c8d9df;
+  background: hsl(var(--vz-surface));
+  border: 1px solid hsl(var(--vz-line-soft));
+  border-radius: var(--vz-r-card);
+  box-shadow: var(--vz-fx-shadow);
   display: grid;
   gap: 1rem;
   max-width: 31rem;
-  padding: 1.4rem;
+  padding: 1.75rem;
 }
 
 .form label {
@@ -15,30 +24,57 @@
 }
 
 .form input {
-  background: #fff;
-  border: 1px solid #91afba;
-  border-radius: 0.25rem;
-  color: #102f3f;
+  background: hsl(var(--vz-surface));
+  border: 1px solid hsl(var(--vz-line));
+  border-radius: var(--vz-r-input);
+  color: hsl(var(--vz-ink));
   font: inherit;
   min-height: 3rem;
-  padding: 0.7rem 0.8rem;
+  padding: 0.7rem 0.9rem;
+  transition:
+    border-color 220ms var(--vz-ease),
+    box-shadow 220ms var(--vz-ease);
+}
+
+.form input:hover {
+  border-color: hsl(var(--vz-ink) / 32%);
 }
 
 .form input:focus-visible {
-  outline: 3px solid #ffb368;
+  outline: 3px solid hsl(var(--vz-accent));
   outline-offset: 2px;
 }
 
+/* The primary action takes the accent, not ink. On the landing page a filled pine surface is a
+   brand *block* (a whole tile), while the thing you click is vermillion — an ink-filled button
+   here read as a disabled or secondary control. */
 .form button {
-  background: #008b91;
-  border: 0;
-  border-radius: 0.35rem;
-  color: #fff;
+  background: hsl(var(--vz-accent));
+  border: 1px solid transparent;
+  border-radius: var(--vz-r-pill);
+  box-shadow: 0 1px 2px hsl(var(--vz-ink) / 8%);
+  color: hsl(var(--vz-accent-on));
   cursor: pointer;
-  font: inherit;
-  font-weight: 800;
+  font-family: var(--vz-display);
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
   min-height: 3rem;
   padding: 0.75rem 1rem;
+  transition:
+    box-shadow 220ms var(--vz-ease),
+    transform 220ms var(--vz-ease);
+}
+
+.form button:hover:not(:disabled) {
+  box-shadow:
+    var(--vz-fx-glow),
+    0 1px 2px hsl(var(--vz-ink) / 10%);
+  transform: translateY(-2px);
+}
+
+.form button:active:not(:disabled) {
+  transform: scale(0.975);
 }
 
 .form button:disabled {
@@ -47,15 +83,18 @@
 }
 
 .error {
-  background: #fff0ed;
-  border-left: 3px solid #b83c2e;
-  color: #78251c;
+  background: hsl(var(--vz-accent) / 10%);
+  border-left: 3px solid hsl(var(--vz-accent));
+  border-radius: var(--vz-r-input);
+  color: hsl(var(--vz-accent));
   margin: 0;
-  padding: 0.75rem;
+  padding: 0.75rem 0.9rem;
 }
 
+/* Muted, not ink: this is a footnote under the primary action, and rendering it at full ink weight
+   competed with the label text above it. 5.34:1 on paper, so it still clears AA. */
 .privacy {
-  color: #4f6878;
+  color: hsl(var(--vz-muted));
   font-size: 0.82rem;
   margin: 0;
 }

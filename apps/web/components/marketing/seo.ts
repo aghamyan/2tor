@@ -10,6 +10,7 @@ export const pageSlugs = [
   "group-lessons",
   "project-based-learning",
   "parents",
+  "anti-cheating",
   "tutors",
   "pricing",
   "consultation",

@@ -1,0 +1,35 @@
+/*
+ * Root surface for every public page. The `--vz-*` tokens it reads are declared in
+ * `app/globals.css` against `[data-surface="vz"]`, which the layout sets on this same element.
+ *
+ * This only establishes the page ground: background, ink, body type, and the column that keeps
+ * the footer at the bottom. Section rhythm and component styling stay in each feature's own
+ * module.
+ */
+.surface {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: hsl(var(--vz-paper));
+  color: hsl(var(--vz-ink));
+  font-family: var(--vz-body);
+  font-size: 17px;
+  line-height: 1.62;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Headings take the display face. Set once here so every marketing module inherits the same
+   voice instead of restating a font stack per section. */
+.surface :is(h1, h2, h3, h4) {
+  font-family: var(--vz-display);
+  letter-spacing: -0.028em;
+  line-height: 1.08;
+  text-wrap: balance;
+}
+
+.surface :focus-visible {
+  outline: 2px solid hsl(var(--vz-accent));
+  outline-offset: 3px;
+  border-radius: 4px;
+}
