@@ -1,6 +1,5 @@
 "use server";
 
-import { assertServerOnly, serverEnv } from "@app/config/env";
 import { createWhatsAppProvider, type WhatsAppProviderConfig } from "@app/whatsapp";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -11,16 +10,27 @@ import { WHATSAPP_REMINDER_LEAD_MINUTES_OPTIONS } from "../../../../../packages/
 import { updateGroupPreferences, syncGroupMembership } from "../../../../../packages/domain/whatsapp/services";
 import { currentWhatsAppContext } from "./context";
 
+// Reads these three WHATSAPP_* vars straight off process.env rather than through
+// @app/config/env's `serverEnv` — same reasoning as the marketing home page's
+// `organizationJsonLd` comment: `serverEnv` eagerly validates the *entire* app's required
+// server config (database, Redis, Zoom, Sentry, KMS, …) at import time, which is far too wide
+// a blast radius for three vars that `packages/config/src/schema.ts` already treats as optional.
+function optionalEnv(name: string): string | undefined {
+  const value = process.env[name]?.trim();
+  return value ? value : undefined;
+}
+
 function whatsappProviderConfig(): WhatsAppProviderConfig {
-  assertServerOnly();
-  if (!serverEnv.WHATSAPP_ACCESS_TOKEN || !serverEnv.WHATSAPP_PHONE_NUMBER_ID) {
+  const accessToken = optionalEnv("WHATSAPP_ACCESS_TOKEN");
+  const phoneNumberId = optionalEnv("WHATSAPP_PHONE_NUMBER_ID");
+  if (!accessToken || !phoneNumberId) {
     return { kind: "disabled" };
   }
   return {
     kind: "meta_cloud_api",
-    accessToken: serverEnv.WHATSAPP_ACCESS_TOKEN,
-    phoneNumberId: serverEnv.WHATSAPP_PHONE_NUMBER_ID,
-    apiVersion: serverEnv.WHATSAPP_API_VERSION,
+    accessToken,
+    phoneNumberId,
+    apiVersion: optionalEnv("WHATSAPP_API_VERSION"),
   };
 }
 
