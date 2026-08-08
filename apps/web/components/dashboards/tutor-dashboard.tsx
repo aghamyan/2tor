@@ -146,8 +146,10 @@ export async function TutorDashboardSignals() {
           </div>
           <div data-attention={summary.feedbackQueue.length > 0}>
             <dt>{t("tutor.recapsDue")}</dt>
-            <dd>{summary.feedbackQueue.length}</dd>
-            <span>{t("tutor.recapsDueHint")}</span>
+            <dd>
+              {summary.feedbackQueue.length}
+              <span>{t("tutor.recapsDueHint")}</span>
+            </dd>
           </div>
           <div>
             <dt>{t("tutor.weekClasses")}</dt>
@@ -155,8 +157,10 @@ export async function TutorDashboardSignals() {
           </div>
           <div>
             <dt>{t("tutor.expected")}</dt>
-            <dd className={styles.moneyValue}>{expected}</dd>
-            <span>{t("tutor.expectedHint")}</span>
+            <dd className={styles.moneyValue}>
+              {expected}
+              <span>{t("tutor.expectedHint")}</span>
+            </dd>
           </div>
         </dl>
       </section>

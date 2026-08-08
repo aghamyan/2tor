@@ -1182,7 +1182,9 @@
 
 .tutorStats span {
   color: var(--learn-muted);
+  display: block;
   font-size: 0.7rem;
+  margin-top: 0.3rem;
 }
 
 .recapQueue .sectionHeadingRow > p {
@@ -1647,7 +1649,10 @@
 /* Management workspace visual system -------------------------------------------------------- */
 .shell {
   --dashboard-ink: #17233c;
-  --dashboard-muted: #68758a;
+  /* #68758a fell short of WCAG AA (4.5:1) against this file's --dashboard-paper/--learn-paper
+     (#f7fafc), the app shell's canvas (#f6f5f1), and the tutor stats' attention tile (#fff8ed) —
+     ratios of 4.45, 4.27, and 4.42 respectively. Darkened with margin against all three. */
+  --dashboard-muted: #616d81;
   --dashboard-line: #dce6ee;
   --dashboard-paper: #f7fafc;
   --dashboard-white: #ffffff;
@@ -1952,7 +1957,8 @@
 /* Parent and tutor pages share the same canvas and card grammar while retaining richer stories. */
 .learningShell {
   --learn-ink: #17233c;
-  --learn-muted: #68758a;
+  /* Same fix as --dashboard-muted above — see that comment. */
+  --learn-muted: #616d81;
   --learn-paper: #f7fafc;
   --learn-white: #ffffff;
   --learn-blue: #126e82;

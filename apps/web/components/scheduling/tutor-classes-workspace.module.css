@@ -1,7 +1,12 @@
 .workspace {
   --cal-ink: #16233b;
-  --cal-muted: #68758b;
-  --cal-faint: #93a0b2;
+  /* #68758b fell short of WCAG AA (4.5:1) against --cal-canvas (#f5f7fa) at 4.34:1 for the
+     view-selector's bold labels; darkened with margin. */
+  --cal-muted: #647186;
+  /* #93a0b2 was 2.65:1 against white for the timezone tag, all-day label, and time-rail hour
+     markers — well short of 4.5:1 (this isn't decorative like the aria-hidden weekday header
+     that also uses this token). Darkened with margin. */
+  --cal-faint: #6c7683;
   --cal-canvas: #f5f7fa;
   --cal-paper: #ffffff;
   --cal-soft: #f8fafc;
@@ -105,7 +110,9 @@
 .miniWeekdays span { color: var(--cal-faint); font-size: 0.57rem; font-weight: 750; padding: 0.28rem 0; }
 .miniDays button { aspect-ratio: 1; background: transparent; border: 0; border-radius: 50%; color: var(--cal-muted); cursor: pointer; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.62rem; margin: 1px; }
 .miniDays button:hover { background: var(--cal-line-soft); color: var(--cal-ink); }
-.miniDays button[data-outside="true"] { color: #c0c8d3; }
+/* These stay fully clickable (they jump to the adjacent month), so they need real contrast, not
+   just a faded hint — #c0c8d3 on the sidebar's #fbfcfe was 1.64:1 against a 4.5:1 requirement. */
+.miniDays button[data-outside="true"] { color: #6f737a; }
 .miniDays button[data-selected="true"] { background: var(--cal-primary); color: white; font-weight: 760; }
 .miniDays button[data-today="true"]:not([data-selected="true"]) { box-shadow: inset 0 0 0 1px var(--cal-primary); color: var(--cal-primary); }
 
@@ -209,7 +216,11 @@
 .monthWeekdays span { border-right: 1px solid var(--cal-line); padding: 0.6rem; }
 .monthGrid { display: grid; grid-template-columns: repeat(7, minmax(8rem, 1fr)); min-width: 56rem; }
 .monthGrid > div { border-bottom: 1px solid var(--cal-line); border-right: 1px solid var(--cal-line); min-height: 8.3rem; padding: 0.35rem; }
-.monthGrid > div[data-outside="true"] { background: #fafbfd; color: #adb7c5; }
+/* Same reasoning as .miniDays' data-outside rule: these day cells are still fully clickable
+   (they create a lesson on that day), so #adb7c5 on #fafbfd (1.96:1) wasn't just too faint for
+   AA (4.5:1), it was close to unreadable. Not covered by the current a11y test suite (it exercises
+   the mini calendar, not this month-grid view) but the same defect, fixed the same way. */
+.monthGrid > div[data-outside="true"] { background: #fafbfd; color: #6d737c; }
 .monthGrid > div[data-today="true"] { background: rgba(63,95,166,.035); }
 .monthGrid > div > button:first-child { align-items: center; background: transparent; border: 0; border-radius: 50%; cursor: pointer; display: flex; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.66rem; height: 1.55rem; justify-content: center; margin-bottom: 0.2rem; width: 1.55rem; }
 .monthGrid > div[data-today="true"] > button:first-child { background: var(--cal-primary); color: white; }
