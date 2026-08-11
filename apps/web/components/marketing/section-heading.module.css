@@ -1,0 +1,69 @@
+/*
+ * Section openers, shared by the home page and `/how-it-works`.
+ *
+ * ── The eyebrow, and why it looks like this ──────────────────────────────────
+ *
+ * This used to be a glass capsule with uppercase tracked type inside it. That is the single most
+ * transferable element on any marketing page — the same component on every SaaS landing page ever
+ * built — and several of them stacked down one page is what made the structure read as assembled
+ * rather than authored.
+ *
+ * What remains is the mark, not the packaging: a short accent rule, then the label. The heading
+ * underneath is strong enough to open its own section; the label only needs to name it. Keeping the
+ * copy matters — "For parents" tells you who a section is addressed to — but the capsule does not.
+ *
+ * ── Two registers ───────────────────────────────────────────────────────────
+ *
+ * `paper` uses `--vz-accent-ink`, not the raw accent: this is 0.78rem text, and that token exists
+ * because the brand vermillion does not clear AA at small sizes. `pine` uses `--vz-field-2`, which
+ * that token's own comment names as one of only two colours that read as text on the dark block —
+ * vermillion on pine measures far too dark to see.
+ */
+.eyebrow {
+  align-items: center;
+  align-self: flex-start;
+  display: inline-flex;
+  font-family: var(--vz-display);
+  font-size: 0.78rem;
+  font-weight: 600;
+  gap: 0.6rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  width: fit-content;
+}
+
+.eyebrow::before {
+  border-radius: 2px;
+  content: "";
+  height: 2px;
+  width: 1.6rem;
+}
+
+.eyebrow[data-tone="paper"] {
+  color: hsl(var(--vz-accent-ink));
+}
+
+.eyebrow[data-tone="paper"]::before {
+  background: hsl(var(--vz-accent));
+}
+
+.eyebrow[data-tone="pine"] {
+  color: hsl(var(--vz-field-2));
+}
+
+.eyebrow[data-tone="pine"]::before {
+  background: hsl(var(--vz-field-2) / 80%);
+}
+
+/*
+ * The accent run inside a heading. Same two registers, same reasoning: full-strength vermillion on
+ * paper because a heading is large text and clears 3:1, peach on pine because vermillion does not
+ * read there at all.
+ */
+.accent[data-tone="paper"] {
+  color: hsl(var(--vz-accent));
+}
+
+.accent[data-tone="pine"] {
+  color: hsl(var(--vz-field-2));
+}

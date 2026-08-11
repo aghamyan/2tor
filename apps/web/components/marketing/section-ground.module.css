@@ -1,0 +1,63 @@
+/*
+ * THE RULED GROUND — one recipe, every public page that uses it.
+ *
+ * This started life inside `home/compact-home.module.css`, whose comment argued `--grid-cell`
+ * should stay page-local "because no other public surface uses a ruled ground". `/how-it-works`
+ * now does, which inverts that reasoning exactly: two copies of a page-defining texture is how the
+ * two pages drift a pixel apart and stop looking like one product.
+ *
+ * Why these pages earn a grid when most pages do not: the classroom mock in the home hero contains
+ * a whiteboard whose own background is this same motif at a finer pitch, and that surface genuinely
+ * IS a measurement surface. The page ground and the product's ground rhyme deliberately — ruled
+ * paper is domain vocabulary for a school whose first subject is mathematics, not stock texture.
+ *
+ * ONE CELL SIZE across every section and every page. When this lived per-section it had already
+ * drifted — 40px in the hero against 46px elsewhere, two different alphas — and the result read as
+ * several unrelated backgrounds rather than one sheet the sections are printed on.
+ *
+ * Only the MASK varies, and that is composition rather than drift: each section anchors the ruling
+ * under its own centre of gravity and fades it out before it reaches text that has to stay legible.
+ * Callers pass their own via the `--ground-mask` custom property.
+ */
+.ground {
+  --grid-cell: 46px;
+  inset: 0;
+  pointer-events: none;
+  position: absolute;
+  z-index: 0;
+}
+
+.grid {
+  inset: 0;
+  mask-image: var(--ground-mask, radial-gradient(120% 90% at 50% 45%, black 30%, transparent 78%));
+  position: absolute;
+}
+
+/* Light register: ink hairlines on paper. */
+.ground[data-tone="paper"] .grid {
+  background-image:
+    linear-gradient(hsl(var(--vz-ink) / 5%) 1px, transparent 1px),
+    linear-gradient(90deg, hsl(var(--vz-ink) / 5%) 1px, transparent 1px);
+  background-size: var(--grid-cell) var(--grid-cell);
+}
+
+/* Dark register. Ink lines are invisible on the pine block, so these draw with the block's own
+   foreground and sit a little stronger — a light line on a dark ground reads fainter than a dark
+   line on a light one at equal alpha. */
+.ground[data-tone="pine"] .grid {
+  background-image:
+    linear-gradient(hsl(var(--vz-block-on) / 7%) 1px, transparent 1px),
+    linear-gradient(90deg, hsl(var(--vz-block-on) / 7%) 1px, transparent 1px);
+  background-size: var(--grid-cell) var(--grid-cell);
+}
+
+/*
+ * Colour blooms. Callers place these with their own rules; what lives here is only what must not
+ * differ — the shape and the blur radius. A bloom with a different blur reads as a different
+ * material, and the whole point of the field is that every section is lit the same way.
+ */
+.bloom {
+  border-radius: 50%;
+  filter: blur(70px);
+  position: absolute;
+}

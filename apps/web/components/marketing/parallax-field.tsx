@@ -1,12 +1,12 @@
 "use client";
 
 import { motion, useReducedMotion, useScroll, useSpring, useTransform } from "framer-motion";
-import { useRef, type ReactNode } from "react";
+import { useRef, type ComponentPropsWithoutRef, type CSSProperties, type ReactNode } from "react";
 
 /**
  * Scroll-linked depth for a section's decorative field.
  *
- * Every section on this page already renders an `aria-hidden` field — a ruled ground plus two or
+ * Every section on the pages that use it renders an `aria-hidden` field — a ruled ground plus two or
  * three colour blooms — behind its content. Until now those layers were welded to the page: the
  * only motion on the page was one identical entrance reveal fired six times, which is the thing
  * that reads as "template". Parallax is the honest fix, because these layers are ALREADY
@@ -47,11 +47,19 @@ export function ParallaxField({
    * the blooms start leaving the box they were positioned in.
    */
   distance = 48,
+  style,
+  ...rest
 }: {
   children: ReactNode;
   className?: string;
   distance?: number;
-}) {
+  /**
+   * Merged with the parallax transform rather than replacing it. Callers use this to pass custom
+   * properties the field's own CSS reads (`--ground-mask`); anything setting `transform` here would
+   * be overwritten by the motion value, which is the correct precedence.
+   */
+  style?: CSSProperties;
+} & Omit<ComponentPropsWithoutRef<typeof motion.div>, "style" | "children" | "className">) {
   const ref = useRef<HTMLDivElement>(null);
   const reduceMotion = useReducedMotion();
 
@@ -85,7 +93,7 @@ export function ParallaxField({
   );
 
   return (
-    <motion.div ref={ref} className={className} aria-hidden="true" style={{ y }}>
+    <motion.div ref={ref} className={className} aria-hidden="true" style={{ ...style, y }} {...rest}>
       {children}
     </motion.div>
   );

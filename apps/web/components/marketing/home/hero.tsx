@@ -4,7 +4,7 @@ import { headerButtonClass } from "../site/header-actions";
 import { ArrowUpRightIcon } from "../site/icons";
 import siteStyles from "../site/site.module.css";
 import { ClassroomPreview, type ClassroomCopy } from "./compact-home";
-import { ParallaxField } from "./parallax-field";
+import { ParallaxField } from "../parallax-field";
 import styles from "./compact-home.module.css";
 
 export interface HeroProps {

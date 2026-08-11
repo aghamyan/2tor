@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 import { ParentDashboardPreview } from "../parents/parent-dashboard-preview";
 import type { ParentsCopy } from "../parents/parents-content";
-import { ParallaxField } from "./parallax-field";
+import { ParallaxField } from "../parallax-field";
 import styles from "./compact-home.module.css";
 
 /**

@@ -4,7 +4,7 @@ import { ArrowUpRightIcon } from "../site/icons";
 import siteStyles from "../site/site.module.css";
 import type { Cta } from "./content";
 import { Reveal } from "./reveal";
-import { ParallaxField } from "./parallax-field";
+import { ParallaxField } from "../parallax-field";
 import styles from "./compact-home.module.css";
 
 export interface ClosingCtaCopy {

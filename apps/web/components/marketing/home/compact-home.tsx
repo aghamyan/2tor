@@ -16,7 +16,7 @@ import { useEffect, useState, type MouseEvent } from "react";
 import { ClassroomBoard, type BoardKey } from "./classroom-boards";
 import { Reveal } from "./reveal";
 import { accentedTitle } from "./home-sections";
-import { ParallaxField } from "./parallax-field";
+import { ParallaxField } from "../parallax-field";
 import styles from "./compact-home.module.css";
 
 const ease = [0.22, 1, 0.36, 1] as const;
