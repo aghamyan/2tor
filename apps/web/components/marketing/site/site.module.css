@@ -582,9 +582,11 @@
   position: relative;
   z-index: 1;
 }
+/* `--vz-accent-ink`, not the raw accent. The active item sits on `.navPill`, an accent tint, where
+   full-strength vermillion measures 4.19:1 against the 4.5:1 floor for 14px text. */
 .navLink[data-active="true"],
 .dropdownTrigger[data-active="true"] {
-  color: hsl(var(--site-primary));
+  color: hsl(var(--vz-accent-ink));
 }
 /* The dropdown trigger cannot host the shared pill (it is a button with its own state), so it
    takes the same fill directly. Visually identical, no layout animation. */

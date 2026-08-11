@@ -27,27 +27,48 @@ import {
 import type { Locale } from "@app/i18n/config";
 import { getHowItWorksCopy } from "./how-it-works-content";
 import { KnowledgeMap, LearningLogic, RecordTabs, Reveal } from "./how-it-works-interactive";
+import { SectionGround } from "../section-ground";
+import { SectionEyebrow, accentedTitle, type SectionTone } from "../section-heading";
 import styles from "./how-it-works.module.css";
 
 function localHref(locale: Locale, path: string) {
   return `/${locale}${path}`;
 }
 
+/**
+ * A section opener: eyebrow, heading, supporting sentence.
+ *
+ * `tone` picks the register for the eyebrow and the accent run — `pine` on the three filled blocks,
+ * `paper` everywhere else. It is not a colour: ink hairlines and vermillion both disappear on the
+ * dark block, which is why the shared component takes a register rather than letting callers pass
+ * a colour and get it wrong.
+ *
+ * `titleAccent` is optional. Where present it colours the phrase that carries the section's claim,
+ * the same treatment every home-page heading uses; where absent the heading renders whole.
+ */
 function Heading({
   eyebrow,
   title,
+  titleAccent,
   body,
+  tone = "paper",
   inverse = false,
 }: {
   eyebrow?: string;
   title: string;
+  titleAccent?: string;
   body?: string;
+  tone?: SectionTone;
   inverse?: boolean;
 }) {
   return (
     <div className={`${styles.heading} ${inverse ? styles.inverse : ""}`}>
-      {eyebrow && <p>{eyebrow}</p>}
-      <h2>{title}</h2>
+      {eyebrow && (
+        <SectionEyebrow tone={tone} className={styles.eyebrowSlot}>
+          {eyebrow}
+        </SectionEyebrow>
+      )}
+      <h2>{titleAccent ? accentedTitle(title, titleAccent, tone) : title}</h2>
       {body && <div>{body}</div>}
     </div>
   );
@@ -111,7 +132,7 @@ export function HowItWorksPage({ locale }: { locale: Locale }) {
         <div className={styles.shell}>
           <div className={styles.heroLayout}>
             <div className={styles.heroCopy}>
-              <p className={styles.eyebrow}>{c.hero.eyebrow}</p>
+              <SectionEyebrow>{c.hero.eyebrow}</SectionEyebrow>
               <h1>{c.hero.title}</h1>
               <p className={styles.heroLede}>{c.hero.body}</p>
               <p className={styles.heroSecondary}>{c.hero.secondary}</p>
@@ -144,6 +165,7 @@ export function HowItWorksPage({ locale }: { locale: Locale }) {
       </section>
 
       <section className={styles.evidenceSection} id="learning-system">
+        <SectionGround tone="paper" mask="radial-gradient(110% 85% at 50% 40%, black 24%, transparent 76%)" />
         <div className={styles.shell}>
           <Reveal>
             <Heading eyebrow={c.evidence.eyebrow} title={c.evidence.title} body={c.evidence.body} />
@@ -161,6 +183,7 @@ export function HowItWorksPage({ locale }: { locale: Locale }) {
       </section>
 
       <section className={styles.understandSection} id="understand">
+        <SectionGround tone="paper" mask="radial-gradient(115% 90% at 32% 46%, black 26%, transparent 78%)" />
         <div className={styles.shell}>
           <Reveal>
             <div className={styles.headingRow}>
@@ -180,6 +203,7 @@ export function HowItWorksPage({ locale }: { locale: Locale }) {
       </section>
 
       <section className={styles.recordSection} id="record">
+        <SectionGround tone="paper" mask="radial-gradient(110% 88% at 62% 44%, black 24%, transparent 76%)" />
         <div className={styles.shell}>
           <Reveal className={styles.recordLayout}>
             <div>
@@ -216,6 +240,7 @@ export function HowItWorksPage({ locale }: { locale: Locale }) {
       </section>
 
       <section className={styles.prepareSection} id="prepare">
+        <SectionGround tone="paper" mask="radial-gradient(112% 88% at 38% 48%, black 22%, transparent 76%)" />
         <div className={styles.shell}>
           <Reveal>
             <Heading eyebrow={c.prepare.eyebrow} title={c.prepare.title} body={c.prepare.body} />
@@ -290,6 +315,7 @@ export function HowItWorksPage({ locale }: { locale: Locale }) {
       </section>
 
       <section className={styles.teachSection} id="teach">
+        <SectionGround tone="paper" mask="radial-gradient(110% 90% at 55% 42%, black 24%, transparent 78%)" />
         <div className={styles.shell}>
           <Reveal>
             <div className={styles.headingRow}>
@@ -364,6 +390,7 @@ export function HowItWorksPage({ locale }: { locale: Locale }) {
       </section>
 
       <section className={styles.betweenSection} id="continue">
+        <SectionGround tone="paper" mask="radial-gradient(115% 88% at 40% 50%, black 26%, transparent 76%)" />
         <div className={styles.shell}>
           <Reveal className={styles.betweenLayout}>
             <Heading eyebrow={c.between.eyebrow} title={c.between.title} body={c.between.body} />
@@ -407,6 +434,7 @@ export function HowItWorksPage({ locale }: { locale: Locale }) {
       </section>
 
       <section className={styles.parentSection} id="inform">
+        <SectionGround tone="paper" mask="radial-gradient(110% 88% at 58% 46%, black 24%, transparent 76%)" />
         <div className={styles.shell}>
           <Reveal className={styles.parentLayout}>
             <div>
@@ -447,6 +475,7 @@ export function HowItWorksPage({ locale }: { locale: Locale }) {
       </section>
 
       <section className={styles.matchSection} id="match">
+        <SectionGround tone="pine" mask="radial-gradient(118% 95% at 48% 44%, black 26%, transparent 78%)" />
         <div className={styles.shell}>
           <Reveal>
             <Heading eyebrow={c.match.eyebrow} title={c.match.title} body={c.match.body} />
@@ -506,6 +535,7 @@ export function HowItWorksPage({ locale }: { locale: Locale }) {
       </section>
 
       <section className={styles.verifySection} id="verify">
+        <SectionGround tone="paper" mask="radial-gradient(112% 88% at 36% 46%, black 24%, transparent 76%)" />
         <div className={styles.shell}>
           <Reveal>
             <div className={styles.verifyLayout}>
@@ -562,6 +592,7 @@ export function HowItWorksPage({ locale }: { locale: Locale }) {
       </section>
 
       <section className={styles.systemSection}>
+        <SectionGround tone="pine" mask="radial-gradient(115% 95% at 52% 46%, black 24%, transparent 78%)" />
         <div className={styles.shell}>
           <Reveal>
             <Heading title={c.system.title} inverse />
@@ -588,6 +619,7 @@ export function HowItWorksPage({ locale }: { locale: Locale }) {
       </section>
 
       <section className={styles.logicSection}>
+        <SectionGround tone="paper" mask="radial-gradient(110% 88% at 44% 46%, black 24%, transparent 76%)" />
         <div className={styles.shell}>
           <Reveal>
             <Heading eyebrow={c.logic.eyebrow} title={c.logic.title} body={c.logic.body} />
@@ -597,6 +629,7 @@ export function HowItWorksPage({ locale }: { locale: Locale }) {
       </section>
 
       <section className={styles.curriculumSection}>
+        <SectionGround tone="paper" mask="radial-gradient(112% 90% at 50% 44%, black 24%, transparent 78%)" />
         <div className={styles.shell}>
           <Reveal>
             <Heading title={c.curriculum.title} />
@@ -637,6 +670,7 @@ export function HowItWorksPage({ locale }: { locale: Locale }) {
       </section>
 
       <section className={styles.overviewSection}>
+        <SectionGround tone="paper" mask="radial-gradient(110% 85% at 50% 48%, black 22%, transparent 76%)" />
         <div className={styles.shell}>
           <Reveal>
             <Heading title={c.overview.title} />
@@ -655,6 +689,7 @@ export function HowItWorksPage({ locale }: { locale: Locale }) {
       </section>
 
       <section className={styles.finalSection} id="final-cta">
+        <SectionGround tone="pine" mask="radial-gradient(115% 95% at 50% 46%, black 26%, transparent 78%)" />
         <div className={styles.shell}>
           <Reveal className={styles.finalPanel}>
             <div className={styles.finalIcon}>
