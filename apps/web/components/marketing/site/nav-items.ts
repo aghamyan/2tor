@@ -57,13 +57,21 @@ export const footerGroups: FooterGroup[] = [
   {
     id: "subjects",
     headingKey: "site.footer.subjectsHeading",
+    /*
+     * All four subjects, in the order the home page's subject rail shows them. Programming and
+     * chess were missing here while both shipped as real, linked pages — the footer was quietly
+     * advertising half the curriculum. If a fifth subject is added, it belongs in three places:
+     * this list, `subjectsMenu` above, and the home page's `subjectPaths`.
+     */
     links: [
       { id: "mathematics", labelKey: "site.footer.mathematics", href: "/mathematics" },
+      { id: "programming", labelKey: "site.footer.programming", href: "/programming" },
       {
         id: "heritage",
         labelKey: "site.footer.heritage",
         href: "/armenian-language-heritage",
       },
+      { id: "chess", labelKey: "site.footer.chess", href: "/chess" },
     ],
   },
   {

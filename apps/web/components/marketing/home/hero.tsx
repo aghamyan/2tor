@@ -4,6 +4,7 @@ import { headerButtonClass } from "../site/header-actions";
 import { ArrowUpRightIcon } from "../site/icons";
 import siteStyles from "../site/site.module.css";
 import { ClassroomPreview, type ClassroomCopy } from "./compact-home";
+import { ParallaxField } from "./parallax-field";
 import styles from "./compact-home.module.css";
 
 export interface HeroProps {
@@ -60,12 +61,13 @@ export function Hero({
 
   return (
     <section className={styles.hero} aria-labelledby="home-title">
-      <div className={styles.heroBackdrop} aria-hidden="true">
+      {/* Two decorative glyphs (`Ա` and `{ }`) used to sit in here. See the note where their rules
+          were in `compact-home.module.css` for why the hero is better with three background layers
+          than five. */}
+      <ParallaxField className={styles.heroBackdrop} distance={60}>
         <span className={styles.heroGrid} />
         <span className={styles.pathLine} />
-        <span className={styles.armenianGlyph}>Ա</span>
-        <span className={styles.codeGlyph}>&#123; &#125;</span>
-      </div>
+      </ParallaxField>
 
       <div className={styles.heroShell}>
         <div className={styles.heroLayout}>

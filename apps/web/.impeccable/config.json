@@ -1,0 +1,17 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "codex-grid-background",
+        "value": "*",
+        "files": [
+          "**/compact-home.module.css"
+        ],
+        "createdAt": "2026-08-11T00:32:45.239Z",
+        "reason": "Ruled ground is deliberate page vocabulary, confirmed by Aram ('add the grid everywhere'): the classroom mock's whiteboard is a real measurement surface and the page ground rhymes with it. One 46px cell across all six sections. Duplicated here because apps/web has its own package.json and so resolves as a project root — the hook reads apps/web/.impeccable/config.json, not the repo-root one."
+      }
+    ]
+  }
+}

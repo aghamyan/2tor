@@ -20,6 +20,16 @@ export async function Footer({ locale }: { locale: Locale }) {
   return (
     <footer className={`${styles.scope} ${styles.footer}`}>
       <div className="mx-auto max-w-[100rem] px-4 py-12 sm:px-6">
+        {/* The wordmark the header uses, so the footer identifies whose site these links belong
+            to. A line of privacy positioning copy sat here briefly and was removed — the claim is
+            already made properly on `/privacy`, and the footer reads cleaner without it. */}
+        <div className={styles.footerBrand}>
+          <span className={styles.brandMark} aria-hidden="true">
+            2
+          </span>
+          <span className={styles.brandWord}>tor</span>
+        </div>
+
         <div className="grid grid-cols-2 gap-x-6 gap-y-10 lg:grid-cols-4">
           {footerGroups.map((group) => (
             <div key={group.id}>

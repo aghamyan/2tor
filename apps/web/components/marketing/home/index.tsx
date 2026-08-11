@@ -178,6 +178,12 @@ const copy: Record<Locale, HomeCopy> = {
     benefits: {
       eyebrow: "The complete learning loop",
       title: "Everything around the lesson matters.",
+      /*
+       * The claim, not the noun. What this section argues is that the work AROUND the lesson is
+       * what makes the lesson stick, so that phrase carries the colour — the same way `group` puts
+       * it on "two or three" and `parents` on "without having to ask".
+       */
+      titleAccent: "around the lesson",
       description:
         "A good class creates momentum. 2tor carries that momentum from the live explanation to the parent update and the next practice session.",
       items: [
@@ -220,11 +226,16 @@ const copy: Record<Locale, HomeCopy> = {
       cta: "See how matching works",
       map: {
         ariaLabel:
-          "Sample matching map: two students on the same topic, level and schedule, matched into one group with a verified tutor",
+          "Sample matching map: a student in California and a student in Maryland, on the same topic, level and schedule, matched into one group with a verified tutor",
         title: "Matching map",
         status: "Comparing fit",
         students: [
-          { initials: "AM", name: "Aram", detail: "Grade 6 · Fractions", tag: "Weekday evenings" },
+          {
+            initials: "AM",
+            name: "Aram",
+            detail: "Grade 7 · Fractions review",
+            tag: "Weekday evenings",
+          },
           { initials: "MK", name: "Maya", detail: "Grade 6 · Fractions", tag: "Weekday evenings" },
         ],
         tutorLabel: "Verified tutor",
@@ -235,8 +246,26 @@ const copy: Record<Locale, HomeCopy> = {
     parents: {
       eyebrow: "For parents",
       title: "See what happened, without having to ask.",
-      titleAccent: "without having to ask",
-      body: "The parent view gathers the next class, the current goal, homework status, and the tutor's latest note in one place, so you are not reconstructing the week out of messages.",
+      /*
+       * The period is INSIDE the accent, unlike the other sections'. Theirs sit mid-sentence
+       * ("around the lesson", "two or three") so their terminal punctuation belongs to the ink half
+       * of the line; this one runs to the end, and leaving the full stop outside it left a single
+       * dark dot hanging off the last coloured word.
+       */
+      titleAccent: "without having to ask.",
+      /*
+       * Four labelled points rather than the paragraph that used to sit here. The prose named the
+       * same four things ("the next class, the current goal, homework status, and the tutor's
+       * latest note") but buried them in a sentence a reader has to parse; as a list they are
+       * scannable, and they mirror the hero's differentiators so the two sections speak the same
+       * way. Order matches the parent workspace shown beside them.
+       */
+      points: [
+        "The next class",
+        "The current goal",
+        "Homework status",
+        "The tutor's latest note",
+      ],
       cta: "See the parent view",
       dashboardAriaLabel:
         "The parent workspace, shown with example content: the current goal and its progress, the next lesson, homework due, and the tutor's latest feedback",
@@ -244,7 +273,7 @@ const copy: Record<Locale, HomeCopy> = {
     closing: {
       title: "Start with one good lesson.",
       description:
-        "Tell us where your child is stuck. We will suggest a tutor, a level, and a schedule — and you decide afterwards. We are taking 40 families this term.",
+        "Tell us where your child is stuck. We will suggest a tutor, a level, and a schedule. You decide afterwards. We are taking 40 families this term.",
       pricing: "See pricing",
       note: "Free · 20 minutes · no card, no obligation",
     },
@@ -371,6 +400,10 @@ const copy: Record<Locale, HomeCopy> = {
     benefits: {
       eyebrow: "Ուսուցման ամբողջական շղթա",
       title: "Դասի շուրջ ամեն ինչ կարևոր է։",
+      /* "Դասի շուրջ" is "around the lesson" and opens the sentence in Armenian rather than sitting
+         mid-sentence as in English. The accent follows the MEANING, not the position — `parents`
+         and `group` already differ positionally between the two locales for the same reason. */
+      titleAccent: "Դասի շուրջ",
       description:
         "Լավ դասը շարժում է ստեղծում։ 2tor-ը պահպանում է այն բացատրությունից մինչև ծնողի ամփոփում և հաջորդ վարժանք։",
       items: [
@@ -414,7 +447,7 @@ const copy: Record<Locale, HomeCopy> = {
       cta: "\u054f\u0565\u057d\u0576\u0565\u056c, \u0569\u0565 \u056b\u0576\u0579\u057a\u0565\u057d \u0567 \u056f\u0561\u0566\u0574\u057e\u0578\u0582\u0574 \u056d\u0578\u0582\u0574\u0562\u0568",
       map: {
         ariaLabel:
-          "\u0540\u0561\u0574\u0561\u0564\u0580\u0574\u0561\u0576 \u0584\u0561\u0580\u057f\u0565\u0566\u056b \u0585\u0580\u056b\u0576\u0561\u056f\u055d \u0576\u0578\u0582\u0575\u0576 \u0569\u0565\u0574\u0561\u0576, \u0574\u0561\u056f\u0561\u0580\u0564\u0561\u056f\u0568 \u0587 \u056a\u0561\u0574\u0565\u0580\u0576 \u0578\u0582\u0576\u0565\u0581\u0578\u0572 \u0565\u0580\u056f\u0578\u0582 \u057d\u0578\u057e\u0578\u0580\u0578\u0572\u055d \u0570\u0561\u0574\u0561\u0564\u0580\u057e\u0561\u056e \u0574\u0565\u056f \u056d\u0574\u0562\u0578\u0582\u0574 \u057d\u057f\u0578\u0582\u0563\u057e\u0561\u056e \u0564\u0561\u057d\u0561\u057e\u0561\u0576\u0564\u0578\u0572\u056b \u0570\u0565\u057f",
+          "\u0540\u0561\u0574\u0561\u0564\u0580\u0574\u0561\u0576 \u0584\u0561\u0580\u057f\u0565\u0566\u056b \u0585\u0580\u056b\u0576\u0561\u056f\u055d \u0554\u0561\u056c\u056b\u0586\u0578\u0580\u0576\u056b\u0561\u0575\u056b\u0581 \u0587 \u0544\u0565\u0580\u056b\u056c\u0565\u0576\u0564\u056b\u0581 \u057d\u0578\u057e\u0578\u0580\u0578\u0572\u0576\u0565\u0580\u055d \u0576\u0578\u0582\u0575\u0576 \u0569\u0565\u0574\u0561\u0576, \u0574\u0561\u056f\u0561\u0580\u0564\u0561\u056f\u0568 \u0587 \u056a\u0561\u0574\u0565\u0580\u0576 \u0578\u0582\u0576\u0565\u0581\u0578\u0572 \u0565\u0580\u056f\u0578\u0582 \u057d\u0578\u057e\u0578\u0580\u0578\u0572\u055d \u0570\u0561\u0574\u0561\u0564\u0580\u057e\u0561\u056e \u0574\u0565\u056f \u056d\u0574\u0562\u0578\u0582\u0574 \u057d\u057f\u0578\u0582\u0563\u057e\u0561\u056e \u0564\u0561\u057d\u0561\u057e\u0561\u0576\u0564\u0578\u0572\u056b \u0570\u0565\u057f",
         title:
           "\u0540\u0561\u0574\u0561\u0564\u0580\u0574\u0561\u0576 \u0584\u0561\u0580\u057f\u0565\u0566",
         status: "\u054d\u057f\u0578\u0582\u0563\u057e\u0578\u0582\u0574 \u0567",
@@ -423,8 +456,7 @@ const copy: Record<Locale, HomeCopy> = {
             // Latin initials in both locales, matching the same figures on `/group-lessons`.
             initials: "AM",
             name: "\u0531\u0580\u0561\u0574",
-            detail:
-              "6-\u0580\u0564 \u0564\u0561\u057d\u0561\u0580\u0561\u0576 \u00b7 \u053f\u0578\u057f\u0578\u0580\u0561\u056f\u0576\u0565\u0580",
+            detail: "7-րդ դասարան · Կրկնություն",
             tag: "\u0535\u0580\u0565\u056f\u0578\u0575\u0561\u0576",
           },
           {
@@ -449,8 +481,15 @@ const copy: Record<Locale, HomeCopy> = {
     parents: {
       eyebrow: "\u053e\u0576\u0578\u0572\u0576\u0565\u0580\u056b \u0570\u0561\u0574\u0561\u0580",
       title: "Տեսեք, թե ինչ է եղել՝ առանց հարցնելու։",
-      titleAccent: "առանց հարցնելու",
-      body: "\u053e\u0576\u0578\u0572\u056b \u0567\u057b\u0578\u0582\u0574 \u0574\u0565\u056f \u057f\u0565\u0572\u0578\u0582\u0574 \u0570\u0561\u057e\u0561\u0584\u057e\u0561\u056e \u0565\u0576 \u0570\u0561\u057b\u0578\u0580\u0564 \u0564\u0561\u057d\u0568, \u0568\u0576\u0569\u0561\u0581\u056b\u056f \u0576\u057a\u0561\u057f\u0561\u056f\u0568, \u057f\u0576\u0561\u0575\u056b\u0576 \u0561\u0577\u056d\u0561\u057f\u0561\u0576\u0584\u056b \u056f\u0561\u0580\u0563\u0561\u057e\u056b\u0573\u0561\u056f\u0568 \u0587 \u0578\u0582\u057d\u0578\u0582\u0581\u0579\u056b \u057e\u0565\u0580\u057b\u056b\u0576 \u0576\u0577\u0578\u0582\u0574\u0568\u0589",
+      /* The վերջակետ is inside the accent for the same reason the English period is. */
+      titleAccent: "առանց հարցնելու։",
+      /* The same four items the Armenian paragraph named, in the same order as the English. */
+      points: [
+        "Հաջորդ դասը",
+        "Ընթացիկ նպատակը",
+        "Տնային առաջադրանքի կարգավիճակը",
+        "Ուսուցչի վերջին նշումը",
+      ],
       cta: "\u054f\u0565\u057d\u0576\u0565\u056c \u056e\u0576\u0578\u0572\u056b \u0567\u057b\u0568",
       dashboardAriaLabel:
         "Ծնողի էջը՝ օրինակային բովանդակությամբ՝ ընթացիկ նպատակը և դրա առաջընթացը, հաջորդ դասը, տնային առաջադրանքը և ուսուցչի վերջին կարծիքը",

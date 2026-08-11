@@ -58,6 +58,14 @@
   --vz-muted: 141 9% 37%; /* #57685D */
   --vz-accent: 12 72% 44%; /* #C2401F */
   --vz-accent-on: 0 0% 100%;
+  /* ACCENT AS TEXT. The brand vermillion measures 4.68:1 on paper — it clears AA for body copy,
+     but only just, and it drops under it on any of the tinted or translucent surfaces this system
+     puts text on (~3.6:1 over the field tints, 3.74:1 over the peach avatar fill). Three call
+     sites had independently reinvented the same rescue with `color-mix(… 75-82%, ink)`; this is
+     that mix, resolved once. Same warm family, 5.90:1 on paper and ~5:1 over the field tints.
+     Reach for it whenever the accent has to be READ rather than seen; keep `--vz-accent` for
+     fills, rules, icons and anything large enough to live at 3:1. */
+  --vz-accent-ink: 13 66% 38%; /* #A13D21 */
   /* Semantic status, deliberately NOT the brand accent: vermillion on a rising
      score reads as a warning, and a gain has to look like a gain. */
   --vz-positive: 156 61% 24%; /* #186445 */
@@ -83,6 +91,14 @@
      produce a double-slash colour that fails silently to `initial`. */
   --vz-line: 90 8% 83%; /* #D3D6D0 = ink 15% over paper */
   --vz-line-soft: 68 10% 88%; /* #E3E4DD = ink 8% over paper */
+  /* The INTERACTIVE edge, and the reason it had to exist. `--vz-line` is a content hairline: it
+     measures 1.15:1 against paper, which is right for separating two blocks of text and wrong for
+     the only visible boundary of a control. WCAG 2.2 §1.4.11 (non-text contrast) asks 3:1 of the
+     part of a component that identifies it, and an outlined button with no fill has nothing else.
+     Use this wherever a border IS the affordance — outline buttons, unfilled inputs, selectable
+     tiles — and keep `--vz-line` for dividers and card edges that sit under a fill.
+     Measured: 3.08:1 on paper, 3.30:1 on surface. */
+  --vz-line-strong: 162 12% 51%; /* #739188 */
 
   /* ── Composite values ──────────────────────────────────────────────────── */
   --vz-fx-shadow: 0 1px 2px hsl(var(--vz-ink) / 5%), 0 12px 32px -12px hsl(var(--vz-ink) / 18%);
@@ -134,7 +150,17 @@
      generated family names, so they must be referenced as variables rather than
      quoted by name. The Armenian face sits second in BOTH stacks: neither Latin
      family covers Armenian, `hy` is a first-class locale, and without it Վարժարան
-     falls back to an arbitrary system face. */
+     falls back to an arbitrary system face.
+
+     A serif heading role was tried here and reverted. Worth recording why it is
+     not a small change if it comes up again: around forty call sites across the
+     marketing modules use `--vz-display` for chips, monograms, avatars and button
+     labels, so the serif has to arrive as a NEW role rather than by redefining
+     this one. Even then, several pages restate `font-family: var(--vz-display)`
+     on their own headings (`.stepHeader h2`, `.panel h2`, `.heroCopy h1`, …),
+     which silently outranks the shared heading rule — so those pages kept the
+     sans while others switched, and the site split in two. Any future attempt has
+     to fix those call sites first. */
   --vz-display:
     var(--vz-font-display), var(--vz-font-armenian), ui-sans-serif, system-ui, sans-serif;
   --vz-body: var(--vz-font-body), var(--vz-font-armenian), ui-sans-serif, system-ui, sans-serif;

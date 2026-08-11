@@ -14,12 +14,28 @@ import Image from "next/image";
 import { AnimatePresence } from "framer-motion";
 import { useEffect, useState, type MouseEvent } from "react";
 import { ClassroomBoard, type BoardKey } from "./classroom-boards";
+import { Reveal } from "./reveal";
+import { accentedTitle } from "./home-sections";
+import { ParallaxField } from "./parallax-field";
 import styles from "./compact-home.module.css";
 
 const ease = [0.22, 1, 0.36, 1] as const;
 
 /** How long each subject holds before the card advances. Long enough to read the prompt. */
 const ROTATE_MS = 6200;
+
+/**
+ * Splits a note into its sentences, keeping the terminator attached.
+ *
+ * `\p{Sentence_Terminal}` rather than a hand-written `[.!?]`: Armenian ends a sentence with the
+ * վերջակետ `։` (U+0589), which is a different character from a colon and would be missed by an
+ * ASCII class — the same trap `splitAccent` in `hero.tsx` documents for its punctuation check.
+ * A body with no terminator at all falls through as a single sentence rather than vanishing.
+ */
+function splitSentences(body: string): string[] {
+  const parts = body.match(/[^\p{Sentence_Terminal}]+\p{Sentence_Terminal}+/gu);
+  return parts ? parts.map((part) => part.trim()) : [body];
+}
 
 /**
  * The teacher's note that sits under the lesson card.
@@ -89,6 +105,8 @@ export interface BenefitItem {
 export interface BenefitsCopy {
   eyebrow: string;
   title: string;
+  /** The phrase inside `title` that renders in the accent. See `accentedTitle`. */
+  titleAccent: string;
   description: string;
   items: readonly BenefitItem[];
 }
@@ -274,7 +292,24 @@ function TeacherNote({ note, swapKey }: { note: ClassroomNote; swapKey: string }
               <small>{note.role}</small>
             </span>
           </div>
-          <p className={styles.noteBody}>{note.body}</p>
+          {/*
+           * One sentence per line, rather than one flowing paragraph on a `ch` measure.
+           *
+           * Every note in both locales is written the same way — an observation, then the caveat
+           * that starts "Still" / "Դեռ" — and letting the text reflow inside a fixed measure put
+           * the line break in the middle of that second clause on all four subjects, stranding
+           * "Still" at the end of line one. No `max-width` value fixes it: measured across all
+           * four notes, any measure wide enough for one note strands a connector on another.
+           *
+           * Breaking where the author already broke the thought is both the correct typography
+           * and stable against copy edits, since it derives the break from the sentence rather
+           * than from a character count.
+           */}
+          <p className={styles.noteBody}>
+            {splitSentences(note.body).map((sentence) => (
+              <span key={sentence}>{sentence}</span>
+            ))}
+          </p>
           <ul className={styles.noteTags}>
             {/* One accented tag only: the thing the student has to go and do. The other two are
                 context, and three equally loud chips would flatten that hierarchy. */}
@@ -392,6 +427,13 @@ export function ClassroomPreview({ copy }: { copy: ClassroomCopy }) {
       transition={reduceMotion ? { duration: 0 } : { duration: 0.8, delay: 0.14, ease }}
     >
       <div className={styles.stageAura} aria-hidden="true" />
+      {/*
+       * A second bloom, sitting low behind the teacher's note specifically. `.stageAura` is placed
+       * for the lesson window and stops well above this, which left the note as glass with nothing
+       * behind it — and glass over nothing is just a tinted rectangle. This is the content its
+       * backdrop-filter actually bends.
+       */}
+      <div className={styles.noteAura} aria-hidden="true" />
       <div className={styles.learningPath} aria-hidden="true">
         <span>∑</span>
         <span>♞</span>
@@ -431,20 +473,20 @@ export function SubjectExplorer({ copy }: { copy: SubjectCopy }) {
   const reduceMotion = useReducedMotion();
   return (
     <section id="courses" className={styles.subjectSection} aria-labelledby="subject-title">
-      <div className={styles.subjectField} aria-hidden="true">
+      <ParallaxField className={styles.subjectField} distance={40}>
         <span className={styles.fieldGrid} />
         <span className={styles.fieldBloomOne} />
         <span className={styles.fieldBloomTwo} />
         <span className={styles.fieldBloomThree} />
-      </div>
+      </ParallaxField>
 
       <div className={styles.sectionShell}>
-        <div className={styles.subjectHeading}>
+        <Reveal className={styles.subjectHeading}>
           <div>
             <p className={styles.sectionEyebrow}>{copy.eyebrow}</p>
             <h2 id="subject-title">{copy.title}</h2>
           </div>
-        </div>
+        </Reveal>
         <ul className={styles.subjectRail}>
           {copy.items.map((subject, index) => {
             return (
@@ -529,17 +571,21 @@ export function LearningBenefits({ copy }: { copy: BenefitsCopy }) {
     <section className={styles.benefitsSection} aria-labelledby="benefits-title">
       {/* Same job as `subjectField`: the thing the glass refracts. Without it these cards would be
           tinted divs — see the header of `app/globals.css`. */}
-      <div className={styles.benefitsField} aria-hidden="true">
+      <ParallaxField className={styles.benefitsField} distance={54}>
+        {/* The ruled ground, which this section was the only one on the page to be missing. */}
+        <span className={styles.benefitsGrid} />
         <span className={styles.benefitBloomOne} />
         <span className={styles.benefitBloomTwo} />
         <span className={styles.benefitBloomThree} />
-      </div>
+      </ParallaxField>
       <div className={styles.sectionShell}>
-        <div className={styles.benefitsIntro}>
+        <Reveal className={styles.benefitsIntro}>
           <p className={styles.sectionEyebrow}>{copy.eyebrow}</p>
-          <h2 id="benefits-title">{copy.title}</h2>
+          <h2 id="benefits-title">
+            {accentedTitle(copy.title, copy.titleAccent, styles.benefitsTitleAccent)}
+          </h2>
           <p>{copy.description}</p>
-        </div>
+        </Reveal>
 
         {/*
          * No connecting rail. It ran behind the icon nodes and read as a line struck THROUGH the
@@ -564,7 +610,12 @@ export function LearningBenefits({ copy }: { copy: BenefitsCopy }) {
                     : { type: "spring", bounce: 0, duration: 0.55, delay: index * 0.07 }
                 }
               >
-                <span className={styles.benefitSheen} aria-hidden="true" />
+                {/*
+                 * There was a 01/02/03/04 numeral here. It is gone — it measured 2.51:1 against
+                 * this card, and `.benefitSignal` below already names the same position in the
+                 * sequence in language a reader can use ("During class", "Between classes"). See
+                 * the note above `.benefitCard:hover` in the stylesheet.
+                 */}
                 <span className={`${styles.benefitNode} ${styles[item.key]}`}>
                   <Icon size={21} aria-hidden="true" />
                 </span>

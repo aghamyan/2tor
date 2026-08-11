@@ -1,0 +1,260 @@
+- generic [active] [ref=e1]:
+  - link "Skip to content" [ref=e2] [cursor=pointer]:
+    - /url: "#main"
+  - banner:
+    - generic [ref=e5]:
+      - link "Varzharan, home" [ref=e6] [cursor=pointer]:
+        - /url: "#top"
+        - generic [ref=e7]: Վ
+        - generic [ref=e8]: Varzharan
+      - navigation "Sections" [ref=e9]:
+        - link "How it works" [ref=e10] [cursor=pointer]:
+          - /url: "#how"
+        - link "Subjects" [ref=e11] [cursor=pointer]:
+          - /url: "#subjects"
+        - link "For parents" [ref=e12] [cursor=pointer]:
+          - /url: "#progress"
+        - link "Teachers" [ref=e13] [cursor=pointer]:
+          - /url: "#teachers"
+      - generic [ref=e14]:
+        - button "Switch to dark theme" [ref=e15] [cursor=pointer]: Dark
+        - link "Parent login" [ref=e16] [cursor=pointer]:
+          - /url: "#"
+        - link "Enroll" [ref=e17] [cursor=pointer]:
+          - /url: "#enroll"
+  - main [ref=e18]:
+    - generic [ref=e19]:
+      - generic [ref=e20]:
+        - generic [ref=e21]:
+          - heading "Math tutoring that runs like a school." [level=1] [ref=e22]:
+            - generic [ref=e23]: Math
+            - generic [ref=e25]: tutoring
+            - generic [ref=e27]: that
+            - generic [ref=e29]: runs
+            - generic [ref=e31]: like
+            - generic [ref=e33]: a
+            - generic [ref=e35]: school.
+          - paragraph [ref=e37]: Vetted teachers in Armenia, one-on-one lessons, and a plan built from your child's own assessment.
+          - generic [ref=e38]:
+            - link "Enroll" [ref=e39] [cursor=pointer]:
+              - /url: "#enroll"
+            - link "See how it works" [ref=e40] [cursor=pointer]:
+              - /url: "#how"
+        - figure [ref=e41]:
+          - img "An open book on a desk." [ref=e42]
+      - generic [ref=e44]:
+        - article [ref=e45]:
+          - generic [ref=e46]: K-12
+          - strong [ref=e47]: Mathematics
+          - generic [ref=e48]: Elementary through calculus
+        - article [ref=e49]:
+          - generic [ref=e50]: 1:1
+          - strong [ref=e51]: One-on-one
+          - generic [ref=e52]: The same teacher every week
+        - article [ref=e53]:
+          - generic [ref=e54]: US
+          - strong [ref=e55]: American curriculum
+          - generic [ref=e56]: Matched to your child's school
+    - generic [ref=e58]:
+      - heading "Four things happen before the first lesson ends." [level=2] [ref=e59]:
+        - generic [ref=e60]: Four
+        - generic [ref=e62]: things
+        - generic [ref=e64]: happen
+        - generic [ref=e66]: before
+        - generic [ref=e68]: the
+        - generic [ref=e70]: first
+        - generic [ref=e72]: lesson
+        - generic [ref=e74]: ends.
+      - list [ref=e76]:
+        - listitem [ref=e77]:
+          - generic [ref=e78]: "01"
+          - heading "We test before we teach" [level=3] [ref=e80]
+          - paragraph [ref=e81]: An assessment maps what your child knows, and what is missing.
+        - listitem [ref=e82]:
+          - generic [ref=e83]: "02"
+          - heading "You get a written plan" [level=3] [ref=e85]
+          - paragraph [ref=e86]: What comes next, what can be skipped, and how fast to move.
+        - listitem [ref=e87]:
+          - generic [ref=e88]: "03"
+          - heading "One teacher who stays" [level=3] [ref=e90]
+          - paragraph [ref=e91]: The same vetted teacher every week, reachable between lessons.
+        - listitem [ref=e92]:
+          - generic [ref=e93]: "04"
+          - heading "Progress you can see" [level=3] [ref=e95]
+          - paragraph [ref=e96]: "After each lesson: what was covered, and what comes next."
+    - generic [ref=e98]:
+      - heading "Find your child." [level=2] [ref=e99]:
+        - generic [ref=e100]: Find
+        - generic [ref=e102]: your
+        - generic [ref=e104]: child.
+      - generic [ref=e106]:
+        - article [ref=e107]:
+          - generic [ref=e109]:
+            - generic [ref=e110]: Grades 9 to 12
+            - heading "High school" [level=3] [ref=e111]
+            - paragraph [ref=e112]: Algebra I, Geometry, Algebra II, Precalculus, Trigonometry, Statistics, Calculus.
+        - article [ref=e113]:
+          - generic [ref=e114]:
+            - generic [ref=e115]: Grades K to 5
+            - heading "Elementary" [level=3] [ref=e116]
+            - paragraph [ref=e117]: Number sense, fractions, decimals, measurement, and early problem solving.
+        - article [ref=e118]:
+          - generic [ref=e119]:
+            - generic [ref=e120]: Grades 6 to 8
+            - heading "Middle school" [level=3] [ref=e121]
+            - paragraph [ref=e122]: Pre-algebra, ratios, expressions, equations, inequalities, and functions.
+        - article [ref=e123]:
+          - generic [ref=e124]:
+            - generic [ref=e125]: Grades 10 to 12
+            - heading "SAT and ACT math" [level=3] [ref=e126]
+            - paragraph [ref=e127]: Timed practice, error analysis, and the question types your child keeps losing points on.
+        - article [ref=e128]:
+          - generic [ref=e130]:
+            - generic [ref=e131]: By invitation
+            - heading "Competition math" [level=3] [ref=e132]
+            - paragraph [ref=e133]: Problems that do not fit a formula, for students who finish early.
+    - generic [ref=e135]:
+      - heading "You always know where your child stands." [level=2] [ref=e136]:
+        - generic [ref=e137]: You
+        - generic [ref=e139]: always
+        - generic [ref=e141]: know
+        - generic [ref=e143]: where
+        - generic [ref=e145]: your
+        - generic [ref=e147]: child
+        - generic [ref=e149]: stands.
+      - paragraph [ref=e151]: Not "attended 12 lessons." A real academic record, in plain language.
+      - generic [ref=e152]:
+        - article [ref=e153]:
+          - generic [ref=e154]:
+            - generic [ref=e155]:
+              - heading "Grade 7 Mathematics" [level=3] [ref=e156]
+              - paragraph [ref=e157]: Updated after every lesson
+            - generic [ref=e158]: MTH-G7
+          - generic [ref=e159]:
+            - generic [ref=e160]:
+              - term [ref=e161]: Course progress
+              - definition [ref=e162]:
+                - img "68 percent complete" [ref=e163]
+                - generic [ref=e164]: 68%
+            - generic [ref=e165]:
+              - term [ref=e166]: Latest assessment
+              - definition [ref=e167]:
+                - generic [ref=e168]:
+                  - generic [ref=e169]: ↑
+                  - text: 62% to
+                  - generic [ref=e170]: 84%
+          - generic [ref=e171]:
+            - generic [ref=e172]:
+              - term [ref=e173]: Mastered
+              - definition [ref=e175]: Linear equations
+            - generic [ref=e176]:
+              - term [ref=e177]: In review
+              - definition [ref=e179]: Equations with fractions
+            - generic [ref=e180]:
+              - term [ref=e181]: Next up
+              - definition [ref=e183]: Proportional reasoning
+          - paragraph [ref=e184]: Sample record. Every student has one.
+        - generic [ref=e185]:
+          - article [ref=e186]:
+            - generic [ref=e187]:
+              - generic [ref=e188]: AG
+              - generic [ref=e189]:
+                - generic [ref=e190]: Anahit Ghazaryan
+                - generic [ref=e191]: Note after today's lesson
+            - paragraph [ref=e192]: Solid grasp of the method. Still slow when the denominators differ.
+            - list [ref=e193]:
+              - listitem [ref=e194]: 10 practice problems
+              - listitem [ref=e195]: Fractions
+          - blockquote [ref=e196]:
+            - paragraph [ref=e197]: “I stopped guessing whether the lessons were working. Every week I can see what he learned and what he still needs.”
+            - generic [ref=e198]:
+              - text: Karine Ohanian
+              - generic [ref=e199]: Parent of a 9th grader, Glendale
+    - generic [ref=e200]:
+      - generic [ref=e202]:
+        - generic [ref=e203]:
+          - heading "Teachers are chosen, not listed." [level=2] [ref=e204]:
+            - generic [ref=e205]: Teachers
+            - generic [ref=e207]: are
+            - generic [ref=e209]: chosen,
+            - generic [ref=e211]: not
+            - generic [ref=e213]: listed.
+          - paragraph [ref=e215]: Every teacher is interviewed, tested on mathematics and English, and observed teaching before they ever meet a student.
+        - generic [ref=e216]:
+          - button "Previous teachers" [disabled] [ref=e217] [cursor=pointer]: ←
+          - button "More teachers" [ref=e218] [cursor=pointer]: →
+      - list "Teachers, scrollable" [ref=e219]:
+        - listitem [ref=e220]:
+          - generic [ref=e221]: AG
+          - heading "Anahit Ghazaryan" [level=3] [ref=e222]
+          - paragraph [ref=e223]: Algebra I and II
+          - generic [ref=e224]: Grades 8 to 11
+        - listitem [ref=e225]:
+          - generic [ref=e226]: TP
+          - heading "Tigran Petrosyan" [level=3] [ref=e227]
+          - paragraph [ref=e228]: Geometry and Trigonometry
+          - generic [ref=e229]: Grades 9 to 12
+        - listitem [ref=e230]:
+          - generic [ref=e231]: NH
+          - heading "Nvard Hakobyan" [level=3] [ref=e232]
+          - paragraph [ref=e233]: Elementary mathematics
+          - generic [ref=e234]: Grades K to 5
+        - listitem [ref=e235]:
+          - generic [ref=e236]: AM
+          - heading "Armen Melikyan" [level=3] [ref=e237]
+          - paragraph [ref=e238]: Precalculus and Calculus
+          - generic [ref=e239]: Grades 11 to 12
+        - listitem [ref=e240]:
+          - generic [ref=e241]: SA
+          - heading "Siranush Avetisyan" [level=3] [ref=e242]
+          - paragraph [ref=e243]: Pre-algebra
+          - generic [ref=e244]: Grades 6 to 8
+        - listitem [ref=e245]:
+          - generic [ref=e246]: VM
+          - heading "Vahagn Mkrtchyan" [level=3] [ref=e247]
+          - paragraph [ref=e248]: Competition mathematics
+          - generic [ref=e249]: Grades 7 to 12
+    - generic [ref=e251]:
+      - heading "It starts with the assessment." [level=2] [ref=e252]:
+        - generic [ref=e253]: It
+        - generic [ref=e255]: starts
+        - generic [ref=e257]: with
+        - generic [ref=e259]: the
+        - generic [ref=e261]: assessment.
+      - paragraph [ref=e263]: Tell us your child's grade and school. We take it from there.
+      - link "Enroll" [ref=e264] [cursor=pointer]:
+        - /url: "#"
+  - contentinfo [ref=e265]:
+    - generic [ref=e266]:
+      - generic [ref=e267]:
+        - generic [ref=e268]: Վ
+        - paragraph [ref=e269]: Վարժարան connects Armenian-American students with vetted teachers in Armenia.
+      - navigation "Program" [ref=e270]:
+        - heading "Program" [level=4] [ref=e271]
+        - link "How it works" [ref=e272] [cursor=pointer]:
+          - /url: "#how"
+        - link "Subjects" [ref=e273] [cursor=pointer]:
+          - /url: "#subjects"
+        - link "For parents" [ref=e274] [cursor=pointer]:
+          - /url: "#progress"
+      - navigation "Company" [ref=e275]:
+        - heading "Company" [level=4] [ref=e276]
+        - link "Teachers" [ref=e277] [cursor=pointer]:
+          - /url: "#teachers"
+        - link "Teach with us" [ref=e278] [cursor=pointer]:
+          - /url: "#"
+        - link "Contact" [ref=e279] [cursor=pointer]:
+          - /url: "#"
+      - navigation "Account" [ref=e280]:
+        - heading "Account" [level=4] [ref=e281]
+        - link "Parent login" [ref=e282] [cursor=pointer]:
+          - /url: "#"
+        - link "Enroll" [ref=e283] [cursor=pointer]:
+          - /url: "#enroll"
+    - generic [ref=e284]:
+      - generic [ref=e285]: © 2026 Վարժարան
+      - generic [ref=e286]:
+        - link "Privacy" [ref=e287] [cursor=pointer]:
+          - /url: "#"
+        - link "Terms" [ref=e288] [cursor=pointer]:
+          - /url: "#"

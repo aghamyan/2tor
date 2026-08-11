@@ -29,9 +29,10 @@
   --paper: hsl(var(--vz-paper));
   --white: hsl(var(--vz-surface));
   --indigo: hsl(var(--vz-accent));
-  /* No darker accent exists in the system — its buttons take a hover lift and an accent glow
-     instead. This is only for the few rules that need a pressed/darker text tone. */
-  --indigo-dark: color-mix(in srgb, hsl(var(--vz-accent)) 82%, hsl(var(--vz-ink)));
+  /* Now a straight alias. This used to be a local `color-mix(… 82%, ink)` because the system had
+     no darker accent; it does now — `--vz-accent-ink` in `globals.css` is that same mix resolved
+     once, for every surface that needs the accent to be read rather than seen. */
+  --indigo-dark: hsl(var(--vz-accent-ink));
   --indigo-soft: hsl(var(--vz-accent) / 12%);
   --yellow: hsl(var(--vz-accent));
   --yellow-soft: hsl(var(--vz-field-3) / 45%);
@@ -39,6 +40,8 @@
   --mint-soft: hsl(var(--vz-field-1) / 45%);
   --coral: hsl(var(--vz-accent));
   --coral-soft: hsl(var(--vz-field-2) / 45%);
+  /* One cell for every ruled ground on the page — see the note above `.heroGrid`. */
+  --grid-cell: 46px;
   background: var(--paper);
   color: var(--ink);
   font-family: var(--vz-display);
@@ -71,6 +74,42 @@
   letter-spacing: -0.028em;
 }
 
+/*
+ * ARMENIAN TYPOGRAPHY. Every tracking value in this file was calibrated by eye on Instrument Sans
+ * setting Latin. Armenian copy does not render in Instrument Sans at all — the family has no
+ * Armenian coverage, so `--vz-display` falls through to Noto Sans Armenian, a different family
+ * with different sidebearings and a taller, rounder lowercase.
+ *
+ * Negative tracking is the specific problem. Latin display type takes it because its counters are
+ * open and its stems are vertical; Armenian's ը, ղ, ա and ռ carry bowls and descenders that close
+ * up and start colliding well before -0.03em. Applying the Latin values unchanged is why Armenian
+ * headings read cramped rather than tight.
+ *
+ * Measured before this block existed, at 1440x900: the `hy` H1 ran FIVE lines against the English
+ * three, filled its `10.8ch` ceiling exactly (615px), left 14px of clearance to the classroom mock
+ * where English has 72px, and pushed the CTA row from y=702 to y=792 — below the fold on the
+ * 1366x768 and 1280x800 viewports this project's own screenshot script checks.
+ *
+ * Three things fix it, and all three are needed:
+ *   1. tracking relaxes to near zero — Armenian's natural fit;
+ *   2. the `ch` ceiling goes. `ch` is the advance of "0" in the FIRST AVAILABLE font, so a measure
+ *      authored against Instrument Sans silently means something else once Noto is doing the
+ *      setting. An `em` ceiling is family-relative and behaves the same in both;
+ *   3. the display step comes down. Armenian needs the room its wider glyphs take.
+ */
+.page:lang(hy) h1,
+.page:lang(hy) h2,
+.page:lang(hy) h3 {
+  letter-spacing: -0.008em;
+}
+
+.page:lang(hy) h1.heroTitle {
+  font-size: clamp(3rem, 4.9vw, 5.3rem);
+  letter-spacing: -0.006em;
+  line-height: 1;
+  max-width: 13em;
+}
+
 .page a:focus-visible {
   outline: 3px solid hsl(var(--vz-accent) / 45%);
   outline-offset: 4px;
@@ -94,12 +133,72 @@
   position: absolute;
 }
 
-.heroGrid {
+/*
+ * The mask is radial and anchored under the headline, not a top-to-bottom linear fade.
+ *
+ * The linear version faded only downward, so the ruling stayed at full strength right across the
+ * top edge — including behind the classroom card, where it collided with that card's own
+ * whiteboard grid at a different pitch. What the eye got was two grids beating against each other
+ * in the top-right corner and nothing anywhere else, which reads as a rendering artifact rather
+ * than as paper.
+ *
+ * Anchored at 26%/42% it sits behind the headline and the differentiator list, falls off before it
+ * reaches the product mock, and gives the left column the ground-plane the composition wanted.
+ */
+/*
+ * THE RULED GROUND — one recipe, every section. Confirmed as intentional page vocabulary rather
+ * than hero decoration, so it is now declared once here instead of being restated per section.
+ *
+ * Why this page earns a grid when most pages do not: the classroom mock in the hero contains a
+ * whiteboard whose own background is this same motif at a finer pitch, and that surface genuinely
+ * IS a measurement surface. The page ground and the product's ground rhyme deliberately — ruled
+ * paper is domain vocabulary for a school whose first subject is mathematics, not stock texture.
+ *
+ * Four sections had already grown their own copy of this, and they had drifted: 40px in the hero
+ * against 46px everywhere else, and two different alphas. One cell size across the whole page is
+ * what makes it read as a single sheet the sections are printed on rather than as six unrelated
+ * backgrounds. The 46px cell wins because it is what four of the six already used.
+ *
+ * `--grid-cell` is local to this page rather than promoted to `globals.css`: no other public
+ * surface uses a ruled ground, and a token nothing else reads is a system abstraction for one
+ * exception.
+ *
+ * Only the MASK stays per-section, and that is composition, not drift — each one anchors the
+ * ruling under that section's own centre of gravity and fades it before it reaches the content
+ * that has to stay legible.
+ */
+.heroGrid,
+.fieldGrid,
+.benefitsGrid,
+.parentGrid {
   background-image:
-    linear-gradient(hsl(var(--vz-ink) / 4.5%) 1px, transparent 1px),
-    linear-gradient(90deg, hsl(var(--vz-ink) / 4.5%) 1px, transparent 1px);
-  background-size: 40px 40px;
-  mask-image: linear-gradient(to bottom, black, transparent 86%);
+    linear-gradient(hsl(var(--vz-ink) / 5%) 1px, transparent 1px),
+    linear-gradient(90deg, hsl(var(--vz-ink) / 5%) 1px, transparent 1px);
+  background-size: var(--grid-cell) var(--grid-cell);
+}
+
+/* The dark register. Ink lines are invisible on the pine block, so these draw with the block's own
+   foreground and sit a little stronger — a light line on a dark ground reads fainter than a dark
+   line on a light one at equal alpha. */
+.groupGrid,
+.closingGrid {
+  background-image:
+    linear-gradient(hsl(var(--vz-block-on) / 7%) 1px, transparent 1px),
+    linear-gradient(90deg, hsl(var(--vz-block-on) / 7%) 1px, transparent 1px);
+  background-size: var(--grid-cell) var(--grid-cell);
+}
+
+.fieldGrid,
+.benefitsGrid,
+.parentGrid,
+.groupGrid,
+.closingGrid {
+  inset: 0;
+  position: absolute;
+}
+
+.heroGrid {
+  mask-image: radial-gradient(80% 75% at 26% 42%, black 8%, transparent 72%);
 }
 
 .pathLine {
@@ -114,27 +213,22 @@
   width: 49rem;
 }
 
-.armenianGlyph,
-.codeGlyph {
-  color: hsl(var(--vz-accent) / 12%);
-  font-family: var(--vz-display);
-  font-weight: 800;
-  position: absolute;
-}
-
-.armenianGlyph {
-  bottom: 12%;
-  font-size: 1.2rem;
-  left: 3.5%;
-  transform: rotate(-9deg);
-}
-
-.codeGlyph {
-  font-size: 1rem;
-  right: 3%;
-  top: 17%;
-  transform: rotate(7deg);
-}
+/*
+ * The `Ա` and `{ }` watermarks that used to sit here are gone, and the reason is worth keeping.
+ *
+ * They shipped at 1.2rem/1rem in the accent at 12% alpha, which is the worst available position:
+ * far too faint to be recognised as an Armenian Ayb or a pair of braces, and far too present to
+ * disappear. At hero scale they read as two smudges on the paper.
+ *
+ * Committing them was tried first — the honest response to a half-drawn layer is to finish it, not
+ * to fade it further. At a size where the letterforms actually read, both cropped against the
+ * viewport edge and the Ayb ran into the CTA row, and holding them clear of content would have
+ * meant a bespoke position at every breakpoint for two elements carrying no information.
+ *
+ * So the hero keeps three background layers instead of five: the ruled ground, the dashed path,
+ * and the two colour blooms. The Armenian and programming strands are already stated where they
+ * can be read — in the classroom card's course list and in the subject row's clay art.
+ */
 
 .heroShell,
 .sectionShell {
@@ -168,31 +262,70 @@
   z-index: 4;
 }
 
-/* The same framed pill as `.groupEyebrow`, in its light-background register: over paper the frame
-   is carried by the token's outer ink hairline rather than by its inner white line. Both sections
-   that use this lay a refractive field behind their content, so there is something real to bend. */
+/*
+ * No longer a glass capsule.
+ *
+ * The uppercase-tracked label in a rounded pill above a heading is the single most transferable
+ * element on any marketing page — it is the same component on every SaaS landing page ever built,
+ * and three of them stacked down one page is what made this page's structure read as assembled
+ * rather than authored. The heading underneath is strong enough to open its own section; the label
+ * only needs to name the section, not compete for the entrance.
+ *
+ * So the material is gone and what remains is the mark: a short accent rule, then the label. That
+ * keeps the copy (it does real work — "For parents" tells you who a section is addressed to) while
+ * removing the packaging. It also frees the glass for the two places that earn it, where there is
+ * genuinely moving content behind the pane: the subject cards and the teacher's note.
+ *
+ * `--vz-accent-ink` rather than raw accent, per that token's own note: this is small text.
+ */
 .sectionEyebrow {
   align-items: center;
   align-self: flex-start;
-  backdrop-filter: var(--vz-fx-glass-blur);
-  background: var(--vz-fx-glass-bg);
-  border-radius: var(--vz-r-pill);
-  box-shadow: var(--vz-fx-glass-shadow);
-  color: var(--indigo-dark);
+  color: hsl(var(--vz-accent-ink));
   display: inline-flex;
-  font-size: 0.85rem;
-  font-weight: 850;
-  letter-spacing: 0.12em;
-  padding: 0.52rem 1rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  gap: 0.6rem;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   width: fit-content;
 }
 
-.heroTitle {
+.sectionEyebrow::before {
+  background: hsl(var(--vz-accent));
+  border-radius: 2px;
+  content: "";
+  height: 2px;
+  width: 1.6rem;
+}
+
+/*
+ * `.page h1.heroTitle`, not `.heroTitle`. This is the SAME specificity trap this file already
+ * documents for margins, and the headline was losing it silently.
+ *
+ * Two rules were beating a bare `.heroTitle` at (0,1,0): the preflight `.page h1, h2, h3` at
+ * (0,1,1), and `app/(marketing)/surface.module.css`'s `.surface :is(h1, h2, h3, h4)` at (0,2,0).
+ * Between them they set `letter-spacing: -0.028em` and `line-height: 1.08`. Verified against the
+ * live cascade over CDP, not inferred: the hero was rendering at -0.028em/1.08 while this rule
+ * declared -0.071em/0.94, so BOTH of the headline's defining typographic properties were dead
+ * code. That is why the biggest element on the page read loose and un-art-directed.
+ *
+ * `.page h1.heroTitle` is (0,2,1) and wins outright against both, in any file order.
+ *
+ * The tracking that now actually applies is -0.042em rather than the -0.071em declared here
+ * before. -0.071em was authored blind — it had never rendered — and at this size it collides the
+ * terminals of `g`/`o` pairs. -0.042em is as tight as Instrument Sans holds at display size.
+ */
+.page h1.heroTitle {
   font-size: clamp(3.6rem, 5.8vw, 6.5rem);
-  font-weight: 720;
-  letter-spacing: -0.071em;
+  font-weight: 700;
+  letter-spacing: -0.042em;
   line-height: 0.94;
+  /*
+   * `ch` measures the advance of "0" IN THE FIRST AVAILABLE FONT, so this ceiling is calibrated on
+   * Instrument Sans and means something different the moment Armenian falls through to Noto Sans
+   * Armenian. See the `:lang(hy)` block below, which replaces it.
+   */
   max-width: 10.8ch;
   text-wrap: balance;
 }
@@ -259,7 +392,7 @@
   color: var(--ink-soft);
   display: flex;
   font-size: clamp(0.82rem, 1vw, 0.92rem);
-  font-weight: 640;
+  font-weight: 560;
   gap: 0.5rem;
   letter-spacing: -0.006em;
 }
@@ -301,14 +434,37 @@
   box-sizing: content-box;
 }
 
+/*
+ * The hero's second action, and the one control on the page that was not identifiable as a
+ * control. It drew its edge with `--line`, which is a CONTENT hairline: measured against the
+ * hero's paper ground it is 1.15:1, so the button read as a floating text label sitting next to a
+ * filled pill, and its whole job is to be the visible alternative to that pill.
+ *
+ * Two changes, and both are structural rather than cosmetic. The border moves to
+ * `--vz-line-strong`, the interactive edge added to `globals.css` for exactly this. And it takes a
+ * `--vz-surface` fill, so the shape is legible from the fill as well as the edge rather than
+ * resting on the border alone — the same near-white the site header's own secondary button sits on.
+ *
+ * BOTH ARE AT FULL OPACITY, and that is the point rather than an oversight. A first pass set the
+ * border to `/ 62%` over a `/ 78%` fill, which composites to roughly rgb(167,185,178) — about
+ * 1.85:1 on paper. Better than the 1.15:1 it replaced and still short of the 3:1 WCAG 2.2 §1.4.11
+ * wants from a boundary that is the only thing identifying a component. Alpha was doing nothing
+ * here except quietly undoing the token's whole reason for existing. At full strength the edge
+ * measures 3.08:1 against the paper outside it and 3.30:1 against the fill inside it.
+ *
+ * Worth noting how close this came to shipping: a pixel sampler reading darkest-vs-lightest inside
+ * the element's box reports the INK LABEL at 13:1 and never sees a 1px border, and axe has no
+ * §1.4.11 rule at all. Neither check can catch this one — only the arithmetic can.
+ */
 .secondaryAction {
   align-items: center;
-  border: 1px solid var(--line);
+  background: hsl(var(--vz-surface));
+  border: 1px solid hsl(var(--vz-line-strong));
   border-radius: var(--vz-r-pill);
   color: var(--ink);
   display: inline-flex;
   font-size: 0.9rem;
-  font-weight: 700;
+  font-weight: 600;
   gap: 0.55rem;
   justify-content: center;
   min-height: 3.4rem;
@@ -326,8 +482,8 @@
 }
 
 .secondaryAction:hover {
-  background: rgb(255 255 255 / 72%);
-  border-color: hsl(var(--vz-accent) / 45%);
+  background: hsl(var(--vz-surface));
+  border-color: hsl(var(--vz-accent) / 60%);
   transform: translateY(-2px);
 }
 
@@ -361,6 +517,45 @@
   width: 68%;
 }
 
+/*
+ * Two overlapping blooms low on the stage, behind the teacher's note. Deliberately stronger and
+ * more saturated than `.stageAura`: they are read THROUGH an 8%-transmission glass panel, so at
+ * that element's opacity they would vanish entirely. Two hues rather than one, because a single
+ * flat wash behind glass still reads flat — it is the gradient between them that the blur smears
+ * into something that looks refracted.
+ */
+.noteAura {
+  bottom: -6%;
+  height: 46%;
+  left: -6%;
+  position: absolute;
+  right: -6%;
+}
+
+.noteAura::before,
+.noteAura::after {
+  border-radius: 50%;
+  content: "";
+  filter: blur(70px);
+  position: absolute;
+}
+
+.noteAura::before {
+  background: hsl(var(--vz-accent) / 46%);
+  height: 78%;
+  left: 4%;
+  top: 6%;
+  width: 52%;
+}
+
+.noteAura::after {
+  background: hsl(var(--vz-positive) / 40%);
+  bottom: 2%;
+  height: 74%;
+  right: 2%;
+  width: 48%;
+}
+
 .learningPath {
   border: 1px dashed hsl(var(--vz-accent) / 20%);
   border-radius: 50%;
@@ -381,7 +576,7 @@
   display: flex;
   font-family: var(--vz-display);
   font-size: 0.7rem;
-  font-weight: 800;
+  font-weight: 620;
   height: 2.25rem;
   justify-content: center;
   position: absolute;
@@ -449,14 +644,15 @@
   background: var(--coral-soft);
   border: 1px solid hsl(var(--vz-accent) / 30%);
   border-radius: var(--vz-r-input);
-  /* Accent at full strength measures 3.74:1 on this peach tint. Darkened toward ink it reaches
-     5.04:1 and still reads as the same warm family. The monogram is `aria-hidden` and the tutor's
-     name sits beside it, but a legible initial costs nothing. */
-  color: color-mix(in srgb, hsl(var(--vz-accent)) 75%, hsl(var(--vz-ink)));
+  /* Accent at full strength measures 3.74:1 on this peach tint. `--vz-accent-ink` is the system's
+     darkened accent and reaches ~5:1 here while still reading as the same warm family. The
+     monogram is `aria-hidden` and the tutor's name sits beside it, but a legible initial costs
+     nothing. */
+  color: hsl(var(--vz-accent-ink));
   display: flex;
   font-family: var(--vz-display);
   font-size: 0.82rem;
-  font-weight: 800;
+  font-weight: 620;
   height: 2.6rem;
   justify-content: center;
   width: 2.6rem;
@@ -484,7 +680,7 @@
   display: flex;
   flex: 0 0 auto;
   font-size: 0.58rem;
-  font-weight: 800;
+  font-weight: 600;
   gap: 0.42rem;
   padding: 0.35rem 0.6rem;
   text-transform: uppercase;
@@ -543,7 +739,7 @@
 .boardHeading span {
   color: var(--indigo-dark);
   font-size: 0.6rem;
-  font-weight: 850;
+  font-weight: 600;
   letter-spacing: 0.1em;
   text-transform: uppercase;
 }
@@ -625,7 +821,7 @@
   color: var(--muted);
   display: flex;
   font-size: 0.58rem;
-  font-weight: 800;
+  font-weight: 600;
   gap: 0.35rem;
   letter-spacing: 0.09em;
   line-height: 1.35;
@@ -662,7 +858,7 @@
   color: var(--muted);
   display: flex;
   font-size: 0.84rem;
-  font-weight: 650;
+  font-weight: 500;
   min-height: 2.3rem;
   padding-left: 0.8rem;
   position: relative;
@@ -684,7 +880,7 @@
 .courseList .courseActive {
   background: hsl(var(--vz-accent) / 8%);
   color: var(--indigo-dark);
-  font-weight: 780;
+  font-weight: 620;
 }
 
 /* Slides between rows via framer's `layoutId` rather than fading in place, so the eye follows the
@@ -748,13 +944,17 @@
 }
 
 .fieldGrid {
-  background-image:
-    linear-gradient(hsl(var(--vz-ink) / 5%) 1px, transparent 1px),
-    linear-gradient(90deg, hsl(var(--vz-ink) / 5%) 1px, transparent 1px);
-  background-size: 46px 46px;
-  inset: 0;
   mask-image: radial-gradient(120% 90% at 50% 45%, black 30%, transparent 78%);
-  position: absolute;
+}
+
+/* The two sections that had no ruling at all. Both carry blooms already, so the grid gives that
+   colour something to sit on instead of floating over bare paper. */
+.benefitsGrid {
+  mask-image: radial-gradient(115% 88% at 42% 52%, black 22%, transparent 76%);
+}
+
+.parentGrid {
+  mask-image: radial-gradient(110% 85% at 30% 40%, black 26%, transparent 74%);
 }
 
 .fieldBloomOne,
@@ -765,28 +965,46 @@
   position: absolute;
 }
 
+/*
+ * Retuned against where the cards actually land, which is the whole point of the field and was the
+ * one thing it was not doing.
+ *
+ * The rule above says no two cards should sit over the same colour. Measured at 1440, they did:
+ * the four card centres fall near 16%, 39%, 62% and 85% of the viewport, and the three blooms were
+ * centred near 15%, 52% and 85% — so cards 1 and 2 both sat in the green and cards 3 and 4 both in
+ * the gold, with the peach spending most of its strength in the gutter between them. The row read
+ * as two pairs.
+ *
+ * Three hues still cover four cards, and no fourth is invented for it: the blooms are spaced so
+ * the outer cards sit in the centre of a colour and the inner two sit on the two transitions
+ * between them. Four distinguishable grounds, three tokens, which is what "four panes of one
+ * material" needs — a continuous gradient across the row, not four separate tints.
+ *
+ * The green also drops from 62% to 52%. At the higher value it was reading through cards 1 AND 2
+ * strongly enough to be the section's ambient colour rather than one note in a sweep.
+ */
 .fieldBloomOne {
-  background: hsl(var(--vz-field-1) / 62%);
+  background: hsl(var(--vz-field-1) / 52%);
   height: 24rem;
-  left: -4%;
+  left: -8%;
   top: 24%;
-  width: 34rem;
+  width: 30rem;
 }
 
 .fieldBloomTwo {
-  background: hsl(var(--vz-field-2) / 55%);
+  background: hsl(var(--vz-field-2) / 58%);
   height: 22rem;
-  left: 34%;
+  left: 31%;
   top: 12%;
-  width: 32rem;
+  width: 30rem;
 }
 
 .fieldBloomThree {
   background: hsl(var(--vz-field-3) / 58%);
   height: 25rem;
-  right: -3%;
+  right: -7%;
   top: 30%;
-  width: 33rem;
+  width: 30rem;
 }
 
 .subjectHeading {
@@ -802,12 +1020,13 @@
  * `font-weight` is the whole fix for "this doesn't look like the hero headline". The family was
  * already Instrument Sans everywhere on this page; what differed was weight — Tailwind's preflight
  * sets `h1..h6 { font-weight: inherit }`, so this h2 was landing on the body's 400 while
- * `.heroTitle` declares 720. Matching it makes the two headings read as one voice.
+ * `.heroTitle` declares its own. This h2 is 670 against the hero's 700: one clear step down, and
+ * a step that is now real rather than nominal — see the weight note in `../fonts.ts`.
  */
 .subjectHeading h2 {
   font-size: clamp(1.8rem, 3vw, 2.8rem);
-  font-weight: 720;
-  letter-spacing: -0.05em;
+  font-weight: 670;
+  letter-spacing: -0.04em;
   line-height: 1.05;
   margin-top: 0.4rem !important;
 }
@@ -830,13 +1049,19 @@
  * the material in `globals.css` reaches the header and these cards together.
  */
 /*
- * ONE recipe for this module's two glass surfaces. `globals.css` refuses to ship a shared
- * `.vz-glass` class — "a second, unexercised copy of the recipe is how the two drift apart" — and
- * that argument applies just as much within a file: the subject cards and the benefit cards are
- * the same material and must stay so. Layout stays per-card below.
+ * This was ONE recipe shared by the subject and benefit cards, on the argument that they are the
+ * same material and must stay so. They are no longer the same material, deliberately.
+ *
+ * The two rows do different jobs. The subject cards are art tiles — a rendered plate over a
+ * refractive field, where glass is what makes the plate sit IN the page rather than on it. The
+ * benefit row is a four-step sequence, and four panes of pale glass on a pale wash gave it no
+ * hierarchy and no reading order: the section was the weakest on the page precisely because
+ * everything in it was the same weight. It is now solid, ruled and numbered (see `.benefitCard`
+ * further down).
+ *
+ * So this rule keeps the glass and the subject cards; nothing else in the file uses it.
  */
-.subjectCard,
-.benefitCard {
+.subjectCard {
   backdrop-filter: var(--vz-fx-glass-blur);
   background: var(--vz-fx-glass-bg);
   border-radius: var(--vz-r-card);
@@ -849,8 +1074,7 @@
     transform 320ms var(--vz-ease);
 }
 
-.subjectSheen,
-.benefitSheen {
+.subjectSheen {
   background: var(--vz-fx-glass-sheen);
   inset: 0;
   mask-image: radial-gradient(120% 120% at 8% 0%, black 12%, transparent 62%);
@@ -919,7 +1143,13 @@
  * second set of files keeps one asset per subject.
  */
 .subjectPlateArt {
-  aspect-ratio: 16 / 10;
+  /*
+   * 4:3, not the 16:10 this started at. The renders are square with a large centred object, and a
+   * 16:10 band cropped enough off the top and bottom to clip the taller subjects — the chess
+   * knight lost its ears. 4:3 keeps the plate a band rather than a square while leaving the object
+   * whole at every card width.
+   */
+  aspect-ratio: 4 / 3;
   display: block;
   height: auto;
   object-fit: cover;
@@ -952,7 +1182,7 @@
 .subjectText strong {
   color: var(--indigo-dark);
   font-size: 1.25rem;
-  font-weight: 700;
+  font-weight: 620;
   letter-spacing: -0.024em;
   line-height: 1.22;
   /* "Armenian Language & Culture" cannot fit one line at this size in a quarter-width card, so it
@@ -1006,24 +1236,16 @@
   .parentField {
     display: none;
   }
-  /* The eyebrow pills lose the material but keep the frame — see `.sectionEyebrow`. */
-  .sectionEyebrow {
+  /* The eyebrows need no fallback any more: they are a rule and a word, with no material to lose.
+     Same for the benefit cards, which are opaque in every mode since they stopped being glass. */
+  .subjectCard {
     backdrop-filter: none;
     background: hsl(var(--vz-surface));
     box-shadow:
       inset 0 0 0 1px hsl(var(--vz-line)),
       var(--vz-fx-shadow);
   }
-  .subjectCard,
-  .benefitCard {
-    backdrop-filter: none;
-    background: hsl(var(--vz-surface));
-    box-shadow:
-      inset 0 0 0 1px hsl(var(--vz-line)),
-      var(--vz-fx-shadow);
-  }
-  .subjectSheen,
-  .benefitSheen {
+  .subjectSheen {
     display: none;
   }
   .subjectIcon,
@@ -1084,8 +1306,12 @@
   position: absolute;
 }
 
+/* Roughly halved from their original ~55%. Those values were tuned when the cards were glass and
+   the blooms were the thing being refracted THROUGH them; now that the cards are opaque the wash
+   only shows in the gutters, where at full strength it read as fog sitting behind crisp cards
+   rather than as one surface. */
 .benefitBloomOne {
-  background: hsl(var(--vz-field-2) / 58%);
+  background: hsl(var(--vz-field-2) / 32%);
   bottom: 8%;
   height: 28rem;
   left: -4%;
@@ -1093,7 +1319,7 @@
 }
 
 .benefitBloomTwo {
-  background: hsl(var(--vz-field-3) / 55%);
+  background: hsl(var(--vz-field-3) / 30%);
   bottom: 12%;
   height: 26rem;
   left: 36%;
@@ -1101,38 +1327,165 @@
 }
 
 .benefitBloomThree {
-  background: hsl(var(--vz-field-1) / 55%);
+  background: hsl(var(--vz-field-1) / 32%);
   bottom: 9%;
   height: 28rem;
   right: -4%;
   width: 36rem;
 }
 
+/*
+ * The `max-width: 50rem` that used to cap this block is gone, and it is what created the hole.
+ *
+ * Measured at 1440: the heading ended at x=872 inside a 1408px shell, so 552px — nearly 40% of the
+ * section's top half — was empty, while the card row underneath ran the full width. The section
+ * read as two unrelated compositions stacked on top of each other, one hugging the left edge and
+ * one spanning everything.
+ *
+ * The intro is now heading-left / lede-right on wide viewports, which is not a new idea on this
+ * page: `.subjectHeading` two sections up is already a heading on the left with its secondary text
+ * pushed right and baseline-aligned. Reusing that relationship fills the space with copy that was
+ * already there rather than inventing a decorative object to plug the gap, and it gives the lede
+ * a column of its own instead of a trailing sentence under a headline eight times its size.
+ */
 .benefitsIntro {
-  max-width: 50rem;
   position: relative;
   z-index: 2;
 }
 
-/* Weight 720, matching `.heroTitle` and `.subjectHeading h2`. Tailwind's preflight sets
+/*
+ * 80rem, not the 64rem this was first written at. The breakpoint is set by the MEASURE, not by the
+ * point at which two columns physically fit: at 1024px the split gave the lede a 48-character
+ * line, which is worse than the stacked layout it replaced. Stacked, the same paragraph measures
+ * 69 characters. So the two-column composition only earns its place once both columns can hold a
+ * real measure — 66 characters at 1440, 61 at the 1280 floor — and below that the section stacks,
+ * which is the better layout there rather than a fallback.
+ */
+@media (min-width: 80rem) {
+  .benefitsIntro {
+    /*
+     * `start`, after `end` was tried and looked wrong.
+     *
+     * Bottom-aligning the two columns sounds right and is not: the headline runs to two or three
+     * lines depending on viewport, so the lede was pinned to the BOTTOM of a column whose height it
+     * does not control, floating in the middle-right of the section with a large void above it and
+     * nothing connecting it to the heading it belongs to. Worse, the amount of void changed with
+     * the breakpoint.
+     *
+     * Top-aligned, the lede starts level with the headline's first line and reads as a deck beside
+     * a standing head — a relationship rather than two objects that happen to share a row. The
+     * leftover space now falls at the BOTTOM of the column, where it merges with the gap before the
+     * card row instead of forming a pocket of its own.
+     */
+    align-items: start;
+    column-gap: clamp(2.5rem, 5vw, 5.5rem);
+    display: grid;
+    /* Even columns, arrived at by measuring rather than by eye. A 1.08/0.92 split looked right in
+       the abstract but left the lede a 563px column, and a column — not the `max-width` — is what
+       actually sets the measure: the longest rendered line came out at 54 characters, under the
+       65–75 band. Even columns give it ~648px and land it in range, and the heading loses 13px,
+       which does not change its line count. */
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+
+  /* Explicit placement, because the eyebrow, the heading and the lede are three siblings and auto
+     flow would put the eyebrow and heading in different columns. */
+  .benefitsIntro > .sectionEyebrow {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .benefitsIntro h2 {
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  .benefitsIntro > p:last-child {
+    /* The block carries its own edge and accent mark now (see the base rule further down), so the
+       hairline this used to draw here is gone; only the two-column placement is left.
+       `margin-top` is optical, not structural: the heading's box top sits above its cap line by the
+       font's internal leading — roughly 14px at 72px/0.98 — so a block flush with the grid row
+       floats visibly above the headline's first stroke. `!important` because the stacked rule this
+       overrides carries it too, to win the preflight `.page p { margin: 0 }`. */
+    grid-column: 2;
+    grid-row: 2;
+    margin-top: 1.35rem !important;
+    /* 32rem was tried first and measured 45 characters per line — comfortably under the 65–75
+       band, which is as much a defect as running long. At 40rem the column resolves to ~64. */
+    max-width: 40rem;
+  }
+}
+
+/* Weight 670, the section-heading step, matching `.subjectHeading h2`. Tailwind's preflight sets
    `h1..h6 { font-weight: inherit }`, so every heading on this page lands on the body's 400 unless
-   it says otherwise — this one was the last still doing that. */
+   it says otherwise. */
 .benefitsIntro h2 {
   font-size: clamp(2.55rem, 5vw, 5rem);
-  font-weight: 720;
-  letter-spacing: -0.064em;
+  font-weight: 670;
+  letter-spacing: -0.04em;
   line-height: 0.98;
   margin-top: 0.9rem !important;
   text-wrap: balance;
 }
 
+/*
+ * The lede, and the reason it read weak had nothing to do with its measure or its leading — both
+ * were already inside the 65–75ch / 1.5–1.75 guidance (measured: 68 characters per line, 1.68).
+ *
+ * It was the COLOUR. This was the page's only paragraph set in `--muted`, and it sat immediately
+ * under the largest heading on the site: a 72px/670 headline dropping straight to 18px/450 grey.
+ * Muted grey is the right tone for a caption or a timestamp and the wrong one for the sentence
+ * that explains the section. `--ink-soft` is ink at 82% — still clearly secondary to the heading,
+ * but it now reads as prose rather than as a footnote.
+ *
+ * Size goes up a step for the same reason: this is the one paragraph in the section, so it can
+ * afford to be the largest body text on the page.
+ */
+/*
+ * The deck is a BLOCK, not a bare paragraph.
+ *
+ * A hairline rule over a single sentence floating in a wide column read as unfinished rather than
+ * restrained — the text had no left edge of its own to sit against and nothing holding it in the
+ * composition. Giving it a surface makes it an object: the section now reads as a headline and a
+ * stated claim set beside it.
+ *
+ * `--vz-surface-2` rather than the white the benefit cards below use. Those cards are the section's
+ * content; this is its preamble, and painting it the same white would make it look like a fifth
+ * card that lost its heading. A tint of the page's own paper sits it behind the cards in the
+ * material hierarchy while still lifting it off the ground.
+ */
 .benefitsIntro > p:last-child {
-  color: var(--muted);
-  font-size: 1.12rem;
-  font-weight: 520;
-  line-height: 1.68;
+  background: hsl(var(--vz-surface-2) / 62%);
+  border: 1px solid hsl(var(--vz-line) / 80%);
+  border-radius: var(--vz-r-card);
+  color: var(--ink-soft);
+  font-size: 1.14rem;
+  font-weight: 450;
+  /* Body tracking, not heading tracking. Type this size wants a touch of POSITIVE to open its
+     counters — the negative tracking that flatters a 72px headline closes small text up. This is
+     the one axis where the deck and the heading above it should disagree. */
+  letter-spacing: 0.004em;
+  line-height: 1.6;
   margin-top: 1.25rem;
   max-width: 40rem;
+  /* The top inset reserves room for the accent mark drawn below: mark position (1.75rem) plus its
+     own weight plus a gap, so the rule sits above the first line rather than through it. */
+  padding: 3rem 1.85rem 1.75rem;
+  position: relative;
+  text-wrap: pretty;
+}
+
+/* The accent mark, now drawn inside the block's own top padding — the same short rule
+   `.sectionEyebrow::before` uses, so the section opens and its deck begins with one gesture. */
+.benefitsIntro > p:last-child::before {
+  background: hsl(var(--vz-accent));
+  border-radius: 2px;
+  content: "";
+  height: 2px;
+  left: 1.85rem;
+  position: absolute;
+  top: 1.75rem;
+  width: 2.5rem;
 }
 
 .benefitTimeline {
@@ -1144,41 +1497,68 @@
   z-index: 2;
 }
 
-/* The material comes from the shared rule further up; this is layout only. */
+/*
+ * Solid, not glass — see the note on `.subjectCard`'s recipe above for why these two rows split.
+ *
+ * An opaque surface is what lets the step rule, the numeral and the heading carry real weight;
+ * over glass every one of them was competing with the wash showing through. The card sits ON the
+ * field now instead of in it, which is the correct relationship for a step in a sequence.
+ */
 .benefitCard {
   align-content: start;
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: var(--vz-r-card);
   display: grid;
-  gap: 1.05rem;
+  gap: 0.9rem;
+  isolation: isolate;
   min-height: 15rem;
-  padding: 1.5rem 1.35rem 1.6rem;
-}
-
-.benefitCard:hover {
-  box-shadow: var(--vz-fx-glass-shadow), var(--vz-fx-glow);
-  transform: translateY(-4px);
-}
-
-.benefitCard:hover .benefitSheen {
-  opacity: 0.85;
-}
-
-.benefitNode,
-.benefitSignal,
-.benefitCard h3,
-.benefitCard p {
+  overflow: hidden;
+  /* Even top and side padding. The 2.3rem this carried was clearance for the step numeral pinned
+     in the top-right corner; with the numeral gone it was just a dead band above the icon tile. */
+  padding: 1.55rem 1.35rem 1.6rem;
   position: relative;
-  z-index: 1;
+  transition:
+    border-color 320ms var(--vz-ease),
+    box-shadow 320ms var(--vz-ease),
+    transform 320ms var(--vz-ease);
+}
+
+/*
+ * There is deliberately no accent bar across the top of this card, and no longer a 01/02/03/04
+ * numeral in its corner either.
+ *
+ * The numeral was removed for two independent reasons, either of which is sufficient.
+ *
+ * It failed contrast. `--vz-accent` at 58% over this card's `--white` measures 2.51:1 sampled off
+ * the rendered pixels — not large text at 0.95rem, so its floor is 4.5:1. Raising the alpha until
+ * it passed would have made it as loud as the heading, which was the opposite of its purpose.
+ *
+ * And it was redundant. Every card already opens with `.benefitSignal` — "During class", "After
+ * every lesson", "Between classes", "Outside class hours" — which states the sequence in the
+ * reader's own terms and states it more usefully than an ordinal. A number that only repeats
+ * position information the label already carries is decoration wearing a system's clothes.
+ *
+ * The accent still appears in the signal label, which is enough for one hue on a white card.
+ */
+.benefitCard:hover {
+  border-color: hsl(var(--vz-accent) / 45%);
+  box-shadow: 0 18px 38px -22px hsl(var(--vz-ink) / 45%);
+  transform: translateY(-4px);
 }
 
 /* In the card now, not pinned half outside it on a rail. Same tile as the subject cards, so the
    two rows read as one system. */
+/*
+ * Retinted for an opaque card. The old fill was white at 55% with a white inner hairline — correct
+ * over glass, invisible on the solid surface this card now has. A tint of the page's paper plus an
+ * ink hairline gives the tile an edge again.
+ */
 .benefitNode {
   align-items: center;
-  background: hsl(0 0% 100% / 55%);
+  background: hsl(var(--vz-field-1) / 34%);
   border-radius: var(--vz-r-input);
-  box-shadow:
-    inset 0 0 0 1px hsl(0 0% 100% / 65%),
-    0 6px 14px -8px hsl(var(--vz-ink) / 35%);
+  box-shadow: inset 0 0 0 1px hsl(var(--vz-ink) / 8%);
   color: var(--indigo-dark);
   display: flex;
   height: 3.15rem;
@@ -1204,7 +1584,7 @@
 .benefitSignal {
   color: var(--indigo-dark);
   font-size: 0.66rem;
-  font-weight: 850;
+  font-weight: 600;
   letter-spacing: 0.09em;
   text-transform: uppercase;
 }
@@ -1214,12 +1594,18 @@
  * arrives on its own: preflight zeroes the heading weight, and `--indigo-dark` rather than raw
  * `--vz-accent` is what clears AA on a translucent surface (measured, see `.subjectText strong`).
  */
+/*
+ * Ink, not accent, and a step up in size. On the old glass card the accent was doing the work of
+ * separating the heading from the wash behind it; on an opaque surface that job is done by the
+ * surface, and four accent-coloured headings in a row next to four accent step rules was the
+ * accent carrying three different meanings at once. The rule marks the series, the heading reads.
+ */
 .benefitCard h3 {
-  color: var(--indigo-dark);
-  font-size: 1.3rem;
-  font-weight: 700;
-  letter-spacing: -0.028em;
-  line-height: 1.24;
+  color: hsl(var(--vz-ink));
+  font-size: 1.45rem;
+  font-weight: 620;
+  letter-spacing: -0.03em;
+  line-height: 1.2;
   margin-top: 0 !important;
   text-wrap: balance;
 }
@@ -1259,13 +1645,7 @@
 }
 
 .groupGrid {
-  background-image:
-    linear-gradient(hsl(var(--vz-block-on) / 7%) 1px, transparent 1px),
-    linear-gradient(90deg, hsl(var(--vz-block-on) / 7%) 1px, transparent 1px);
-  background-size: 46px 46px;
-  inset: 0;
   mask-image: radial-gradient(115% 95% at 68% 46%, black 24%, transparent 76%);
-  position: absolute;
 }
 
 .groupBloomOne,
@@ -1330,28 +1710,33 @@
    `brightness(1.06)` on top of that; a white tint measured 3.87:1 under the pale coral at 1440 and
    1.06:1 at 390, where the pill lands on the coral bloom. Tinting dark keeps the material — blur,
    saturation, specular rim — while leaving the text somewhere it can be read. */
+/* `.sectionEyebrow` in its dark-ground register — see that rule for why the pill went. The colour
+   is `--vz-field-2` at full opacity, which that token's own note names as the correct text colour
+   for this on the pine block (6.40:1); the rule beside it is the same peach so the mark and the
+   label stay one object. */
 .groupEyebrow {
   align-items: center;
-  backdrop-filter: var(--vz-fx-glass-blur);
-  background: hsl(var(--vz-ink) / 52%);
-  border-radius: var(--vz-r-pill);
-  box-shadow:
-    inset 0 0 0 1px hsl(var(--vz-field-2) / 34%),
-    inset 2px 3px 0 -2px hsl(0 0% 100% / 42%),
-    inset -2px -3px 0 -2px hsl(0 0% 100% / 16%);
   color: hsl(var(--vz-field-2));
   display: inline-flex;
-  font-size: 0.82rem;
-  font-weight: 850;
+  font-size: 0.78rem;
+  font-weight: 600;
+  gap: 0.6rem;
   letter-spacing: 0.1em;
-  padding: 0.5rem 0.95rem;
   text-transform: uppercase;
+}
+
+.groupEyebrow::before {
+  background: hsl(var(--vz-field-2) / 80%);
+  border-radius: 2px;
+  content: "";
+  height: 2px;
+  width: 1.6rem;
 }
 
 .groupSection h2 {
   color: hsl(var(--vz-block-on));
   font-size: clamp(2.15rem, 4vw, 3.3rem);
-  font-weight: 720;
+  font-weight: 670;
   letter-spacing: -0.04em;
   line-height: 1.06;
   margin-top: 1rem !important;
@@ -1369,7 +1754,7 @@
 .groupBody {
   color: hsl(var(--vz-block-on) / 90%);
   font-size: 1.08rem;
-  font-weight: 520;
+  font-weight: 450;
   line-height: 1.6;
   margin-top: 1.15rem !important;
   max-width: 50ch;
@@ -1387,7 +1772,7 @@
   color: hsl(var(--vz-block-on));
   display: flex;
   font-size: 0.95rem;
-  font-weight: 640;
+  font-weight: 560;
   gap: 0.5rem;
 }
 
@@ -1404,7 +1789,7 @@
   color: hsl(var(--vz-block-on));
   display: inline-flex;
   font-size: 0.87rem;
-  font-weight: 700;
+  font-weight: 600;
   gap: 0.55rem;
   margin-top: 1.7rem;
   min-height: 2.9rem;
@@ -1464,7 +1849,7 @@
   color: hsl(var(--vz-block-on));
   display: flex;
   font-size: 1.02rem;
-  font-weight: 800;
+  font-weight: 620;
   gap: 0.55rem;
   letter-spacing: -0.01em;
 }
@@ -1488,7 +1873,7 @@
   display: flex;
   flex: 0 0 auto;
   font-size: 0.72rem;
-  font-weight: 800;
+  font-weight: 600;
   gap: 0.45rem;
   letter-spacing: 0.06em;
   padding: 0.4rem 0.75rem;
@@ -1632,7 +2017,7 @@
   display: flex;
   flex: 0 0 auto;
   font-size: 0.78rem;
-  font-weight: 850;
+  font-weight: 620;
   height: 2.5rem;
   justify-content: center;
   width: 2.5rem;
@@ -1643,7 +2028,7 @@
   border-radius: var(--vz-r-pill);
   color: hsl(var(--vz-positive));
   font-size: 0.78rem;
-  font-weight: 780;
+  font-weight: 560;
   grid-column: 1 / -1;
   padding: 0.35rem 0.55rem;
   text-align: center;
@@ -1718,6 +2103,10 @@
 }
 
 /* Same split as the student cards: framer's transform on the wrapper, the hover lift on the card. */
+/* The map itself lives in `../us-match-map.module.css` — `/group-lessons` renders the same
+   surface, and two copies of a country outline's styling is exactly how the two diagrams would
+   drift apart. Only the card that sits over it is styled here. */
+
 .mapHubEntry {
   margin-inline: auto;
   width: min(100%, 20rem);
@@ -1784,7 +2173,7 @@
   color: hsl(var(--vz-positive));
   display: flex;
   font-size: 0.78rem;
-  font-weight: 760;
+  font-weight: 560;
   gap: 0.28rem;
   padding: 0.35rem 0.6rem;
 }
@@ -1855,15 +2244,10 @@
   z-index: 0;
 }
 
-.parentField > span:first-child {
-  background-image:
-    linear-gradient(hsl(var(--vz-ink) / 4%) 1px, transparent 1px),
-    linear-gradient(90deg, hsl(var(--vz-ink) / 4%) 1px, transparent 1px);
-  background-size: 46px 46px;
-  inset: 0;
-  mask-image: radial-gradient(110% 85% at 30% 40%, black 26%, transparent 74%);
-  position: absolute;
-}
+/* This section's ruling used to be declared here as `.parentField > span:first-child` — a
+   positional selector that painted its own copy of the grid at a fifth alpha (4%). It is now the
+   shared `.parentGrid` class like every other section, so it cannot drift again and it is findable
+   by name. The mask below is the one thing that was worth keeping from the old rule. */
 
 .parentBloomOne,
 .parentBloomTwo {
@@ -1902,10 +2286,13 @@
   max-width: 76rem;
 }
 
+/* Tracking is size-specific: this heading tops out at 3.3rem against the benefits section's 5rem,
+   and the same -0.04em that suits the larger one crowds this one. Tighten less as type gets
+   smaller. */
 .parentSection h2 {
   font-size: clamp(2.15rem, 4vw, 3.3rem);
-  font-weight: 720;
-  letter-spacing: -0.04em;
+  font-weight: 670;
+  letter-spacing: -0.032em;
   line-height: 1.06;
   margin-top: 1rem !important;
   max-width: 16ch;
@@ -1919,13 +2306,78 @@
   color: hsl(var(--vz-accent));
 }
 
-.parentCopy > p:last-of-type {
-  color: var(--muted);
-  font-size: 1.12rem;
-  font-weight: 520;
-  line-height: 1.66;
-  margin-top: 1.15rem;
-  max-width: 40ch;
+/* Same accent as `.parentTitleAccent` — this heading sits on paper, like that one, so it takes the
+   accent at full strength. (`.groupTitleAccent` differs because it sits on the pine block, where
+   vermillion measures far too dark and the palette's peach is the correct light-on-dark accent.)
+   At clamp(2.55rem, 5vw, 5rem) this is large text, so 3:1 is its floor and the accent clears it. */
+.benefitsTitleAccent {
+  color: hsl(var(--vz-accent));
+}
+
+/*
+ * `.parentCopy > p:last-of-type` used to live here, styling this section's body paragraph. It is
+ * deleted rather than kept, and the reason is worth recording because it broke something.
+ *
+ * When that paragraph became `.parentPoints` (a `<ul>`), the eyebrow — which is also a `<p>` —
+ * became the LAST `<p>` in `.parentCopy`. `:last-of-type` counts elements of that tag among
+ * siblings, so the rule silently retargeted onto the eyebrow and repainted it as body copy: ink at
+ * 82% instead of the accent, 1.14rem instead of 0.78rem. "FOR PARENTS" stopped matching the other
+ * two section eyebrows on the page and nothing errored.
+ *
+ * The rule had no other job — `.parentCopy` exists only in this module, used only by the home
+ * page's `ParentPreviewStrip`; the `/parents` page has its own `parents-page.module.css`. So it
+ * goes. The lesson generalises: `:last-of-type` and `:last-child` are positional, and removing a
+ * sibling silently hands their styles to whatever is now in that position.
+ */
+
+/*
+ * What the parent view gathers, as four labelled points instead of one sentence.
+ *
+ * Modelled on `.heroPoints` deliberately: the hero opens the page with exactly this shape — icon,
+ * short label, two columns — and repeating it here is what makes the two sections read as the same
+ * product rather than two different pitches. Same 2x2 grid, same accent icons, same weight.
+ *
+ * `!important` on the margin because the preflight `.page ul { margin: 0 }` is (0,1,1) and beats a
+ * bare class. This file documents that trap at the top; it is the single most common way an edit
+ * here silently does nothing.
+ */
+.parentPoints {
+  column-gap: clamp(1rem, 2.4vw, 2.25rem);
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, auto));
+  justify-content: start;
+  margin-top: 1.6rem !important;
+  row-gap: 0.85rem;
+}
+
+/* `start`, not `center`. Armenian's labels are longer than the English and wrap to two or three
+   lines here; centring the row put the icon beside the MIDDLE line of a wrapped label, which reads
+   as a misalignment rather than a pairing. Aligned to the top the icon always sits with the first
+   line, in both locales. */
+.parentPoints li {
+  align-items: start;
+  color: var(--ink-soft);
+  display: flex;
+  font-size: 0.95rem;
+  font-weight: 560;
+  gap: 0.55rem;
+  letter-spacing: -0.004em;
+  line-height: 1.45;
+}
+
+.parentPoints svg {
+  color: hsl(var(--vz-accent));
+  flex: 0 0 auto;
+  /* Optical centring against the first line's cap height rather than its box top. */
+  margin-top: 0.12rem;
+}
+
+/* One column below the two-column layout's own breakpoint, where two columns of Armenian labels
+   would wrap every line. */
+@media (max-width: 34rem) {
+  .parentPoints {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 
 .parentCta {
@@ -1935,7 +2387,7 @@
   color: var(--ink);
   display: inline-flex;
   font-size: 0.95rem;
-  font-weight: 700;
+  font-weight: 600;
   gap: 0.55rem;
   margin-top: 1.6rem;
   min-height: 2.9rem;
@@ -2224,7 +2676,6 @@
   .subjectIcon,
   .benefitNode,
   .subjectSheen,
-  .benefitSheen,
   .subjectArrow {
     transition: none;
   }
@@ -2389,12 +2840,52 @@
      avatar/action  --vz-field-2    6.40:1 ·  5.70:1
      action tag on its accent-16% fill        5.93:1
    All clear AA. `--vz-muted` measures 2.25:1 here and must never be used. */
+/*
+ * Liquid glass, not a flat pine block.
+ *
+ * Three things have to happen together or it reads as a plain translucent div. The fill is the
+ * block colour at 72% so the hero's grid, blooms and the lesson card's aura genuinely show
+ * through — `app/globals.css` is explicit that glass over an opaque fill is just a tinted box, and
+ * this note sits over the one part of the page with real content behind it. `saturate` on the
+ * backdrop is what makes the colour bend rather than merely blur. And the edge is TWO inset
+ * hairlines, not one: a bright line along the top where light would catch the lip, and a dimmer
+ * one along the bottom. A single uniform ring reads as a border; the pair reads as a thick piece
+ * of material with a near and a far edge.
+ *
+ * The fill is a GRADIENT, not a flat alpha, and that is what makes it read as glass rather than as
+ * a tinted rectangle. A uniform panel over flat paper has nothing to show and no variation to show
+ * it with — which is exactly what it looked like. It runs thin at the top-left corner where the
+ * light enters and deepens toward the bottom-right, so the panel visibly thins toward the light.
+ * `.noteAura` supplies the colour that shows through the thin end.
+ *
+ * The thin end is 82%, not the 62% this first shipped at. The header — the tutor's name and the
+ * "note after today's lesson" line — sits in that corner, and at 62% it was the lightest ground on
+ * the panel under the smallest, faintest type on it. The body text measured fine because it sits
+ * further down the gradient, which is exactly why a single sample was not enough to catch this.
+ * Every text element is measured now, and the floor is set by the worst of them, not the best.
+ *
+ * The edge is four inset layers, because a real thick edge is not one line: a bright specular
+ * hairline along the top lip, a broad soft inner glow just inside it (light travelling into the
+ * material), a dim line along the bottom, and a faint full ring to close the shape.
+ *
+ * Contrast is protected structurally rather than by keeping the panel opaque: the text sits over
+ * the DEEP end of the gradient, so the thin corner never runs under a glyph. Measured after.
+ */
 .teacherNote {
-  background: hsl(var(--vz-block));
+  backdrop-filter: blur(22px) saturate(190%) brightness(0.94);
+  background: linear-gradient(
+    137deg,
+    hsl(var(--vz-block) / 62%) 0%,
+    hsl(var(--vz-block) / 78%) 38%,
+    hsl(var(--vz-block) / 88%) 100%
+  );
   border-radius: var(--vz-r-card);
   box-shadow:
     0 2rem 4.5rem hsl(var(--vz-ink) / 26%),
-    inset 0 0 0 1px hsl(0 0% 100% / 8%);
+    inset 0 1.5px 0 0 hsl(0 0% 100% / 34%),
+    inset 0 14px 26px -14px hsl(0 0% 100% / 22%),
+    inset 0 -1px 0 0 hsl(0 0% 100% / 8%),
+    inset 0 0 0 1px hsl(0 0% 100% / 12%);
   display: flex;
   flex-direction: column;
   /* A floor, so the block keeps a deliberate proportion instead of collapsing to whatever one
@@ -2414,9 +2905,15 @@
   flex-direction: column;
 }
 
-/* A single warm bloom in the top-right, so the block is not a flat rectangle. */
+/*
+ * The specular sweep. A warm bloom in the top-right as before, plus a broad diagonal highlight
+ * running off the top-left corner — the sheen a curved glass surface throws when lit from that
+ * side, which is the same direction every other lit surface on this page is lit from.
+ */
 .teacherNote::before {
-  background: radial-gradient(120% 90% at 88% -10%, hsl(var(--vz-accent) / 22%), transparent 62%);
+  background:
+    linear-gradient(133deg, hsl(0 0% 100% / 13%) 0%, hsl(0 0% 100% / 3%) 26%, transparent 52%),
+    radial-gradient(120% 90% at 88% -10%, hsl(var(--vz-accent) / 22%), transparent 62%);
   content: "";
   inset: 0;
   pointer-events: none;
@@ -2443,7 +2940,7 @@
   flex: none;
   font-family: var(--vz-display);
   font-size: 0.92rem;
-  font-weight: 700;
+  font-weight: 620;
   height: 3rem;
   justify-content: center;
   letter-spacing: -0.02em;
@@ -2476,11 +2973,21 @@
   font-weight: 500;
   letter-spacing: -0.022em;
   line-height: 1.36;
-  /* Held to a reading measure rather than the full card width. At 669px the note ran to a single
-     line, which left the block a squat 3.9:1 bar; wrapping to two gives it the proportion the
-     reference has and stops the eye travelling the whole width for one sentence. */
-  max-width: 32ch;
+  /*
+   * The `max-width: 32ch` + `text-wrap: balance` that used to live here is gone. Each sentence is
+   * now its own block (see `splitSentences` in `compact-home.tsx`), so the break comes from the
+   * copy instead of from a character count. The measure that remains is a generous ceiling for a
+   * single long sentence, not the thing choosing the breaks.
+   */
+  max-width: 44ch;
   position: relative;
+  text-wrap: pretty;
+}
+
+/* One sentence per line. `balance` inside each block so a sentence long enough to wrap splits
+   evenly rather than leaving one word alone on its second line. */
+.noteBody span {
+  display: block;
   text-wrap: balance;
 }
 
@@ -2511,10 +3018,41 @@
   padding: 1.6rem 0 0;
   position: relative;
 }
+/*
+ * The same glass as the panel, one scale down. These sit ON the note, not on the page, so their
+ * `backdrop-filter` samples the note — which is itself glass over the aura. That stacking is the
+ * point: the pills pick up whichever part of the bloom is behind them, so the row is not four
+ * identical chips.
+ *
+ * The blur is deliberately small. A pill is a thin piece of material; blurring it as hard as the
+ * panel would make it read as a hole cut in the card rather than as something lying on top of it.
+ *
+ * The TINT IS INK, not white — the same correction `.groupEyebrow` records for glass on a dark
+ * ground. A white-tinted fill was tried first and measured 2.91:1 under this label, well under AA
+ * for text this size: glass lightens what is behind it, and on pine that walks straight into the
+ * text. Tinting with the block colour darkens the pill against the panel instead, and the glass
+ * still reads because the top hairline and the ring are what carry it, not the fill.
+ */
 .noteTags li {
-  border: 1px solid hsl(var(--vz-block-on) / 26%);
+  backdrop-filter: blur(7px) saturate(150%);
+  /*
+   * Thin enough to be glass. Measured by screenshotting a pill directly rather than by computing
+   * its offset inside the panel — the panel sits under a `Reveal` transform, so rect-relative
+   * sampling lands somewhere else entirely and reported a false AA failure here. Sampled properly,
+   * the label runs about 11:1 at this thickness, so the fill is free to stay light.
+   */
+  background: linear-gradient(
+    140deg,
+    hsl(var(--vz-block) / 30%) 0%,
+    hsl(var(--vz-block) / 46%) 60%,
+    hsl(var(--vz-block) / 58%) 100%
+  );
   border-radius: var(--vz-r-pill);
-  color: hsl(var(--vz-block-on) / 86%);
+  box-shadow:
+    inset 0 1px 0 0 hsl(0 0% 100% / 28%),
+    inset 0 0 0 1px hsl(var(--vz-block-on) / 17%),
+    0 2px 6px -3px hsl(var(--vz-ink) / 40%);
+  color: hsl(var(--vz-block-on) / 92%);
   font-family: var(--vz-display);
   font-size: 0.83rem;
   font-weight: 600;
@@ -2523,9 +3061,25 @@
 }
 /* Exactly one accented tag: the thing the student has to go and do. Three equally loud
    chips would flatten the hierarchy the note is trying to express. */
+/*
+ * The one pill that names an action. Same glass, tinted accent — the `border-color` it used to set
+ * no longer applies now that the ring is an inset shadow, so the accent edge is restated in the
+ * shadow stack. It keeps its own top hairline so it stays part of the row.
+ */
 .noteTags li.noteTagAction {
-  background: hsl(var(--vz-accent) / 16%);
-  border-color: hsl(var(--vz-accent) / 55%);
+  background: linear-gradient(
+    140deg,
+    /* Deeper than the plain pills. Its label is `--vz-field-2`, a pale peach rather than white, so
+       it starts with less headroom: an accent-forward mix measured 4.52:1, which clears AA for
+       this size by 0.02 and is not a margin worth shipping. */
+    color-mix(in srgb, hsl(var(--vz-accent)) 30%, hsl(var(--vz-block) / 74%)) 0%,
+    color-mix(in srgb, hsl(var(--vz-accent)) 23%, hsl(var(--vz-block) / 82%)) 60%,
+    color-mix(in srgb, hsl(var(--vz-accent)) 17%, hsl(var(--vz-block) / 88%)) 100%
+  );
+  box-shadow:
+    inset 0 1px 0 0 hsl(0 0% 100% / 30%),
+    inset 0 0 0 1px hsl(var(--vz-accent) / 62%),
+    0 2px 8px -3px hsl(var(--vz-accent) / 45%);
   color: hsl(var(--vz-field-2));
 }
 
@@ -2663,13 +3217,7 @@
 }
 
 .closingGrid {
-  background-image:
-    linear-gradient(hsl(var(--vz-block-on) / 7%) 1px, transparent 1px),
-    linear-gradient(90deg, hsl(var(--vz-block-on) / 7%) 1px, transparent 1px);
-  background-size: 46px 46px;
-  inset: 0;
   mask-image: radial-gradient(110% 95% at 50% 44%, black 26%, transparent 78%);
-  position: absolute;
 }
 
 .closingBloomOne,
@@ -2728,7 +3276,7 @@
 .closingTitle {
   color: hsl(var(--vz-block-on));
   font-size: clamp(2.1rem, 4.4vw, 3.5rem);
-  font-weight: 700;
+  font-weight: 670;
   line-height: 1.06;
 }
 
@@ -2784,7 +3332,7 @@
   color: hsl(var(--vz-block-on));
   display: inline-flex;
   font-size: 0.9rem;
-  font-weight: 700;
+  font-weight: 600;
   justify-content: center;
   min-height: 3.4rem;
   padding-inline: 1.35rem;

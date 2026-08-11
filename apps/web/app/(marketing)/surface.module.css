@@ -20,7 +20,13 @@
 }
 
 /* Headings take the display face. Set once here so every marketing module inherits the same
-   voice instead of restating a font stack per section. */
+   voice instead of restating a font stack per section.
+
+   NOTE the specificity: this is `.surface :is(...)` at (0,2,0), which beats a bare single-class
+   rule like `.heroTitle`. A section that wants its own heading tracking or leading has to scope
+   through a parent to win — `compact-home.module.css` uses `.page h1.heroTitle` (0,2,1) for
+   exactly this reason, after its hero spent a while silently rendering these values instead of
+   its own. */
 .surface :is(h1, h2, h3, h4) {
   font-family: var(--vz-display);
   letter-spacing: -0.028em;

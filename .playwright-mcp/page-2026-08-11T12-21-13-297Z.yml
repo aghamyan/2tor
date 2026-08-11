@@ -1,0 +1,289 @@
+- generic [ref=f1e2]:
+  - banner [ref=f1e3]:
+    - generic [ref=f1e4]:
+      - link "2tor home" [ref=f1e5] [cursor=pointer]:
+        - /url: /en/home
+        - generic [ref=f1e6]: "2"
+        - generic [ref=f1e7]: tor
+      - generic [ref=f1e8]:
+        - group "Switch language" [ref=f1e9]:
+          - link "EN" [ref=f1e10] [cursor=pointer]:
+            - /url: /en/home
+          - link "HY" [ref=f1e11] [cursor=pointer]:
+            - /url: /hy/home
+        - button "Open menu" [ref=f1e12]
+  - main [ref=f1e17]:
+    - generic [ref=f1e18]:
+      - region [ref=f1e19]:
+        - generic [ref=f1e21]:
+          - generic [ref=f1e22]:
+            - heading "Big goals start with one good lesson ." [level=1] [ref=f1e23]:
+              - text: Big goals start with
+              - generic [ref=f1e24]:
+                - text: one good
+                - generic [ref=f1e25]: lesson
+                - text: .
+            - list [ref=f1e26]:
+              - listitem [ref=f1e27]: Anti-cheating system
+              - listitem [ref=f1e31]: Group classes
+              - listitem [ref=f1e37]: Office hours outside class
+              - listitem [ref=f1e42]: Daily feedback from your tutor
+            - generic [ref=f1e45]:
+              - link "Book a free consultation" [ref=f1e46] [cursor=pointer]:
+                - /url: /en/consultation
+              - link "Explore courses" [ref=f1e49] [cursor=pointer]:
+                - /url: "#courses"
+          - complementary "2tor classroom preview, cycling through a mathematics, programming, Armenian, and chess lesson, each with the tutor's note afterwards" [ref=f1e52]:
+            - generic [ref=f1e55]:
+              - generic [ref=f1e56]: ∑
+              - generic [ref=f1e57]: ♞
+              - generic [ref=f1e58]: Ա
+            - generic [ref=f1e60]:
+              - generic [ref=f1e61]:
+                - generic [ref=f1e62]:
+                  - generic [ref=f1e63]: A
+                  - generic [ref=f1e65]:
+                    - strong [ref=f1e66]: "Algebra: Visual equations"
+                    - generic [ref=f1e67]: Anna · Today at 4:00 PM
+                - generic [ref=f1e68]: Live lesson
+              - generic [ref=f1e70]:
+                - generic [ref=f1e72]:
+                  - generic [ref=f1e73]: Visual equations
+                  - strong [ref=f1e74]: Balance both sides
+                - complementary [ref=f1e87]:
+                  - paragraph [ref=f1e88]: Courses
+                  - list [ref=f1e93]:
+                    - listitem [ref=f1e94]:
+                      - button "Mathematics" [ref=f1e95] [cursor=pointer]
+                    - listitem [ref=f1e97]:
+                      - button "Programming" [ref=f1e98] [cursor=pointer]
+                    - listitem [ref=f1e99]:
+                      - button "Armenian" [ref=f1e100] [cursor=pointer]
+                    - listitem [ref=f1e101]:
+                      - button "Chess" [ref=f1e102] [cursor=pointer]
+            - generic [ref=f1e104]:
+              - generic [ref=f1e105]:
+                - generic [ref=f1e106]: AG
+                - generic [ref=f1e107]:
+                  - strong [ref=f1e108]: Anna Ghazaryan
+                  - generic [ref=f1e109]: Note after today's lesson
+              - paragraph [ref=f1e110]:
+                - generic [ref=f1e111]: Solid grasp of the method.
+                - generic [ref=f1e112]: Still slow when the denominators differ.
+              - list [ref=f1e113]:
+                - listitem [ref=f1e114]: 10 practice problems
+                - listitem [ref=f1e115]: Fractions
+                - listitem [ref=f1e116]: Summary sent to parents
+      - region [ref=f1e117]:
+        - generic [ref=f1e118]:
+          - generic [ref=f1e120]:
+            - paragraph [ref=f1e121]: Find the right starting point
+            - heading "Explore a subject" [level=2] [ref=f1e122]
+          - list [ref=f1e123]:
+            - listitem [ref=f1e124]:
+              - link "Mathematics Build confidence through visual problem solving." [ref=f1e125] [cursor=pointer]:
+                - /url: /en/mathematics
+                - generic [ref=f1e127]:
+                  - strong [ref=f1e128]: Mathematics
+                  - generic [ref=f1e129]: Build confidence through visual problem solving.
+            - listitem [ref=f1e133]:
+              - link "Programming Make it, test it, explain it, improve it. One real project at a time." [ref=f1e134] [cursor=pointer]:
+                - /url: /en/programming
+                - generic [ref=f1e136]:
+                  - strong [ref=f1e137]: Programming
+                  - generic [ref=f1e138]: Make it, test it, explain it, improve it. One real project at a time.
+            - listitem [ref=f1e142]:
+              - link "Armenian Language & Culture Read, write, and speak the language, with the culture behind it." [ref=f1e143] [cursor=pointer]:
+                - /url: /en/armenian-language-heritage
+                - generic [ref=f1e145]:
+                  - strong [ref=f1e146]: Armenian Language & Culture
+                  - generic [ref=f1e147]: Read, write, and speak the language, with the culture behind it.
+            - listitem [ref=f1e151]:
+              - link "Chess Tactics, patience, and thinking two moves ahead." [ref=f1e152] [cursor=pointer]:
+                - /url: /en/chess
+                - generic [ref=f1e154]:
+                  - strong [ref=f1e155]: Chess
+                  - generic [ref=f1e156]: Tactics, patience, and thinking two moves ahead.
+      - region [ref=f1e160]:
+        - generic [ref=f1e161]:
+          - generic [ref=f1e162]:
+            - paragraph [ref=f1e163]: The complete learning loop
+            - heading "Everything around the lesson matters." [level=2] [ref=f1e164]
+            - paragraph [ref=f1e165]: A good class creates momentum. 2tor carries that momentum from the live explanation to the parent update and the next practice session.
+          - generic [ref=f1e166]:
+            - article [ref=f1e167]:
+              - generic [ref=f1e172]: During class
+              - heading "Adaptive live teaching" [level=3] [ref=f1e173]
+              - paragraph [ref=f1e174]: Tutors adjust explanations as soon as a student gets stuck.
+            - article [ref=f1e175]:
+              - generic [ref=f1e180]: After every lesson
+              - heading "Parent-visible progress" [level=3] [ref=f1e181]
+              - paragraph [ref=f1e182]: Parents receive clear feedback and can track results after every class.
+            - article [ref=f1e183]:
+              - generic [ref=f1e188]: Between classes
+              - heading "Practice that continues after class" [level=3] [ref=f1e189]
+              - paragraph [ref=f1e190]: Homework, projects, and weekly problem-solving sessions reinforce learning.
+            - article [ref=f1e191]:
+              - generic [ref=f1e197]: Outside class hours
+              - heading "Office hours, not just lessons" [level=3] [ref=f1e198]
+              - paragraph [ref=f1e199]: Tutors keep open office hours between sessions. A student who gets stuck on a Tuesday does not have to stay stuck until Thursday.
+      - region [ref=f1e200]:
+        - generic [ref=f1e202]:
+          - generic [ref=f1e203]:
+            - paragraph [ref=f1e204]: Small-group learning
+            - heading "Learn alongside two or three others." [level=2] [ref=f1e205]
+            - paragraph [ref=f1e206]: Every group is matched by subject, level, and goal, never by whichever slot happened to be free. The same verified tutors, at around 40% less than one to one.
+            - list [ref=f1e207]:
+              - listitem [ref=f1e208]: Two to four students per group
+              - listitem [ref=f1e211]: Matched by level, not by age
+              - listitem [ref=f1e214]: Around 40% lower cost
+            - link "See how matching works" [ref=f1e217] [cursor=pointer]:
+              - /url: /en/group-lessons
+          - 'img "Sample matching map: a student in California and a student in Maryland, on the same topic, level and schedule, matched into one group with a verified tutor" [ref=f1e220]':
+            - generic [ref=f1e221]:
+              - generic [ref=f1e222]: Matching map
+              - generic [ref=f1e228]: Comparing fit
+            - generic [ref=f1e230]:
+              - article [ref=f1e232]:
+                - generic [ref=f1e233]: AM
+                - generic [ref=f1e234]:
+                  - strong [ref=f1e235]: Aram
+                  - generic [ref=f1e236]: Grade 7 · Fractions review
+                - generic [ref=f1e237]: Weekday evenings
+              - article [ref=f1e239]:
+                - generic [ref=f1e240]: MK
+                - generic [ref=f1e241]:
+                  - strong [ref=f1e242]: Maya
+                  - generic [ref=f1e243]: Grade 6 · Fractions
+                - generic [ref=f1e244]: Weekday evenings
+            - generic [ref=f1e249]:
+              - generic [ref=f1e255]: Verified tutor
+              - strong [ref=f1e256]: Group match found
+              - generic [ref=f1e257]:
+                - generic [ref=f1e258]: Same topic
+                - generic [ref=f1e261]: Similar level
+                - generic [ref=f1e264]: Compatible time
+      - region [ref=f1e267]:
+        - generic [ref=f1e269]:
+          - generic [ref=f1e270]:
+            - paragraph [ref=f1e271]: For parents
+            - heading "See what happened, without having to ask." [level=2] [ref=f1e272]
+            - list [ref=f1e273]:
+              - listitem [ref=f1e274]: The next class
+              - listitem [ref=f1e279]: The current goal
+              - listitem [ref=f1e284]: Homework status
+              - listitem [ref=f1e288]: The tutor's latest note
+            - link "See the parent view" [ref=f1e291] [cursor=pointer]:
+              - /url: /en/parents
+          - 'img "The parent workspace, shown with example content: the current goal and its progress, the next lesson, homework due, and the tutor''s latest feedback" [ref=f1e294]':
+            - generic [ref=f1e296]:
+              - generic [ref=f1e297]:
+                - generic [ref=f1e298]: "2"
+                - paragraph [ref=f1e299]: Good afternoon, Ani
+                - generic [ref=f1e300]: A
+              - generic [ref=f1e301]:
+                - navigation [ref=f1e302]:
+                  - generic [ref=f1e303]: Overview
+                  - generic [ref=f1e307]: Classes
+                  - generic [ref=f1e314]: Homework
+                  - generic [ref=f1e325]: Progress
+                  - generic [ref=f1e330]: Feedback
+                - generic [ref=f1e333]:
+                  - generic [ref=f1e334]:
+                    - generic [ref=f1e335]:
+                      - text: Aram's learning
+                      - heading [level=3] [ref=f1e336]: Mathematics · Grade 6
+                    - generic [ref=f1e337]: Attended
+                  - generic [ref=f1e341]:
+                    - article [ref=f1e342]:
+                      - paragraph [ref=f1e348]: Current goal
+                      - strong [ref=f1e349]: Fractions and ratios
+                      - generic [ref=f1e356]: 3 of 5 developing
+                    - article [ref=f1e357]:
+                      - paragraph [ref=f1e364]: Next lesson
+                      - strong [ref=f1e365]: Thursday, 4:00 PM
+                      - generic [ref=f1e366]: Mathematics · Grade 6
+                    - article [ref=f1e367]:
+                      - paragraph [ref=f1e373]: Homework
+                      - strong [ref=f1e374]: 1 task due Friday
+                      - generic [ref=f1e375]: View assignment
+                    - article [ref=f1e376]:
+                      - generic [ref=f1e383]:
+                        - paragraph [ref=f1e384]: Latest tutor feedback
+                        - generic [ref=f1e385]: Today · Mariam S.
+                      - blockquote [ref=f1e386]: Aram understands equivalent fractions visually. Next, we will practise common denominators.
+              - paragraph [ref=f1e387]: Example content. Your workspace reflects your child's actual plan and lessons.
+      - region [ref=f1e388]:
+        - generic [ref=f1e390]:
+          - heading "Start with one good lesson." [level=2] [ref=f1e391]
+          - paragraph [ref=f1e392]: Tell us where your child is stuck. We will suggest a tutor, a level, and a schedule. You decide afterwards. We are taking 40 families this term.
+          - generic [ref=f1e393]:
+            - link "Book a free consultation" [ref=f1e394] [cursor=pointer]:
+              - /url: /en/consultation
+            - link "See pricing" [ref=f1e397] [cursor=pointer]:
+              - /url: /en/pricing
+          - paragraph [ref=f1e398]: Free · 20 minutes · no card, no obligation
+  - contentinfo [ref=f1e399]:
+    - generic [ref=f1e400]:
+      - generic [ref=f1e401]:
+        - generic [ref=f1e402]: "2"
+        - generic [ref=f1e403]: tor
+      - generic [ref=f1e404]:
+        - generic [ref=f1e405]:
+          - paragraph [ref=f1e406]: Subjects
+          - list [ref=f1e407]:
+            - listitem [ref=f1e408]:
+              - link "Mathematics" [ref=f1e409] [cursor=pointer]:
+                - /url: /en/mathematics
+            - listitem [ref=f1e410]:
+              - link "Programming" [ref=f1e411] [cursor=pointer]:
+                - /url: /en/programming
+            - listitem [ref=f1e412]:
+              - link "Armenian language & culture" [ref=f1e413] [cursor=pointer]:
+                - /url: /en/armenian-language-heritage
+            - listitem [ref=f1e414]:
+              - link "Chess" [ref=f1e415] [cursor=pointer]:
+                - /url: /en/chess
+        - generic [ref=f1e416]:
+          - paragraph [ref=f1e417]: About 2tor
+          - list [ref=f1e418]:
+            - listitem [ref=f1e419]:
+              - link "How it works" [ref=f1e420] [cursor=pointer]:
+                - /url: /en/how-it-works
+            - listitem [ref=f1e421]:
+              - link "Group lessons" [ref=f1e422] [cursor=pointer]:
+                - /url: /en/group-lessons
+            - listitem [ref=f1e423]:
+              - link "Pricing" [ref=f1e424] [cursor=pointer]:
+                - /url: /en/pricing
+            - listitem [ref=f1e425]:
+              - link "Safety" [ref=f1e426] [cursor=pointer]:
+                - /url: /en/safety
+        - generic [ref=f1e427]:
+          - paragraph [ref=f1e428]: Families & tutors
+          - list [ref=f1e429]:
+            - listitem [ref=f1e430]:
+              - link "For parents" [ref=f1e431] [cursor=pointer]:
+                - /url: /en/parents
+            - listitem [ref=f1e432]:
+              - link "Apply to teach" [ref=f1e433] [cursor=pointer]:
+                - /url: /en/tutor-application
+        - generic [ref=f1e434]:
+          - paragraph [ref=f1e435]: Legal
+          - list [ref=f1e436]:
+            - listitem [ref=f1e437]:
+              - link "Privacy" [ref=f1e438] [cursor=pointer]:
+                - /url: /en/privacy
+            - listitem [ref=f1e439]:
+              - link "Terms" [ref=f1e440] [cursor=pointer]:
+                - /url: /en/terms
+            - listitem [ref=f1e441]:
+              - link "Contact" [ref=f1e442] [cursor=pointer]:
+                - /url: /en/contact
+      - generic [ref=f1e443]:
+        - paragraph [ref=f1e444]: © 2026 2tor. All rights reserved.
+        - group "Switch language" [ref=f1e445]:
+          - link "English" [ref=f1e446] [cursor=pointer]:
+            - /url: /en/home
+          - link "Armenian" [ref=f1e447] [cursor=pointer]:
+            - /url: /hy/home

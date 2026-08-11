@@ -817,7 +817,7 @@ export const mathematicsCurriculum: CurriculumLevel[] = [
     focus: "Equations, functions, inequalities, and modeling",
     readinessLabel: "Core high school",
     summary:
-      "A complete first algebra course built around structure, representations, functions, and modeling—not isolated symbol rules.",
+      "A complete first algebra course built around structure, representations, functions, and modeling, not isolated symbol rules.",
     bestFor: [
       "Students enrolled in Algebra I",
       "Advanced middle school students",

@@ -91,7 +91,7 @@ const en = {
   },
   preference: {
     title: "What kind of support are you considering?",
-    hint: "This helps us recommend the right starting point—it isn’t a commitment.",
+    hint: "This helps us recommend the right starting point, and it isn’t a commitment.",
     format: "Lesson preference",
     formats: {
       individual: "Individual lessons",

@@ -3,9 +3,19 @@
 import { useState } from "react";
 import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
-import { ArrowRight, Check, Network, UserRoundCheck } from "lucide-react";
+import {
+  ArrowRight,
+  BookOpenCheck,
+  CalendarClock,
+  Check,
+  MessageSquareText,
+  Network,
+  UserRoundCheck,
+  Target,
+} from "lucide-react";
 import { ParentDashboardPreview } from "../parents/parent-dashboard-preview";
 import type { ParentsCopy } from "../parents/parents-content";
+import { ParallaxField } from "./parallax-field";
 import styles from "./compact-home.module.css";
 
 /**
@@ -44,7 +54,12 @@ export interface ParentPreviewCopy {
   title: string;
   /** See `GroupLessonsCopy.titleAccent`. */
   titleAccent: string;
-  body: string;
+  /**
+   * What the parent view gathers, one item per line. This replaced a paragraph that listed the
+   * same four things inside a sentence — see the copy record. Order matches `parentPointIcons`
+   * below and the workspace mock beside it.
+   */
+  points: readonly string[];
   cta: string;
   /** One sentence naming what the workspace picture shows. */
   dashboardAriaLabel: string;
@@ -55,8 +70,12 @@ export interface ParentPreviewCopy {
  *
  * Returns the untouched string when the run is absent, so a copy edit that loses the phrase costs
  * the colour and nothing else — never a headline with a hole in it.
+ *
+ * Exported because the benefits section in `compact-home.tsx` uses the same treatment. Every
+ * section heading on this page now carries an accent phrase, and a second copy of this search is
+ * how the two would drift apart.
  */
-function accentedTitle(title: string, accent: string, className = styles.groupTitleAccent) {
+export function accentedTitle(title: string, accent: string, className = styles.groupTitleAccent) {
   const at = accent ? title.indexOf(accent) : -1;
   if (at === -1) return title;
   return (
@@ -67,6 +86,15 @@ function accentedTitle(title: string, accent: string, className = styles.groupTi
     </>
   );
 }
+
+/*
+ * Positional, matching `copy.points` order and the hero's own `differentiatorIcons` pattern. Four
+ * distinct icons rather than four repeated checkmarks: each names a different KIND of thing the
+ * parent view surfaces, and a row of identical ticks would throw that distinction away. The group
+ * band above deliberately keeps checkmarks — there the points are a list of claims about one offer,
+ * so sameness is correct.
+ */
+const parentPointIcons = [CalendarClock, Target, BookOpenCheck, MessageSquareText] as const;
 
 /**
  * Group lessons, in one band.
@@ -86,12 +114,12 @@ export function GroupLessonsStrip({ copy, href }: { copy: GroupLessonsCopy; href
        * tinted div, so the map's panes need something behind them worth bending. Positioned so the
        * two student cards and the hub each sit over a different tint.
        */}
-      <div className={styles.groupField} aria-hidden="true">
+      <ParallaxField className={styles.groupField} distance={34}>
         <span className={styles.groupGrid} />
         <span className={styles.groupBloomOne} />
         <span className={styles.groupBloomTwo} />
         <span className={styles.groupBloomThree} />
-      </div>
+      </ParallaxField>
 
       <div className={styles.sectionShell}>
         <motion.div
@@ -139,6 +167,28 @@ export function GroupLessonsStrip({ copy, href }: { copy: GroupLessonsCopy; href
  *
  * One `role="img"`: a screen reader should hear the sentence this picture makes, not walk two fake
  * student records and a list of invented criteria.
+ */
+/**
+ * Two students on opposite coasts, resolving into one group.
+ *
+ * This replaced an abstract node diagram — two cards, a dashed wire, a hub. That drawing said
+ * "these two were connected" but not the thing the section is actually claiming, which is that
+ * geography stops mattering. A real map says it in one glance: a family in California and a family
+ * in Maryland, three time zones apart, in the same lesson.
+ *
+ * The map is real geometry, not a freehand shape — see `us-map.ts` for how it was projected and
+ * why it is baked. The pin positions are Glendale, CA and Rockville, MD, the two launch markets
+ * `description.txt` names.
+ *
+ * MOTION. One authored sequence rather than the same entrance repeated: the map fades up, the two
+ * pins drop in a beat apart, the arc draws between them, and only then does the result resolve at
+ * the meeting point. The order is the argument — you watch two separate places become one match.
+ * Springs are critically damped (`bounce: 0`); a background diagram that overshoots is a diagram
+ * you have started to notice. Under `prefers-reduced-motion` every step collapses to zero duration,
+ * so the final state simply appears.
+ *
+ * The whole thing is one `role="img"` with a single label. A screen reader should hear the sentence
+ * this picture makes, not walk two fake student records, a country outline and a list of criteria.
  */
 function GroupMatchMap({ copy }: { copy: GroupMapCopy }) {
   const reduceMotion = useReducedMotion();
@@ -265,11 +315,11 @@ export function ParentPreviewStrip({
   return (
     <section className={styles.parentSection} aria-labelledby="parent-title">
       {/* One pane of glass — the eyebrow — still needs something behind it to be glass at all. */}
-      <div className={styles.parentField} aria-hidden="true">
-        <span />
+      <ParallaxField className={styles.parentField} distance={46}>
+        <span className={styles.parentGrid} />
         <span className={styles.parentBloomOne} />
         <span className={styles.parentBloomTwo} />
-      </div>
+      </ParallaxField>
 
       <div className={styles.sectionShell}>
         <div className={styles.parentLayout}>
@@ -278,7 +328,17 @@ export function ParentPreviewStrip({
             <h2 id="parent-title">
               {accentedTitle(copy.title, copy.titleAccent, styles.parentTitleAccent)}
             </h2>
-            <p>{copy.body}</p>
+            <ul className={styles.parentPoints}>
+              {copy.points.map((point, index) => {
+                const Icon = parentPointIcons[index] ?? Check;
+                return (
+                  <li key={point}>
+                    <Icon size={17} aria-hidden="true" />
+                    {point}
+                  </li>
+                );
+              })}
+            </ul>
             <Link href={href} className={styles.parentCta}>
               {copy.cta}
               <ArrowRight size={16} aria-hidden="true" />

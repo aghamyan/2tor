@@ -57,7 +57,7 @@ export function NavRail({
   return (
     <nav
       aria-label={ariaLabel}
-      className={`${styles.navRail} hidden shrink-0 items-center gap-0.5 xl:flex`}
+      className={`${styles.navRail} hidden shrink-0 items-center gap-1.5 xl:flex`}
     >
       {entries.map((entry) => {
         const active = isEntryActive(pathname, locale, entry);
@@ -70,7 +70,7 @@ export function NavRail({
             href={localizedHref(locale, entry.href)}
             aria-current={active ? "page" : undefined}
             data-active={active ? "true" : "false"}
-            className={`${styles.navLink} relative shrink-0 whitespace-nowrap rounded-lg px-3 py-2 text-sm font-medium`}
+            className={`${styles.navLink} relative shrink-0 whitespace-nowrap px-3.5 py-2 text-sm font-medium`}
           >
             {active ? (
               <motion.span

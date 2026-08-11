@@ -67,6 +67,7 @@
         "legalHeading": "Legal",
         "mathematics": "Mathematics",
         "programming": "Programming",
+        "chess": "Chess",
         "heritage": "Armenian language & culture",
         "sat": "SAT",
         "toefl": "TOEFL",
@@ -90,7 +91,7 @@
       },
       "hero": {
         "eyebrow": "A managed school, not a marketplace",
-        "title": "Personalized online tutoring with verified Armenian educators — and progress parents can actually see.",
+        "title": "Personalized online tutoring with verified Armenian educators, and progress parents can actually see.",
         "description": "Math, programming, and Armenian heritage lessons built around each learner's goals, with structured feedback, milestones, projects, and support between classes.",
         "trust": {
           "label": "Trust signals",
@@ -101,7 +102,7 @@
         "visual": {
           "label": "What a parent sees",
           "headline": "Steady, visible progress",
-          "note": "A real trend from feedback after every lesson — not a guess."
+          "note": "A real trend from feedback after every lesson, not a guess."
         }
       },
       "trustBar": {
@@ -116,7 +117,7 @@
       "howItWorks": {
         "eyebrow": "How it works",
         "title": "A clear path from first conversation to visible progress",
-        "description": "Four steps, the same for every family — no guesswork about what happens next.",
+        "description": "Four steps, the same for every family. No guesswork about what happens next.",
         "steps": {
           "one": {
             "title": "Free consultation",
@@ -128,7 +129,7 @@
           },
           "three": {
             "title": "A personalized learning plan",
-            "body": "Your tutor builds a plan around real goals — not a generic syllabus — with milestones you can see."
+            "body": "Your tutor builds a plan around real goals, not a generic syllabus, with milestones you can see."
           },
           "four": {
             "title": "Visible progress",
@@ -143,13 +144,13 @@
         "items": {
           "heritage": {
             "title": "Armenian language & culture",
-            "body": "Reading, speaking, and writing Armenian alongside history and culture — taught by educators who carry the language as their own, not an afterthought subject.",
+            "body": "Reading, speaking, and writing Armenian alongside history and culture, taught by educators who carry the language as their own, not an afterthought subject.",
             "cta": "Explore the curriculum",
             "highlights": ["Reading & writing", "Conversational speaking", "History & culture"]
           },
           "mathematics": {
             "title": "Mathematics",
-            "body": "From foundations to advanced coursework, taught for understanding — with practice that builds real fluency, not just answers.",
+            "body": "From foundations to advanced coursework, taught for understanding, with practice that builds real fluency, not just answers.",
             "cta": "Explore the curriculum",
             "highlights": [
               "Foundations & number sense",
@@ -159,7 +160,7 @@
           },
           "programming": {
             "title": "Programming",
-            "body": "Learners build and ship real projects — websites, games, tools — while developing the habits of testing, debugging, and explaining their work.",
+            "body": "Learners build and ship real projects: websites, games, and tools. Along the way they develop the habits of testing, debugging, and explaining their work.",
             "cta": "Explore the curriculum",
             "highlights": [
               "Web & app projects",
@@ -196,7 +197,7 @@
         "points": {
           "structure": {
             "title": "Structure",
-            "body": "Every learner follows a plan with defined goals and milestones — never an improvised lesson."
+            "body": "Every learner follows a plan with defined goals and milestones, never an improvised lesson."
           },
           "visibility": {
             "title": "Visibility",
@@ -204,7 +205,7 @@
           },
           "accountability": {
             "title": "Accountability",
-            "body": "Tutors are trained, reviewed, and part of the 2tor team — not independent contractors you vet yourself."
+            "body": "Tutors are trained, reviewed, and part of the 2tor team, not independent contractors you vet yourself."
           },
           "safety": {
             "title": "Child safety",
@@ -242,7 +243,7 @@
       "forParents": {
         "eyebrow": "For parents",
         "title": "Everything you need to know, without managing every lesson",
-        "description": "The parent dashboard keeps schedules, feedback, and milestones in one place — so you always know what's happening, without sitting in on class.",
+        "description": "The parent dashboard keeps schedules, feedback, and milestones in one place, so you always know what's happening without sitting in on class.",
         "points": {
           "schedule": {
             "title": "Schedules",
@@ -250,7 +251,7 @@
           },
           "feedback": {
             "title": "Feedback",
-            "body": "Read what the tutor noted after every lesson — what was covered, what to practice next."
+            "body": "Read what the tutor noted after every lesson: what was covered, what to practice next."
           },
           "milestones": {
             "title": "Milestones",
@@ -258,13 +259,13 @@
           },
           "progressTrend": {
             "title": "Progress trend",
-            "body": "A trend built from real lesson feedback over time — not a guess."
+            "body": "A trend built from real lesson feedback over time, not a guess."
           }
         },
         "preview": {
           "label": "Parent dashboard preview",
           "headline": "Progress trend, this term",
-          "caption": "Illustrative preview — built from structured feedback after each lesson.",
+          "caption": "Illustrative preview, built from structured feedback after each lesson.",
           "week": "Week 08",
           "lessons": "Lessons",
           "milestones": "Milestones",
@@ -274,7 +275,7 @@
       "tutors": {
         "eyebrow": "Our educators",
         "title": "Educators who are part of our school, not strangers from a listing",
-        "description": "Every tutor is hand-verified, trained on a U.S. curriculum, and supported by our team — publicly part of the 2tor name, not an anonymous profile.",
+        "description": "Every tutor is hand-verified, trained on a U.S. curriculum, and supported by our team, and publicly part of the 2tor name rather than an anonymous profile.",
         "cta": "Apply to teach with us"
       },
       "testimonials": {
@@ -283,7 +284,7 @@
         "disclosure": "Sample testimonials shown for illustration. Real testimonials are published only with a verified parent relationship and written parental consent, and never name or picture a child.",
         "items": {
           "one": {
-            "quote": "We finally know what our son is working on and why it matters — not just that a lesson happened.",
+            "quote": "We finally know what our son is working on and why it matters, not just that a lesson happened.",
             "attribution": "— Parent of a 2tor mathematics student"
           },
           "two": {
@@ -297,16 +298,16 @@
       },
       "finalCta": {
         "title": "Ready to see what a structured plan looks like for your learner?",
-        "description": "Start with a free consultation — no pressure, no long form."
+        "description": "Start with a free consultation. No pressure, no long form."
       }
     },
     "testimonial": {
       "quote": "We always knew what our child was working on, and why the next step mattered.",
-      "attribution": "Parent testimonial — relationship verified; published with parental consent; child not identified."
+      "attribution": "Parent testimonial. Relationship verified; published with parental consent; child not identified."
     },
     "aside": {
       "title": "Start with a real conversation",
-      "body": "Tell us what you are noticing. We will help you choose a sensible next step — no pressure, no long form."
+      "body": "Tell us what you are noticing. We will help you choose a sensible next step. No pressure, no long form."
     },
     "form": {
       "name": "Your name",
@@ -355,7 +356,7 @@
         "description": "Reasoning, not rushing.",
         "body": "Mathematics lessons make thinking visible. Learners work with patterns, representations, explanations, and carefully chosen practice so fluency grows alongside understanding.",
         "audienceLabel": "Who this is for",
-        "audience": "Learners from early number sense through pre-calculus — whether catching up, keeping pace, or reaching ahead of grade level.",
+        "audience": "Learners from early number sense through pre-calculus, whether catching up, keeping pace, or reaching ahead of grade level.",
         "curriculumHeading": "What your child will learn",
         "curriculumIntro": "A structured path through five areas, adapted to your learner's current level and goals.",
         "modules": [
@@ -395,7 +396,7 @@
         "description": "Language as a living connection.",
         "body": "Lessons bring language, history, and creative expression together. Learners read, speak, write, and investigate cultural material in ways that invite genuine participation.",
         "audienceLabel": "Who this is for",
-        "audience": "Learners at any starting point — from a first introduction to the Armenian alphabet through advanced reading, writing, and conversation.",
+        "audience": "Learners at any starting point, from a first introduction to the Armenian alphabet through advanced reading, writing, and conversation.",
         "curriculumHeading": "What your child will learn",
         "curriculumIntro": "A structured path through five areas, adapted to your learner's current level and goals.",
         "modules": [

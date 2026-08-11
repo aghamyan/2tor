@@ -1,0 +1,17 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "codex-grid-background",
+        "value": "*",
+        "files": [
+          "**/compact-home.module.css"
+        ],
+        "createdAt": "2026-08-10T20:51:54.101Z",
+        "reason": "Ruled ground is deliberate page vocabulary, confirmed by Aram: the classroom mock's whiteboard is a real measurement surface and the page ground rhymes with it. One 46px cell across all six sections. Glob is path-suffix matched because the hook reports paths relative to apps/web while a repo-root run reports them relative to the repo."
+      }
+    ]
+  }
+}

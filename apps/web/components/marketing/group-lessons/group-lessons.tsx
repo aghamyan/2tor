@@ -96,7 +96,7 @@ const copy = {
     eyebrow: "Small-group learning",
     heroTitle: "Learn together. Pay less. Stay challenged.",
     heroBody:
-      "Students are matched by subject, current level, learning goals, and schedule—so they can learn together without being held back or left behind.",
+      "Students are matched by subject, current level, learning goals, and schedule, so they can learn together without being held back or left behind.",
     saving: "Group lessons can cost around 40% less than individual classes.",
     availability: "Availability depends on finding compatible learners.",
     primary: "Join the matching list",
@@ -142,7 +142,7 @@ const copy = {
     criteria: {
       eyebrow: "Compatibility matters",
       title: "We match by level, not just age",
-      body: "Two students in the same school grade may need very different mathematics instruction. A useful group shares a learning problem—not only a birth year.",
+      body: "Two students in the same school grade may need very different mathematics instruction. A useful group shares a learning problem, not only a birth year.",
       example:
         "Two Grade 7 students may not be suitable classmates if one is learning basic fractions and the other is ready for Algebra I.",
       factors: [
@@ -190,7 +190,7 @@ const copy = {
     classroom: {
       eyebrow: "Inside the lesson",
       title: "What happens during a group lesson",
-      body: "The tutor moves between shared explanation, individual turns, and a collaborative challenge—while monitoring who needs a different prompt.",
+      body: "The tutor moves between shared explanation, individual turns, and a collaborative challenge, while monitoring who needs a different prompt.",
       timeline: [
         "Warm-up",
         "Tutor explanation",
@@ -308,7 +308,7 @@ const copy = {
       items: [
         [
           "How many students are in a group?",
-          `Groups are intentionally small—usually around ${GROUP_SIZE_RANGE.minimum}–${GROUP_SIZE_RANGE.maximum} learners. The proposed size is shown before you confirm.`,
+          `Groups are intentionally small, usually around ${GROUP_SIZE_RANGE.minimum}–${GROUP_SIZE_RANGE.maximum} learners. The proposed size is shown before you confirm.`,
         ],
         [
           "How do you decide which students belong together?",
@@ -340,7 +340,7 @@ const copy = {
         ],
         [
           "Can siblings join the same group?",
-          "Possibly—if their topic, readiness, goals, and schedule are genuinely compatible.",
+          "Possibly, if their topic, readiness, goals, and schedule are genuinely compatible.",
         ],
         [
           "What if one student progresses faster?",
@@ -719,6 +719,20 @@ function CheckList({ items, muted = false }: { items: readonly string[]; muted?:
   );
 }
 
+/**
+ * Three students, two of whom become a group.
+ *
+ * A US map version was built here and reverted alongside the home page's. The note on
+ * `GroupMatchMap` in `../home/home-sections.tsx` records why: at map scale the learner cards
+ * covered the country, shrinking them to pins threw away the grade/topic/schedule detail that makes
+ * a match believable, and keeping both meant nudging cards off their true coordinates — a map that
+ * lies. This diagram states the same thing without pretending to be geography.
+ *
+ * Lena's line deliberately never completes. She shares the topic but not the grade level or the
+ * schedule, so she goes on the waiting list — which is this page's actual argument ("we do not
+ * place students together just because a time slot is open"). A diagram where every line resolves
+ * would quietly contradict the copy beside it.
+ */
 function MatchingVisualization({ locale }: { locale: Locale }) {
   const isHy = locale === "hy";
   return (
@@ -794,7 +808,6 @@ function MatchingVisualization({ locale }: { locale: Locale }) {
     </div>
   );
 }
-
 const benefitIcons: LucideIcon[] = [Lightbulb, MessageCircleMore, Target, Network];
 
 function ClassroomPreview({ c, locale }: { c: GroupCopy["classroom"]; locale: Locale }) {

@@ -3,6 +3,8 @@ import { headerButtonClass } from "../site/header-actions";
 import { ArrowUpRightIcon } from "../site/icons";
 import siteStyles from "../site/site.module.css";
 import type { Cta } from "./content";
+import { Reveal } from "./reveal";
+import { ParallaxField } from "./parallax-field";
 import styles from "./compact-home.module.css";
 
 export interface ClosingCtaCopy {
@@ -31,15 +33,21 @@ export interface ClosingCtaProps {
 export function ClosingCta({ copy, consultationCta, pricingCta }: ClosingCtaProps) {
   return (
     <section className={styles.closingSection} aria-labelledby="home-closing-title">
-      <div className={styles.closingField} aria-hidden="true">
+      <ParallaxField className={styles.closingField} distance={28}>
         <span className={styles.closingGrid} />
         <span className={styles.closingBloomOne} />
         <span className={styles.closingBloomTwo} />
         <span className={styles.closingBloomThree} />
-      </div>
+      </ParallaxField>
 
       <div className={styles.sectionShell}>
-        <div className={styles.closingInner}>
+        {/*
+         * `fade={false}` because this block contains the page's two closing buttons. A reveal that
+         * animates from `opacity: 0` would leave them focusable-but-invisible for anyone tabbing
+         * ahead of the scroll — the exact failure `scroll-reveal.tsx` was written to avoid. The
+         * rise alone still reads as an entrance.
+         */}
+        <Reveal fade={false} className={styles.closingInner}>
           <h2 className={styles.closingTitle} id="home-closing-title">
             {copy.title}
           </h2>
@@ -68,7 +76,7 @@ export function ClosingCta({ copy, consultationCta, pricingCta }: ClosingCtaProp
           </div>
 
           <p className={styles.closingNote}>{copy.note}</p>
-        </div>
+        </Reveal>
       </div>
     </section>
   );
