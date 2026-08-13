@@ -6,6 +6,7 @@ import {
   BrainCircuit,
   CalendarDays,
   Check,
+  Eye,
   CheckCircle2,
   ClipboardCheck,
   FileText,
@@ -27,9 +28,19 @@ import {
 import type { Locale } from "@app/i18n/config";
 import { getHowItWorksCopy } from "./how-it-works-content";
 import { KnowledgeMap, LearningLogic, RecordTabs, Reveal } from "./how-it-works-interactive";
+import { headerButtonClass } from "../site/header-actions";
+import { ArrowUpRightIcon } from "../site/icons";
+import siteStyles from "../site/site.module.css";
 import { SectionGround } from "../section-ground";
 import { SectionEyebrow, accentedTitle, type SectionTone } from "../section-heading";
 import styles from "./how-it-works.module.css";
+
+/*
+ * Positional, matching `hero.outcomes` order. Three distinct icons rather than three repeated
+ * checkmarks: each names a different kind of outcome, and a row of identical ticks would throw that
+ * distinction away.
+ */
+const outcomeIcons = [BookOpenCheck, Eye, Users] as const;
 
 function localHref(locale: Locale, path: string) {
   return `/${locale}${path}`;
@@ -133,13 +144,43 @@ export function HowItWorksPage({ locale }: { locale: Locale }) {
           <div className={styles.heroLayout}>
             <div className={styles.heroCopy}>
               <SectionEyebrow>{c.hero.eyebrow}</SectionEyebrow>
-              <h1>{c.hero.title}</h1>
+              <h1>{accentedTitle(c.hero.title, c.hero.titleAccent)}</h1>
               <p className={styles.heroLede}>{c.hero.body}</p>
-              <p className={styles.heroSecondary}>{c.hero.secondary}</p>
+
+              {/*
+               * Three outcomes, replacing a second paragraph that restated the lede above it. Same
+               * shape as the home hero's differentiator row — icon, short label — so the two front
+               * doors introduce the product the same way.
+               */}
+              <ul className={styles.heroOutcomes}>
+                {c.hero.outcomes.map((item, index) => {
+                  const Icon = outcomeIcons[index] ?? Check;
+                  return (
+                    <li key={item}>
+                      <Icon size={17} aria-hidden="true" />
+                      {item}
+                    </li>
+                  );
+                })}
+              </ul>
+
               <div className={styles.actions}>
-                <Link className={styles.primary} href={consultation}>
+                {/*
+                 * The header's own button, not a copy of it. `headerButtonClass` and
+                 * `.buttonPrimary` are the exact two classes `HeaderActionsPanel` composes, so the
+                 * accent pill, the travelling sheen, the arrow badge and the destination stay in
+                 * sync by construction — the home hero does the same.
+                 *
+                 * `.scope` has to come along: it is where `site.module.css` declares the `--site-*`
+                 * tokens `.buttonPrimary` paints with, and outside the site chrome they would
+                 * resolve to nothing and the button would render as bare text.
+                 */}
+                <Link
+                  href={consultation}
+                  className={`${siteStyles.scope} ${siteStyles.buttonPrimary} ${headerButtonClass} ${styles.heroConsultAction}`}
+                >
                   {c.hero.primary}
-                  <ArrowRight />
+                  <ArrowUpRightIcon className={siteStyles.buttonIcon} />
                 </Link>
                 <a className={styles.secondary} href="#learning-system">
                   {c.hero.secondaryCta}

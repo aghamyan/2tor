@@ -5,10 +5,23 @@ export type HowItWorksCopy = typeof en;
 const en = {
   hero: {
     eyebrow: "How 2tor works",
-    title: "We learn the student before we plan the lesson.",
+    /*
+     * "learn" is doing two jobs in one sentence — the school learns, and the student learns — and
+     * the reader has to disambiguate mid-headline. "know" says the same thing in one meaning. The
+     * Armemian translation already read this way ("we know the student, and only then plan the
+     * lesson"), so this brings the English in line with it rather than the other way round.
+     */
+    title: "We know the student before we plan the lesson.",
+    /* The claim is the ORDER, not the knowing — plenty of tutors know their students. */
+    titleAccent: "before we plan the lesson.",
     body: "2tor records what your child knows, where they struggle, what they are learning at school, and what should come next.",
-    secondary:
-      "That shared record helps tutors prepare better lessons, gives parents clear visibility, and makes accurate group matching possible.",
+    /*
+     * Three points, not the paragraph that used to sit here. That sentence restated the lede above
+     * it — both said "we keep a record and it helps" — and a second block of prose under a headline
+     * this large read as filler. As labelled points they name three distinct outcomes and scan in
+     * one pass, matching the home hero's differentiator row.
+     */
+    outcomes: ["Better-prepared lessons", "Visible parent updates", "Accurate group matching"],
     primary: "Book a free consultation",
     secondaryCta: "See the learning system",
     note: "Start with a short conversation. No long enrollment form.",
@@ -401,9 +414,9 @@ const hy: HowItWorksCopy = {
   hero: {
     eyebrow: "Ինչպես է աշխատում 2tor-ը",
     title: "Մենք ճանաչում ենք սովորողին, հետո միայն պլանավորում դասը։",
+    titleAccent: "հետո միայն պլանավորում դասը։",
     body: "2tor-ը գրանցում է՝ ինչ գիտի ձեր երեխան, որտեղ է դժվարանում, ինչ է սովորում դպրոցում և որն է հաջորդ քայլը։",
-    secondary:
-      "Այս ընդհանուր գրառումն օգնում է դասավանդողին լավ պատրաստվել, ծնողին՝ տեսնել ընթացքը, իսկ համակարգին՝ ճիշտ խմբեր ձևավորել։",
+    outcomes: ["Ավելի լավ պատրաստված դասեր", "Ծնողին տեսանելի ընթացք", "Ճշգրիտ խմբավորում"],
     primary: "Ամրագրել անվճար խորհրդատվություն",
     secondaryCta: "Տեսնել ուսուցման համակարգը",
     note: "Սկսեք կարճ զրույցից՝ առանց երկար գրանցման ձևի։",

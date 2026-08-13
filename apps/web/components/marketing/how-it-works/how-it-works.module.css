@@ -114,15 +114,6 @@
   margin-top: 1.5rem !important;
   max-width: 38rem;
 }
-.heroSecondary {
-  border-left: 2px solid var(--teal);
-  color: var(--muted);
-  font-size: 0.9rem;
-  line-height: 1.65;
-  margin-top: 1.1rem !important;
-  max-width: 38rem;
-  padding-left: 1rem;
-}
 .actions {
   display: flex;
   flex-wrap: wrap;
@@ -153,9 +144,17 @@
   color: white;
 }
 .secondary {
-  background: hsl(var(--vz-surface) / 75%);
-  border: 1px solid var(--line);
+  /* Matched to the home hero's secondary: a full pill, an opaque surface and `--vz-line-strong`,
+     the interactive edge token. `--line` is a CONTENT hairline measuring 1.15:1 against paper — right
+     for separating blocks of text, wrong for the only visible boundary of a control. */
+  background: hsl(var(--vz-surface));
+  border: 1px solid hsl(var(--vz-line-strong));
+  border-radius: var(--vz-r-pill);
   color: var(--navy);
+  font-size: 0.9rem;
+  font-weight: 600;
+  min-height: 3.4rem;
+  padding-inline: 1.35rem;
 }
 .primary:hover,
 .secondary:hover {
@@ -167,13 +166,47 @@
   height: 1rem;
   width: 1rem;
 }
+.heroOutcomes {
+  column-gap: clamp(1rem, 2.4vw, 2.25rem);
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, auto));
+  justify-content: start;
+  /* `!important` because the preflight `.page ul { margin: 0 }` is (0,1,1) and beats a bare class —
+     the trap this file shares with the home page's stylesheet. */
+  margin-top: 1.7rem !important;
+  row-gap: 0.85rem;
+}
+
+.heroOutcomes li {
+  align-items: center;
+  color: hsl(var(--vz-ink) / 82%);
+  display: flex;
+  font-size: 0.98rem;
+  font-weight: 560;
+  gap: 0.55rem;
+  letter-spacing: -0.004em;
+}
+
+.heroOutcomes svg {
+  color: hsl(var(--vz-accent));
+  flex: 0 0 auto;
+}
+
+@media (max-width: 34rem) {
+  .heroOutcomes {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
 .reassurance {
   align-items: center;
-  color: var(--muted);
+  /* Ink at 78%, not muted grey. This is the line that removes the last objection before the CTA —
+     it earns full legibility, and at 0.78rem in muted it was the faintest thing in the hero. */
+  color: hsl(var(--vz-ink) / 78%);
   display: flex;
-  font-size: 0.78rem;
-  gap: 0.45rem;
-  margin-top: 0.85rem !important;
+  font-size: 0.95rem;
+  gap: 0.5rem;
+  margin-top: 1.1rem !important;
 }
 .reassurance svg {
   color: var(--teal);
@@ -189,11 +222,13 @@
 }
 .trust li {
   align-items: center;
-  color: var(--muted);
+  color: hsl(var(--vz-ink) / 78%);
   display: flex;
-  font-size: 0.68rem;
+  /* 0.68rem was smaller than anything on the home page and sat directly under a 100px headline —
+     the size contrast read as an afterthought rather than as a hierarchy. */
+  font-size: 0.88rem;
   font-weight: 560;
-  gap: 0.35rem;
+  gap: 0.45rem;
 }
 .trust svg {
   color: var(--teal);
@@ -201,11 +236,40 @@
   width: 0.8rem;
 }
 .profileVisual {
-  background: hsl(var(--vz-ink));
-  border: 1px solid hsl(var(--vz-surface) / 9%);
+  /*
+   * Liquid glass, not a flat pine block — the same material the home page's teacher's note uses.
+   *
+   * Three things have to happen together or it reads as a plain translucent div. The fill is a
+   * GRADIENT rather than a flat alpha: a uniform panel has no variation to show, which is exactly
+   * what a tinted rectangle looks like. It runs thin at the top-left where the light enters and
+   * deepens toward the bottom-right, so the panel visibly thins toward the light. `saturate` on the
+   * backdrop is what makes the colour bend rather than merely blur. And the edge is FOUR inset
+   * layers, because a real thick edge is not one line: a bright specular hairline along the top lip,
+   * a broad soft glow just inside it, a dim line along the bottom, and a faint ring to close the
+   * shape.
+   *
+   * This earns glass rather than faking it: the hero lays a ruled ground and two colour blooms
+   * behind this card, so there is real content for it to refract. `globals.css` is explicit that
+   * glass over an opaque fill is just a tinted div.
+   *
+   * The thin end is 74%, not lower. Every label inside sits over the gradient, and the top-left
+   * corner — where the panel is thinnest — carries the smallest type on the card.
+   */
+  backdrop-filter: blur(22px) saturate(190%) brightness(0.94);
+  background: linear-gradient(
+    137deg,
+    hsl(var(--vz-block) / 74%) 0%,
+    hsl(var(--vz-block) / 84%) 38%,
+    hsl(var(--vz-block) / 92%) 100%
+  );
   border-radius: var(--vz-r-card);
-  box-shadow: 0 2.8rem 6rem hsl(var(--vz-ink) / 20%);
-  color: white;
+  box-shadow:
+    0 2.8rem 6rem hsl(var(--vz-ink) / 26%),
+    inset 0 1.5px 0 0 hsl(0 0% 100% / 34%),
+    inset 0 14px 26px -14px hsl(0 0% 100% / 22%),
+    inset 0 -1px 0 0 hsl(0 0% 100% / 8%),
+    inset 0 0 0 1px hsl(0 0% 100% / 12%);
+  color: hsl(var(--vz-block-on));
   min-height: 37rem;
   overflow: hidden;
   padding: 1.2rem;
@@ -222,28 +286,40 @@
 }
 .visualTop {
   align-items: center;
-  border-bottom: 1px solid hsl(var(--vz-surface) / 10%);
+  border-bottom: 1px solid hsl(var(--vz-block-on) / 14%);
   display: flex;
-  font-size: 0.67rem;
+  /* 0.67rem rendered at 10.7px, the smallest type on the page. */
+  font-size: 0.8rem;
   justify-content: space-between;
   padding-bottom: 0.9rem;
   position: relative;
 }
 .visualTop span {
   align-items: center;
-  color: hsl(var(--vz-block-on) / 62%);
+  /* 62% measured 4.14:1 on the glass, under the 4.5:1 floor for text this size. Glass LIGHTENS what
+     sits behind it, so an alpha tuned against the old opaque pine no longer holds. */
+  color: hsl(var(--vz-block-on) / 82%);
   display: flex;
   gap: 0.45rem;
 }
 .visualTop i {
-  background: hsl(var(--vz-positive));
+  /* `--vz-field-1`, the palette's light green. The dark `--vz-positive` disappears on this block —
+     the same correction the drawer chips needed. */
+  background: hsl(var(--vz-field-1));
   border-radius: 50%;
-  box-shadow: 0 0 0 5px hsl(var(--vz-positive) / 10%);
+  box-shadow: 0 0 0 5px hsl(var(--vz-field-1) / 16%);
   height: 0.4rem;
   width: 0.4rem;
 }
 .visualTop small {
-  color: hsl(var(--vz-positive));
+  /*
+   * White at 76%, not the light green. Green measured 1.26:1 as the dark positive and only 4.3:1 as
+   * `--vz-field-1` — still under the floor, because this label sits in the panel's THIN corner where
+   * the glass lets the paper through and the ground is lightest. The live-example marker is already
+   * carried by the green dot beside it, so the text does not need to repeat it in colour.
+   */
+  color: hsl(var(--vz-block-on) / 76%);
+  font-size: 0.76rem;
 }
 .signalGrid {
   display: grid;
@@ -255,22 +331,32 @@
 .signal {
   animation: signalIn 0.55s both;
   animation-delay: var(--delay);
-  background: hsl(var(--vz-surface) / 7%);
-  border: 1px solid hsl(var(--vz-surface) / 10%);
+  /* Tiles read as panes ON the glass rather than holes in it: a lighter fill than the card, and a
+     bright top hairline where light would catch the lip. */
+  background: hsl(var(--vz-block-on) / 7%);
   border-radius: var(--vz-r-input);
+  box-shadow:
+    inset 0 1px 0 hsl(0 0% 100% / 14%),
+    inset 0 0 0 1px hsl(0 0% 100% / 8%);
   display: flex;
   flex-direction: column;
-  padding: 0.65rem 0.7rem;
+  padding: 0.8rem 0.85rem;
 }
 .signal small {
-  color: hsl(var(--vz-block-on) / 62%);
-  font-size: 0.54rem;
+  /* 0.54rem was under 9px — below anything else on the site and unreadable on a laptop. The label
+     also gains tracking, which is what small uppercase type needs and large display type does not. */
+  /* 78%, not 70%: at 70% the label measured 4.52:1 — over the line but with no headroom, and this
+     type sits over a gradient whose lightness varies across the card. */
+  color: hsl(var(--vz-block-on) / 78%);
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
 }
 .signal strong {
-  color: hsl(var(--vz-surface));
-  font-size: 0.69rem;
-  margin-top: 0.22rem;
+  color: hsl(var(--vz-block-on));
+  font-size: 0.92rem;
+  letter-spacing: -0.006em;
+  margin-top: 0.28rem;
 }
 .recordCore {
   align-items: center;
@@ -2336,9 +2422,92 @@
   .heroCopy h1 {
     font-size: 3.1rem;
   }
-  .heroSecondary {
-    font-size: 0.82rem;
+  @media (prefers-reduced-motion: reduce) {
+  .page * {
+    animation: none !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
   }
+  .reveal {
+    transform: none;
+  }
+  .recordCore > i {
+    display: none;
+  }
+}
+.confidence em {
+  align-items: center;
+  background: hsl(var(--vz-surface));
+  border: 1px solid var(--line);
+  border-radius: 0.55rem;
+  color: var(--navy);
+  display: flex;
+  font-size: 0.56rem;
+  font-style: normal;
+  min-height: 2.4rem;
+  padding: 0.5rem 0.7rem;
+}
+.confidence em:last-child {
+  background: var(--teal);
+  border-color: var(--teal);
+  color: white;
+}
+.criteriaRail .sampleLabel {
+  align-items: center;
+  color: hsl(var(--vz-block-on) / 62%);
+  display: flex;
+  font-size: 0.52rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  margin-right: auto;
+  text-transform: uppercase;
+}
+
+
+/* ── Pine blocks ─────────────────────────────────────────────────────────────
+   Three sections carry the filled block: the group-matching story, the "more than
+   tutoring software" statement, and the closing CTA. On the home page pine marks a
+   brand statement and works because it is rare; three across fifteen keeps that true.
+
+   `matchSection` and `systemSection` are separated by only one section, so
+   `verifySection` between them takes `--vz-surface-2` rather than white — a mineral
+   mid-tone, so the run reads as one darker passage with a breath in the middle
+   instead of a dark/light/dark strobe. */
+.matchSection,
+.systemSection,
+.finalSection {
+  color: hsl(var(--vz-block-on));
+}
+
+.matchSection :is(h2, h3, strong),
+.systemSection :is(h2, h3, strong),
+.finalSection :is(h2, h3, strong) {
+  color: hsl(var(--vz-block-on));
+}
+
+/* Body copy on the block. `--vz-muted` measures ~2.25:1 here and must never be used; white at
+   partial alpha is the only tone that clears AA on this ground. */
+.matchSection .heading > div,
+.systemSection .heading > div,
+.finalSection .heading > div {
+  color: hsl(var(--vz-block-on) / 82%);
+}
+
+
+/*
+ * The hero's primary button IS the site header's `.buttonPrimary`, imported from
+ * `site/site.module.css` — the accent pill, its travelling sheen and its arrow badge all come from
+ * there, so the header, the home hero and this hero stay identical by construction rather than by
+ * discipline. This class only scales it to hero proportions and must not restate any of the
+ * button's own appearance.
+ */
+.heroConsultAction {
+  border-radius: var(--vz-r-pill) !important;
+  font-size: 0.9rem !important;
+  min-height: 3.4rem !important;
+  padding-left: 1.35rem !important;
+  padding-right: 1.15rem !important;
+}
   .actions {
     align-items: stretch;
     flex-direction: column;
@@ -2595,4 +2764,25 @@
 .systemSection .heading > div,
 .finalSection .heading > div {
   color: hsl(var(--vz-block-on) / 82%);
+}
+
+/* `.buttonIcon` sizes its arrow badge with `content-box` so the padding sits OUTSIDE the glyph.
+   This page's `.page *` reset is the same specificity and lands later, silently flipping it to
+   `border-box` and collapsing the arrow inside a circle that keeps its diameter. One class deeper
+   wins it back — the same fix the home hero carries. */
+.heroConsultAction svg {
+  box-sizing: content-box;
+}
+
+
+/* Reduced transparency: an opaque block with a drawn edge, because the rim above is an inset shadow
+   and would vanish with the rest of the material. */
+@media (prefers-reduced-transparency: reduce) {
+  .profileVisual {
+    backdrop-filter: none;
+    background: hsl(var(--vz-block));
+    box-shadow:
+      0 2.8rem 6rem hsl(var(--vz-ink) / 26%),
+      inset 0 0 0 1px hsl(0 0% 100% / 16%);
+  }
 }
