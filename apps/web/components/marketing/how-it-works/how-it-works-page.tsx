@@ -209,7 +209,7 @@ export function HowItWorksPage({ locale }: { locale: Locale }) {
         <SectionGround tone="paper" mask="radial-gradient(110% 85% at 50% 40%, black 24%, transparent 76%)" />
         <div className={styles.shell}>
           <Reveal>
-            <Heading eyebrow={c.evidence.eyebrow} title={c.evidence.title} body={c.evidence.body} />
+            <Heading eyebrow={c.evidence.eyebrow} title={c.evidence.title} titleAccent={c.evidence.titleAccent} body={c.evidence.body} />
             <ol className={styles.evidencePath}>
               {c.evidence.items.map((item, index) => (
                 <li key={item}>
@@ -230,7 +230,7 @@ export function HowItWorksPage({ locale }: { locale: Locale }) {
             <div className={styles.headingRow}>
               <Heading
                 eyebrow={c.understand.eyebrow}
-                title={c.understand.title}
+                title={c.understand.title} titleAccent={c.understand.titleAccent}
                 body={c.understand.body}
               />
               <aside>
@@ -248,7 +248,7 @@ export function HowItWorksPage({ locale }: { locale: Locale }) {
         <div className={styles.shell}>
           <Reveal className={styles.recordLayout}>
             <div>
-              <Heading eyebrow={c.record.eyebrow} title={c.record.title} />
+              <Heading eyebrow={c.record.eyebrow} title={c.record.title} titleAccent={c.record.titleAccent} />
               <ol className={styles.activityFeed}>
                 {c.record.feed.map((item, index) => (
                   <li key={item}>
@@ -284,7 +284,7 @@ export function HowItWorksPage({ locale }: { locale: Locale }) {
         <SectionGround tone="paper" mask="radial-gradient(112% 88% at 38% 48%, black 22%, transparent 76%)" />
         <div className={styles.shell}>
           <Reveal>
-            <Heading eyebrow={c.prepare.eyebrow} title={c.prepare.title} body={c.prepare.body} />
+            <Heading eyebrow={c.prepare.eyebrow} title={c.prepare.title} titleAccent={c.prepare.titleAccent} body={c.prepare.body} />
             <div className={styles.prepWorkspace}>
               <div className={styles.prepSidebar}>
                 <div className={styles.workspaceTop}>
@@ -360,7 +360,7 @@ export function HowItWorksPage({ locale }: { locale: Locale }) {
         <div className={styles.shell}>
           <Reveal>
             <div className={styles.headingRow}>
-              <Heading eyebrow={c.teach.eyebrow} title={c.teach.title} />
+              <Heading eyebrow={c.teach.eyebrow} title={c.teach.title} titleAccent={c.teach.titleAccent} />
               <div className={styles.lessonGoal}>
                 <Target />
                 <span>
@@ -434,7 +434,7 @@ export function HowItWorksPage({ locale }: { locale: Locale }) {
         <SectionGround tone="paper" mask="radial-gradient(115% 88% at 40% 50%, black 26%, transparent 76%)" />
         <div className={styles.shell}>
           <Reveal className={styles.betweenLayout}>
-            <Heading eyebrow={c.between.eyebrow} title={c.between.title} body={c.between.body} />
+            <Heading eyebrow={c.between.eyebrow} title={c.between.title} titleAccent={c.between.titleAccent} body={c.between.body} />
             <div>
               <div
                 className={styles.orbit}
@@ -479,7 +479,7 @@ export function HowItWorksPage({ locale }: { locale: Locale }) {
         <div className={styles.shell}>
           <Reveal className={styles.parentLayout}>
             <div>
-              <Heading eyebrow={c.parents.eyebrow} title={c.parents.title} body={c.parents.body} />
+              <Heading eyebrow={c.parents.eyebrow} title={c.parents.title} titleAccent={c.parents.titleAccent} body={c.parents.body} />
               <Link className={styles.textLink} href={localHref(locale, "/parents")}>
                 {c.parents.cta}
                 <ArrowRight />
@@ -519,7 +519,7 @@ export function HowItWorksPage({ locale }: { locale: Locale }) {
         <SectionGround tone="pine" mask="radial-gradient(118% 95% at 48% 44%, black 26%, transparent 78%)" />
         <div className={styles.shell}>
           <Reveal>
-            <Heading eyebrow={c.match.eyebrow} title={c.match.title} body={c.match.body} />
+            <Heading eyebrow={c.match.eyebrow} title={c.match.title} titleAccent={c.match.titleAccent} tone="pine" body={c.match.body} />
             <div
               className={styles.matchBoard}
               role="img"
@@ -581,7 +581,7 @@ export function HowItWorksPage({ locale }: { locale: Locale }) {
           <Reveal>
             <div className={styles.verifyLayout}>
               <div>
-                <Heading eyebrow={c.verify.eyebrow} title={c.verify.title} />
+                <Heading eyebrow={c.verify.eyebrow} title={c.verify.title} titleAccent={c.verify.titleAccent} />
                 <p className={styles.policy}>
                   <ShieldCheck />
                   {c.verify.policy}
@@ -636,7 +636,7 @@ export function HowItWorksPage({ locale }: { locale: Locale }) {
         <SectionGround tone="pine" mask="radial-gradient(115% 95% at 52% 46%, black 24%, transparent 78%)" />
         <div className={styles.shell}>
           <Reveal>
-            <Heading title={c.system.title} inverse />
+            <Heading title={c.system.title} titleAccent={c.system.titleAccent} tone="pine" inverse />
             <div className={styles.systemDiagram}>
               {c.system.roles.slice(0, 3).map(([role, contribution], index) => (
                 <article data-role={index} key={role}>
@@ -663,7 +663,7 @@ export function HowItWorksPage({ locale }: { locale: Locale }) {
         <SectionGround tone="paper" mask="radial-gradient(110% 88% at 44% 46%, black 24%, transparent 76%)" />
         <div className={styles.shell}>
           <Reveal>
-            <Heading eyebrow={c.logic.eyebrow} title={c.logic.title} body={c.logic.body} />
+            <Heading eyebrow={c.logic.eyebrow} title={c.logic.title} titleAccent={c.logic.titleAccent} body={c.logic.body} />
             <LearningLogic c={c.logic} />
           </Reveal>
         </div>
@@ -673,7 +673,7 @@ export function HowItWorksPage({ locale }: { locale: Locale }) {
         <SectionGround tone="paper" mask="radial-gradient(112% 90% at 50% 44%, black 24%, transparent 78%)" />
         <div className={styles.shell}>
           <Reveal>
-            <Heading title={c.curriculum.title} />
+            <Heading title={c.curriculum.title} titleAccent={c.curriculum.titleAccent} />
             <div className={styles.curriculumSplit}>
               <article>
                 <span>
@@ -714,7 +714,7 @@ export function HowItWorksPage({ locale }: { locale: Locale }) {
         <SectionGround tone="paper" mask="radial-gradient(110% 85% at 50% 48%, black 22%, transparent 76%)" />
         <div className={styles.shell}>
           <Reveal>
-            <Heading title={c.overview.title} />
+            <Heading title={c.overview.title} titleAccent={c.overview.titleAccent} />
             <ol className={styles.overviewPath}>
               {c.overview.items.map(([label, id], index) => (
                 <li key={label}>
@@ -740,7 +740,7 @@ export function HowItWorksPage({ locale }: { locale: Locale }) {
               <i />
             </div>
             <div>
-              <h2>{c.final.title}</h2>
+              <h2>{accentedTitle(c.final.title, c.final.titleAccent, "pine")}</h2>
               <p>{c.final.body}</p>
               <div className={styles.actions}>
                 <Link className={styles.primary} href={consultation}>

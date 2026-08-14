@@ -51,6 +51,7 @@ const en = {
   evidence: {
     eyebrow: "The shared thread",
     title: "One student. One evolving learning record.",
+    titleAccent: "One evolving learning record.",
     body: "Every lesson, homework submission, tutor note, and assessment adds useful evidence.",
     items: [
       "School learning",
@@ -65,6 +66,7 @@ const en = {
   understand: {
     eyebrow: "01 · Understand",
     title: "We start with what the student actually knows.",
+    titleAccent: "actually knows.",
     body: "Grade level is useful, but it is not enough. Two students in the same grade may need completely different support.",
     note: "We do not label a student only by age or school grade.",
     categories: [
@@ -140,6 +142,7 @@ const en = {
   record: {
     eyebrow: "02 · Record",
     title: "The learning record grows with every class.",
+    titleAccent: "with every class.",
     feed: [
       "Lesson attended",
       "Skill practised",
@@ -205,6 +208,7 @@ const en = {
   prepare: {
     eyebrow: "03 · Prepare",
     title: "The tutor does not start from zero every week.",
+    titleAccent: "from zero every week.",
     body: "Before class, the tutor can see the previous lesson, current goals, weak points, assigned homework, and recommended next step.",
     objective:
       "Add fractions with unlike denominators using visual models, then move to symbolic steps.",
@@ -232,6 +236,7 @@ const en = {
   teach: {
     eyebrow: "04 · Teach",
     title: "A clear lesson, adjusted in real time.",
+    titleAccent: "adjusted in real time.",
     flow: [
       "Quick check-in",
       "Review",
@@ -251,6 +256,7 @@ const en = {
   between: {
     eyebrow: "05 · Continue",
     title: "Learning should not disappear when the call ends.",
+    titleAccent: "when the call ends.",
     body: "The platform keeps the work, feedback, and next steps in one place.",
     center: "Completed lesson",
     items: [
@@ -266,6 +272,7 @@ const en = {
   parents: {
     eyebrow: "06 · Inform",
     title: "Parents see the progress without becoming the tutor.",
+    titleAccent: "without becoming the tutor.",
     body: "Parents stay involved in major decisions while tutors manage day-to-day instruction.",
     cta: "Explore the parent experience",
     fields: [
@@ -282,6 +289,7 @@ const en = {
   match: {
     eyebrow: "07 · Match",
     title: "Knowing the student helps us build better groups.",
+    titleAccent: "build better groups.",
     body: "Group lessons work only when students have compatible levels, topics, goals, and schedules.",
     students: [
       ["Student A", "Grade 6 mathematics", "Fractions · at grade level", "Weekday evenings"],
@@ -309,6 +317,7 @@ const en = {
   verify: {
     eyebrow: "Qualified support",
     title: "We do not simply connect you with an available tutor.",
+    titleAccent: "an available tutor.",
     stages: [
       ["Application", "Teaching experience and subject fit"],
       ["Identity review", "Identity information is checked"],
@@ -332,6 +341,7 @@ const en = {
   },
   system: {
     title: "More than tutoring software. More than a tutor directory.",
+    titleAccent: "More than a tutor directory.",
     roles: [
       ["Student", "Work · Questions · Assessments · Participation"],
       ["Tutor", "Lesson notes · Feedback · Homework · Observations"],
@@ -345,6 +355,7 @@ const en = {
   logic: {
     eyebrow: "Plain-language learning logic",
     title: "We make the learning process understandable.",
+    titleAccent: "understandable.",
     body: "You can see why a topic is being taught, what evidence shows progress, and what should happen next.",
     items: [
       [
@@ -360,6 +371,7 @@ const en = {
   },
   curriculum: {
     title: "A structured curriculum, personalized to the student.",
+    titleAccent: "personalized to the student.",
     curriculum: [
       "Sequence",
       "Grade expectations",
@@ -380,6 +392,7 @@ const en = {
   },
   overview: {
     title: "From first conversation to measurable next steps",
+    titleAccent: "measurable next steps",
     items: [
       ["Parent consultation", "final-cta"],
       ["Student-level review", "understand"],
@@ -393,6 +406,7 @@ const en = {
   },
   final: {
     title: "Start with a clearer picture of what your child needs.",
+    titleAccent: "a clearer picture",
     body: "Tell us what is going well, what feels difficult, and what your family hopes to achieve.",
     primary: "Book a free consultation",
     secondary: "Explore subjects",
@@ -430,6 +444,7 @@ const hy: HowItWorksCopy = {
   evidence: {
     eyebrow: "Ընդհանուր թել",
     title: "Մեկ սովորող։ Մեկ զարգացող ուսումնական գրառում։",
+    titleAccent: "Մեկ զարգացող ուսումնական գրառում։",
     body: "Յուրաքանչյուր դաս, տնային աշխատանք, դասավանդողի նշում և գնահատում ավելացնում է օգտակար փաստեր։",
     items: [
       "Դպրոցական ուսուցում",
@@ -445,6 +460,7 @@ const hy: HowItWorksCopy = {
     ...en.understand,
     eyebrow: "01 · Հասկանալ",
     title: "Սկսում ենք նրանից, թե սովորողն իրականում ինչ գիտի։",
+    titleAccent: "իրականում ինչ գիտի։",
     body: "Դասարանը կարևոր է, բայց բավարար չէ։ Նույն դասարանի երկու սովորողի կարող է պետք լինել բոլորովին տարբեր աջակցություն։",
     note: "Մենք սովորողին չենք բնորոշում միայն տարիքով կամ դասարանով։",
   },
@@ -452,6 +468,7 @@ const hy: HowItWorksCopy = {
     ...en.record,
     eyebrow: "02 · Գրանցել",
     title: "Ուսումնական գրառումն աճում է յուրաքանչյուր դասի հետ։",
+    titleAccent: "յուրաքանչյուր դասի հետ։",
     privacy:
       "Օրինակային բովանդակություն։ Իրական գրառումները տեսանելի են միայն լիազորված օգտվողներին։",
   },
@@ -459,6 +476,7 @@ const hy: HowItWorksCopy = {
     ...en.prepare,
     eyebrow: "03 · Պատրաստվել",
     title: "Դասավանդողը ամեն շաբաթ զրոյից չի սկսում։",
+    titleAccent: "զրոյից չի սկսում։",
     body: "Դասից առաջ դասավանդողը տեսնում է նախորդ դասը, նպատակները, դժվարությունները, տնային աշխատանքը և հաջորդ առաջարկվող քայլը։",
   },
   teach: { ...en.teach, eyebrow: "04 · Դասավանդել", title: "Հստակ դաս՝ ընթացքին հարմարեցված։" },
@@ -466,6 +484,7 @@ const hy: HowItWorksCopy = {
     ...en.between,
     eyebrow: "05 · Շարունակել",
     title: "Ուսուցումը չպետք է ավարտվի զանգի հետ։",
+    titleAccent: "զանգի հետ։",
     body: "Հարթակը մեկ տեղում պահում է աշխատանքը, արձագանքը և հաջորդ քայլերը։",
     note: "Սովորողները կարող են հարցեր ուղարկել և հարթակում դիտել դասավանդողի պատասխանները։",
   },
@@ -473,6 +492,7 @@ const hy: HowItWorksCopy = {
     ...en.parents,
     eyebrow: "06 · Տեղեկացնել",
     title: "Ծնողը տեսնում է առաջընթացը՝ առանց դասավանդող դառնալու։",
+    titleAccent: "առանց դասավանդող դառնալու։",
     body: "Ծնողները մասնակցում են կարևոր որոշումներին, իսկ դասավանդողները վարում են ամենօրյա ուսուցումը։",
     cta: "Ծանոթանալ ծնողի փորձին",
   },
@@ -480,6 +500,7 @@ const hy: HowItWorksCopy = {
     ...en.match,
     eyebrow: "07 · Համադրել",
     title: "Սովորողին ճանաչելը օգնում է ավելի ճիշտ խմբեր կազմել։",
+    titleAccent: "ավելի ճիշտ խմբեր կազմել։",
     body: "Խմբային դասերն աշխատում են, երբ համատեղելի են մակարդակը, թեման, նպատակը և ժամանակացույցը։",
     compatible: "A + B կարող են համատեղելի լինել",
     wait: "C-ն դեռ չի ընդգրկվում այս խմբում",
@@ -490,6 +511,7 @@ const hy: HowItWorksCopy = {
     ...en.verify,
     eyebrow: "Որակյալ աջակցություն",
     title: "Մենք պարզապես չենք միացնում ձեզ ազատ դասավանդողի հետ։",
+    titleAccent: "ազատ դասավանդողի հետ։",
     policy:
       "Մենք առաջնահերթություն ենք տալիս համապատասխան ոլորտում առնվազն բակալավրի աստիճան ունեցող դասավանդողներին և հաստատում ենք որակավորումները մինչև ընդունումը։",
     sample: "Դասավանդողի պատկերավոր պրոֆիլ",
@@ -499,16 +521,19 @@ const hy: HowItWorksCopy = {
     ...en.logic,
     eyebrow: "Ուսուցման տրամաբանությունը՝ պարզ լեզվով",
     title: "Մենք ուսուցման ընթացքը դարձնում ենք հասկանալի։",
+    titleAccent: "հասկանալի։",
     body: "Դուք տեսնում եք՝ ինչու է թեման ուսուցանվում, ինչ փաստ է ցույց տալիս առաջընթացը և որն է հաջորդ քայլը։",
   },
   curriculum: {
     ...en.curriculum,
     title: "Կառուցվածքային ծրագիր՝ հարմարեցված սովորողին։",
+    titleAccent: "հարմարեցված սովորողին։",
     note: "Անհատականացումը պատահական դասեր չի նշանակում։ Կառուցվածքն ու հարմարեցումը գործում են միասին։",
   },
   overview: { ...en.overview, title: "Առաջին զրույցից մինչև չափելի հաջորդ քայլեր" },
   final: {
     title: "Սկսեք՝ ավելի հստակ հասկանալով, թե ինչ է պետք ձեր երեխային։",
+    titleAccent: "ավելի հստակ հասկանալով",
     body: "Պատմեք՝ ինչն է լավ ընթանում, ինչն է դժվար և ինչի է ցանկանում հասնել ձեր ընտանիքը։",
     primary: "Ամրագրել անվճար խորհրդատվություն",
     secondary: "Ուսումնասիրել առարկաները",
