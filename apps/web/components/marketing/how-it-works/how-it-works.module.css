@@ -750,29 +750,71 @@
 .skillButtons svg {
   height: 0.85rem;
 }
+ /*
+ * Liquid glass in its DARK register — the same material the home page's teacher's note uses, and
+ * the counterpart to the light glass on the three columns directly above this strip.
+ *
+ * Three things have to happen together or it is a translucent div. The fill is a GRADIENT rather
+ * than a flat alpha: a uniform panel has no variation to show, which is what a tinted rectangle
+ * looks like. It runs thin at the top-left where the light enters and deepens toward the
+ * bottom-right, so the panel visibly thins toward the light. `saturate` on the backdrop is what
+ * makes the colour bend rather than merely blur. And the edge is four inset layers, because a real
+ * thick edge is not one line: a bright specular hairline along the top lip, a broad soft glow just
+ * inside it, a dim line along the bottom, and a faint ring to close the shape.
+ *
+ * It earns the material: this sits directly over the section's three colour blooms, so the panel
+ * picks up green at its left end and gold at its right — the refraction is doing real work rather
+ * than tinting a flat ground.
+ */
 .evidenceDrawer {
-  background: var(--navy);
+  backdrop-filter: blur(20px) saturate(180%) brightness(0.96);
+  background: linear-gradient(
+    134deg,
+    hsl(var(--vz-block) / 76%) 0%,
+    hsl(var(--vz-block) / 86%) 42%,
+    hsl(var(--vz-block) / 93%) 100%
+  );
   border-radius: var(--vz-r-card);
-  color: white;
+  box-shadow:
+    0 1.6rem 3.6rem -1rem hsl(var(--vz-ink) / 34%),
+    inset 0 1.5px 0 0 hsl(0 0% 100% / 30%),
+    inset 0 14px 26px -14px hsl(0 0% 100% / 18%),
+    inset 0 -1px 0 0 hsl(0 0% 100% / 8%),
+    inset 0 0 0 1px hsl(0 0% 100% / 12%);
+  color: hsl(var(--vz-block-on));
   display: grid;
-  gap: 1px;
   grid-template-columns: repeat(3, 1fr);
+  isolation: isolate;
   margin-top: 0.8rem;
   overflow: hidden;
 }
+ /*
+ * Transparent, so the glass shows through. These used to be opaque `--vz-ink` cells with a 1px grid
+ * gap letting the panel behind read as a divider — which would have covered the material entirely.
+ * The divider is now a hairline in the panel's own foreground, drawn between cells rather than
+ * between opaque tiles.
+ */
 .evidenceDrawer > div {
-  background: hsl(var(--vz-ink));
   display: grid;
   gap: 0.3rem;
   grid-template-columns: auto 1fr;
-  padding: 1.1rem;
+  padding: 1.15rem 1.2rem;
+}
+
+.evidenceDrawer > div + div {
+  border-left: 1px solid hsl(0 0% 100% / 12%);
 }
 .evidenceDrawer span {
   align-items: center;
-  /* 12%, not 18%: at the thicker fill the numeral measured 4.44:1 against a 4.5:1 floor. Thinning
-     the tint darkens what sits behind the glyph rather than changing the glyph, which keeps the
-     step markers the same colour as every other status mark on the page. */
-  background: hsl(var(--vz-field-1) / 12%);
+  /*
+   * A DARKER disc than the panel, not a lighter one — the inverse of what this needed when the
+   * drawer was opaque. Making the strip glass lightened everything behind the glyph and the numeral
+   * fell to 3.51:1; a light-green tint on a now-lighter ground made it worse, not better. Recessing
+   * the disc into the panel restores the ground the glyph needs while keeping it the same colour as
+   * every other status mark on the page.
+   */
+  background: hsl(var(--vz-block) / 58%);
+  box-shadow: inset 0 0 0 1px hsl(var(--vz-field-1) / 22%);
   border-radius: 50%;
   color: hsl(var(--vz-field-1));
   display: flex;
@@ -784,8 +826,11 @@
   width: 1.8rem;
 }
 .evidenceDrawer small {
-  color: hsl(var(--vz-block-on) / 62%);
+  /* 62% measured 4.61:1 on the glass — over the line but with no headroom, and this label sits over
+     a gradient whose lightness varies across the strip. */
+  color: hsl(var(--vz-block-on) / 76%);
   font-size: 0.74rem;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
 }
 .evidenceDrawer strong {
@@ -3020,4 +3065,17 @@
   right: -5%;
   top: 38%;
   width: 30rem;
+}
+
+
+/* Reduced transparency: an opaque block with a drawn edge, since the rim here is an inset shadow
+   and would vanish with the material. */
+@media (prefers-reduced-transparency: reduce) {
+  .evidenceDrawer {
+    backdrop-filter: none;
+    background: hsl(var(--vz-block));
+    box-shadow:
+      0 1.6rem 3.6rem -1rem hsl(var(--vz-ink) / 34%),
+      inset 0 0 0 1px hsl(0 0% 100% / 16%);
+  }
 }
