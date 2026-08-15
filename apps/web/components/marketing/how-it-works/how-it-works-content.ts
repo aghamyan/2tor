@@ -68,7 +68,13 @@ const en = {
     title: "We start with what the student actually knows.",
     titleAccent: "actually knows.",
     body: "Grade level is useful, but it is not enough. Two students in the same grade may need completely different support.",
-    note: "We do not label a student only by age or school grade.",
+    /*
+ * "label" made this sound like the objection is to categorising children at all, which is not the
+ * claim — the claim is that age and grade are not enough information to plan from. Stated as what
+ * we do instead, it also connects directly to the heading above it ("we start with what the student
+ * actually knows") rather than restating it in the negative.
+ */
+    note: "Age and school grade alone do not tell us where to start.",
     categories: [
       {
         title: "Knows confidently",
@@ -462,7 +468,7 @@ const hy: HowItWorksCopy = {
     title: "Սկսում ենք նրանից, թե սովորողն իրականում ինչ գիտի։",
     titleAccent: "իրականում ինչ գիտի։",
     body: "Դասարանը կարևոր է, բայց բավարար չէ։ Նույն դասարանի երկու սովորողի կարող է պետք լինել բոլորովին տարբեր աջակցություն։",
-    note: "Մենք սովորողին չենք բնորոշում միայն տարիքով կամ դասարանով։",
+    note: "Տարիքը և դասարանը միայնակ չեն ասում, թե որտեղից սկսել։",
   },
   record: {
     ...en.record,

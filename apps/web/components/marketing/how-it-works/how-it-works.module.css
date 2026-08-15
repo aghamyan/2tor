@@ -472,17 +472,31 @@
 }
 .headingRow aside {
   align-items: flex-start;
-  background: hsl(var(--vz-surface));
-  border: 1px solid var(--line);
-  border-radius: var(--vz-r-input);
-  color: var(--navy2);
+  /*
+   * Liquid glass in its LIGHT register — the same material the site header uses, composed from the
+   * `--vz-fx-glass-*` tokens rather than restated, so a change to the material in `globals.css`
+   * reaches this too.
+   *
+   * It earns the material: the section lays a ruled ground and colour blooms behind this card, so
+   * there is genuine content for it to refract. `globals.css` states the test directly — if the
+   * surface would look identical with `backdrop-filter: none`, it is not glass, it is a tinted div.
+   *
+   * `isolation` matters: the glass shadow carries chromatic fringing at its edges, and without a new
+   * stacking context that blends into whatever the section paints beneath it.
+   */
+  backdrop-filter: var(--vz-fx-glass-blur);
+  background: var(--vz-fx-glass-bg);
+  border-radius: var(--vz-r-card);
+  box-shadow: var(--vz-fx-glass-shadow);
+  color: hsl(var(--vz-ink) / 88%);
   display: flex;
+  isolation: isolate;
   font-size: 0.87rem;
   font-weight: 560;
-  gap: 0.55rem;
+  gap: 0.6rem;
   line-height: 1.5;
   max-width: 19rem;
-  padding: 0.9rem;
+  padding: 1.05rem 1.15rem;
 }
 .headingRow aside svg {
   color: var(--teal);
@@ -668,9 +682,14 @@
   grid-template-columns: repeat(3, 1fr);
 }
 .skillColumn {
-  background: hsl(var(--vz-surface));
-  border: 1px solid var(--line);
+  /* Same glass as the callout above, same reasoning — these three sit over the section's ruled
+     ground and its blooms, positioned so no two columns sit over the same colour, which is what
+     makes the row read as three panes of one material rather than three copies of one card. */
+  backdrop-filter: var(--vz-fx-glass-blur);
+  background: var(--vz-fx-glass-bg);
   border-radius: var(--vz-r-card);
+  box-shadow: var(--vz-fx-glass-shadow);
+  isolation: isolate;
   overflow: hidden;
 }
 .skillColumnHead {
@@ -2939,4 +2958,66 @@
   .revealed .evidencePath li:before {
     animation: none;
   }
+}
+
+
+/*
+ * Reduced transparency: an opaque surface with a DRAWN border, because the rim on these is an inset
+ * shadow and would vanish along with the rest of the material.
+ */
+@media (prefers-reduced-transparency: reduce) {
+  .headingRow aside,
+  .skillColumn {
+    backdrop-filter: none;
+    background: hsl(var(--vz-surface));
+    box-shadow:
+      inset 0 0 0 1px hsl(var(--vz-line)),
+      var(--vz-fx-shadow);
+  }
+}
+
+/* High contrast: near-solid surface with a defined edge. */
+@media (prefers-contrast: more) {
+  .headingRow aside,
+  .skillColumn {
+    background: hsl(var(--vz-surface));
+    box-shadow: inset 0 0 0 2px hsl(var(--vz-ink) / 55%);
+  }
+}
+
+
+/*
+ * The refractive field behind the understand section's glass.
+ *
+ * Three blooms in the palette's field tints — the tokens whose own comment says they are "placed
+ * BEHIND glass" — positioned so no two skill columns sit over the same colour. That is what makes
+ * the row read as three panes of one material rather than three copies of one card, and it is the
+ * difference between glass and a tinted div: without colour beneath it there is nothing for the
+ * blur and saturation to bend.
+ *
+ * Shape and blur come from the shared `.bloom` in `section-ground.module.css`; only placement and
+ * tint are per-section.
+ */
+.understandBloomOne {
+  background: hsl(var(--vz-field-1) / 46%);
+  height: 24rem;
+  left: -6%;
+  top: 34%;
+  width: 30rem;
+}
+
+.understandBloomTwo {
+  background: hsl(var(--vz-field-2) / 42%);
+  height: 22rem;
+  left: 34%;
+  top: 22%;
+  width: 30rem;
+}
+
+.understandBloomThree {
+  background: hsl(var(--vz-field-3) / 46%);
+  height: 25rem;
+  right: -5%;
+  top: 38%;
+  width: 30rem;
 }

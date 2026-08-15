@@ -37,8 +37,12 @@ export function SectionGround({
    * with the shared `.bloom`, which owns only the shape and the blur radius — a bloom with a
    * different blur reads as a different material, and the field's whole job is that every section is
    * lit the same way.
+   *
+   * `undefined` is permitted because CSS-module lookups are typed `string | undefined`; a name that
+   * does not exist compiles fine and yields undefined at runtime. Filtering below means a typo
+   * degrades to "no bloom" rather than rendering `class="bloom undefined"`.
    */
-  blooms?: readonly string[];
+  blooms?: readonly (string | undefined)[];
 }) {
   return (
     <ParallaxField
@@ -48,7 +52,7 @@ export function SectionGround({
       data-tone={tone}
     >
       <span className={styles.grid} />
-      {blooms.map((bloom) => (
+      {blooms.filter(Boolean).map((bloom) => (
         <span key={bloom} className={`${styles.bloom} ${bloom}`} />
       ))}
     </ParallaxField>

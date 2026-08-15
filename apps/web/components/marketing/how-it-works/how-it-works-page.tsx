@@ -224,7 +224,15 @@ export function HowItWorksPage({ locale }: { locale: Locale }) {
       </section>
 
       <section className={styles.understandSection} id="understand">
-        <SectionGround tone="paper" mask="radial-gradient(115% 90% at 32% 46%, black 26%, transparent 78%)" />
+        <SectionGround
+          tone="paper"
+          mask="radial-gradient(115% 90% at 32% 46%, black 26%, transparent 78%)"
+          blooms={[
+            styles.understandBloomOne,
+            styles.understandBloomTwo,
+            styles.understandBloomThree,
+          ]}
+        />
         <div className={styles.shell}>
           <Reveal>
             <div className={styles.headingRow}>
