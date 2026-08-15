@@ -36,3 +36,9 @@ pnpm-debug.log*
 # python (skill scripts)
 __pycache__/
 *.pyc
+
+# Playwright MCP scratch dumps
+.playwright-mcp/
+
+# Editor/Finder duplicates of local settings
+.claude/settings.local [0-9]*.json
