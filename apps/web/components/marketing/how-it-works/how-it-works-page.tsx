@@ -252,7 +252,11 @@ export function HowItWorksPage({ locale }: { locale: Locale }) {
       </section>
 
       <section className={styles.recordSection} id="record">
-        <SectionGround tone="paper" mask="radial-gradient(110% 88% at 62% 44%, black 24%, transparent 76%)" />
+        <SectionGround
+          tone="paper"
+          mask="radial-gradient(110% 88% at 62% 44%, black 24%, transparent 76%)"
+          blooms={[styles.recordBloomOne, styles.recordBloomTwo]}
+        />
         <div className={styles.shell}>
           <Reveal className={styles.recordLayout}>
             <div>
