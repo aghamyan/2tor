@@ -35,6 +35,32 @@ import { SectionGround } from "../section-ground";
 import { SectionEyebrow, accentedTitle, type SectionTone } from "../section-heading";
 import styles from "./how-it-works.module.css";
 
+/**
+ * How far out from an orbit chip's centre its spoke may start drawing, in rem.
+ *
+ * The chips are glass, so a spoke that begins under one draws a line across the inside of the card
+ * — which is what it did. The fix cannot be one start distance for all six, because a card presents
+ * a different edge to the centre depending on where it sits: the ones at three and nine o'clock are
+ * half their 10.5rem WIDTH away from their own border, the four diagonal ones only half their
+ * 3.6rem height. A single value either buries two spokes inside their cards or leaves four floating
+ * 3rem clear of theirs.
+ *
+ * So it is solved where the geometry already lives. The angle comes from the same index the CSS
+ * uses for placement, and the reach is the distance to whichever edge the ray leaves through —
+ * width-limited or height-limited — plus a little clearance. `Math.min` picks the nearer edge, and
+ * a zero component gives `Infinity` rather than an error, which is exactly the right answer: a
+ * horizontal ray never meets the horizontal edges.
+ *
+ * Keep this in step with `.orbit > span` in the stylesheet — the two numbers below are that rule's
+ * `width` and `min-height` halved.
+ */
+function orbitReach(index: number) {
+  const angle = (index * 60 * Math.PI) / 180;
+  const toSide = 5.25 / Math.abs(Math.cos(angle));
+  const toCap = 1.8 / Math.abs(Math.sin(angle));
+  return `${(Math.min(toSide, toCap) + 0.35).toFixed(2)}rem`;
+}
+
 /*
  * Positional, matching `hero.outcomes` order. Three distinct icons rather than three repeated
  * checkmarks: each names a different kind of outcome, and a row of identical ticks would throw that
@@ -489,7 +515,12 @@ export function HowItWorksPage({ locale }: { locale: Locale }) {
                   <small>Fractions · 50 min</small>
                 </div>
                 {c.between.items.map((item, index) => (
-                  <span style={{ "--i": index } as React.CSSProperties} key={item}>
+                  <span
+                    style={
+                      { "--i": index, "--reach": orbitReach(index) } as React.CSSProperties
+                    }
+                    key={item}
+                  >
                     {index === 0 ? (
                       <BookOpenCheck />
                     ) : index === 1 ? (

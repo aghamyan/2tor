@@ -2010,20 +2010,19 @@
  */
 .orbit > span:before {
   /*
-   * Transparent for the first sixth, for the same reason the ring is masked: the chips are glass,
-   * and a spoke that begins at the chip's centre draws a line across the inside of the card.
+   * Opaque from its first pixel, because `--reach` has already placed that pixel outside the card
+   * — see `orbitReach` in the page component for why that distance differs per chip. An earlier
+   * version faded the near end instead and did not work: a ramp that STARTS at the chip's centre is
+   * already a third of the way up by the time it clears the border, so the two horizontal spokes
+   * still drew across their own cards.
    *
-   * The ramp rather than simply starting the spoke further out, because the six chips do not
-   * present the same edge to the core. A card at three o'clock is 5.25rem wide to its border; the
-   * diagonal ones are 2.08rem to theirs. One start distance either buries the horizontal spokes
-   * inside their cards or leaves the diagonal ones floating a full 3rem clear. Fading the near end
-   * lets the same geometry serve both: the spoke emerges wherever the card stops covering it.
+   * All six stop at the same radius, so `width` is the remainder rather than a constant. That makes
+   * the horizontal spokes visibly the shortest, which is correct — their cards cover more of them.
    */
   background: linear-gradient(
     90deg,
-    hsl(var(--vz-accent) / 0%) 0%,
-    hsl(var(--vz-accent) / 38%) 17%,
-    hsl(var(--vz-accent) / 20%) 64%,
+    hsl(var(--vz-accent) / 38%) 0%,
+    hsl(var(--vz-accent) / 22%) 58%,
     hsl(var(--vz-accent) / 0%) 100%
   );
   content: "";
@@ -2031,9 +2030,9 @@
   left: 50%;
   position: absolute;
   top: 50%;
-  transform: rotate(calc(var(--angle) + 180deg)) translateX(4.6rem);
+  transform: rotate(calc(var(--angle) + 180deg)) translateX(var(--reach));
   transform-origin: 0 50%;
-  width: 4.4rem;
+  width: calc(8.2rem - var(--reach));
 }
 .orbit > span svg {
   color: var(--teal);
