@@ -467,7 +467,13 @@ export function HowItWorksPage({ locale }: { locale: Locale }) {
       </section>
 
       <section className={styles.betweenSection} id="continue">
-        <SectionGround tone="paper" mask="radial-gradient(115% 88% at 40% 50%, black 26%, transparent 76%)" />
+        {/* The orbit's chips are glass; these are what they refract. Both sit on the right, under
+            the diagram — a bloom behind the headline on the left would only cost it contrast. */}
+        <SectionGround
+          tone="paper"
+          mask="radial-gradient(115% 88% at 40% 50%, black 26%, transparent 76%)"
+          blooms={[styles.betweenBloomOne, styles.betweenBloomTwo]}
+        />
         <div className={styles.shell}>
           <Reveal className={styles.betweenLayout}>
             <Heading eyebrow={c.between.eyebrow} title={c.between.title} titleAccent={c.between.titleAccent} body={c.between.body} />

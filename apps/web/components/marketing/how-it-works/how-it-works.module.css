@@ -1863,95 +1863,173 @@
   height: 35rem;
   position: relative;
 }
-.orbit:before,
-.orbit:after {
-  border: 1px dashed hsl(var(--vz-positive) / 30%);
+/*
+ * The path the chips sit on, and a soft field around the core.
+ *
+ * There were two dashed rings, at 22rem and 30rem — and the chips orbit at a 28rem diameter, so
+ * NEITHER ring passed through them. The geometry was decorative: three concentric shapes that
+ * happened to share a centre. `:before` is now exactly the chips' own orbit, so the ring is the
+ * thing they are arranged on rather than a hoop drawn near them, and the dashes are gone because a
+ * dashed circle is the most transferable diagram cliché there is.
+ */
+/* 24%, not the 11% this started at. The ring is now the only thing carrying the diagram's structure
+   — the chips sit ON it — and at 11% it measured 1.25:1 against paper and vanished entirely where
+   the warm bloom crosses it. The two dashed rings it replaced were themselves at 30% of a much
+   darker green; a meaningful ring drawn fainter than the meaningless ones is not an improvement. */
+.orbit:before {
+  border: 1px solid hsl(var(--vz-ink) / 24%);
   border-radius: 50%;
   content: "";
+  height: 28rem;
   left: 50%;
   position: absolute;
   top: 50%;
   transform: translate(-50%, -50%);
+  width: 28rem;
 }
-.orbit:before {
+/* A light field behind the core, not a second ring. It gives the disc something to sit in and
+   keeps the middle of the diagram from reading as a hole. */
+.orbit:after {
+  background: radial-gradient(
+    circle,
+    hsl(var(--vz-field-1) / 26%) 0%,
+    hsl(var(--vz-field-1) / 0%) 70%
+  );
+  border-radius: 50%;
+  content: "";
   height: 22rem;
+  left: 50%;
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
   width: 22rem;
 }
-.orbit:after {
-  height: 30rem;
-  width: 30rem;
-}
+/*
+ * The core, as a lit object rather than a dark circle with a white ring cut round it.
+ *
+ * The 5px white border was a sticker edge — a hard band of pure white with no light direction. It
+ * is replaced by a halo in the page's own surface colour, which separates the disc from the ring it
+ * sits on, plus the same specular top lip and closing ring the other dark surfaces on this page
+ * carry, so the light comes from the same place here as everywhere else.
+ */
 .orbitCenter {
   align-items: center;
-  background: var(--navy);
-  border: 5px solid white;
+  background: radial-gradient(
+    120% 120% at 32% 20%,
+    hsl(var(--vz-block) / 96%) 0%,
+    hsl(var(--vz-block)) 72%
+  );
   border-radius: 50%;
-  box-shadow: 0 1.5rem 3rem hsl(var(--vz-ink) / 20%);
+  box-shadow:
+    0 0 0 0.5rem hsl(var(--vz-paper) / 88%),
+    0 1.6rem 3.2rem -0.6rem hsl(var(--vz-ink) / 32%),
+    inset 0 2px 0 hsl(0 0% 100% / 22%),
+    inset 0 0 0 1px hsl(0 0% 100% / 14%);
   color: white;
   display: flex;
   flex-direction: column;
-  height: 11rem;
+  height: 12rem;
   justify-content: center;
   left: 50%;
   position: absolute;
+  text-align: center;
   top: 50%;
   transform: translate(-50%, -50%);
-  width: 11rem;
+  width: 12rem;
   z-index: 2;
 }
+/* `--vz-positive` is a dark green measuring 1.73:1 on the block — the play mark was very nearly
+   invisible. `--vz-field-1` is one of the two colours that read as foreground there. */
 .orbitCenter svg {
-  color: hsl(var(--vz-positive));
-  height: 1.2rem;
+  color: hsl(var(--vz-field-1));
+  height: 1.35rem;
 }
 .orbitCenter strong {
-  font-size: 0.86rem;
-  margin-top: 0.55rem;
+  font-size: 1.02rem;
+  letter-spacing: -0.008em;
+  margin-top: 0.6rem;
 }
 .orbitCenter small {
-  color: hsl(var(--vz-block-on) / 62%);
-  font-size: 0.74rem;
-  margin-top: 0.2rem;
+  color: hsl(var(--vz-block-on) / 74%);
+  font-size: 0.82rem;
+  margin-top: 0.25rem;
 }
+/*
+ * The six things a finished lesson leaves behind, in the site's light glass.
+ *
+ * `isolation` is deliberate here as well as on the bigger panels: six glass surfaces over the same
+ * bloom will each fringe at their own edges, and without a stacking context per chip those fringes
+ * composite into the ring line behind them.
+ */
 .orbit > span {
   --angle: calc(var(--i) * 60deg);
   align-items: center;
-  background: hsl(var(--vz-surface));
-  border: 1px solid var(--line);
+  backdrop-filter: var(--vz-fx-glass-blur);
+  background: var(--vz-fx-glass-bg);
   border-radius: var(--vz-r-input);
-  box-shadow: 0 0.7rem 1.8rem hsl(var(--vz-ink) / 9%);
+  box-shadow: var(--vz-fx-glass-shadow);
   display: flex;
-  gap: 0.5rem;
+  gap: 0.6rem;
+  isolation: isolate;
   left: calc(50% + cos(var(--angle)) * 14rem);
-  min-height: 3.3rem;
-  padding: 0.6rem;
+  min-height: 3.6rem;
+  padding: 0.7rem 0.85rem;
   position: absolute;
   top: calc(50% + sin(var(--angle)) * 14rem);
   transform: translate(-50%, -50%);
-  width: 9.5rem;
+  width: 10.5rem;
   z-index: 3;
+}
+/*
+ * A spoke back to the core. The rings said "these things are arranged in a circle"; nothing said
+ * they CAME from the lesson at the centre, which is the entire claim of the section.
+ *
+ * `rotate` then `translateX` with the origin on the left edge walks the line outward along its own
+ * rotated axis, so it starts clear of the chip and stops short of the core's halo — no per-chip
+ * arithmetic, and it stays correct if the orbit radius changes. It fades toward the core so the
+ * spoke reads as arriving rather than as a drawn connector.
+ */
+.orbit > span:before {
+  background: linear-gradient(
+    90deg,
+    hsl(var(--vz-accent) / 38%) 0%,
+    hsl(var(--vz-accent) / 20%) 62%,
+    hsl(var(--vz-accent) / 0%) 100%
+  );
+  content: "";
+  height: 1.5px;
+  left: 50%;
+  position: absolute;
+  top: 50%;
+  transform: rotate(calc(var(--angle) + 180deg)) translateX(4.6rem);
+  transform-origin: 0 50%;
+  width: 4.4rem;
 }
 .orbit > span svg {
   color: var(--teal);
-  height: 0.9rem;
+  flex: none;
+  height: 1.05rem;
 }
 .orbit > span b {
-  font-size: 0.76rem;
-  line-height: 1.35;
+  font-size: 0.9rem;
+  letter-spacing: -0.006em;
+  line-height: 1.3;
 }
 .orbitNote {
   align-items: flex-start;
-  color: var(--muted);
+  color: hsl(var(--vz-ink) / 78%);
   display: flex;
-  font-size: 0.86rem;
-  gap: 0.45rem;
+  font-size: 0.98rem;
+  gap: 0.55rem;
   line-height: 1.55;
   margin: -0.7rem auto 0 !important;
-  max-width: 28rem;
+  max-width: 30rem;
 }
 .orbitNote svg {
   color: var(--teal);
   flex: none;
-  height: 0.9rem;
+  height: 1.05rem;
+  margin-top: 0.15rem;
 }
 .parentSection {
   background: hsl(var(--vz-surface));
@@ -3195,8 +3273,10 @@
     gap: 0.6rem;
     height: auto;
   }
+  /* Stacked: the ring, the field and the spokes all describe a circle that no longer exists. */
   .orbit:before,
-  .orbit:after {
+  .orbit:after,
+  .orbit > span:before {
     display: none;
   }
   .orbitCenter {
@@ -3553,6 +3633,15 @@
     background: var(--teal);
     box-shadow: none;
   }
+  /* The orbit chips. Six small glass surfaces are the ones that vanish soonest without the
+     material, so they get the drawn border too. */
+  .orbit > span {
+    backdrop-filter: none;
+    background: hsl(var(--vz-surface));
+    box-shadow:
+      inset 0 0 0 1px hsl(var(--vz-line)),
+      var(--vz-fx-shadow);
+  }
 }
 
 /* Reduced transparency: an opaque block with a drawn edge, since the rim here is an inset shadow
@@ -3579,6 +3668,24 @@
    to bend. */
 /* Under the classroom panel, off to the sides — the whiteboard's centre carries the largest figures
    on the page and a bloom behind them would only take contrast off them. */
+/* Both under the diagram on the right — the headline on the left is the largest type in the section
+   and a bloom behind it only costs it contrast. */
+.betweenBloomOne {
+  background: hsl(var(--vz-field-2) / 34%);
+  height: 24rem;
+  right: 6%;
+  top: 12%;
+  width: 28rem;
+}
+
+.betweenBloomTwo {
+  background: hsl(var(--vz-field-1) / 38%);
+  height: 24rem;
+  right: 18%;
+  top: 52%;
+  width: 26rem;
+}
+
 .teachBloomOne {
   background: hsl(var(--vz-field-1) / 38%);
   height: 26rem;
