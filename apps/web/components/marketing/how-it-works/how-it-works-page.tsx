@@ -24,6 +24,7 @@ import {
   UserRoundCheck,
   Users,
   Waypoints,
+  X,
 } from "lucide-react";
 import type { Locale } from "@app/i18n/config";
 import { getHowItWorksCopy } from "./how-it-works-content";
@@ -81,6 +82,38 @@ const outcomeIcons = [BookOpenCheck, Eye, Users] as const;
  *   what changes    plan update, full width, as the row the other three lead to
  */
 const dashboardSpans = [2, 2, 2, 3, 3, 3, 3, 6] as const;
+
+/**
+ * One student card on the match board. `index` supplies the letter, so the A/B/C in the drawing and
+ * the A/B/C in `match.compatible` and `match.wait` cannot drift apart. `held` marks the student who
+ * is not placed in this group — it is the same card at a quieter weight, not a different one.
+ */
+function MatchStudent({
+  student,
+  index,
+  held = false,
+}: {
+  /* `match.students` is inferred as `string[][]` from the copy record, so this stays a plain array
+     rather than a tuple — narrowing it here would only push the cast up to the call site. */
+  student: readonly string[];
+  index: number;
+  held?: boolean;
+}) {
+  return (
+    <article data-held={held || undefined} data-student={index}>
+      <span>{String.fromCharCode(65 + index)}</span>
+      <div>
+        <small>{student[0]}</small>
+        <strong>{student[1]}</strong>
+        <p>{student[2]}</p>
+        <p>
+          <CalendarDays />
+          {student[3]}
+        </p>
+      </div>
+    </article>
+  );
+}
 
 function localHref(locale: Locale, path: string) {
   return `/${locale}${path}`;
@@ -630,10 +663,28 @@ export function HowItWorksPage({ locale }: { locale: Locale }) {
       </section>
 
       <section className={styles.matchSection} id="match">
-        <SectionGround tone="pine" mask="radial-gradient(118% 95% at 48% 44%, black 26%, transparent 78%)" />
+        <SectionGround
+          tone="pine"
+          mask="radial-gradient(118% 95% at 48% 44%, black 26%, transparent 78%)"
+          blooms={[styles.matchBloomOne, styles.matchBloomTwo]}
+        />
         <div className={styles.shell}>
           <Reveal>
             <Heading eyebrow={c.match.eyebrow} title={c.match.title} titleAccent={c.match.titleAccent} tone="pine" body={c.match.body} />
+            {/*
+             * The board reads top to bottom as the argument the section is making: two students,
+             * the wire that joins them, the group that results — and then, held apart below it, the
+             * one who does not fit yet.
+             *
+             * Laid out as stacked rows, NOT as absolutely positioned nodes on a fixed-height canvas.
+             * The previous version placed three cards at hardcoded percentages and drew the wire as
+             * two pseudo-elements at `left: 24%; width: 27%; rotate(±16deg)` — coordinates that
+             * agreed with the cards at no width at all: the lines began in mid-air and touched
+             * nothing. `GroupMatchMap` on the home page records the same lesson and the same fix.
+             *
+             * One `role="img"`: a screen reader should hear the sentence this picture makes, not
+             * walk three fake student records.
+             */}
             <div
               className={styles.matchBoard}
               role="img"
@@ -643,30 +694,34 @@ export function HowItWorksPage({ locale }: { locale: Locale }) {
                 <small className={styles.sampleLabel}>{c.common.example}</small>
                 {c.match.labels.map((label, index) => (
                   <span data-negative={index === 3} key={label}>
-                    {index === 3 ? "×" : <Check />}
+                    {/* An icon, not a bare "×" text node — as text it took neither the flex `gap`
+                        nor the `svg` sizing beside it, and sat jammed against its label. */}
+                    {index === 3 ? <X /> : <Check />}
                     {label}
                   </span>
                 ))}
               </div>
-              <div className={styles.studentNetwork}>
-                {c.match.students.map((student, index) => (
-                  <article data-student={index} key={student[0]}>
-                    <span>{String.fromCharCode(65 + index)}</span>
-                    <div>
-                      <small>{student[0]}</small>
-                      <strong>{student[1]}</strong>
-                      <p>{student[2]}</p>
-                      <p>
-                        <CalendarDays />
-                        {student[3]}
-                      </p>
-                    </div>
-                  </article>
-                ))}
-                <div className={styles.matchHub}>
+              <div className={styles.matchNetwork}>
+                <div className={styles.matchPair}>
+                  {c.match.students.slice(0, 2).map((student, index) => (
+                    <MatchStudent index={index} key={student[0]} student={student} />
+                  ))}
+                </div>
+                {/* The wire is its own row spanning exactly the gap, so its endpoints are the
+                    horizontal centres of the two cards above at every width and in both locales. */}
+                <div className={styles.matchWire} aria-hidden="true" />
+                <div className={styles.matchResult}>
                   <Network />
                   <strong>{c.match.compatible}</strong>
-                  <small>{c.match.wait}</small>
+                </div>
+                {/* C, held back. Its connector is dashed and fades out before it arrives — an
+                    incomplete line is the plainest way to draw "not placed yet", and it puts that
+                    sentence on the student it is about rather than on the group's own card. */}
+                <div className={styles.matchHold}>
+                  <p>{c.match.wait}</p>
+                  {c.match.students.slice(2).map((student) => (
+                    <MatchStudent held index={2} key={student[0]} student={student} />
+                  ))}
                 </div>
               </div>
             </div>

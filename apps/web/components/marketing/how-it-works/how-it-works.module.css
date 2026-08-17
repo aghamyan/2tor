@@ -2426,191 +2426,317 @@
 .matchSection .heading {
   max-width: 50rem;
 }
+/*
+ * The match board, in the same ink-tinted glass the home page's `.groupMap` uses on its pine band.
+ *
+ * It was `background: var(--navy)` — which is `hsl(var(--vz-ink))`, the SAME colour this section's
+ * ground already paints. Both measured `rgb(20, 52, 42)`: there was no panel, only three cards
+ * floating on the block. That is what made the section read as belonging to a different page.
+ *
+ * INK-TINTED, NOT WHITE, and this is the direction that surprises people: glass lightens what is
+ * behind it (`--vz-fx-glass-blur` carries a `brightness` term), so a white tint on pine washes the
+ * ground out from under its own text. Tinting dark keeps the material — blur, saturation, specular
+ * rim — while leaving the labels somewhere they can be read. `.groupMap` records the same finding.
+ */
 .matchBoard {
-  background: var(--navy);
-  border-radius: var(--vz-r-card);
-  color: white;
+  backdrop-filter: var(--vz-fx-glass-blur);
+  background: hsl(var(--vz-ink) / 42%);
+  border-radius: calc(var(--vz-r-card) + 6px);
+  box-shadow:
+    var(--vz-fx-glass-shadow),
+    inset 0 1.5px 0 0 hsl(0 0% 100% / 20%),
+    inset 0 0 0 1px hsl(0 0% 100% / 11%);
+  color: hsl(var(--vz-block-on));
+  /*
+   * Two columns: the criteria on the left, the drawing they judge on the right.
+   *
+   * The rail used to run along the top as a wrapping row, which put four abstract phrases as far as
+   * possible from the three cards they describe and left the diagram centred in a panel twice its
+   * width. Proximity is what says these belong together — the legend reads as the axis of the
+   * picture beside it rather than as a caption above it, and the board stops being mostly margin.
+   */
+  display: grid;
+  gap: clamp(1.2rem, 2.8vw, 2.8rem);
+  grid-template-columns: minmax(0, 15.5rem) minmax(0, 1fr);
+  isolation: isolate;
   margin-top: 3rem;
   overflow: hidden;
-  padding: 1rem;
+  padding: 1.4rem 1.4rem 1.6rem;
 }
 .criteriaRail {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
+  align-content: start;
+  display: grid;
+  gap: 0.55rem;
+  justify-items: start;
 }
+/*
+ * INK-tinted fills, field-tinted edges. Measured, not chosen: with the pale green as the fill these
+ * chips ran 3.94:1 at 390 — the blooms behind the board lighten every pane sitting on it, so a light
+ * tint under light text loses contrast exactly where the ground is brightest. Darkening the fill and
+ * keeping the field tint on the rim holds the identity and puts the label back on a stable ground.
+ */
 .criteriaRail span {
   align-items: center;
-  background: hsl(var(--vz-field-1) / 16%);
-  border: 1px solid hsl(var(--vz-positive) / 18%);
+  background: hsl(var(--vz-ink) / 48%);
+  border: 1px solid hsl(var(--vz-field-1) / 34%);
   border-radius: 999px;
   color: hsl(var(--vz-field-1));
   display: flex;
-  font-size: 0.74rem;
+  font-size: 0.78rem;
   font-weight: 700;
-  gap: 0.25rem;
-  padding: 0.4rem 0.6rem;
+  gap: 0.35rem;
+  padding: 0.45rem 0.7rem;
 }
+/* `--vz-positive` was the old border here and it is a dark green: on this ground it drew nothing.
+   The negative chip is the one the eye should find, so it keeps the accent. */
 .criteriaRail span[data-negative="true"] {
-  background: hsl(var(--vz-accent) / 10%);
-  border-color: hsl(var(--vz-accent) / 18%);
+  background: hsl(var(--vz-ink) / 48%);
+  border-color: hsl(var(--vz-accent) / 52%);
   color: hsl(var(--vz-field-2));
 }
 .criteriaRail svg {
-  height: 0.7rem;
+  flex: none;
+  height: 0.78rem;
+  width: 0.78rem;
 }
-.studentNetwork {
-  height: 30rem;
+/*
+ * Stacked rows: pair, wire, result, held. No absolute canvas, no fixed height — the drawing is the
+ * layout, so it cannot come apart at a width nobody screenshotted.
+ */
+.matchNetwork {
+  /* One width and one gutter for the whole diagram. The wire spans the same box as the pair, and the
+     held card is exactly one card wide, so every part stays aligned by arithmetic rather than by
+     three numbers that have to be kept in step by hand. */
+  --match-w: 100%;
+  --match-gap: clamp(1rem, 2.2vw, 2rem);
+  display: grid;
+  justify-items: center;
+}
+.matchPair {
+  display: grid;
+  gap: var(--match-gap);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  max-width: var(--match-w);
+  width: 100%;
+}
+/*
+ * The wire. Two feeds descending from the horizontal centres of the two cards above, joining at the
+ * halfway line, and one drop from there into the result.
+ *
+ * 25% and 75% are the centres of two equal columns — which is exactly what `.matchPair` is — so the
+ * endpoints follow the cards at every width instead of agreeing with them at one.
+ */
+.matchWire {
+  height: 3.6rem;
+  max-width: var(--match-w);
   position: relative;
+  width: 100%;
 }
-.studentNetwork:before,
-.studentNetwork:after {
-  border-top: 2px dashed hsl(var(--vz-positive));
+.matchWire::before,
+.matchWire::after {
+  border-color: hsl(var(--vz-field-1) / 62%);
+  border-style: solid;
   content: "";
-  left: 24%;
   position: absolute;
-  top: 48%;
-  transform-origin: right;
-  width: 27%;
 }
-.studentNetwork:before {
-  transform: rotate(16deg);
+/* └────┘ — the two verticals and the rule that joins them.
+   Not a flat 25%: with a gutter between the columns, a column's centre is at `W/4 − gap/4`, so a
+   bare 25% lands a quarter of the gutter outboard of the card it is supposed to descend from. Eight
+   pixels at 1440 — small enough to read as sloppiness rather than as a bug, which is worse. */
+.matchWire::before {
+  border-top: 0;
+  border-radius: 0 0 0.7rem 0.7rem;
+  border-width: 0 2px 2px;
+  height: 55%;
+  left: calc(25% - var(--match-gap) / 4);
+  right: calc(25% - var(--match-gap) / 4);
+  top: 0;
 }
-.studentNetwork:after {
-  transform: rotate(-16deg);
+/* The single drop from the join into the result card. */
+.matchWire::after {
+  border-width: 0 0 0 2px;
+  bottom: 0;
+  left: calc(50% - 1px);
+  top: 55%;
 }
-.studentNetwork article {
+/*
+ * The student card, as a pane on the board's glass rather than a cream rectangle laid on top of it.
+ *
+ * Three opaque light cards were most of why this section looked pasted in: on a dark structural
+ * surface the content panes should be LIGHTER MATERIAL, not a different material. Everything in
+ * them now reads in the block's own foreground, which is also what fixes a card whose second line
+ * was invisible — `.matchSection :is(h2, h3, strong)` paints `strong` white for the block, and the
+ * old rules put that white on a `--vz-surface` card at 1.01:1.
+ */
+.matchNetwork article {
   align-items: center;
-  background: hsl(var(--vz-surface));
-  border: 1px solid hsl(var(--vz-line-soft));
+  /* Ink, not the block's foreground. A pane lightened to sit "on" the glass measured 4.26:1 for its
+     name line and 3.12:1 for its letter chip where the bloom is strongest — glass lightens what is
+     behind it and the pane was lightening it again. The panes nested inside a glass frame need a
+     DARKER ground, which is the same conclusion `.groupMap` reached on the home page's pine band. */
+  background: hsl(var(--vz-ink) / 30%);
   border-radius: var(--vz-r-input);
-  color: var(--navy);
+  box-shadow:
+    inset 0 1px 0 hsl(0 0% 100% / 22%),
+    inset 0 0 0 1px hsl(0 0% 100% / 10%);
   display: flex;
-  gap: 0.7rem;
-  padding: 0.8rem;
-  position: absolute;
-  width: 14rem;
-  z-index: 2;
+  gap: 0.75rem;
+  padding: 0.9rem;
+  width: 100%;
 }
-.studentNetwork article[data-student="0"] {
-  left: 3%;
-  top: 15%;
-}
-.studentNetwork article[data-student="1"] {
-  left: 3%;
-  top: 58%;
-}
-.studentNetwork article[data-student="2"] {
-  right: 3%;
-  top: 35%;
-}
-.studentNetwork article > span {
+.matchNetwork article > span {
   align-items: center;
-  background: var(--blue);
+  background: hsl(var(--vz-ink) / 70%);
   border-radius: var(--vz-r-input);
-  color: var(--royal);
+  box-shadow: inset 0 0 0 1px hsl(var(--vz-field-1) / 42%);
+  color: hsl(var(--vz-field-1));
   display: flex;
-  font-size: 0.8rem;
-  font-weight: 600;
-  height: 2.5rem;
+  flex: none;
+  font-size: 0.88rem;
+  font-weight: 700;
+  height: 2.6rem;
   justify-content: center;
-  width: 2.5rem;
+  width: 2.6rem;
 }
-.studentNetwork article[data-student="2"] > span {
-  background: var(--amber);
-  color: hsl(var(--vz-accent));
+.matchNetwork article[data-held] > span {
+  background: hsl(var(--vz-ink) / 70%);
+  box-shadow: inset 0 0 0 1px hsl(var(--vz-accent) / 52%);
+  color: hsl(var(--vz-field-2));
 }
-.studentNetwork article div {
+.matchNetwork article div {
   min-width: 0;
 }
-.studentNetwork article small {
-  color: var(--teal);
+/* `--vz-field-2`, the peach: `--teal` is `--vz-accent-ink`, a DARK accent, and on this ground it was
+   a dark red label on dark green. On the block only `--vz-block-on` at alpha and the two field
+   tints read as text — the rule this file states at the top and this section broke four times. */
+.matchNetwork article small {
+  color: hsl(var(--vz-field-2));
   display: block;
-  font-size: 0.67rem;
-  font-weight: 600;
-}
-.studentNetwork article strong {
-  display: block;
-  font-size: 0.82rem;
-  margin-top: 0.15rem;
-}
-.studentNetwork article p {
-  color: var(--muted);
   font-size: 0.72rem;
-  line-height: 1.4;
-  margin-top: 0.17rem !important;
+  font-weight: 700;
+  letter-spacing: 0.02em;
 }
-.studentNetwork article p:last-child {
+.matchNetwork article strong {
+  display: block;
+  font-size: 0.92rem;
+  letter-spacing: -0.006em;
+  margin-top: 0.2rem;
+}
+.matchNetwork article p {
+  color: hsl(var(--vz-block-on) / 76%);
+  font-size: 0.79rem;
+  line-height: 1.45;
+  margin-top: 0.22rem !important;
+}
+.matchNetwork article p:last-child {
   align-items: center;
   display: flex;
-  gap: 0.25rem;
+  gap: 0.3rem;
 }
-.studentNetwork article svg {
-  height: 0.6rem;
+.matchNetwork article svg {
+  flex: none;
+  height: 0.7rem;
+  width: 0.7rem;
 }
-.matchHub {
+/*
+ * The result. The one element on the board that should stop the eye, so it is the only one carrying
+ * the accent — a lit ring and a filled badge, against panes that are all the same quiet tint.
+ */
+.matchResult {
   align-items: center;
-  background: linear-gradient(145deg, hsl(var(--vz-positive) / 12%), hsl(var(--vz-surface)));
-  border: 1px solid hsl(var(--vz-positive));
+  background: hsl(var(--vz-field-1) / 14%);
   border-radius: var(--vz-r-card);
-  box-shadow: 0 1.2rem 3rem hsl(var(--vz-ink) / 30%);
-  color: var(--navy);
+  box-shadow:
+    inset 0 1px 0 hsl(0 0% 100% / 26%),
+    inset 0 0 0 1px hsl(var(--vz-field-1) / 34%),
+    0 1.2rem 2.8rem -0.8rem hsl(var(--vz-ink) / 46%);
   display: flex;
-  flex-direction: column;
-  left: 51%;
-  padding: 1rem;
-  position: absolute;
-  text-align: center;
-  top: 49%;
-  transform: translate(-50%, -50%);
-  width: 14rem;
-  z-index: 3;
+  gap: 0.7rem;
+  padding: 0.85rem 1.4rem 0.85rem 0.95rem;
 }
-.matchHub svg {
-  background: var(--teal);
+.matchResult svg {
+  background: hsl(var(--vz-accent));
   border-radius: 50%;
-  color: white;
-  height: 3.2rem;
-  margin-top: -2.3rem;
-  padding: 0.85rem;
-  width: 3.2rem;
+  box-shadow: 0 0.4rem 1rem -0.2rem hsl(var(--vz-accent) / 60%);
+  color: hsl(var(--vz-paper));
+  flex: none;
+  height: 2.5rem;
+  padding: 0.62rem;
+  width: 2.5rem;
 }
-.matchHub strong {
-  font-size: 0.83rem;
-  margin-top: 0.5rem;
+.matchResult strong {
+  font-size: 1rem;
+  letter-spacing: -0.008em;
 }
-.matchHub small {
-  color: hsl(var(--vz-accent));
-  font-size: 0.7rem;
-  margin-top: 0.3rem;
+/*
+ * C, held back. The connector above it is dashed AND fades out before it arrives — a line that does
+ * not complete is the plainest drawing of "not placed yet", and it says so without a second label.
+ */
+.matchHold {
+  display: grid;
+  justify-items: center;
+  margin-top: 2.6rem;
+  /* Exactly one card wide — C is one student, the same size as the two above it. */
+  max-width: calc((var(--match-w) - var(--match-gap)) / 2);
+  position: relative;
+  width: 100%;
+}
+.matchHold::before {
+  border-left: 2px dashed hsl(var(--vz-block-on) / 34%);
+  content: "";
+  height: 2.6rem;
+  left: calc(50% - 1px);
+  /* Fades along its own length, so the connection visibly runs out rather than stopping square. */
+  mask-image: linear-gradient(180deg, hsl(0 0% 0% / 90%), transparent 82%);
+  position: absolute;
+  top: -2.6rem;
+}
+.matchHold > p {
+  color: hsl(var(--vz-field-2));
+  font-size: 0.82rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem !important;
+  text-align: center;
+}
+/* Quieter than the pair above it — the same card, held. Quieter on a dark ground means closer to it,
+   so the tint is lighter than the pair's while still being ink rather than foreground. */
+.matchNetwork article[data-held] {
+  background: hsl(var(--vz-ink) / 20%);
+  box-shadow:
+    inset 0 1px 0 hsl(0 0% 100% / 14%),
+    inset 0 0 0 1px hsl(0 0% 100% / 8%);
 }
 .matchFooter {
   align-items: center;
   display: grid;
   gap: 1.2rem;
   grid-template-columns: 0.8fr 1.5fr auto;
-  margin-top: 1rem;
+  margin-top: 1.6rem;
 }
+/* `--vz-muted` measures ~2.25:1 on this block and must never be used here — the rule this file
+   states twice, which the whole footer was breaking. White at alpha is the only tone that clears. */
 .matchFooter > p {
-  color: var(--muted);
-  font-size: 0.83rem;
+  color: hsl(var(--vz-block-on) / 82%);
+  font-size: 0.88rem;
   font-weight: 620;
 }
 .matchFooter ul {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
+  gap: 0.5rem 1rem;
 }
 .matchFooter li {
   align-items: center;
-  color: var(--muted);
+  color: hsl(var(--vz-block-on) / 82%);
   display: flex;
-  font-size: 0.79rem;
-  gap: 0.25rem;
+  font-size: 0.84rem;
+  gap: 0.3rem;
 }
 .matchFooter li svg {
-  color: var(--teal);
-  height: 0.7rem;
+  color: hsl(var(--vz-field-1));
+  flex: none;
+  height: 0.8rem;
+  width: 0.8rem;
 }
 .matchFooter .secondary {
   background: hsl(var(--vz-surface));
@@ -3351,29 +3477,44 @@
   .lessonRail {
     grid-template-columns: repeat(2, 1fr);
   }
+  /* One column, and the rail goes back to being a wrapping row above the drawing: side by side it
+     would leave each of them too narrow to read. */
   .matchBoard {
-    padding: 0.8rem;
+    grid-template-columns: minmax(0, 1fr);
+    padding: 1rem 1rem 1.3rem;
   }
-  .studentNetwork {
+  .criteriaRail {
+    align-items: center;
     display: flex;
-    flex-direction: column;
-    gap: 0.6rem;
-    height: auto;
-    padding-block: 1rem;
+    flex-wrap: wrap;
   }
-  .studentNetwork:before,
-  .studentNetwork:after {
+  /* One column, so the two feeds become one. The bracket's 25%/75% verticals are the centres of two
+     equal columns; with a single column there is nothing for them to be the centres OF, and leaving
+     them would put the wire back to describing a layout that is not on screen. */
+  .matchPair {
+    gap: 0.7rem;
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .matchWire {
+    height: 2.4rem;
+  }
+  .matchWire::before {
+    border-radius: 0;
+    border-width: 0 0 0 2px;
+    height: 100%;
+    left: calc(50% - 1px);
+    right: auto;
+  }
+  .matchWire::after {
     display: none;
   }
-  .studentNetwork article {
-    position: static;
-    width: 100%;
+  /* "One card wide" is the full width once the pair stops being two columns — the halving calc
+     would otherwise leave C at half the size of the two students it is being compared against. */
+  .matchHold {
+    max-width: var(--match-w);
   }
-  .matchHub {
-    order: 4;
-    position: static;
-    transform: none;
-    width: 100%;
+  .matchResult {
+    text-align: left;
   }
 }
 @media (max-width: 560px) {
@@ -3851,6 +3992,75 @@
 }
 
 /*
+ * The match board resolving — the section's argument acted out in the order it is made.
+ *
+ * The two students arrive, the wire draws down out of them, and only then does the group appear at
+ * the end of it. Ordering is the whole justification for animating a static diagram: watch it once
+ * and you have read the claim, which is that the match is the RESULT of the two above it rather than
+ * a third card that happens to sit lower on the page. The same staging as the evidence path and the
+ * orbit, so a reader arriving from either already knows how to read this one.
+ *
+ * The wire draws with `clip-path` rather than `scaleX`/`scaleY`: it is a bordered box whose corner
+ * radii would smear under a scale, and `transform` on the `::after` already carries its own -1px
+ * centring offset.
+ *
+ * C is deliberately NOT part of the sequence. It is the counter-example; having it fly in with the
+ * others would stage it as a participant.
+ */
+.revealed .matchPair article {
+  animation: matchCardIn 520ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.revealed .matchPair article:nth-child(2) {
+  animation-delay: 80ms;
+}
+.revealed .matchWire::before,
+.revealed .matchWire::after {
+  animation: matchWireIn 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.revealed .matchWire::before {
+  animation-delay: 220ms;
+}
+.revealed .matchWire::after {
+  animation-delay: 420ms;
+}
+.revealed .matchResult {
+  animation: matchResultIn 560ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: 560ms;
+}
+
+@keyframes matchCardIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
+@keyframes matchWireIn {
+  from {
+    clip-path: inset(0 0 100% 0);
+  }
+}
+
+@keyframes matchResultIn {
+  from {
+    opacity: 0;
+    /* From 0.94, never from 0: the card settles into place rather than popping out of nothing. The
+       spring is critically damped, because a result that overshoots is a result you notice moving
+       instead of one you read. */
+    transform: scale(0.94) translateY(8px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .revealed .matchPair article,
+  .revealed .matchWire::before,
+  .revealed .matchWire::after,
+  .revealed .matchResult {
+    animation: none;
+  }
+}
+
+/*
  * The orbit assembling itself — the section's claim acted out rather than merely drawn.
  *
  * Order is the whole point. The lesson lands first, then each spoke draws OUT of it and its card
@@ -4062,6 +4272,24 @@
     background: hsl(var(--vz-accent) / 12%);
     box-shadow: inset 0 0 0 1px hsl(var(--vz-accent) / 34%);
   }
+  /* The match board. Opaque and one step lighter than the block it sits on — with the material gone
+     an ink tint would resolve to the ground's own colour, which is the state this panel was rescued
+     from. Its panes keep their alpha fills but gain drawn edges. */
+  .matchBoard {
+    backdrop-filter: none;
+    /* The block lightened by its own foreground rather than a second dark token — there isn't one
+       (`globals.css` ships `--vz-block` and `--vz-block-on`, nothing between). Mixing the two is how
+       the panel stays distinguishable from the ground once the material is gone. */
+    background: color-mix(in srgb, hsl(var(--vz-block)) 92%, hsl(var(--vz-block-on)));
+    box-shadow: inset 0 0 0 1px hsl(0 0% 100% / 18%);
+  }
+  .matchNetwork article,
+  .matchNetwork article[data-held] {
+    box-shadow: inset 0 0 0 1px hsl(0 0% 100% / 20%);
+  }
+  .matchResult {
+    box-shadow: inset 0 0 0 1px hsl(var(--vz-field-1) / 50%);
+  }
 }
 
 /* Reduced transparency: an opaque block with a drawn edge, since the rim here is an inset shadow
@@ -4136,6 +4364,31 @@
   right: -4%;
   top: 56%;
   width: 30rem;
+}
+
+/*
+ * The match section's blooms — the first this section has had.
+ *
+ * Without them the board's `backdrop-filter` had nothing to bend and the panel would have been an
+ * ink rectangle on an ink ground for the second time. Tints and strengths follow the home page's
+ * pine band (`.groupBloomOne/Two/Three`), which is the only other place on the site where glass sits
+ * on `--vz-block`: field tints and the accent at high alpha, because a pale wash that reads on paper
+ * disappears entirely down here.
+ */
+.matchBloomOne {
+  background: hsl(var(--vz-field-1) / 34%);
+  height: 26rem;
+  left: 6%;
+  top: 18%;
+  width: 30rem;
+}
+
+.matchBloomTwo {
+  background: hsl(var(--vz-accent) / 30%);
+  bottom: -14%;
+  height: 24rem;
+  right: 8%;
+  width: 28rem;
 }
 
 /*
