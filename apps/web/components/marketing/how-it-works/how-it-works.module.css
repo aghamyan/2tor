@@ -1872,16 +1872,35 @@
  * thing they are arranged on rather than a hoop drawn near them, and the dashes are gone because a
  * dashed circle is the most transferable diagram cliché there is.
  */
-/* 24%, not the 11% this started at. The ring is now the only thing carrying the diagram's structure
-   — the chips sit ON it — and at 11% it measured 1.25:1 against paper and vanished entirely where
-   the warm bloom crosses it. The two dashed rings it replaced were themselves at 30% of a much
-   darker green; a meaningful ring drawn fainter than the meaningless ones is not an improvement. */
+/*
+ * The ring is at the chips' own radius, which is what makes it the thing they sit on — and is also
+ * why it CANNOT be drawn as a continuous circle. A full ring passes straight through all six cards,
+ * and they are glass, so it shows through them: a line crossing the middle of a card reads as a
+ * rendering fault, not as depth.
+ *
+ * Hiding it behind them is not available either. There is nothing to hide behind.
+ *
+ * So the ring breathes instead. The conic mask ramps to fully opaque exactly midway between two
+ * chips and to fully transparent exactly at each one, on a 60° period matching their spacing — the
+ * ring is brightest in the open gaps and has already faded to nothing before it reaches a card.
+ * That is the same rule as every thread on this page (fade before the disc, never butt into it),
+ * applied around a circle. A smooth ramp rather than cut wedges, because hard ends at these
+ * intervals would just be the dashed ring this replaced.
+ *
+ * The 60° period must stay tied to the chips' 60° spacing; `conic-gradient` measures clockwise from
+ * twelve o'clock while the chips are placed from three o'clock, hence the 30° offset that lands the
+ * transparent point on a chip rather than between two.
+ *
+ * 30% rather than the 24% it was drawn at flat: peak opacity has to rise when most of the ring is
+ * now partly masked, or the average reads fainter than before.
+ */
 .orbit:before {
-  border: 1px solid hsl(var(--vz-ink) / 24%);
+  border: 1px solid hsl(var(--vz-ink) / 30%);
   border-radius: 50%;
   content: "";
   height: 28rem;
   left: 50%;
+  mask-image: repeating-conic-gradient(from 0deg, black 0deg, transparent 30deg, black 60deg);
   position: absolute;
   top: 50%;
   transform: translate(-50%, -50%);
@@ -1990,10 +2009,21 @@
  * spoke reads as arriving rather than as a drawn connector.
  */
 .orbit > span:before {
+  /*
+   * Transparent for the first sixth, for the same reason the ring is masked: the chips are glass,
+   * and a spoke that begins at the chip's centre draws a line across the inside of the card.
+   *
+   * The ramp rather than simply starting the spoke further out, because the six chips do not
+   * present the same edge to the core. A card at three o'clock is 5.25rem wide to its border; the
+   * diagonal ones are 2.08rem to theirs. One start distance either buries the horizontal spokes
+   * inside their cards or leaves the diagonal ones floating a full 3rem clear. Fading the near end
+   * lets the same geometry serve both: the spoke emerges wherever the card stops covering it.
+   */
   background: linear-gradient(
     90deg,
-    hsl(var(--vz-accent) / 38%) 0%,
-    hsl(var(--vz-accent) / 20%) 62%,
+    hsl(var(--vz-accent) / 0%) 0%,
+    hsl(var(--vz-accent) / 38%) 17%,
+    hsl(var(--vz-accent) / 20%) 64%,
     hsl(var(--vz-accent) / 0%) 100%
   );
   content: "";
