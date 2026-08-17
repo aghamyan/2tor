@@ -1156,6 +1156,10 @@
  * The track carries an inset shadow so it reads as a groove cut into the tile; the fill carries a
  * highlight along its own top edge so it reads as something sitting in that groove. That pairing is
  * the whole difference between a progress bar and two coloured rectangles.
+ *
+ * The 72% below is the DASHBOARD's single meter only. Record tiles set their own width inline,
+ * because there the number is data — one shared width is what made four bars per tab identical, and
+ * a bar that always draws the same length is decoration wearing a measurement's clothes.
  */
 .statGrid i,
 .dashboardGrid i {

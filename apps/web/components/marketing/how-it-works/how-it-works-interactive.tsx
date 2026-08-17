@@ -146,13 +146,20 @@ export function RecordTabs({ c }: { c: HowItWorksCopy["record"] }) {
           </div>
         </div>
         <div className={styles.statGrid}>
-          {panel.stats.map(([label, value]) => (
+          {/*
+           * The meter is rendered only for tiles that carry a percentage — see `RecordStat`. Its
+           * width is inline because it is data, not styling: the shared `.statGrid b` rule can only
+           * hold one number, and one number for every bar is what made them all identical.
+           */}
+          {panel.stats.map(([label, value, meter]) => (
             <div key={label}>
               <small>{label}</small>
               <strong>{value}</strong>
-              <i>
-                <b />
-              </i>
+              {meter === undefined ? null : (
+                <i>
+                  <b style={{ width: `${meter}%` }} />
+                </i>
+              )}
             </div>
           ))}
         </div>

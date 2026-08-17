@@ -2,6 +2,23 @@ import type { Locale } from "@app/i18n/config";
 
 export type HowItWorksCopy = typeof en;
 
+/**
+ * One tile in the learning-record card: a label, its value, and — only sometimes — the percentage
+ * its meter draws.
+ *
+ * The meter is optional because most of what a learning record holds is not a quantity. "Explains
+ * thinking" and "Fractions unit" are observations; a bar under them measured nothing, and four
+ * identical bars per tab measured nothing four times. A tile gets a meter only when the card itself
+ * states the number the bar is drawing — `82%`, `6 of 6`, or a share of two counts printed side by
+ * side. Everything else ends after its value.
+ *
+ * The parent dashboard in `06 · Inform` looks like a precedent for this and is not one. It does
+ * restrict itself to a single meter in eight tiles, but that tile is "Skills developing / Common
+ * denominators", which states no number either — so it fails the same test, and is this defect left
+ * unfixed rather than the rule already in force.
+ */
+type RecordStat = readonly [label: string, value: string, meter?: number];
+
 const en = {
   hero: {
     eyebrow: "How 2tor works",
@@ -161,34 +178,43 @@ const en = {
       {
         label: "Knowledge",
         title: "Current knowledge",
+        /*
+         * The two meters here are each other's complement: 12 mastered and 3 developing are both
+         * printed on the card, so 80/20 is a share of the skills it already lists rather than a
+         * claim about a curriculum length nobody stated.
+         */
         stats: [
           ["Current level", "Grade 6 · Fractions"],
-          ["Mastered", "12 recorded skills"],
-          ["Developing", "3 active skills"],
+          ["Mastered", "12 recorded skills", 80],
+          ["Developing", "3 active skills", 20],
           ["Next milestone", "Add unlike denominators"],
-        ],
+        ] as RecordStat[],
       },
       {
         label: "Lessons",
         title: "Lesson continuity",
         stats: [
-          ["Attended", "6 of 6"],
+          ["Attended", "6 of 6", 100],
           ["Latest focus", "Visual fraction models"],
           ["Participation", "Consistent"],
           ["Next lesson", "Symbolic steps"],
-        ],
+        ] as RecordStat[],
       },
       {
         label: "Homework",
         title: "Practice evidence",
         stats: [
-          ["Latest result", "82%"],
+          ["Latest result", "82%", 82],
           ["Completed", "On schedule"],
           ["Pattern", "Models are strongest"],
           ["Review next", "Denominator choice"],
-        ],
+        ] as RecordStat[],
       },
       {
+        /*
+         * No meters at all, and that is the point of the tab: tutor feedback is observation, not
+         * measurement, and a page that draws bars under it is measuring nothing.
+         */
         label: "Feedback",
         title: "Tutor observations",
         stats: [
@@ -196,7 +222,7 @@ const en = {
           ["Support", "Needs visual start"],
           ["School link", "Fractions unit"],
           ["Next note", "Check independence"],
-        ],
+        ] as RecordStat[],
       },
       {
         label: "Progress",
@@ -204,9 +230,9 @@ const en = {
         stats: [
           ["Active goal", "Reliable fraction addition"],
           ["Evidence", "Lessons + homework"],
-          ["Attendance", "100% example"],
+          ["Attendance", "100% example", 100],
           ["Plan status", "On track"],
-        ],
+        ] as RecordStat[],
       },
     ],
     privacy: "Example content. Real records are visible only to authorized users.",
