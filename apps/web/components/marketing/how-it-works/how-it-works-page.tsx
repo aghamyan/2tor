@@ -293,7 +293,17 @@ export function HowItWorksPage({ locale }: { locale: Locale }) {
       </section>
 
       <section className={styles.prepareSection} id="prepare">
-        <SectionGround tone="paper" mask="radial-gradient(112% 88% at 38% 48%, black 22%, transparent 76%)" />
+        {/*
+         * Blooms are not decoration here — they are what the workspace panel and the two comparison
+         * cards refract. `globals.css` states the test: a glass surface over flat paper would look
+         * identical with `backdrop-filter: none`, which makes it a tinted div. This section had no
+         * blooms at all before the glass went on.
+         */}
+        <SectionGround
+          tone="paper"
+          mask="radial-gradient(112% 88% at 38% 48%, black 22%, transparent 76%)"
+          blooms={[styles.prepBloomOne, styles.prepBloomTwo]}
+        />
         <div className={styles.shell}>
           <Reveal>
             <Heading eyebrow={c.prepare.eyebrow} title={c.prepare.title} titleAccent={c.prepare.titleAccent} body={c.prepare.body} />
