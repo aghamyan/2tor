@@ -41,8 +41,8 @@ import styles from "./how-it-works.module.css";
  * The chips are glass, so a spoke that begins under one draws a line across the inside of the card
  * — which is what it did. The fix cannot be one start distance for all six, because a card presents
  * a different edge to the centre depending on where it sits: the ones at three and nine o'clock are
- * half their 10.5rem WIDTH away from their own border, the four diagonal ones only half their
- * 3.6rem height. A single value either buries two spokes inside their cards or leaves four floating
+ * half their 11.4rem WIDTH away from their own border, the four diagonal ones only half their
+ * 3.9rem height. A single value either buries two spokes inside their cards or leaves four floating
  * 3rem clear of theirs.
  *
  * So it is solved where the geometry already lives. The angle comes from the same index the CSS
@@ -56,8 +56,8 @@ import styles from "./how-it-works.module.css";
  */
 function orbitReach(index: number) {
   const angle = (index * 60 * Math.PI) / 180;
-  const toSide = 5.25 / Math.abs(Math.cos(angle));
-  const toCap = 1.8 / Math.abs(Math.sin(angle));
+  const toSide = 5.7 / Math.abs(Math.cos(angle));
+  const toCap = 1.95 / Math.abs(Math.sin(angle));
   return `${(Math.min(toSide, toCap) + 0.35).toFixed(2)}rem`;
 }
 
