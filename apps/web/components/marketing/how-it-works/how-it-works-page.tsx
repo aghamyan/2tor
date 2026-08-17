@@ -36,29 +36,27 @@ import { SectionEyebrow, accentedTitle, type SectionTone } from "../section-head
 import styles from "./how-it-works.module.css";
 
 /**
- * How far out from an orbit chip's centre its spoke may start drawing, in rem.
+ * The two ratios a chip's spoke needs to start outside the card: 1/|cos| and 1/|sin| of its angle.
  *
- * The chips are glass, so a spoke that begins under one draws a line across the inside of the card
- * — which is what it did. The fix cannot be one start distance for all six, because a card presents
- * a different edge to the centre depending on where it sits: the ones at three and nine o'clock are
- * half their 11.4rem WIDTH away from their own border, the four diagonal ones only half their
- * 3.9rem height. A single value either buries two spokes inside their cards or leaves four floating
- * 3rem clear of theirs.
+ * The chips are glass, so a spoke that begins under one draws a line across the inside of the card.
+ * Clearing it is not one distance for all six — a card presents a different edge to the centre
+ * depending on where it sits, its side at three and nine o'clock and its cap at the four diagonals.
  *
- * So it is solved where the geometry already lives. The angle comes from the same index the CSS
- * uses for placement, and the reach is the distance to whichever edge the ray leaves through —
- * width-limited or height-limited — plus a little clearance. `Math.min` picks the nearer edge, and
- * a zero component gives `Infinity` rather than an error, which is exactly the right answer: a
- * horizontal ray never meets the horizontal edges.
+ * What crosses the language boundary is these two ratios rather than a finished length, because the
+ * chips are sized in `clamp()` and a length resolved here would be right at exactly one viewport
+ * width. The stylesheet multiplies them by whatever half-width and half-height the chip currently
+ * has and takes the smaller — see `--reach` in `.orbit > span`.
  *
- * Keep this in step with `.orbit > span` in the stylesheet — the two numbers below are that rule's
- * `width` and `min-height` halved.
+ * The cap stands in for infinity: a horizontal ray never meets the horizontal edges, so that side
+ * of the `min()` must simply lose. `Infinity` itself would serialise into CSS as an invalid value
+ * and take the whole declaration with it.
  */
-function orbitReach(index: number) {
+function orbitRatios(index: number) {
   const angle = (index * 60 * Math.PI) / 180;
-  const toSide = 5.7 / Math.abs(Math.cos(angle));
-  const toCap = 1.95 / Math.abs(Math.sin(angle));
-  return `${(Math.min(toSide, toCap) + 0.35).toFixed(2)}rem`;
+  return {
+    "--kw": Math.min(1 / Math.abs(Math.cos(angle)), 1000),
+    "--kh": Math.min(1 / Math.abs(Math.sin(angle)), 1000),
+  };
 }
 
 /*
@@ -517,7 +515,7 @@ export function HowItWorksPage({ locale }: { locale: Locale }) {
                 {c.between.items.map((item, index) => (
                   <span
                     style={
-                      { "--i": index, "--reach": orbitReach(index) } as React.CSSProperties
+                      { "--i": index, ...orbitRatios(index) } as React.CSSProperties
                     }
                     key={item}
                   >

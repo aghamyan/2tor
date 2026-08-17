@@ -1856,29 +1856,40 @@
 .betweenLayout {
   align-items: center;
   display: grid;
-  gap: clamp(2rem, 3.4vw, 4.5rem);
-  grid-template-columns: 0.79fr 1.21fr;
+  /*
+   * The left column is wide here, and the type stays at the page's shared section size. Those two
+   * facts are the same decision: the headline fills its column by running FEWER, LONGER lines, not
+   * by setting bigger. Enlarging it was tried and reverted — one section's heading at a size no
+   * other section uses is a hole in the page's scale, and it was solving a width problem with a
+   * font size.
+   *
+   * The gutter pays for it. It was clamp(3rem, 8vw, 8rem) — 115px at 1440, more than a fifth of the
+   * left column's own width spent on nothing.
+   *
+   * The ratio is set by the diagram: the right column needs `2 × (orbit radius + half a chip)` and
+   * not a pixel more, so everything else goes left. Check both when either moves.
+   */
+  gap: clamp(2rem, 2.5vw, 3.5rem);
+  grid-template-columns: 0.89fr 1.11fr;
 }
 /*
- * This section's headline runs larger than the page's other section headings, and that is the one
- * place on the page where it is right. Every other section stacks its heading above a full-width
- * visual; this one sets it BESIDE a diagram half a screen tall, so at the shared size the left
- * column ran out of copy two-thirds of the way down and left a hole. The type fills the column it
- * was given rather than the column being padded out to match the type.
+ * The diagram's geometry, in one place, and fluid.
  *
- * The measure narrows as the size goes up. A 1.3rem sentence set to 42rem would run past 80
- * characters, which is where a line stops being easy to return from.
+ * It used to be six fixed rem values that happened to agree. At its full size that no longer fits
+ * beside a left column wide enough to set the headline in three lines: at 1120px the chips reached
+ * back across the gutter and touched the text. Fixing it by stacking the section earlier would have
+ * meant stacking at 1375px, which is most laptops.
+ *
+ * So the radius and the chip width track the viewport and cap at the size they hold at 1440. Every
+ * other measurement here is derived from the radius rather than restated, so the diagram cannot
+ * come apart at an intermediate width — the ring, the field, the core and the panel's own height
+ * are all one number.
  */
-.betweenLayout .heading h2 {
-  font-size: clamp(2.4rem, 5.4vw, 5rem);
-}
-.betweenLayout .heading > div {
-  font-size: 1.3rem;
-  margin-top: 1.4rem;
-  max-width: 34rem;
-}
 .orbit {
-  height: 39rem;
+  --orbit-r: clamp(11.5rem, 17.3vw, 15.6rem);
+  --orbit-chip-w: clamp(9.6rem, 12.6vw, 11.4rem);
+  --orbit-chip-h: 3.9rem;
+  height: calc(var(--orbit-r) * 2 + 7.8rem);
   position: relative;
 }
 /*
@@ -1916,13 +1927,13 @@
   border: 1px solid hsl(var(--vz-ink) / 30%);
   border-radius: 50%;
   content: "";
-  height: 31.2rem;
+  height: calc(var(--orbit-r) * 2);
   left: 50%;
   mask-image: repeating-conic-gradient(from 0deg, black 0deg, transparent 30deg, black 60deg);
   position: absolute;
   top: 50%;
   transform: translate(-50%, -50%);
-  width: 31.2rem;
+  width: calc(var(--orbit-r) * 2);
 }
 /* A light field behind the core, not a second ring. It gives the disc something to sit in and
    keeps the middle of the diagram from reading as a hole. */
@@ -1934,12 +1945,12 @@
   );
   border-radius: 50%;
   content: "";
-  height: 24rem;
+  height: calc(var(--orbit-r) * 1.54);
   left: 50%;
   position: absolute;
   top: 50%;
   transform: translate(-50%, -50%);
-  width: 24rem;
+  width: calc(var(--orbit-r) * 1.54);
 }
 /*
  * The core, as a lit object rather than a dark circle with a white ring cut round it.
@@ -1965,14 +1976,14 @@
   color: white;
   display: flex;
   flex-direction: column;
-  height: 13.2rem;
+  height: calc(var(--orbit-r) * 0.846);
   justify-content: center;
   left: 50%;
   position: absolute;
   text-align: center;
   top: 50%;
   transform: translate(-50%, -50%);
-  width: 13.2rem;
+  width: calc(var(--orbit-r) * 0.846);
   z-index: 2;
 }
 /* `--vz-positive` is a dark green measuring 1.73:1 on the block — the play mark was very nearly
@@ -2008,13 +2019,23 @@
   display: flex;
   gap: 0.6rem;
   isolation: isolate;
-  left: calc(50% + cos(var(--angle)) * 15.6rem);
-  min-height: 3.9rem;
+  /*
+   * `--kw` and `--kh` come from the page component: 1/|cos| and 1/|sin| of this chip's own angle.
+   * They turn the chip's half-width and half-height into the distance to whichever border the ray
+   * to the core leaves through, so the spoke below can start outside the card whatever size the
+   * card currently is. Doing it here rather than in JS is what lets the chip be fluid — a reach
+   * computed once in rem would be wrong at every width but one.
+   */
+  --reach: calc(
+    min(var(--orbit-chip-w) * var(--kw), var(--orbit-chip-h) * var(--kh)) / 2 + 0.35rem
+  );
+  left: calc(50% + cos(var(--angle)) * var(--orbit-r));
+  min-height: var(--orbit-chip-h);
   padding: 0.8rem 0.95rem;
   position: absolute;
-  top: calc(50% + sin(var(--angle)) * 15.6rem);
+  top: calc(50% + sin(var(--angle)) * var(--orbit-r));
   transform: translate(-50%, -50%);
-  width: 11.4rem;
+  width: var(--orbit-chip-w);
   z-index: 3;
 }
 /*
@@ -2050,7 +2071,7 @@
   top: 50%;
   transform: rotate(calc(var(--angle) + 180deg)) translateX(var(--reach));
   transform-origin: 0 50%;
-  width: calc(9.1rem - var(--reach));
+  width: calc(var(--orbit-r) * 0.583 - var(--reach));
 }
 .orbit > span svg {
   color: var(--teal);
