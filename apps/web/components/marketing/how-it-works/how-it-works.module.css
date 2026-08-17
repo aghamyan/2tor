@@ -1872,6 +1872,12 @@
   gap: clamp(2rem, 2.5vw, 3.5rem);
   grid-template-columns: 0.89fr 1.11fr;
 }
+/* Stretched rather than centred, because the slack between this block and the row is what
+   `ScrollDrift` measures and turns into travel. Centred, there is nothing left to move through.
+   Reduced motion puts it back — the component parks the block mid-slack, which is where it sat. */
+.betweenCopy {
+  align-self: stretch;
+}
 /*
  * The diagram's geometry, in one place, and fluid.
  *
