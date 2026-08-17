@@ -690,16 +690,28 @@ export function HowItWorksPage({ locale }: { locale: Locale }) {
               role="img"
               aria-label={`${c.match.compatible}. ${c.match.wait}.`}
             >
-              <div className={styles.criteriaRail}>
+              {/*
+               * The legend column: what is being compared, and — pinned to the foot of it — the
+               * conclusion the comparison leads to.
+               *
+               * `explanation` used to sit under the board in a three-column strip beside a wrapping
+               * list and a button, which is where a sentence goes to be skipped. Here it is the only
+               * prose in the panel and it lands directly opposite the held card it explains, while
+               * also filling a column that was four short chips and then nothing.
+               */}
+              <div className={styles.matchLegend}>
                 <small className={styles.sampleLabel}>{c.common.example}</small>
-                {c.match.labels.map((label, index) => (
-                  <span data-negative={index === 3} key={label}>
-                    {/* An icon, not a bare "×" text node — as text it took neither the flex `gap`
-                        nor the `svg` sizing beside it, and sat jammed against its label. */}
-                    {index === 3 ? <X /> : <Check />}
-                    {label}
-                  </span>
-                ))}
+                <div className={styles.criteriaRail}>
+                  {c.match.labels.map((label, index) => (
+                    <span data-negative={index === 3} key={label}>
+                      {/* An icon, not a bare "×" text node — as text it took neither the flex `gap`
+                          nor the `svg` sizing beside it, and sat jammed against its label. */}
+                      {index === 3 ? <X /> : <Check />}
+                      {label}
+                    </span>
+                  ))}
+                </div>
+                <p className={styles.matchNote}>{c.match.explanation}</p>
               </div>
               <div className={styles.matchNetwork}>
                 <div className={styles.matchPair}>
@@ -725,8 +737,9 @@ export function HowItWorksPage({ locale }: { locale: Locale }) {
                 </div>
               </div>
             </div>
+            {/* Two parts now, not three: what a group gives you, and the way in. The explanation
+                moved onto the board — see `.matchLegend`. */}
             <div className={styles.matchFooter}>
-              <p>{c.match.explanation}</p>
               <ul>
                 {c.match.benefits.map((item) => (
                   <li key={item}>
