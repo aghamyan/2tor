@@ -378,7 +378,13 @@ export function HowItWorksPage({ locale }: { locale: Locale }) {
       </section>
 
       <section className={styles.teachSection} id="teach">
-        <SectionGround tone="paper" mask="radial-gradient(110% 90% at 55% 42%, black 24%, transparent 78%)" />
+        {/* Same reason as `03 · Prepare`: the classroom panel is glass now, and glass over flat
+            paper is a tinted div. These are what it refracts. */}
+        <SectionGround
+          tone="paper"
+          mask="radial-gradient(110% 90% at 55% 42%, black 24%, transparent 78%)"
+          blooms={[styles.teachBloomOne, styles.teachBloomTwo]}
+        />
         <div className={styles.shell}>
           <Reveal>
             <div className={styles.headingRow}>
@@ -416,21 +422,29 @@ export function HowItWorksPage({ locale }: { locale: Locale }) {
                 </aside>
                 <div className={styles.whiteboard}>
                   <small>Shared whiteboard · Fractions</small>
+                  {/* `data-part` rather than `:nth-of-type`: the two terms are colour-matched to
+                      their shaded runs in the bar model below, and a positional selector would hand
+                      that colour to the wrong term the moment anyone edits this expression. */}
                   <div className={styles.fraction}>
-                    <span>1/3</span>
+                    <span data-part="a">1/3</span>
                     <b>+</b>
-                    <span>1/4</span>
+                    <span data-part="b">1/4</span>
                     <b>=</b>
                     <strong>?</strong>
                   </div>
-                  <div className={styles.barModel}>
-                    <i />
-                    <i />
-                    <i />
-                    <i />
-                    <i />
-                    <i />
-                    <i />
+                  {/*
+                   * The bar model, and why there are twelve of these rather than seven.
+                   *
+                   * Seven segments were the ANSWER with the working thrown away — 1/3 and 1/4 are
+                   * 4/12 and 3/12, and the whole point of a visual model is showing the common unit
+                   * that makes them addable. A whole bar of twelve with four shaded, three shaded
+                   * and five left empty is the step the lesson is actually teaching; seven filled
+                   * boxes were just a result.
+                   */}
+                  <div className={styles.barModel} data-model="twelfths">
+                    {Array.from({ length: 12 }, (_, index) => (
+                      <i key={index} data-part={index < 4 ? "a" : index < 7 ? "b" : "rest"} />
+                    ))}
                   </div>
                   <div className={styles.confidence}>
                     <span>{c.teach.confidence}</span>

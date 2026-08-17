@@ -1498,48 +1498,67 @@
   overflow: hidden;
   position: relative;
 }
+/* The goal chip, in the site's light glass with its accent wash laid over the material rather than
+   instead of it — the same construction as the "with 2tor" card in `03 · Prepare`. */
 .lessonGoal {
   align-items: center;
-  background: var(--blue);
-  border: 1px solid hsl(var(--vz-line-soft));
+  backdrop-filter: var(--vz-fx-glass-blur);
+  background:
+    linear-gradient(0deg, hsl(var(--vz-accent) / 8%), hsl(var(--vz-accent) / 8%)),
+    var(--vz-fx-glass-bg);
   border-radius: var(--vz-r-input);
+  box-shadow: var(--vz-fx-glass-shadow);
   display: flex;
-  gap: 0.65rem;
-  max-width: 20rem;
-  padding: 0.9rem;
+  gap: 0.75rem;
+  isolation: isolate;
+  max-width: 22rem;
+  padding: 1.05rem 1.15rem;
 }
 .lessonGoal > svg {
   color: var(--royal);
-  height: 1.1rem;
+  flex: none;
+  height: 1.25rem;
 }
 .lessonGoal span {
   display: flex;
   flex-direction: column;
 }
 .lessonGoal small {
-  color: var(--muted);
-  font-size: 0.72rem;
+  color: hsl(var(--vz-ink) / 74%);
+  font-size: 0.8rem;
 }
 .lessonGoal strong {
-  font-size: 0.86rem;
-  margin-top: 0.16rem;
+  font-size: 0.98rem;
+  letter-spacing: -0.008em;
+  margin-top: 0.2rem;
 }
+/*
+ * The classroom panel, in the site's light glass.
+ *
+ * Everything inside it is a PANE on that glass rather than a second sheet of it. Nesting
+ * `backdrop-filter` inside `backdrop-filter` re-blurs an already-composited image: the result is
+ * mush, it costs a second full-surface filter pass, and it is the "never stack a light translucent
+ * surface on another" case verbatim. So the inner cards get a lighter fill, a bright top hairline
+ * where light would catch the lip, and a faint ring to close the shape — which reads as glass
+ * because it is the same material catching light twice, not because it blurs again.
+ */
 .classroom {
-  background: hsl(var(--vz-surface));
-  border: 1px solid hsl(var(--vz-line-soft));
+  backdrop-filter: var(--vz-fx-glass-blur);
+  background: var(--vz-fx-glass-bg);
   border-radius: var(--vz-r-card);
-  box-shadow: 0 2rem 4.5rem hsl(var(--vz-ink) / 13%);
+  box-shadow: var(--vz-fx-glass-shadow);
+  isolation: isolate;
   margin-top: 3rem;
   overflow: hidden;
 }
 .classroomTop {
   align-items: center;
   background: var(--navy);
-  color: hsl(var(--vz-block-on) / 62%);
+  color: hsl(var(--vz-block-on) / 74%);
   display: flex;
-  font-size: 0.79rem;
+  font-size: 0.86rem;
   justify-content: space-between;
-  padding: 0.75rem 1rem;
+  padding: 0.85rem 1.15rem;
 }
 .classroomTop span:first-child {
   align-items: center;
@@ -1557,22 +1576,34 @@
   grid-template-columns: 10rem 1fr;
   min-height: 29rem;
 }
+/* Transparent, so the panel's material runs unbroken behind it. The divider fades at both ends
+   rather than butting into the panel's rim — the same rule as the prepare sidebar. */
 .classroomBody > aside {
-  background: hsl(var(--vz-surface));
-  border-right: 1px solid hsl(var(--vz-line-soft));
+  border-image: linear-gradient(
+      180deg,
+      transparent,
+      hsl(var(--vz-ink) / 12%) 14%,
+      hsl(var(--vz-ink) / 12%) 86%,
+      transparent
+    )
+    1;
+  border-right: 1px solid transparent;
   display: flex;
   flex-direction: column;
-  gap: 0.7rem;
-  padding: 0.8rem;
+  gap: 0.8rem;
+  padding: 0.9rem;
 }
+/* Panes ON the glass — see the note on `.classroom` for why these do not blur again. */
 .classroomBody > aside > div {
   align-items: center;
-  background: hsl(var(--vz-surface));
-  border: 1px solid var(--line);
+  background: hsl(0 0% 100% / 42%);
   border-radius: var(--vz-r-input);
+  box-shadow:
+    inset 0 1px 0 hsl(0 0% 100% / 80%),
+    inset 0 0 0 1px hsl(var(--vz-ink) / 7%);
   display: flex;
   flex-direction: column;
-  gap: 0.4rem;
+  gap: 0.5rem;
   min-height: 8rem;
   justify-content: center;
 }
@@ -1580,44 +1611,50 @@
   align-items: center;
   background: var(--teal2);
   border-radius: 50%;
+  box-shadow:
+    inset 0 1px 0 hsl(0 0% 100% / 80%),
+    inset 0 0 0 1px hsl(var(--vz-positive) / 20%);
   color: var(--teal);
   display: flex;
-  font-size: 0.8rem;
+  font-size: 0.92rem;
   font-weight: 600;
-  height: 2.5rem;
+  height: 2.75rem;
   justify-content: center;
-  width: 2.5rem;
+  width: 2.75rem;
 }
 .classroomBody aside div:nth-child(2) > span {
   background: var(--blue);
-  color: var(--royal);
+  box-shadow:
+    inset 0 1px 0 hsl(0 0% 100% / 80%),
+    inset 0 0 0 1px hsl(var(--vz-accent) / 20%);
+  color: hsl(var(--vz-accent-ink));
 }
 .classroomBody aside small {
-  color: var(--muted);
-  font-size: 0.7rem;
+  color: hsl(var(--vz-ink) / 76%);
+  font-size: 0.8rem;
 }
 .classroomBody aside > p {
   align-items: flex-start;
-  color: var(--muted);
+  color: hsl(var(--vz-ink) / 76%);
   display: flex;
-  font-size: 0.71rem;
-  gap: 0.4rem;
+  font-size: 0.8rem;
+  gap: 0.45rem;
   line-height: 1.45;
   margin-top: auto;
 }
 .classroomBody aside p svg {
   color: var(--teal);
   flex: none;
-  height: 0.8rem;
+  height: 0.9rem;
 }
 .whiteboard {
   display: flex;
   flex-direction: column;
-  padding: 1.5rem;
+  padding: 1.6rem;
 }
 .whiteboard > small {
-  color: var(--muted);
-  font-size: 0.76rem;
+  color: hsl(var(--vz-ink) / 76%);
+  font-size: 0.84rem;
 }
 .fraction {
   align-items: center;
@@ -1626,13 +1663,25 @@
   font-size: clamp(2rem, 5vw, 4.8rem);
   gap: 1.2rem;
   justify-content: center;
-  margin-top: 3rem;
+  /* This `auto` and the one on `.confidence` are the pair that centres the expression: two equal
+     auto margins split the whiteboard's free space evenly above and below it, where the fixed 3rem
+     this replaced parked it near the top and left a dead band underneath. A third `auto` on
+     `.barModel` would divide the same space three ways and pull it back off centre. */
+  margin-top: auto;
 }
+/* Each term carries the colour of its own run in the bar below, which is the only thing that makes
+   the model legible as a model rather than a decorative strip of boxes. */
 .fraction span {
-  background: var(--blue);
   border-radius: var(--vz-r-input);
-  color: var(--royal);
   padding: 0.5rem 0.8rem;
+}
+.fraction span[data-part="a"] {
+  background: var(--blue);
+  color: hsl(var(--vz-accent-ink));
+}
+.fraction span[data-part="b"] {
+  background: hsl(var(--vz-positive) / 12%);
+  color: hsl(var(--vz-positive));
 }
 .fraction b {
   font-weight: 400;
@@ -1640,21 +1689,46 @@
 .fraction strong {
   color: var(--teal);
 }
+/*
+ * One whole bar cut into twelfths, not seven loose boxes.
+ *
+ * The segments butt together with hairline separators and the run is rounded only at its two ends,
+ * so it reads as a single quantity subdivided — which is the entire idea a bar model exists to
+ * carry. Four twelfths for 1/3, three for 1/4, five left empty: the empty tail is what shows the
+ * sum is still less than one, and it was missing when the row held only the seven filled parts.
+ */
 .barModel {
+  border-radius: 0.4rem;
+  box-shadow:
+    inset 0 0 0 1px hsl(var(--vz-ink) / 10%),
+    0 1px 2px hsl(var(--vz-ink) / 6%);
   display: flex;
-  gap: 0.35rem;
   justify-content: center;
-  margin-top: 1.5rem;
+  margin-inline: auto;
+  margin-top: 1.6rem;
+  overflow: hidden;
+  width: fit-content;
 }
 .barModel i {
-  background: var(--teal2);
-  border: 1px solid hsl(var(--vz-positive) / 30%);
-  height: 1.4rem;
-  width: 2.8rem;
+  border-right: 1px solid hsl(var(--vz-ink) / 12%);
+  height: 2.2rem;
+  width: 2.1rem;
 }
-.barModel i:nth-child(n + 5) {
-  background: var(--amber);
-  border-color: hsl(var(--vz-accent) / 28%);
+.barModel i:last-child {
+  border-right: 0;
+}
+/* Stronger than the chips above them on purpose. A twelfth is a narrow sliver, and a tint that
+   reads fine across a 6rem chip disappears at 2rem wide over glass. */
+.barModel i[data-part="a"] {
+  background: hsl(var(--vz-accent) / 26%);
+  box-shadow: inset 0 1px 0 hsl(0 0% 100% / 45%);
+}
+.barModel i[data-part="b"] {
+  background: hsl(var(--vz-positive) / 24%);
+  box-shadow: inset 0 1px 0 hsl(0 0% 100% / 45%);
+}
+.barModel i[data-part="rest"] {
+  background: hsl(var(--vz-ink) / 6%);
 }
 .confidence {
   align-items: center;
@@ -1665,8 +1739,8 @@
   padding-top: 1rem;
 }
 .confidence span {
-  color: var(--muted);
-  font-size: 0.78rem;
+  color: hsl(var(--vz-ink) / 76%);
+  font-size: 0.88rem;
   margin-right: auto;
 }
 .confidence button {
@@ -1683,26 +1757,95 @@
   border-color: var(--teal);
   color: white;
 }
+/*
+ * The lesson flow, rebuilt as a journey rather than a table.
+ *
+ * It was seven cells divided by full-height 1px rules — which draws the boundaries BETWEEN the
+ * steps, the opposite of what a sequence wants. Vertical rules also read as a table, so seven
+ * ordered stages looked like seven unrelated columns.
+ *
+ * It now uses the same vocabulary as the evidence path in `01 · Understand` and the record roadmap
+ * in `02 · Record`: one thread, lit discs sitting on it, label beneath. Deliberately the same and
+ * not merely similar — three different ways of drawing "these things happen in order" on one page
+ * is three times as much for a reader to learn.
+ */
 .lessonRail {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  margin-top: 0.8rem !important;
+  margin-top: 2.2rem !important;
 }
 .lessonRail li {
-  border-left: 1px solid var(--line);
-  padding: 1rem;
+  min-width: 0;
+  padding-right: 0.9rem;
+  position: relative;
 }
+/* Runs behind the discs and fades at both ends rather than butting into them, so they read as beads
+   on a continuous line instead of six segments that happen to touch. */
+.lessonRail li::before {
+  background: linear-gradient(
+    90deg,
+    hsl(var(--vz-accent) / 0%) 0%,
+    hsl(var(--vz-accent) / 34%) 14%,
+    hsl(var(--vz-accent) / 34%) 86%,
+    hsl(var(--vz-accent) / 0%) 100%
+  );
+  content: "";
+  height: 1.5px;
+  left: 1.2rem;
+  position: absolute;
+  right: -1.2rem;
+  top: 1.2rem;
+}
+.lessonRail li:last-child::before {
+  display: none;
+}
+/* Lit discs, same construction as the evidence path: a fill lit from the top-left, then three edge
+   layers — a specular hairline along the top lip, an accent ring that defines the shape, and a dim
+   inner line at the bottom. */
 .lessonRail span {
-  color: var(--royal);
-  display: block;
-  font-size: 0.7rem;
+  align-items: center;
+  background: radial-gradient(
+    120% 120% at 30% 22%,
+    hsl(var(--vz-surface)) 0%,
+    hsl(var(--vz-paper)) 78%
+  );
+  border-radius: 50%;
+  box-shadow:
+    inset 0 1px 0 hsl(0 0% 100% / 90%),
+    inset 0 0 0 1.5px hsl(var(--vz-accent) / 42%),
+    inset 0 -1px 0 hsl(var(--vz-ink) / 6%),
+    0 1px 1px hsl(var(--vz-ink) / 6%),
+    0 6px 14px -6px hsl(var(--vz-ink) / 22%);
+  color: hsl(var(--vz-accent-ink));
+  display: flex;
+  font-family: var(--vz-display);
+  font-size: 0.78rem;
+  font-variant-numeric: tabular-nums;
   font-weight: 600;
+  height: 2.4rem;
+  justify-content: center;
+  /* Open, because these are numerals at small size — the opposite of what the headings want. */
+  letter-spacing: 0.01em;
+  position: relative;
+  width: 2.4rem;
+  z-index: 1;
+}
+/* "Next step" is where the lesson arrives, so it is the one filled disc — the same device the
+   record roadmap uses to give its column a destination. */
+.lessonRail li:last-child span {
+  background: linear-gradient(180deg, hsl(var(--vz-accent)) 0%, hsl(var(--vz-accent-ink)) 100%);
+  box-shadow:
+    inset 0 1px 0 hsl(0 0% 100% / 34%),
+    0 1px 1px hsl(var(--vz-ink) / 8%),
+    0 8px 18px -6px hsl(var(--vz-accent) / 40%);
+  color: hsl(0 0% 100%);
 }
 .lessonRail strong {
   display: block;
-  font-size: 0.82rem;
+  font-size: 0.95rem;
+  letter-spacing: -0.008em;
   line-height: 1.35;
-  margin-top: 0.35rem;
+  margin-top: 0.85rem;
 }
 .betweenSection {
   background: hsl(var(--vz-paper));
@@ -2678,8 +2821,15 @@
   .evidencePath li:before {
     display: none;
   }
+  /* The thread goes as soon as the row wraps: a line that runs off the end of row one and reappears
+     at the start of row two draws a connection that is not there. Same reason `.evidencePath` drops
+     its thread at this breakpoint. */
   .lessonRail {
+    gap: 1.6rem 0;
     grid-template-columns: repeat(4, 1fr);
+  }
+  .lessonRail li::before {
+    display: none;
   }
   .betweenLayout,
   .parentLayout {
@@ -2715,8 +2865,18 @@
   .prepWorkspace {
     grid-template-columns: 1fr;
   }
+  /*
+   * Resetting the border-image here is load-bearing. The base rule fades the vertical divider with
+   * a `border-image`, and a border-image paints ALL FOUR edges — so without this, the gradient's
+   * transparent end overrides the `border-bottom` below and the stacked layout loses its divider.
+   *
+   * It must be the LONGHAND. lightningcss compiles `border-image: none` to the empty declaration
+   * `border-image: ;`, which every browser drops on the floor — verified by reading the served
+   * stylesheet, after the computed style showed the gradient still winning.
+   */
   .prepSidebar {
-    border-bottom: 1px solid hsl(var(--vz-surface) / 10%);
+    border-bottom: 1px solid hsl(var(--vz-block-on) / 14%);
+    border-image-source: none;
     border-right: 0;
   }
   .comparison article {
@@ -2837,21 +2997,29 @@
     display: none;
   }
 }
+/* The two response chips. The quiet one is a pane on the panel's glass — a bright top hairline and
+   a ring rather than a flat border, so it belongs to the same material as everything around it. The
+   committed one stays solid: it is the choice the lesson is waiting for, and a translucent primary
+   would read as the weaker of the two. */
 .confidence em {
   align-items: center;
-  background: hsl(var(--vz-surface));
-  border: 1px solid var(--line);
-  border-radius: 0.55rem;
+  background: hsl(0 0% 100% / 52%);
+  border-radius: 0.6rem;
+  box-shadow:
+    inset 0 1px 0 hsl(0 0% 100% / 85%),
+    inset 0 0 0 1px hsl(var(--vz-ink) / 12%);
   color: var(--navy);
   display: flex;
-  font-size: 0.75rem;
+  font-size: 0.86rem;
   font-style: normal;
-  min-height: 2.4rem;
-  padding: 0.5rem 0.7rem;
+  min-height: 2.6rem;
+  padding: 0.55rem 0.85rem;
 }
 .confidence em:last-child {
   background: var(--teal);
-  border-color: var(--teal);
+  box-shadow:
+    inset 0 1px 0 hsl(0 0% 100% / 26%),
+    0 1px 2px hsl(var(--vz-ink) / 18%);
   color: white;
 }
 .criteriaRail .sampleLabel {
@@ -2980,8 +3148,11 @@
   .classroomBody {
     grid-template-columns: 1fr;
   }
+  /* Same trap as `.prepSidebar`, including the longhand: `border-image: none` does not survive
+     the build. See the note there. */
   .classroomBody > aside {
     border-bottom: 1px solid var(--line);
+    border-image-source: none;
     border-right: 0;
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -3002,12 +3173,18 @@
   .lessonRail {
     grid-template-columns: 1fr;
   }
+  /* One column: the disc moves beside its label rather than above it, which is the only way seven
+     stacked steps stay compact. The hairline separates rows now that the thread is gone. */
   .lessonRail li {
+    align-items: center;
     border-bottom: 1px solid var(--line);
-    border-left: 0;
     display: grid;
-    gap: 0.6rem;
+    gap: 0.85rem;
     grid-template-columns: auto 1fr;
+    padding: 0.75rem 0;
+  }
+  .lessonRail li:last-child {
+    border-bottom: 0;
   }
   .lessonRail strong {
     margin: 0;
@@ -3110,21 +3287,29 @@
     display: none;
   }
 }
+/* The two response chips. The quiet one is a pane on the panel's glass — a bright top hairline and
+   a ring rather than a flat border, so it belongs to the same material as everything around it. The
+   committed one stays solid: it is the choice the lesson is waiting for, and a translucent primary
+   would read as the weaker of the two. */
 .confidence em {
   align-items: center;
-  background: hsl(var(--vz-surface));
-  border: 1px solid var(--line);
-  border-radius: 0.55rem;
+  background: hsl(0 0% 100% / 52%);
+  border-radius: 0.6rem;
+  box-shadow:
+    inset 0 1px 0 hsl(0 0% 100% / 85%),
+    inset 0 0 0 1px hsl(var(--vz-ink) / 12%);
   color: var(--navy);
   display: flex;
-  font-size: 0.75rem;
+  font-size: 0.86rem;
   font-style: normal;
-  min-height: 2.4rem;
-  padding: 0.5rem 0.7rem;
+  min-height: 2.6rem;
+  padding: 0.55rem 0.85rem;
 }
 .confidence em:last-child {
   background: var(--teal);
-  border-color: var(--teal);
+  box-shadow:
+    inset 0 1px 0 hsl(0 0% 100% / 26%),
+    0 1px 2px hsl(var(--vz-ink) / 18%);
   color: white;
 }
 .criteriaRail .sampleLabel {
@@ -3348,6 +3533,26 @@
       inset 0 0 0 1px hsl(var(--vz-positive) / 30%),
       var(--vz-fx-shadow);
   }
+  /* The classroom panel and its goal chip. The inner panes go opaque too — at 42% white they were
+     reading against the material behind them, and with the material gone they would have been
+     invisible rectangles on a plain surface. */
+  .classroom,
+  .lessonGoal {
+    backdrop-filter: none;
+    background: hsl(var(--vz-surface));
+    box-shadow:
+      inset 0 0 0 1px hsl(var(--vz-line)),
+      var(--vz-fx-shadow);
+  }
+  .classroomBody > aside > div,
+  .confidence em {
+    background: hsl(var(--vz-paper));
+    box-shadow: inset 0 0 0 1px hsl(var(--vz-line));
+  }
+  .confidence em:last-child {
+    background: var(--teal);
+    box-shadow: none;
+  }
 }
 
 /* Reduced transparency: an opaque block with a drawn edge, since the rim here is an inset shadow
@@ -3372,6 +3577,24 @@
 /* Placed under the workspace panel and the two cards, not under the centred heading — a bloom
    behind display type is a contrast problem, and the point of these is to give the glass something
    to bend. */
+/* Under the classroom panel, off to the sides — the whiteboard's centre carries the largest figures
+   on the page and a bloom behind them would only take contrast off them. */
+.teachBloomOne {
+  background: hsl(var(--vz-field-1) / 38%);
+  height: 26rem;
+  left: -4%;
+  top: 34%;
+  width: 30rem;
+}
+
+.teachBloomTwo {
+  background: hsl(var(--vz-field-2) / 34%);
+  height: 24rem;
+  right: 0%;
+  top: 20%;
+  width: 30rem;
+}
+
 .prepBloomOne {
   background: hsl(var(--vz-field-2) / 36%);
   height: 26rem;
