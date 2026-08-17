@@ -307,6 +307,17 @@ const en = {
     titleAccent: "without becoming the tutor.",
     body: "Parents stay involved in major decisions while tutors manage day-to-day instruction.",
     cta: "Explore the parent experience",
+    /*
+     * The "Skills developing" tile's indicator, and why it carries a number.
+     *
+     * It used to be a bar drawn at a hardcoded 72% on a tile whose only value was the phrase
+     * "Common denominators" — a measurement of nothing, the same defect the record card's twenty
+     * identical bars had. The site already has an honest version of this graphic: the parent
+     * dashboard on `/parents` draws five discrete segments and states the count beneath them
+     * ("3 of 5 developing"). This mirrors it, and `filled`/`total` are what the segments are
+     * generated from, so the drawing cannot drift from the sentence.
+     */
+    progress: { label: "3 of 5 developing", filled: 3, total: 5 },
     fields: [
       ["Lesson topic", "Adding unlike fractions"],
       ["Attendance", "Attended"],
@@ -527,6 +538,11 @@ const hy: HowItWorksCopy = {
     titleAccent: "առանց դասավանդող դառնալու։",
     body: "Ծնողները մասնակցում են կարևոր որոշումներին, իսկ դասավանդողները վարում են ամենօրյա ուսուցումը։",
     cta: "Ծանոթանալ ծնողի փորձին",
+    /* The same sentence the `/parents` dashboard already ships in Armenian
+       (`packages/i18n/messages/hy/parents.json` → `progressValue`), reused rather than retranslated.
+       `fields` above it are still English in this locale — a pre-existing gap in this record, not
+       one introduced here. */
+    progress: { label: "5-ից 3-ը զարգանում է", filled: 3, total: 5 },
   },
   match: {
     ...en.match,

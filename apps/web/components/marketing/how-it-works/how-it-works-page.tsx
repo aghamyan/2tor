@@ -66,6 +66,22 @@ function orbitRatios(index: number) {
  */
 const outcomeIcons = [BookOpenCheck, Eye, Users] as const;
 
+/*
+ * Column spans for the parent workspace's eight tiles, over a six-column grid — positional, matching
+ * `parents.fields` order.
+ *
+ * The grid used to be three equal columns with two tiles widened to `span 2`, which left the eighth
+ * tile alone on a fourth row beside two columns of nothing. Eight tiles do not divide into three.
+ * Six columns do divide by both 2 and 3, so the same eight tiles close four full rows, and the
+ * grouping can follow the week rather than the arithmetic:
+ *
+ *   what happened   topic · attendance · homework
+ *   where they are  current goal · skills developing
+ *   what was said   latest feedback · next lesson
+ *   what changes    plan update, full width, as the row the other three lead to
+ */
+const dashboardSpans = [2, 2, 2, 3, 3, 3, 3, 6] as const;
+
 function localHref(locale: Locale, path: string) {
   return `/${locale}${path}`;
 }
@@ -550,14 +566,32 @@ export function HowItWorksPage({ locale }: { locale: Locale }) {
       </section>
 
       <section className={styles.parentSection} id="inform">
-        <SectionGround tone="paper" mask="radial-gradient(110% 88% at 58% 46%, black 24%, transparent 76%)" />
+        <SectionGround
+          tone="paper"
+          mask="radial-gradient(110% 88% at 58% 46%, black 24%, transparent 76%)"
+          blooms={[styles.informBloomOne, styles.informBloomTwo]}
+        />
         <div className={styles.shell}>
           <Reveal className={styles.parentLayout}>
             <div>
               <Heading eyebrow={c.parents.eyebrow} title={c.parents.title} titleAccent={c.parents.titleAccent} body={c.parents.body} />
-              <Link className={styles.textLink} href={localHref(locale, "/parents")}>
-                {c.parents.cta}
-                <ArrowRight />
+              {/*
+               * Two faces, one label. The second carries the accent fill and its own paper-coloured
+               * text, and the hover wipes a clip-path across it — so each glyph changes colour at
+               * the instant the fill's edge reaches it, instead of sitting half on white and half on
+               * vermillion for the length of the transition. See `.exploreAction`.
+               *
+               * `aria-hidden` on the copy: the accessible name must stay one label, not two.
+               */}
+              <Link className={styles.exploreAction} href={localHref(locale, "/parents")}>
+                <span className={styles.exploreFace}>
+                  {c.parents.cta}
+                  <ArrowRight />
+                </span>
+                <span className={styles.exploreFace} data-fill="true" aria-hidden="true">
+                  {c.parents.cta}
+                  <ArrowRight />
+                </span>
               </Link>
             </div>
             <div className={styles.parentDashboard}>
@@ -570,13 +604,18 @@ export function HowItWorksPage({ locale }: { locale: Locale }) {
               </div>
               <div className={styles.dashboardGrid}>
                 {c.parents.fields.map(([label, value], index) => (
-                  <div className={index === 4 || index === 5 ? styles.wideMetric : ""} key={label}>
+                  <div data-span={dashboardSpans[index] ?? 2} key={label}>
                     <small>{label}</small>
                     <strong>{value}</strong>
                     {index === 4 && (
-                      <i>
-                        <b />
-                      </i>
+                      <div className={styles.skillSegments}>
+                        <span aria-hidden="true">
+                          {Array.from({ length: c.parents.progress.total }, (_, step) => (
+                            <i data-on={step < c.parents.progress.filled} key={step} />
+                          ))}
+                        </span>
+                        <small>{c.parents.progress.label}</small>
+                      </div>
                     )}
                   </div>
                 ))}
