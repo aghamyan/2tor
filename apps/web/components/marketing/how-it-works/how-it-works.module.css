@@ -1847,14 +1847,29 @@
   line-height: 1.35;
   margin-top: 0.85rem;
 }
+/*
+ * `clip-path`, not `overflow: hidden`, and that is the whole reason the sticky column above works.
+ *
+ * Every other section here clips its blooms with `overflow: hidden`. That makes the section a
+ * scrollport, and a `position: sticky` child resolves against its nearest scrollport — so the copy
+ * was pinning to a box that never scrolls, which is to say not pinning at all. It read as perfectly
+ * ordinary static content and the rule was doing nothing.
+ *
+ * `clip-path: inset(0)` clips identically and creates no scrollport, so sticky keeps resolving
+ * against the viewport. Group lessons' equivalent section sidesteps this by having nothing to clip.
+ */
 .betweenSection {
   background: hsl(var(--vz-paper));
+  clip-path: inset(0);
   isolation: isolate;
-  overflow: hidden;
+  /* Explicitly unset, not merely omitted. The shared rule near the top of this file sets
+     `overflow: hidden` on thirteen sections at the same specificity, so leaving the property out
+     here inherits it and the sticky column silently goes back to doing nothing. */
+  overflow: visible;
   position: relative;
 }
 .betweenLayout {
-  align-items: center;
+  align-items: start;
   display: grid;
   /*
    * The left column is wide here, and the type stays at the page's shared section size. Those two
@@ -1872,11 +1887,20 @@
   gap: clamp(2rem, 2.5vw, 3.5rem);
   grid-template-columns: 0.89fr 1.11fr;
 }
-/* Stretched rather than centred, because the slack between this block and the row is what
-   `ScrollDrift` measures and turns into travel. Centred, there is nothing left to move through.
-   Reduced motion puts it back — the component parks the block mid-slack, which is where it sat. */
+/*
+ * The copy holds while the diagram passes it — the same construction as `.formIntro` in group
+ * lessons' "Join the list", deliberately, so the two pages pin a column the same way.
+ *
+ * `align-items: start` on the row above is the other half of it. A sticky grid item travels inside
+ * its grid AREA, which stays the full row height either way; what `start` changes is where the hold
+ * BEGINS, and the top of the section is where it should.
+ *
+ * 7rem is the offset the other page uses and it is not arbitrary: the site header floats over the
+ * page, so anything pinned to the viewport has to clear it.
+ */
 .betweenCopy {
-  align-self: stretch;
+  position: sticky;
+  top: 7rem;
 }
 /*
  * The diagram's geometry, in one place, and fluid.
@@ -2986,6 +3010,12 @@
   .betweenLayout,
   .parentLayout {
     grid-template-columns: 1fr;
+  }
+  /* Static once the columns stack, matching `.formIntro` on group lessons. Sticky here would pin the
+     headline under the header while the diagram scrolled beneath it, which on a phone is a third of
+     the screen spent on text the reader has already read. */
+  .betweenCopy {
+    position: static;
   }
   .orbit {
     margin-inline: auto;

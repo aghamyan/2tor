@@ -32,7 +32,6 @@ import { headerButtonClass } from "../site/header-actions";
 import { ArrowUpRightIcon } from "../site/icons";
 import siteStyles from "../site/site.module.css";
 import { SectionGround } from "../section-ground";
-import { ScrollDrift } from "../scroll-drift";
 import { SectionEyebrow, accentedTitle, type SectionTone } from "../section-heading";
 import styles from "./how-it-works.module.css";
 
@@ -501,11 +500,11 @@ export function HowItWorksPage({ locale }: { locale: Locale }) {
         />
         <div className={styles.shell}>
           <Reveal className={styles.betweenLayout}>
-            {/* The copy drifts down its column as the section passes — see `ScrollDrift` for why
-                this is the one place on the page where content is allowed to move. */}
-            <ScrollDrift className={styles.betweenCopy}>
+            {/* Sticky, matching `.formIntro` in group lessons' "Join the list": the copy holds at
+                the top of the viewport while the diagram beside it scrolls past. */}
+            <div className={styles.betweenCopy}>
               <Heading eyebrow={c.between.eyebrow} title={c.between.title} titleAccent={c.between.titleAccent} body={c.between.body} />
-            </ScrollDrift>
+            </div>
             <div>
               <div
                 className={styles.orbit}
