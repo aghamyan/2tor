@@ -17,7 +17,7 @@ export function LessonFeedbackForm({
 }) {
   const t = useTranslations("dashboards.learning.tutor.form");
   const router = useRouter();
-  const [state, setState] = useState<"idle" | "saving" | "saved" | "error">("idle");
+  const [state, setState] = useState<"idle" | "saving" | "saved" | "error" | "noRecipient">("idle");
 
   async function publish(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -27,6 +27,12 @@ export function LessonFeedbackForm({
     const homework = String(form.get("homework")).trim() || t("noneAssigned");
     const topic = String(form.get("topic")).trim();
     const subtopic = String(form.get("subtopic")).trim();
+    const visibleToParent = form.get("visibleToParent") === "on";
+    const visibleToStudent = form.get("visibleToStudent") === "on";
+    if (!visibleToParent && !visibleToStudent) {
+      setState("noRecipient");
+      return;
+    }
 
     const response = await fetch("/api/academics/feedback", {
       method: "POST",
@@ -49,6 +55,8 @@ export function LessonFeedbackForm({
         tutorConfidence: outcome === "yes" ? "high" : outcome === "partly" ? "medium" : "low",
         freeTextComment: String(form.get("comment")).trim(),
         staffOnlyNote: null,
+        visibleToParent,
+        visibleToStudent,
         status: "published",
       }),
     });
@@ -125,6 +133,18 @@ export function LessonFeedbackForm({
         </label>
       </div>
 
+      <fieldset className={styles.outcomeFieldset}>
+        <legend>{t("visibility")}</legend>
+        <label>
+          <input defaultChecked name="visibleToParent" type="checkbox" />
+          {t("visibleToParent")}
+        </label>
+        <label>
+          <input defaultChecked name="visibleToStudent" type="checkbox" />
+          {t("visibleToStudent")}
+        </label>
+      </fieldset>
+
       <div className={styles.formFooter}>
         <p aria-live="polite">
           {state === "saving"
@@ -133,7 +153,9 @@ export function LessonFeedbackForm({
               ? t("saved")
               : state === "error"
                 ? t("error")
-                : t("visibility")}
+                : state === "noRecipient"
+                  ? t("noRecipient")
+                  : t("visibilityHint")}
         </p>
         <button disabled={state === "saving"} type="submit">
           {state === "saving" ? t("savingButton") : t("publish")}

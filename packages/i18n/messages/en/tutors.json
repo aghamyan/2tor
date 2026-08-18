@@ -9,6 +9,9 @@
       "title": "Teaching profile",
       "subtitle": "Complete your profile, availability, and verification details so families can be matched with you.",
       "viewStudents": "View students",
+      "zoomSettingsTitle": "Meeting settings",
+      "zoomSettingsBody": "Set a default Zoom link and passcode once, and it's automatically assigned to every new class.",
+      "zoomSettingsCta": "Manage meeting settings",
       "helpTitle": "Need help?",
       "helpBody": "Our support team can help with anything you can't complete here yet, including adding a new subject.",
       "helpCta": "Contact support"
@@ -230,6 +233,27 @@
       "noHeadline": "Add a headline to introduce yourself to families.",
       "noDetails": "Add subjects, languages, and grade levels to complete your preview.",
       "notPublishable": "Your profile will become visible after verification."
+    },
+    "zoomSettings": {
+      "breadcrumbLabel": "Breadcrumb",
+      "breadcrumbOverview": "Teaching profile",
+      "breadcrumbCurrent": "Meeting settings",
+      "eyebrow": "Tutor workspace",
+      "pageTitle": "Meeting settings",
+      "pageSubtitle": "Set a default Zoom link and passcode. New classes are assigned this meeting automatically, and it's applied to your existing scheduled classes as soon as you save.",
+      "title": "Default Zoom meeting",
+      "description": "Used for every class unless you set a different link on that specific class.",
+      "joinUrl": "Zoom join link",
+      "joinUrlHelper": "Your personal meeting room link works best, since it stays the same for every class.",
+      "joinUrlPlaceholder": "https://zoom.us/j/1234567890",
+      "passcode": "Passcode",
+      "save": "Save changes",
+      "saving": "Saving…",
+      "saved": "Saved. Your upcoming classes now use this meeting.",
+      "saveError": "We could not save your changes. Your entries are still here. Try again.",
+      "lockedTitle": "Save your basic information first",
+      "lockedBody": "Meeting settings become editable once your teaching profile exists.",
+      "lockedCta": "Go to teaching profile"
     },
     "students": {
       "breadcrumbLabel": "Breadcrumb",

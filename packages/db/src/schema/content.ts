@@ -1,4 +1,4 @@
-import { pgEnum, pgTable, text, uniqueIndex } from "drizzle-orm/pg-core";
+import { integer, pgEnum, pgTable, text, uniqueIndex } from "drizzle-orm/pg-core";
 import { timestamps, ulidFk, ulidPk, utcTimestamp } from "./_common";
 import { users } from "./identity";
 import { studentProfiles } from "./families";
@@ -29,6 +29,14 @@ export const resourcePublishStatusEnum = pgEnum("resource_publish_status", [
   "archived",
 ]);
 export const resourceLinkProviderEnum = pgEnum("resource_link_provider", ["youtube", "other"]);
+/** `everyone`: all published resources (default). `grades`: gated by `resource_grade_levels`.
+ *  `students`: gated by a direct `resource_assignments.student_profile_id` row — see
+ *  `packages/domain/content/README.md` for why a second join table was deliberately avoided. */
+export const resourceVisibilityEnum = pgEnum("resource_visibility", [
+  "everyone",
+  "grades",
+  "students",
+]);
 export const tutorUploadStatusEnum = pgEnum("tutor_upload_status", [
   "pending_review",
   "approved",
@@ -52,6 +60,8 @@ export const resources = pgTable("resources", {
     .references(() => users.id, { onDelete: "restrict" }),
   ownership: resourceOwnershipEnum("ownership").notNull().default("company"),
   status: resourcePublishStatusEnum("status").notNull().default("draft"),
+  /** Who can see this once published — everyone, specific grade levels, or specific students. */
+  visibility: resourceVisibilityEnum("visibility").notNull().default("everyone"),
   ...timestamps,
 });
 
@@ -78,6 +88,22 @@ export const resourceTags = pgTable(
     createdAt: timestamps.createdAt,
   },
   (table) => [uniqueIndex("resource_tags_unique").on(table.resourceId, table.tag)],
+);
+
+/** Only meaningful when `resources.visibility = 'grades'`; matched against `student_profiles.grade_level` by exact text equality (same convention as `discussion_questions.grade_level`). */
+export const resourceGradeLevels = pgTable(
+  "resource_grade_levels",
+  {
+    id: ulidPk(),
+    resourceId: ulidFk("resource_id")
+      .notNull()
+      .references(() => resources.id, { onDelete: "cascade" }),
+    gradeLevel: text("grade_level").notNull(),
+    createdAt: timestamps.createdAt,
+  },
+  (table) => [
+    uniqueIndex("resource_grade_levels_unique").on(table.resourceId, table.gradeLevel),
+  ],
 );
 
 export const resourceAssignments = pgTable("resource_assignments", {
@@ -119,6 +145,9 @@ export const tutorContentUploads = pgTable("tutor_content_uploads", {
     .references(() => tutorProfiles.id, { onDelete: "restrict" }),
   resourceId: ulidFk("resource_id").references(() => resources.id, { onDelete: "restrict" }),
   fileKey: text("file_key"),
+  fileName: text("file_name"),
+  mimeType: text("mime_type"),
+  sizeBytes: integer("size_bytes"),
   rightsConfirmedAt: utcTimestamp("rights_confirmed_at"),
   status: tutorUploadStatusEnum("status").notNull().default("pending_review"),
   reviewedByUserId: ulidFk("reviewed_by_user_id").references(() => users.id),

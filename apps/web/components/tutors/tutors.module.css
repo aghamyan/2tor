@@ -32,6 +32,17 @@
   --tw-indigo-soft: #232659;
 }
 
+/* ---------- Single-card settings pages (e.g. /settings/zoom) ---------- */
+
+.settingsShell {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin: 0 auto;
+  max-width: 40rem;
+  padding: clamp(1.25rem, 2vw, 2.25rem) clamp(1rem, 3vw, 1.5rem) 4rem;
+}
+
 /* ---------- Header ---------- */
 
 .breadcrumb {

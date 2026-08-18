@@ -1,14 +1,17 @@
 import { describe, expect, it } from "vitest";
 import { AssessmentError } from "../../../../packages/domain/assessments/errors";
+import type { AssessmentNotifier } from "../../../../packages/domain/assessments/models";
 import {
   createAssessment,
   deleteAssessment,
   getAssessmentAttemptReview,
+  getAssessmentEvidenceForActor,
   getAssessmentForActor,
   getDiagnosticReportForActor,
   listAssessmentAttemptsForActor,
   listAssessableStudents,
   listAssessmentsForActor,
+  recordAssessmentEvidence,
   recordAssessmentSignal,
   recordAssessmentSignals,
   recordDiagnosticConsultation,
@@ -17,7 +20,39 @@ import {
   submitAssessmentAttempt,
   writeDiagnosticReport,
 } from "../../../../packages/domain/assessments/services";
+import type { AssessmentEvidenceStorage } from "../../../../packages/domain/assessments/storage";
 import { InMemoryAssessmentDatabase } from "./support/in-memory-assessment-database";
+
+function fakeJpegBytes(size = 16): Uint8Array {
+  const bytes = new Uint8Array(size);
+  bytes[0] = 0xff;
+  bytes[1] = 0xd8;
+  bytes[2] = 0xff;
+  return bytes;
+}
+
+function fakeEvidenceStorage(): AssessmentEvidenceStorage {
+  const objects = new Map<string, Uint8Array>();
+  return {
+    async putPrivate({ key, body }) {
+      objects.set(key, body);
+    },
+    async getPrivate(key) {
+      if (!objects.has(key)) throw new Error(`No object stored for key "${key}".`);
+      return { body: new ReadableStream(), contentType: "image/jpeg" };
+    },
+  };
+}
+
+function fakeNotifier(): AssessmentNotifier & { calls: Parameters<AssessmentNotifier["notify"]>[0][] } {
+  const calls: Parameters<AssessmentNotifier["notify"]>[0][] = [];
+  return {
+    calls,
+    async notify(notification) {
+      calls.push(notification);
+    },
+  };
+}
 
 const tutor = { userId: "tutor-1", roles: ["tutor"] as const };
 const student = {
@@ -30,6 +65,7 @@ const parent = { userId: "parent-1", roles: ["parent"] as const };
 async function setup(
   options: {
     cameraRequired?: boolean;
+    evidenceCaptureEnabled?: boolean;
     audience?: { mode: "everyone" } | { mode: "selected"; studentProfileIds: string[] };
     maxAttempts?: number | null;
     integrityPolicy?: { violationLimit: number | null; action: "log_only" | "warn" | "auto_submit" };
@@ -53,6 +89,8 @@ async function setup(
       camera: {
         required: options.cameraRequired ?? false,
         policyVersion: options.cameraRequired ? "camera-v2" : null,
+        headTrackingEnabled: options.evidenceCaptureEnabled ?? false,
+        evidenceCaptureEnabled: options.evidenceCaptureEnabled ?? false,
       },
       audience: options.audience,
       maxAttempts: options.maxAttempts,
@@ -194,16 +232,16 @@ describe("assessment integrity contract", () => {
     } satisfies Partial<AssessmentError>);
   });
 
-  it("also requires an active record for the exact camera policy", async () => {
+  it("does not require a parent-granted consent record (bypassed for testing)", async () => {
     const { database, assessment } = await setup({ cameraRequired: true });
 
     await expect(
       startAssessmentAttempt(database, student, assessment.id, {
         cameraConsent: { accepted: true, policyVersion: "camera-v2" },
       }),
-    ).rejects.toMatchObject({
-      code: "CAMERA_CONSENT_REQUIRED",
-    } satisfies Partial<AssessmentError>);
+    ).resolves.toMatchObject({
+      attempt: { proctorMode: "camera_required" },
+    });
   });
 
   it("requires the honor statement before submission", async () => {
@@ -521,6 +559,232 @@ describe("integrity policy", () => {
     });
     const attempt = await database.getAttempt(session.attempt.id);
     expect(attempt?.status).toBe("in_progress");
+  });
+});
+
+describe("evidence capture", () => {
+  async function startCameraAttempt(database: InMemoryAssessmentDatabase, assessmentId: string) {
+    database.cameraConsents.add("student-1:camera-v2");
+    return startAssessmentAttempt(database, student, assessmentId, {
+      cameraConsent: { accepted: true, policyVersion: "camera-v2" },
+    });
+  }
+
+  it("rejects an evidence upload when the version has not opted in", async () => {
+    const { database, assessment } = await setup({ cameraRequired: true });
+    const session = await startCameraAttempt(database, assessment.id);
+
+    await expect(
+      recordAssessmentEvidence(
+        database,
+        fakeEvidenceStorage(),
+        student,
+        session.attempt.id,
+        { eventType: "multiple_faces", mimeType: "image/jpeg", sizeBytes: 16 },
+        fakeJpegBytes(),
+      ),
+    ).rejects.toMatchObject({ code: "EVIDENCE_NOT_ENABLED" } satisfies Partial<AssessmentError>);
+  });
+
+  it("rejects an evidence upload from a student who does not own the attempt", async () => {
+    const { database, assessment } = await setup({
+      cameraRequired: true,
+      evidenceCaptureEnabled: true,
+    });
+    const session = await startCameraAttempt(database, assessment.id);
+    const otherStudent = {
+      userId: "other-student-user",
+      studentProfileId: "student-2",
+      roles: ["student"] as const,
+    };
+
+    await expect(
+      recordAssessmentEvidence(
+        database,
+        fakeEvidenceStorage(),
+        otherStudent,
+        session.attempt.id,
+        { eventType: "multiple_faces", mimeType: "image/jpeg", sizeBytes: 16 },
+        fakeJpegBytes(),
+      ),
+    ).rejects.toMatchObject({ code: "FORBIDDEN" } satisfies Partial<AssessmentError>);
+  });
+
+  it("records an evidence photo under its own event type, never inflating the triggering signal's count", async () => {
+    const { database, assessment } = await setup({
+      cameraRequired: true,
+      evidenceCaptureEnabled: true,
+    });
+    const session = await startCameraAttempt(database, assessment.id);
+
+    const evidence = await recordAssessmentEvidence(
+      database,
+      fakeEvidenceStorage(),
+      student,
+      session.attempt.id,
+      { eventType: "multiple_faces", mimeType: "image/jpeg", sizeBytes: 16 },
+      fakeJpegBytes(),
+    );
+    expect(evidence.eventType).toBe("multiple_faces");
+
+    const review = await getAssessmentAttemptReview(database, tutor, session.attempt.id);
+    expect(review.evidence).toHaveLength(1);
+    expect(review.evidence[0]).toMatchObject({ id: evidence.id, eventType: "multiple_faces" });
+    // The underlying row is "evidence_captured", not "multiple_faces" — see suspicion.test.ts for
+    // the score-neutrality this is what protects.
+    expect(review.eventCounts.multiple_faces ?? 0).toBe(0);
+    expect(review.eventCounts.evidence_captured).toBe(1);
+  });
+
+  it("accepts evidence triggered by phone/unusual-item/eyes-closed detection, not just the original face-tracking triggers", async () => {
+    const { database, assessment } = await setup({
+      cameraRequired: true,
+      evidenceCaptureEnabled: true,
+    });
+    const session = await startCameraAttempt(database, assessment.id);
+    const storage = fakeEvidenceStorage();
+
+    for (const eventType of ["phone_detected", "unusual_item_detected", "eyes_closed"] as const) {
+      const evidence = await recordAssessmentEvidence(
+        database,
+        storage,
+        student,
+        session.attempt.id,
+        { eventType, mimeType: "image/jpeg", sizeBytes: 16 },
+        fakeJpegBytes(),
+      );
+      expect(evidence.eventType).toBe(eventType);
+    }
+
+    const review = await getAssessmentAttemptReview(database, tutor, session.attempt.id);
+    expect(review.evidence.map((item) => item.eventType).sort()).toEqual([
+      "eyes_closed",
+      "phone_detected",
+      "unusual_item_detected",
+    ]);
+  });
+
+  it("lets the assigned tutor resolve the stored file, but rejects an unrelated tutor", async () => {
+    const { database, assessment } = await setup({
+      cameraRequired: true,
+      evidenceCaptureEnabled: true,
+    });
+    const session = await startCameraAttempt(database, assessment.id);
+    const evidence = await recordAssessmentEvidence(
+      database,
+      fakeEvidenceStorage(),
+      student,
+      session.attempt.id,
+      { eventType: "face_missing", mimeType: "image/jpeg", sizeBytes: 16 },
+      fakeJpegBytes(),
+    );
+
+    await expect(
+      getAssessmentEvidenceForActor(database, tutor, session.attempt.id, evidence.id),
+    ).resolves.toMatchObject({ mimeType: "image/jpeg" });
+
+    const otherTutor = { userId: "tutor-2", roles: ["tutor"] as const };
+    await expect(
+      getAssessmentEvidenceForActor(database, otherTutor, session.attempt.id, evidence.id),
+    ).rejects.toMatchObject({ code: "FORBIDDEN" } satisfies Partial<AssessmentError>);
+  });
+
+  it("stops accepting new evidence once the per-attempt cap is reached", async () => {
+    const { database, assessment } = await setup({
+      cameraRequired: true,
+      evidenceCaptureEnabled: true,
+    });
+    const session = await startCameraAttempt(database, assessment.id);
+    const storage = fakeEvidenceStorage();
+    for (let i = 0; i < 60; i += 1) {
+      await recordAssessmentEvidence(
+        database,
+        storage,
+        student,
+        session.attempt.id,
+        { eventType: "multiple_faces", mimeType: "image/jpeg", sizeBytes: 16 },
+        fakeJpegBytes(),
+      );
+    }
+
+    await expect(
+      recordAssessmentEvidence(
+        database,
+        storage,
+        student,
+        session.attempt.id,
+        { eventType: "multiple_faces", mimeType: "image/jpeg", sizeBytes: 16 },
+        fakeJpegBytes(),
+      ),
+    ).rejects.toMatchObject({ code: "EVIDENCE_LIMIT_REACHED" } satisfies Partial<AssessmentError>);
+  });
+
+  it("notifies the assigned tutor with a link to the review page when a camera-required attempt is submitted", async () => {
+    const { database, assessment } = await setup({
+      cameraRequired: true,
+      evidenceCaptureEnabled: true,
+    });
+    const session = await startCameraAttempt(database, assessment.id);
+    const notifier = fakeNotifier();
+
+    await submitAssessmentAttempt(
+      database,
+      student,
+      session.attempt.id,
+      { honorStatementAccepted: true },
+      notifier,
+    );
+
+    expect(notifier.calls).toHaveLength(1);
+    expect(notifier.calls[0]).toMatchObject({
+      userId: "tutor-1",
+      type: "progress_update",
+      data: { actionUrl: expect.stringContaining(session.attempt.id) },
+    });
+  });
+
+  it("never notifies for an attempt that did not require a camera", async () => {
+    const { database, assessment } = await setup();
+    const session = await startAssessmentAttempt(database, student, assessment.id, {
+      cameraConsent: null,
+    });
+    const notifier = fakeNotifier();
+
+    await submitAssessmentAttempt(
+      database,
+      student,
+      session.attempt.id,
+      { honorStatementAccepted: true },
+      notifier,
+    );
+
+    expect(notifier.calls).toHaveLength(0);
+  });
+
+  it("still submits successfully even when the notifier throws (e.g. an unconfigured dispatcher)", async () => {
+    const { database, assessment } = await setup({
+      cameraRequired: true,
+      evidenceCaptureEnabled: true,
+    });
+    const session = await startCameraAttempt(database, assessment.id);
+    const brokenNotifier: AssessmentNotifier = {
+      async notify() {
+        throw new Error("Notifications are not configured. Call configureNotifications() at the composition root.");
+      },
+    };
+
+    await expect(
+      submitAssessmentAttempt(
+        database,
+        student,
+        session.attempt.id,
+        { honorStatementAccepted: true },
+        brokenNotifier,
+      ),
+    ).resolves.toMatchObject({ status: "submitted" });
+
+    const attempt = await database.getAttempt(session.attempt.id);
+    expect(attempt?.status).toBe("submitted");
   });
 });
 

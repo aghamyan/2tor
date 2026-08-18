@@ -12,9 +12,14 @@ const webRoot = path.resolve(here, "..");
 const wasmSource = path.join(webRoot, "node_modules/@mediapipe/tasks-vision/wasm");
 const publicMediapipe = path.join(webRoot, "public/mediapipe");
 const wasmDest = path.join(publicMediapipe, "wasm");
-const modelDest = path.join(publicMediapipe, "face_landmarker.task");
-const modelUrl =
+const faceModelDest = path.join(publicMediapipe, "face_landmarker.task");
+const faceModelUrl =
   "https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task";
+// COCO-80 object detector (phone/laptop/book/remote-in-frame checks) — see
+// components/assessments/proctoring/object-detection-service.ts.
+const objectModelDest = path.join(publicMediapipe, "object_detector.tflite");
+const objectModelUrl =
+  "https://storage.googleapis.com/mediapipe-models/object_detector/efficientdet_lite0/float16/1/efficientdet_lite0.tflite";
 
 function copyWasm() {
   if (!existsSync(wasmSource)) {
@@ -30,28 +35,30 @@ function copyWasm() {
   console.log(`[prepare-mediapipe-assets] Copied WASM runtime to ${path.relative(webRoot, wasmDest)}`);
 }
 
-async function downloadModel() {
-  if (existsSync(modelDest)) {
-    console.log(`[prepare-mediapipe-assets] Model already present at ${path.relative(webRoot, modelDest)}`);
+async function downloadModel(dest, url, label) {
+  if (existsSync(dest)) {
+    console.log(`[prepare-mediapipe-assets] ${label} already present at ${path.relative(webRoot, dest)}`);
     return;
   }
   mkdirSync(publicMediapipe, { recursive: true });
   try {
-    const response = await fetch(modelUrl);
+    const response = await fetch(url);
     if (!response.ok) throw new Error(`HTTP ${String(response.status)}`);
     const buffer = Buffer.from(await response.arrayBuffer());
-    await import("node:fs/promises").then(({ writeFile }) => writeFile(modelDest, buffer));
-    console.log(`[prepare-mediapipe-assets] Downloaded face landmarker model to ${path.relative(webRoot, modelDest)}`);
+    await import("node:fs/promises").then(({ writeFile }) => writeFile(dest, buffer));
+    console.log(`[prepare-mediapipe-assets] Downloaded ${label} to ${path.relative(webRoot, dest)}`);
   } catch (error) {
-    // Non-fatal: face-tracking-service.ts already degrades gracefully to camera-presence-only
-    // when the model can't be loaded. Don't break `dev`/`build` for people who never touch
-    // camera-required, head-tracking-enabled assessments.
+    // Non-fatal: both face-tracking-service.ts and object-detection-service.ts already degrade
+    // gracefully (face tracking falls back to camera-presence-only; object detection just never
+    // starts) when their model can't be loaded. Don't break `dev`/`build` for people who never
+    // touch camera-required, head-tracking-enabled assessments.
     console.warn(
-      `[prepare-mediapipe-assets] Could not download the face landmarker model (${error instanceof Error ? error.message : String(error)}). ` +
-        "On-device face tracking will be unavailable until this succeeds — re-run `node scripts/prepare-mediapipe-assets.mjs` once you have network access to storage.googleapis.com.",
+      `[prepare-mediapipe-assets] Could not download ${label} (${error instanceof Error ? error.message : String(error)}). ` +
+        "Re-run `node scripts/prepare-mediapipe-assets.mjs` once you have network access to storage.googleapis.com.",
     );
   }
 }
 
 copyWasm();
-await downloadModel();
+await downloadModel(faceModelDest, faceModelUrl, "face landmarker model");
+await downloadModel(objectModelDest, objectModelUrl, "object detector model");

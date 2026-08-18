@@ -36,6 +36,29 @@ export const tutorProfileInputSchema = z
   })
   .strict();
 
+/** Clearable, unlike `scheduling/schemas.ts`'s per-lesson `setZoomMeetingInputSchema.joinUrl` (which
+ * is always required): a tutor removing their default shouldn't be forced to paste a placeholder
+ * URL, so "" and `null` both mean "no default set" rather than a validation error. */
+export const tutorZoomDefaultsInputSchema = z
+  .object({
+    defaultZoomJoinUrl: z
+      .string()
+      .trim()
+      .max(500)
+      .nullable()
+      .transform((value) => (value === "" ? null : value))
+      .refine((value) => value === null || z.string().url().safeParse(value).success, {
+        message: "Enter a valid Zoom join URL",
+      }),
+    defaultZoomPasscode: z
+      .string()
+      .trim()
+      .max(40)
+      .nullable()
+      .transform((value) => (value === "" ? null : value)),
+  })
+  .strict();
+
 const gradeRangeSchema = z
   .object({
     minGrade: z.number().int().min(-2).max(20).nullable(),
@@ -155,6 +178,7 @@ export const verificationReviewInputSchema = z
   .strict();
 
 export type TutorProfileInput = z.infer<typeof tutorProfileInputSchema>;
+export type TutorZoomDefaultsInput = z.infer<typeof tutorZoomDefaultsInputSchema>;
 export type TutorCapabilitiesInput = z.infer<typeof tutorCapabilitiesInputSchema>;
 export type ReplaceAvailabilityInput = z.infer<typeof replaceAvailabilityInputSchema>;
 export type AvailabilityQueryInput = z.infer<typeof availabilityQuerySchema>;

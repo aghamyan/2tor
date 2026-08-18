@@ -59,6 +59,8 @@ const feedbackInput = () => ({
   tutorConfidence: "high" as const,
   freeTextComment: "A steady lesson with useful questions.",
   staffOnlyNote: "Discuss pacing with coordinator",
+  visibleToParent: true,
+  visibleToStudent: true,
   status: "published" as const,
 });
 
@@ -100,6 +102,27 @@ describe("academics services", () => {
     const studentView = await getParentVisibleFeedback(database, student, feedback.id);
     expect(parentView).not.toHaveProperty("staffOnlyNote");
     expect(studentView).not.toHaveProperty("staffOnlyNote");
+  });
+
+  it("hides feedback from a recipient the tutor did not select, while staff and the assigned tutor keep full access", async () => {
+    const database = new InMemoryAcademicDatabase();
+    database.parentLinks.add("parent-1:student-1");
+    database.tutorAssignments.add("tutor-1:student-1");
+    const feedback = await writeLessonFeedback(database, tutor, {
+      ...feedbackInput(),
+      visibleToParent: false,
+      visibleToStudent: true,
+    });
+
+    await expect(getParentVisibleFeedback(database, parent, feedback.id)).rejects.toMatchObject({
+      code: "FORBIDDEN",
+    });
+    await expect(
+      getParentVisibleFeedback(database, student, feedback.id),
+    ).resolves.toMatchObject({ id: feedback.id });
+    await expect(
+      getParentVisibleFeedback(database, tutor, feedback.id),
+    ).resolves.toMatchObject({ id: feedback.id });
   });
 
   it("does not complete a milestone without evidence", async () => {

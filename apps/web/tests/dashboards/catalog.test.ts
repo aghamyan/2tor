@@ -25,7 +25,7 @@ describe("dashboard composition catalog", () => {
     const younger = panelsForDashboard("student-younger");
     const older = panelsForDashboard("student-older");
     expect(younger.length).toBeLessThan(older.length);
-    expect(younger.map((panel) => panel.module)).toContain("gamification");
+    expect(younger.map((panel) => panel.module)).toContain("academics");
     expect(older.map((panel) => panel.module)).toEqual(
       expect.arrayContaining(["assessments", "projects", "discussions"]),
     );
@@ -48,7 +48,6 @@ describe("dashboard composition catalog", () => {
         "content",
         "discussions",
         "families",
-        "gamification",
         "matching",
         "payments",
         "payouts",

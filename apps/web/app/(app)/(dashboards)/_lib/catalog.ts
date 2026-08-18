@@ -182,8 +182,8 @@ export const DASHBOARD_PANELS: Readonly<Record<DashboardKind, readonly Dashboard
     }),
     panel({
       id: "student-younger.rewards",
-      module: "gamification",
-      href: "/gamification",
+      module: "academics",
+      href: "/academics",
       roles: studentRoles,
       titleKey: "panels.studentYounger.rewards.title",
       bodyKey: "panels.studentYounger.rewards.body",

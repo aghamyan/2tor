@@ -5,10 +5,16 @@ import { z } from "zod";
 
 import { webRedis } from "../../../../lib/current-session";
 import { postLoginDestination } from "../../../../lib/post-login-destination";
+import { resolveMfaCheck } from "./mfa-check";
 
 const loginSchema = z.object({
   identifier: z.string().trim().min(1).max(254),
   password: z.string().min(1).max(1_024),
+  code: z
+    .string()
+    .trim()
+    .regex(/^\d{6}$/)
+    .optional(),
   next: z
     .string()
     .trim()
@@ -72,13 +78,15 @@ export async function POST(request: NextRequest) {
   const resolvedRoles = roleRows
     .map((role) => roleByDatabaseKey[role.key])
     .filter((role): role is Role => role !== undefined);
-  const mfaEnabled = user
-    ? Boolean(
-        await db.query.mfaMethods.findFirst({
-          where: (table, { and, eq }) => and(eq(table.userId, user.id), eq(table.status, "active")),
-        }),
-      )
-    : false;
+  const activeMfaMethods = user
+    ? await db.query.mfaMethods.findMany({
+        where: (table, { and, eq }) => and(eq(table.userId, user.id), eq(table.status, "active")),
+      })
+    : [];
+  const { mfaEnabled, mfaVerifiedThisAttempt } = resolveMfaCheck(
+    activeMfaMethods,
+    parsed.data.code,
+  );
 
   const result = await login({
     user: user
@@ -91,7 +99,7 @@ export async function POST(request: NextRequest) {
         }
       : null,
     password: parsed.data.password,
-    mfaVerifiedThisAttempt: false,
+    mfaVerifiedThisAttempt,
   });
 
   const userAgent = request.headers.get("user-agent");
@@ -116,6 +124,7 @@ export async function POST(request: NextRequest) {
   const created = await createSession(webRedis(), {
     userId: result.userId,
     roles: result.roles,
+    mfaVerifiedAt: mfaVerifiedThisAttempt ? new Date() : null,
     ipAddress,
     userAgent,
   });

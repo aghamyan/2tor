@@ -40,7 +40,11 @@ export type AssessmentEventType =
   | "multiple_faces"
   | "gaze_away"
   | "external_device_suspected"
-  | "warning_shown";
+  | "phone_detected"
+  | "unusual_item_detected"
+  | "eyes_closed"
+  | "warning_shown"
+  | "evidence_captured";
 
 export type StudentDetectableEventType =
   | "focus_loss"
@@ -64,7 +68,10 @@ export type StudentDetectableEventType =
   | "face_returned"
   | "multiple_faces"
   | "gaze_away"
-  | "external_device_suspected";
+  | "external_device_suspected"
+  | "phone_detected"
+  | "unusual_item_detected"
+  | "eyes_closed";
 
 /**
  * The "left the exam" cluster a tutor's integrity policy counts against — deliberately narrower
@@ -136,8 +143,25 @@ export interface AssessmentVersionSettings {
   camera: {
     required: boolean;
     policyVersion: string | null;
-    /** Opt-in, client-side-only face presence/count/gaze checks — see README "Camera boundary". */
+    /**
+     * Opt-in, client-side-only face presence/count/gaze checks — see README "Camera boundary".
+     * Also gates closed-eye detection (an extension of the same FaceLandmarker pass, via
+     * blendshapes) — there is no separate toggle for that, since it isn't a distinct model or
+     * capability, just another signal read off the same face mesh.
+     */
     headTrackingEnabled: boolean;
+    /**
+     * Opt-in, client-side-only object detection (phone / laptop / book / remote in frame) — a
+     * genuinely separate on-device model (MediaPipe `ObjectDetector`) from face tracking, so it
+     * gets its own disclosed toggle rather than being silently folded into `headTrackingEnabled`.
+     * Requires `headTrackingEnabled` (the "camera monitoring is on" umbrella setting).
+     */
+    objectDetectionEnabled: boolean;
+    /**
+     * Opt-in exception to the "no frame ever leaves the browser" default — see README "Camera
+     * boundary". Requires `headTrackingEnabled`, since capture triggers off its detections.
+     */
+    evidenceCaptureEnabled: boolean;
   };
   audience: AssessmentAudience;
   /** Null means unlimited. Counts only `submitted`/`graded` attempts — see services.ts. */
@@ -271,6 +295,19 @@ export interface SuspicionSummary {
   };
 }
 
+/**
+ * A photo captured on-device when an `EVIDENCE_CAPTURE_EVENT_TYPES` signal fires (see
+ * schemas.ts). `eventType` is the *triggering* violation type (e.g. `multiple_faces`), not the
+ * `"evidence_captured"` type the underlying event row actually carries — that row type exists
+ * only to keep evidence out of suspicion scoring (see suspicion.ts / README "Camera boundary").
+ * `fileKey` is deliberately not exposed here; only a signed download URL is handed to callers.
+ */
+export interface AssessmentEvidenceRecord {
+  id: string;
+  eventType: AssessmentEventType;
+  capturedAt: Date;
+}
+
 export interface AssessmentAttemptReview {
   assessment: AssessmentRecord;
   version: AssessmentVersionRecord;
@@ -279,6 +316,7 @@ export interface AssessmentAttemptReview {
   events: AssessmentEventRecord[];
   eventCounts: Partial<Record<AssessmentEventType, number>>;
   suspicion: SuspicionSummary;
+  evidence: AssessmentEvidenceRecord[];
   report: DiagnosticReportRecord | null;
 }
 
@@ -315,6 +353,25 @@ export interface AssessmentAttemptListPage {
   nextCursor: string | null;
 }
 
+/**
+ * `@app/notifications` isn't a declared dependency of this package (`package.json` is outside a
+ * module's file scope, per docs/CONVENTIONS.md) — see `packages/domain/consent/models.ts`'s
+ * `ConsentNotifier` for the identical rationale. `services.ts` takes this narrow structural
+ * interface instead of importing the real client; the composition root (`apps/web`, which does
+ * declare `@app/notifications`) passes the real `notify` function directly — it satisfies this
+ * interface as-is, no adapter needed.
+ */
+export interface AssessmentAttemptNotification {
+  userId: string;
+  type: "progress_update";
+  data: { actionUrl: string };
+  relatedEntity?: { type: string; id: string; enduring?: boolean };
+}
+
+export interface AssessmentNotifier {
+  notify(notification: AssessmentAttemptNotification): Promise<unknown>;
+}
+
 export interface AssessmentDatabase {
   transaction<T>(operation: (database: AssessmentDatabase) => Promise<T>): Promise<T>;
 
@@ -347,6 +404,8 @@ export interface AssessmentDatabase {
   isTutorAssignedToStudent(tutorUserId: string, studentProfileId: string): Promise<boolean>;
   isParentLinkedToStudent(parentUserId: string, studentProfileId: string): Promise<boolean>;
   findStudentProfileIdByUserId(userId: string): Promise<string | null>;
+  /** Active tutors assigned to this student — who evidence-capture notifications go to. */
+  listAssignedTutorUserIds(studentProfileId: string): Promise<string[]>;
 
   saveDiagnosticReport(report: DiagnosticReportRecord): Promise<void>;
   getDiagnosticReport(reportId: string): Promise<DiagnosticReportRecord | null>;

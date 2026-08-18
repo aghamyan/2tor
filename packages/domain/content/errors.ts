@@ -8,6 +8,9 @@ export const CONTENT_ERROR_CODES = [
   "UPLOAD_NOT_ALLOWED",
   "UPLOAD_TOO_LARGE",
   "UPLOAD_SIGNATURE_INVALID",
+  "UPLOAD_NOT_FOUND",
+  "UPLOAD_NOT_READY",
+  "UPLOAD_ALREADY_REVIEWED",
 ] as const;
 export type ContentErrorCode = (typeof CONTENT_ERROR_CODES)[number];
 export class ContentError extends Error {

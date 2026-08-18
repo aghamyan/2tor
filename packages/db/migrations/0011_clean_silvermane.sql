@@ -1,0 +1,1 @@
+ALTER TABLE "student_skill_records" ADD COLUMN "last_note" text;

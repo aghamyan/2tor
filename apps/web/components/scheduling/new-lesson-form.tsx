@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useMemo, useState } from "react";
+import { Fragment, useActionState, useEffect, useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 
 import {
@@ -23,6 +23,37 @@ function assignmentLabel(assignment: SchedulableAssignmentOption): string {
     : assignment.studentName;
 }
 
+function todayDateString(): string {
+  const now = new Date();
+  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(
+    now.getDate(),
+  ).padStart(2, "0")}`;
+}
+
+/** A same-page confirmation of what "date + time + zone" resolves to, purely for catching typos
+ * (wrong AM/PM, wrong day) before submit — not a substitute for the server's own
+ * `zonedTimeToUtc` conversion, so it deliberately doesn't attempt DST-correct math itself. */
+function formatResolvedPreview(
+  dateValue: string,
+  timeValue: string,
+  timezone: string,
+): string | null {
+  if (!dateValue || !timeValue) return null;
+  const [year, month, day] = dateValue.split("-").map(Number);
+  const [hour, minute] = timeValue.split(":").map(Number);
+  if (!year || !month || !day || Number.isNaN(hour) || Number.isNaN(minute)) return null;
+  const asLocal = new Date(year, month - 1, day, hour, minute);
+  const formatted = new Intl.DateTimeFormat(undefined, {
+    weekday: "long",
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  }).format(asLocal);
+  return timezone ? `${formatted} · ${timezone.replace(/_/g, " ")}` : formatted;
+}
+
 export function NewLessonForm({
   assignments,
   subjects,
@@ -35,9 +66,25 @@ export function NewLessonForm({
   const [recurring, setRecurring] = useState(false);
   const [assignmentId, setAssignmentId] = useState("");
   const [subjectId, setSubjectId] = useState("");
-  const [timezone, setTimezone] = useState(() =>
-    typeof window === "undefined" ? "" : detectBrowserTimezone(),
-  );
+  // Both start blank so the client's first hydration render matches the server-rendered HTML
+  // exactly, then fill in post-mount. A `useState(() => typeof window === "undefined" ? "" : …)`
+  // initializer looks SSR-safe but isn't: React only patches *state-driven* mismatches on
+  // hydration, not plain DOM attributes like an <input min> or a <select>'s reflected value — it
+  // logs a "won't be patched up" warning and leaves the server's blank value in the DOM forever.
+  // Setting the real value from an effect is a normal post-hydration update, which does patch it.
+  const [timezone, setTimezone] = useState("");
+  const [todayStr, setTodayStr] = useState("");
+  useEffect(() => {
+    /* eslint-disable react-hooks/set-state-in-effect -- the browser timezone and today's local
+       date are external, client-only values read after hydration (see comment above). */
+    setTimezone(detectBrowserTimezone());
+    setTodayStr(todayDateString());
+    /* eslint-enable react-hooks/set-state-in-effect */
+  }, []);
+  const [oneTimeDate, setOneTimeDate] = useState("");
+  const [oneTimeTime, setOneTimeTime] = useState("");
+  const [seriesStartDate, setSeriesStartDate] = useState("");
+  const [seriesTime, setSeriesTime] = useState("");
   const [oneTimeState, oneTimeAction, oneTimePending] = useActionState(
     createOneTimeLessonAction,
     initialSchedulingActionState,
@@ -152,7 +199,11 @@ export function NewLessonForm({
           </div>
 
           {recurring ? (
-            <>
+            // Explicit, distinct `key`s (not a bare `<>`) so React never tries to reconcile this
+            // branch's inputs against the one-time branch's by position when `recurring` toggles
+            // — a bare Fragment on both sides let a controlled input line up with an uncontrolled
+            // one at the same index and get its `value` prop silently dropped mid-session.
+            <Fragment key="recurring">
               <div className={styles.formGrid}>
                 <div className={styles.field}>
                   <label className={styles.label} htmlFor="start-date">
@@ -163,6 +214,9 @@ export function NewLessonForm({
                     id="start-date"
                     name="startDate"
                     type="date"
+                    min={todayStr || undefined}
+                    value={seriesStartDate}
+                    onChange={(event) => setSeriesStartDate(event.target.value)}
                     required
                   />
                 </div>
@@ -190,31 +244,16 @@ export function NewLessonForm({
                   <p className={styles.hint}>{t("intervalHint")}</p>
                 </div>
                 <div className={styles.field}>
-                  <label className={styles.label} htmlFor="series-hour">
-                    {t("hour")}
+                  <label className={styles.label} htmlFor="series-time">
+                    {t("time")}
                   </label>
                   <input
                     className={styles.input}
-                    id="series-hour"
-                    name="hour"
-                    type="number"
-                    min={0}
-                    max={23}
-                    required
-                  />
-                </div>
-                <div className={styles.field}>
-                  <label className={styles.label} htmlFor="series-minute">
-                    {t("minute")}
-                  </label>
-                  <input
-                    className={styles.input}
-                    id="series-minute"
-                    name="minute"
-                    type="number"
-                    min={0}
-                    max={59}
-                    defaultValue={0}
+                    id="series-time"
+                    name="seriesTime"
+                    type="time"
+                    value={seriesTime}
+                    onChange={(event) => setSeriesTime(event.target.value)}
                     required
                   />
                 </div>
@@ -241,6 +280,13 @@ export function NewLessonForm({
                   </select>
                 </div>
               </div>
+              {formatResolvedPreview(seriesStartDate, seriesTime, timezone) ? (
+                <p className={styles.hint}>
+                  {t("resolvedPreview", {
+                    details: formatResolvedPreview(seriesStartDate, seriesTime, timezone) ?? "",
+                  })}
+                </p>
+              ) : null}
               <fieldset className={styles.field}>
                 <legend className={styles.label}>{t("weekdays")}</legend>
                 <div className={styles.weekdayRow}>
@@ -252,60 +298,74 @@ export function NewLessonForm({
                   ))}
                 </div>
               </fieldset>
-            </>
+            </Fragment>
           ) : (
-            <div className={styles.formGrid}>
-              <div className={styles.field}>
-                <label className={styles.label} htmlFor="one-time-date">
-                  {t("date")}
-                </label>
-                <input
-                  className={styles.input}
-                  id="one-time-date"
-                  name="date"
-                  type="date"
-                  required
-                />
-              </div>
-              <div className={styles.field}>
-                <label className={styles.label} htmlFor="one-time-time">
-                  {t("time")}
-                </label>
-                <input
-                  className={styles.input}
-                  id="one-time-time"
-                  name="time"
-                  type="time"
-                  required
-                />
-              </div>
-              <div className={styles.field}>
-                <label className={styles.label} htmlFor="one-time-timezone">
-                  {t("timezone")}
-                </label>
-                <select
-                  className={styles.select}
-                  id="one-time-timezone"
-                  name="timezoneAtBooking"
-                  value={timezone}
-                  onChange={(event) => setTimezone(event.target.value)}
-                  required
-                >
-                  <option value="" disabled>
-                    {t("selectTimezone")}
-                  </option>
-                  {timezoneOptions.map((option) => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
+            <Fragment key="one-time">
+              <div className={styles.formGrid}>
+                <div className={styles.field}>
+                  <label className={styles.label} htmlFor="one-time-date">
+                    {t("date")}
+                  </label>
+                  <input
+                    className={styles.input}
+                    id="one-time-date"
+                    name="date"
+                    type="date"
+                    min={todayStr || undefined}
+                    value={oneTimeDate}
+                    onChange={(event) => setOneTimeDate(event.target.value)}
+                    required
+                  />
+                </div>
+                <div className={styles.field}>
+                  <label className={styles.label} htmlFor="one-time-time">
+                    {t("time")}
+                  </label>
+                  <input
+                    className={styles.input}
+                    id="one-time-time"
+                    name="time"
+                    type="time"
+                    value={oneTimeTime}
+                    onChange={(event) => setOneTimeTime(event.target.value)}
+                    required
+                  />
+                </div>
+                <div className={styles.field}>
+                  <label className={styles.label} htmlFor="one-time-timezone">
+                    {t("timezone")}
+                  </label>
+                  <select
+                    className={styles.select}
+                    id="one-time-timezone"
+                    name="timezoneAtBooking"
+                    value={timezone}
+                    onChange={(event) => setTimezone(event.target.value)}
+                    required
+                  >
+                    <option value="" disabled>
+                      {t("selectTimezone")}
                     </option>
-                  ))}
-                </select>
+                    {timezoneOptions.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
+              {formatResolvedPreview(oneTimeDate, oneTimeTime, timezone) ? (
+                <p className={styles.hint}>
+                  {t("resolvedPreview", {
+                    details: formatResolvedPreview(oneTimeDate, oneTimeTime, timezone) ?? "",
+                  })}
+                </p>
+              ) : null}
               <div className={styles.checkboxRow}>
                 <input id="is-trial" type="checkbox" name="isTrial" />
                 <label htmlFor="is-trial">{t("isTrial")}</label>
               </div>
-            </div>
+            </Fragment>
           )}
 
           <button className={styles.button} type="submit" disabled={pending || !canSchedule}>

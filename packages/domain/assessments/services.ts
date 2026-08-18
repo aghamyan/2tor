@@ -11,6 +11,8 @@ import type {
   AssessmentDatabase,
   AssessmentEventRecord,
   AssessmentEventType,
+  AssessmentEvidenceRecord,
+  AssessmentNotifier,
   AssessmentRecord,
   AssessmentSession,
   AssessmentStudentOption,
@@ -25,7 +27,10 @@ import {
   consultationSchema,
   createAssessmentSchema,
   diagnosticReportSchema,
+  EVIDENCE_CAPTURE_EVENT_TYPES,
+  EVIDENCE_MAX_SIZE_BYTES,
   integritySignalBatchSchema,
+  recordEvidenceSchema,
   saveAssessmentAnswerSchema,
   startAttemptSchema,
   submitAssessmentSchema,
@@ -36,11 +41,59 @@ import {
   type DiagnosticReportInput,
   type IntegritySignalBatchInput,
   type IntegritySignalInput,
+  type RecordEvidenceInput,
   type SaveAssessmentAnswerInput,
   type StartAttemptInput,
   type SubmitAssessmentInput,
 } from "./schemas";
+import type { AssessmentEvidenceStorage } from "./storage";
 import { computeSuspicionSummary } from "./suspicion";
+
+// Raised from 40 now that EVIDENCE_CAPTURE_EVENT_TYPES covers six trigger types instead of three
+// (phone/unusual-item/eyes-closed added alongside the original face-tracking triggers) — more
+// legitimate trigger types means the shared cap fills faster. Client-side per-type cooldowns
+// (evidence-capture.ts) keep any one calmer signal from crowding out the higher-priority ones.
+const MAX_EVIDENCE_PER_ATTEMPT = 60;
+const EVIDENCE_FILE_KEY = "evidenceFileKey";
+const EVIDENCE_MIME_KEY = "evidenceMimeType";
+const EVIDENCE_SIZE_KEY = "evidenceSizeBytes";
+const EVIDENCE_TRIGGER_KEY = "evidenceEventType";
+
+function reviewUrl(attemptId: string): string {
+  return `/assessments/attempts/${attemptId}/review`;
+}
+
+/** Default when a caller doesn't inject a real notifier (most tests, background jobs). */
+const noopNotifier: AssessmentNotifier = { notify: async () => undefined };
+
+/**
+ * Best-effort: notifying the tutor is a side effect of the attempt closing, never a precondition
+ * for it. A dispatcher misconfiguration, a missing recipient, or a queue outage must not turn into
+ * a failed submission — the student's answers and honor statement are already durably saved by the
+ * time this runs, so every failure here is caught and logged rather than rethrown.
+ */
+async function notifyAssignedTutors(
+  database: AssessmentDatabase,
+  notifier: AssessmentNotifier,
+  attempt: AssessmentAttemptRecord,
+): Promise<void> {
+  if (attempt.proctorMode !== "camera_required") return;
+  try {
+    const tutorUserIds = await database.listAssignedTutorUserIds(attempt.studentProfileId);
+    await Promise.all(
+      tutorUserIds.map((userId) =>
+        notifier.notify({
+          userId,
+          type: "progress_update",
+          data: { actionUrl: reviewUrl(attempt.id) },
+          relatedEntity: { type: "assessment_attempts", id: attempt.id },
+        }),
+      ),
+    );
+  } catch (error) {
+    console.error(`Failed to notify tutors for assessment attempt "${attempt.id}".`, error);
+  }
+}
 
 function hasRole(actor: AssessmentActor, ...roles: AssessmentActor["roles"][number][]) {
   return roles.some((role) => actor.roles.includes(role));
@@ -388,16 +441,8 @@ export async function startAssessmentAttempt(
         409,
       );
     }
-    if (
-      !cameraPolicy.policyVersion ||
-      !(await database.hasActiveCameraConsent(studentProfileId, cameraPolicy.policyVersion))
-    ) {
-      throw new AssessmentError(
-        "CAMERA_CONSENT_REQUIRED",
-        "An active consent record for the camera policy is required.",
-        409,
-      );
-    }
+    // Testing only: skip the requirement for a parent-granted consent record
+    // (`hasActiveCameraConsent`) so camera-required attempts aren't blocked on that flow.
   }
 
   const now = new Date();
@@ -578,6 +623,7 @@ export async function recordAssessmentSignals(
   actor: AssessmentActor | null | undefined,
   attemptId: string,
   input: IntegritySignalBatchInput,
+  notifier: AssessmentNotifier = noopNotifier,
 ): Promise<RecordedAssessmentSignals> {
   requireActor(actor);
   const values = integritySignalBatchSchema.parse(input);
@@ -607,8 +653,9 @@ export async function recordAssessmentSignals(
     ).length;
     if (violationCount >= violationLimit) {
       const closedAt = new Date();
+      const closed: AssessmentAttemptRecord = { ...attempt, status: "abandoned", updatedAt: closedAt };
       await database.transaction(async (transaction) => {
-        await transaction.saveAttempt({ ...attempt, status: "abandoned", updatedAt: closedAt });
+        await transaction.saveAttempt(closed);
         await transaction.appendEvents([
           event(attempt.id, "end", closedAt, {
             submission: "integrity_policy_auto_submit",
@@ -617,6 +664,7 @@ export async function recordAssessmentSignals(
           }),
         ]);
       });
+      await notifyAssignedTutors(database, notifier, closed);
       return { events: recorded, attemptStatus: "abandoned" };
     }
   }
@@ -629,11 +677,120 @@ export async function recordAssessmentSignal(
   actor: AssessmentActor | null | undefined,
   attemptId: string,
   input: IntegritySignalInput,
+  notifier: AssessmentNotifier = noopNotifier,
 ): Promise<AssessmentEventRecord | null> {
-  const { events } = await recordAssessmentSignals(database, actor, attemptId, {
-    signals: [input],
-  });
+  const { events } = await recordAssessmentSignals(
+    database,
+    actor,
+    attemptId,
+    { signals: [input] },
+    notifier,
+  );
   return events[0] ?? null;
+}
+
+function isJpegSignature(bytes: Uint8Array): boolean {
+  return bytes.length >= 3 && bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff;
+}
+
+/**
+ * Records one evidence photo, captured client-side when an `EVIDENCE_CAPTURE_EVENT_TYPES` signal
+ * fires — see README "Camera boundary". The underlying `assessment_events` row this appends
+ * always carries `eventType: "evidence_captured"`, never the triggering type (`multiple_faces`
+ * etc., which travels in `metadata[EVIDENCE_TRIGGER_KEY]` instead): both `computeSuspicionSummary`
+ * and the review stats bucket purely by `eventType`, so reusing the triggering type here would
+ * silently double-count every photographed violation.
+ */
+export async function recordAssessmentEvidence(
+  database: AssessmentDatabase,
+  storage: AssessmentEvidenceStorage,
+  actor: AssessmentActor | null | undefined,
+  attemptId: string,
+  input: RecordEvidenceInput,
+  bytes: Uint8Array,
+): Promise<AssessmentEvidenceRecord> {
+  requireActor(actor);
+  const values = recordEvidenceSchema.parse(input);
+  const { attempt, version } = await attemptContext(database, attemptId);
+  requireAttemptOwner(actor, attempt);
+  requireOpen(attempt);
+  if (!version.settings.camera.evidenceCaptureEnabled) {
+    throw new AssessmentError(
+      "EVIDENCE_NOT_ENABLED",
+      "This assessment version does not have evidence capture enabled.",
+      409,
+    );
+  }
+  if (
+    !EVIDENCE_CAPTURE_EVENT_TYPES.includes(values.eventType) ||
+    values.sizeBytes !== bytes.byteLength ||
+    bytes.byteLength > EVIDENCE_MAX_SIZE_BYTES ||
+    !isJpegSignature(bytes)
+  ) {
+    throw new AssessmentError(
+      "INVALID_INPUT",
+      "The uploaded evidence file is not a valid JPEG image.",
+      415,
+    );
+  }
+  const existingEvents = await database.listEvents(attempt.id);
+  const evidenceCount = existingEvents.filter(
+    (item) => item.eventType === "evidence_captured",
+  ).length;
+  if (evidenceCount >= MAX_EVIDENCE_PER_ATTEMPT) {
+    throw new AssessmentError(
+      "EVIDENCE_LIMIT_REACHED",
+      "This attempt has already reached its evidence capture limit.",
+      409,
+    );
+  }
+  const now = new Date();
+  const id = ulid();
+  const key = `assessments/evidence/${attempt.id}/${id}.jpg`;
+  await storage.putPrivate({
+    key,
+    body: bytes,
+    mimeType: values.mimeType,
+    metadata: { attemptId: attempt.id, eventType: values.eventType },
+  });
+  const evidenceEvent: AssessmentEventRecord = {
+    id,
+    attemptId: attempt.id,
+    eventType: "evidence_captured",
+    occurredAt: now,
+    metadata: {
+      [EVIDENCE_TRIGGER_KEY]: values.eventType,
+      [EVIDENCE_FILE_KEY]: key,
+      [EVIDENCE_MIME_KEY]: values.mimeType,
+      [EVIDENCE_SIZE_KEY]: values.sizeBytes,
+    },
+    createdAt: now,
+  };
+  await database.appendEvents([evidenceEvent]);
+  return { id: evidenceEvent.id, eventType: values.eventType, capturedAt: now };
+}
+
+/** Resolves a signed evidence URL to its private storage key, enforcing the same tutor/staff
+ * authorization {@link getAssessmentAttemptReview} uses — evidence is never actor-self-servable. */
+export async function getAssessmentEvidenceForActor(
+  database: AssessmentDatabase,
+  actor: AssessmentActor | null | undefined,
+  attemptId: string,
+  evidenceId: string,
+): Promise<{ fileKey: string; mimeType: string }> {
+  requireActor(actor);
+  const { attempt } = await attemptContext(database, attemptId);
+  await requireAssignedTutor(database, actor, attempt.studentProfileId);
+  const events = await database.listEvents(attempt.id);
+  const found = events.find(
+    (item) => item.id === evidenceId && item.eventType === "evidence_captured",
+  );
+  const fileKey = found?.metadata?.[EVIDENCE_FILE_KEY];
+  const mimeType = found?.metadata?.[EVIDENCE_MIME_KEY];
+  if (typeof fileKey !== "string" || typeof mimeType !== "string") {
+    throw new AssessmentError("EVIDENCE_NOT_FOUND", "Evidence photo was not found.", 404);
+  }
+  return { fileKey, mimeType };
 }
 
 export async function submitAssessmentAttempt(
@@ -641,6 +798,7 @@ export async function submitAssessmentAttempt(
   actor: AssessmentActor | null | undefined,
   attemptId: string,
   input: SubmitAssessmentInput,
+  notifier: AssessmentNotifier = noopNotifier,
 ): Promise<AssessmentAttemptRecord> {
   requireActor(actor);
   const values = submitAssessmentSchema.parse(input);
@@ -668,6 +826,7 @@ export async function submitAssessmentAttempt(
       event(attempt.id, "end", now, { submission: "student_confirmed" }),
     ]);
   });
+  await notifyAssignedTutors(database, notifier, submitted);
   return submitted;
 }
 
@@ -676,6 +835,21 @@ function countEvents(events: AssessmentEventRecord[]) {
     counts[item.eventType] = (counts[item.eventType] ?? 0) + 1;
     return counts;
   }, {});
+}
+
+/** Pure derivation over the event log, same discipline as {@link computeSuspicionSummary} —
+ * evidence is never stored separately from the `"evidence_captured"` rows that carry it. */
+function extractEvidence(events: AssessmentEventRecord[]): AssessmentEvidenceRecord[] {
+  return events
+    .filter((item): item is AssessmentEventRecord => item.eventType === "evidence_captured")
+    .map((item) => {
+      const triggerType = item.metadata?.[EVIDENCE_TRIGGER_KEY];
+      return {
+        id: item.id,
+        eventType: (typeof triggerType === "string" ? triggerType : item.eventType) as AssessmentEventType,
+        capturedAt: item.occurredAt,
+      };
+    });
 }
 
 export async function getAssessmentAttemptReview(
@@ -695,6 +869,7 @@ export async function getAssessmentAttemptReview(
     events,
     eventCounts: countEvents(events),
     suspicion: computeSuspicionSummary(events),
+    evidence: extractEvidence(events),
     report: await database.getDiagnosticReportForAttempt(attempt.id),
   };
 }

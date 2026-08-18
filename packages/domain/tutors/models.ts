@@ -29,6 +29,9 @@ export interface TutorProfileRecord {
   country: string | null;
   yearsExperience: number | null;
   educationSummary: string | null;
+  /** Manual entry, reused for every new lesson unless that lesson's Zoom details are overridden individually — see `packages/domain/scheduling/services.ts`'s auto-assign-on-create path. */
+  defaultZoomJoinUrl: string | null;
+  defaultZoomPasscode: string | null;
   status: TutorProfileStatus;
   publicProfileApprovedAt: Date | null;
   createdAt: Date;
@@ -134,6 +137,11 @@ export interface TutorProfileInput {
   educationSummary: string | null;
 }
 
+export interface TutorZoomDefaultsInput {
+  defaultZoomJoinUrl: string | null;
+  defaultZoomPasscode: string | null;
+}
+
 export interface TutorCapabilitiesInput {
   subjects: Array<{ subjectId: string; isPrimary: boolean }>;
   gradeRanges: Array<{ minGrade: number | null; maxGrade: number | null; includesAdult: boolean }>;
@@ -163,6 +171,10 @@ export interface TutorDatabase {
     values: TutorProfileInput,
   ): Promise<TutorProfileRecord>;
   updateTutorProfile(profileId: string, values: TutorProfileInput): Promise<TutorProfileRecord>;
+  updateZoomDefaults(
+    profileId: string,
+    values: TutorZoomDefaultsInput,
+  ): Promise<TutorProfileRecord>;
   listSubjects(profileId: string): Promise<TutorSubjectRecord[]>;
   replaceSubjects(profileId: string, values: TutorCapabilitiesInput["subjects"]): Promise<void>;
   listGradeRanges(profileId: string): Promise<TutorGradeRangeRecord[]>;

@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import {
   decideBulkExport,
@@ -15,6 +15,17 @@ function staffActor(userId: string, mfaVerifiedAt: Date | null = FRESH_MFA) {
 }
 
 describe("bulk export two-person approval", () => {
+  // requireStepUpFresh() checks mfaVerifiedAt against a live `new Date()`, so FRESH_MFA only
+  // stays within its 15-minute window if the clock is pinned to NOW for the test's duration.
+  beforeEach(() => {
+    vi.useFakeTimers();
+    vi.setSystemTime(NOW);
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
   it("lets a different administrator approve the export", async () => {
     const database = new InMemoryAdministrationDatabase();
     const audit = new FakeAuditPort();

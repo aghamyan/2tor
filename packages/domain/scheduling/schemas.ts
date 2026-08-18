@@ -70,6 +70,9 @@ export const rescheduleLessonInputSchema = z
     newScheduledStartAt: z.coerce.date(),
     durationMinutes: durationMinutesSchema,
     reason: reasonSchema,
+    scope: z
+      .enum(["this_lesson", "this_and_future", "entire_series"])
+      .default("this_lesson"),
   })
   .strict();
 
@@ -85,6 +88,18 @@ export const cancelLessonInputSchema = z
     reason: reasonSchema,
   })
   .strict();
+
+const deleteReasonSchema = z
+  .string()
+  .trim()
+  .max(300)
+  .nullable()
+  .transform((value) => (value === "" ? null : value))
+  .default(null);
+
+export const deleteLessonInputSchema = z.object({ reason: deleteReasonSchema }).strict();
+
+export const deleteLessonSeriesInputSchema = z.object({ reason: deleteReasonSchema }).strict();
 
 export const recordNoShowInputSchema = z
   .object({
@@ -143,6 +158,8 @@ export type CreateOneTimeLessonInput = z.input<typeof createOneTimeLessonInputSc
 export type CreateLessonSeriesInput = z.input<typeof createLessonSeriesInputSchema>;
 export type RescheduleLessonInput = z.input<typeof rescheduleLessonInputSchema>;
 export type CancelLessonInput = z.input<typeof cancelLessonInputSchema>;
+export type DeleteLessonInput = z.input<typeof deleteLessonInputSchema>;
+export type DeleteLessonSeriesInput = z.input<typeof deleteLessonSeriesInputSchema>;
 export type RecordNoShowInput = z.input<typeof recordNoShowInputSchema>;
 export type RecordAttendanceInput = z.input<typeof recordAttendanceInputSchema>;
 export type SetZoomMeetingInput = z.input<typeof setZoomMeetingInputSchema>;

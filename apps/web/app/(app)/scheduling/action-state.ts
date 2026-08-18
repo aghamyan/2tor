@@ -5,6 +5,8 @@ export interface SchedulingActionState {
     | "lessonScheduled"
     | "seriesScheduled"
     | "canceled"
+    | "deleted"
+    | "seriesDeleted"
     | "rescheduled"
     | "noShowRecorded"
     | "attendanceRecorded"

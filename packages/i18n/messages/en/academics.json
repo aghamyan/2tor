@@ -18,6 +18,47 @@
         "body": "Completion is tied to work, observation, rubric, or assessment evidence."
       },
       "privacy": "Internal staff notes are not shown to parents or students."
+    },
+    "progress": {
+      "roleLabel": {
+        "tutor": "Tutor view",
+        "student": "Your view",
+        "parent": "Parent view",
+        "admin": "Admin view"
+      },
+      "title": "{name}'s learning progress",
+      "startReview": "Start class review",
+      "selector": {
+        "learner": "Learner",
+        "subject": "Subject"
+      },
+      "views": {
+        "map": "Curriculum map",
+        "table": "Skills table",
+        "timeline": "Timeline"
+      },
+      "viewNote": "Scores shown are tutor-confirmed",
+      "status": {
+        "mastered": "Mastered",
+        "secure": "Secure",
+        "developing": "Developing",
+        "needs_attention": "Needs attention",
+        "not_demonstrated": "Not demonstrated",
+        "not_assessed": "Not assessed",
+        "in_progress": "In progress",
+        "upcoming": "Upcoming"
+      },
+      "rewards": {
+        "kicker": "Recognition",
+        "title": "Rewards",
+        "points": "Points",
+        "levelUnset": "Getting started",
+        "badges": "Badges earned",
+        "noBadges": "None yet",
+        "attendanceStreak": "Attendance streak",
+        "assignmentStreak": "Assignment streak",
+        "bestStreak": "Best: {count}"
+      }
     }
   }
 }

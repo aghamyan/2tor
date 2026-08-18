@@ -13,6 +13,16 @@ interface ResourceListItem {
   type: "document" | "video" | "link" | "worksheet" | "interactive";
   tags: string[];
   links: { id: string; url: string; provider: "youtube" | "other"; title: string | null }[];
+  visibility: "everyone" | "grades" | "students";
+  gradeLevels: string[];
+  file: { id: string; fileName: string; mimeType: string; sizeBytes: number } | null;
+}
+
+async function openResourceFile(uploadId: string) {
+  const response = await fetch(`/api/content/uploads/${uploadId}`);
+  if (!response.ok) return;
+  const payload = (await response.json()) as { data: { downloadUrl: string } };
+  window.open(payload.data.downloadUrl, "_blank", "noopener,noreferrer");
 }
 
 function messageFromResponse(payload: unknown, fallback: string) {
@@ -116,7 +126,16 @@ export function ResourcesOverview({
             {resources.map((resource) => {
               const isOpen = openId === resource.id;
               const videoLink = resource.links.find((link) => link.provider === "youtube");
+              const externalLink = resource.type === "link" ? resource.links[0] : undefined;
               const subject = subjectName(resource.subjectId);
+              const visibilityLabel =
+                resource.visibility === "everyone"
+                  ? t("overview.library.visibilityEveryone")
+                  : resource.visibility === "grades"
+                    ? t("overview.library.visibilityGrades", {
+                        grades: resource.gradeLevels.join(", "),
+                      })
+                    : t("overview.library.visibilityStudents");
               return (
                 <li className={styles.resourceRow} key={resource.id}>
                   <button
@@ -135,6 +154,7 @@ export function ResourcesOverview({
                       {subject ? (
                         <p className={styles.hint}>{t("overview.library.subject", { subject })}</p>
                       ) : null}
+                      <span className={styles.visibilityBadge}>{visibilityLabel}</span>
                       {resource.tags.length > 0 ? (
                         <div className={styles.tagRow}>
                           {resource.tags.map((tag) => (
@@ -153,6 +173,30 @@ export function ResourcesOverview({
                           allowFullScreen
                         />
                       ) : null}
+                      {externalLink ? (
+                        <a
+                          className={styles.fileLink}
+                          href={externalLink.url}
+                          rel="noopener noreferrer"
+                          target="_blank"
+                        >
+                          {t("overview.library.openLink")}
+                        </a>
+                      ) : null}
+                      {resource.file
+                        ? (() => {
+                            const file = resource.file;
+                            return (
+                              <button
+                                className={styles.fileLink}
+                                type="button"
+                                onClick={() => void openResourceFile(file.id)}
+                              >
+                                {t("overview.library.download", { fileName: file.fileName })}
+                              </button>
+                            );
+                          })()
+                        : null}
                       <div className={styles.detailActions}>
                         {reportedIds.has(resource.id) ? (
                           <span className={styles.hint}>{t("overview.library.reported")}</span>

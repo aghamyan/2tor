@@ -3,9 +3,10 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
 import { ContentError } from "../../../../../packages/domain/content/errors";
-import type {
-  ResourceRecord,
-  ResourceSubjectOption,
+import {
+  GRADE_LEVEL_OPTIONS,
+  type ResourceRecord,
+  type ResourceSubjectOption,
 } from "../../../../../packages/domain/content/models";
 import { contentRequestContext } from "../../../../../packages/domain/content/runtime";
 import {
@@ -13,6 +14,7 @@ import {
   listResources,
   listResourceSubjects,
 } from "../../../../../packages/domain/content/services";
+import { loadSchedulableOptions } from "../scheduling/queries";
 
 function redirectIfUnauthenticated(error: unknown): never {
   if (error instanceof ContentError && error.code === "UNAUTHENTICATED") redirect("/login");
@@ -54,6 +56,9 @@ export async function loadContentPageData(): Promise<ContentPageData> {
 
 export interface NewResourceFormData {
   subjects: ResourceSubjectOption[];
+  /** This tutor's own students, for the "specific students" visibility picker — empty for staff, who target by grade instead. */
+  students: { studentProfileId: string; studentName: string }[];
+  gradeLevels: readonly string[];
 }
 
 export async function loadNewResourceFormData(): Promise<NewResourceFormData> {
@@ -64,8 +69,19 @@ export async function loadNewResourceFormData(): Promise<NewResourceFormData> {
       context.actor.roles.includes("administrator") ||
       context.actor.roles.includes("super_administrator");
     if (!isAuthor) redirect("/content");
-    const subjects = await listResourceSubjects(context.database, context.actor);
-    return { subjects };
+    const [subjects, schedulable] = await Promise.all([
+      listResourceSubjects(context.database, context.actor),
+      loadSchedulableOptions(),
+    ]);
+    const students = [
+      ...new Map(
+        schedulable.assignments.map((assignment) => [
+          assignment.studentProfileId,
+          { studentProfileId: assignment.studentProfileId, studentName: assignment.studentName },
+        ]),
+      ).values(),
+    ];
+    return { subjects, students, gradeLevels: GRADE_LEVEL_OPTIONS };
   } catch (error) {
     return redirectIfUnauthenticated(error);
   }

@@ -1,6 +1,417 @@
 {
   "discussions": {
-    "nav": { "label": "Learning Questions" },
+    "nav": { "label": "MathOverflow" },
+    "shell": {
+      "eyebrow": "COMMUNITY · MATHEMATICS",
+      "tagline": "Ask, explain, and learn mathematics together.",
+      "askButton": "Ask a question",
+      "role": {
+        "student": "Student view",
+        "tutor": "Tutor view",
+        "staff": "Admin view"
+      },
+      "context": {
+        "student": "Compare approaches, follow the reasoning, and see when a tutor has verified an explanation.",
+        "tutor": "Help students move forward by reviewing unanswered questions and validating strong explanations.",
+        "staff": "Follow the health of mathematical discussions while keeping moderation within reach."
+      },
+      "stats": {
+        "label": "Current question view summary",
+        "visible": "Questions in view",
+        "needsAttention": "Need attention",
+        "active": "Active discussions",
+        "tutorReviewed": "Tutor reviewed"
+      }
+    },
+    "tabs": {
+      "all": "All questions",
+      "mine": "My questions",
+      "following": "Following",
+      "saved": "Saved",
+      "needsReview": "Needs review",
+      "moderation": "Moderation queue"
+    },
+    "feed": {
+      "heading": "Question feed",
+      "searchPlaceholder": "Search questions",
+      "searchLabel": "Search questions",
+      "sortLabel": "Sort by",
+      "sort": {
+        "recent_activity": "Recent activity",
+        "newest": "Newest",
+        "most_helpful": "Most helpful",
+        "most_answered": "Most answered",
+        "unanswered": "Unanswered",
+        "highest_rated": "Highest rated",
+        "needs_tutor_review": "Needs tutor review"
+      },
+      "tagLabel": "Topic",
+      "allTags": "All topics",
+      "gradeLabel": "Grade level",
+      "allGrades": "All grade levels",
+      "gradeOption": "Grade {grade}",
+      "gradeCollege": "College / Adult",
+      "statusLabel": "Question status",
+      "allStatuses": "All statuses",
+      "activeFiltersLabel": "Active question filters",
+      "clearAll": "Clear all",
+      "clearFilters": "Clear filters",
+      "filteredByAuthor": "Showing only questions from {name}",
+      "resultCount": "{count, plural, =0 {No questions} one {# question} other {# questions}}",
+      "loadMore": "Next page",
+      "previous": "Previous page",
+      "paginationLabel": "Question list pages",
+      "communityHeading": "Recent community questions",
+      "attention": {
+        "eyebrow": "Tutor queue",
+        "title": "Needs your attention",
+        "body": "{count, plural, one {# question is waiting for a tutor response.} other {# questions are waiting for a tutor response.}}",
+        "action": "View all"
+      },
+      "empty": {
+        "title": "No questions yet",
+        "body": "Be the first to ask — your tutor and classmates will see it here."
+      },
+      "emptyFiltered": {
+        "title": "No questions match these filters",
+        "body": "Try a different search term, or clear a filter to see more."
+      }
+    },
+    "card": {
+      "answers": "{count, plural, =0 {No answers} one {# answer} other {# answers}}",
+      "comments": "{count, plural, =0 {No comments} one {# comment} other {# comments}}",
+      "views": "{count, plural, =0 {0 views} one {# view} other {# views}}",
+      "accepted": "Accepted answer",
+      "tutorVerified": "Tutor-verified",
+      "askedBy": "Asked by {name}",
+      "gradeLevel": "Grade {grade}",
+      "student": "Student",
+      "activityLabel": "Question activity",
+      "answersShort": "answers",
+      "commentsShort": "comments",
+      "viewsShort": "views",
+      "tutorRating": "★ {average} tutor rating · {count, plural, one {# rating} other {# ratings}}",
+      "helpful": "{count, plural, one {# helpful mark} other {# helpful marks}}"
+    },
+    "cardState": {
+      "needs_answer": "Needs answer",
+      "student_discussion": "Student discussion",
+      "tutor_replied": "Tutor replied"
+    },
+    "visibility": {
+      "private_support": "Private to you and your tutor",
+      "group_shared": "Shared with your group",
+      "tutors_only": "Visible to tutors",
+      "community": "Community"
+    },
+    "visibilityShort": {
+      "private_support": "Private support",
+      "group_shared": "Group",
+      "tutors_only": "Tutors only",
+      "community": "Community"
+    },
+    "sidebar": {
+      "label": "MathOverflow community summary",
+      "currentView": "Based on the questions in this view",
+      "yourActivity": {
+        "title": "Your activity",
+        "questions": "Questions by you",
+        "answered": "With answers",
+        "reviewed": "Tutor reviewed"
+      },
+      "attention": {
+        "title": "Needs attention",
+        "body": "{count, plural, =0 {No questions in this view need a tutor right now.} one {# question in this view is waiting.} other {# questions in this view are waiting.}}",
+        "action": "Review questions"
+      },
+      "topics": { "title": "Popular topics" },
+      "guidelines": {
+        "title": "Community standard",
+        "reasoning": "Explain your reasoning",
+        "respect": "Be precise and respectful",
+        "help": "Help someone think, not just finish"
+      }
+    },
+    "feedback": {
+      "questionPosted": "Your question was posted.",
+      "attachmentUploaded": "Your file was uploaded.",
+      "questionUpdated": "Your question was updated.",
+      "questionDeleted": "Your question was deleted.",
+      "questionClosed": "This question was closed.",
+      "questionReopened": "This question was reopened.",
+      "questionLocked": "This question was locked.",
+      "questionUnlocked": "This question was unlocked.",
+      "questionMarkedDuplicate": "This question was marked as a duplicate.",
+      "answerPosted": "Your answer was posted.",
+      "answerUpdated": "Your answer was updated.",
+      "answerDeleted": "Your answer was deleted.",
+      "answerAccepted": "Answer accepted.",
+      "answerUnaccepted": "Answer unaccepted.",
+      "helpfulVoted": "Thanks for the feedback.",
+      "answerVerified": "Verification saved.",
+      "revisionRequested": "Revision requested.",
+      "ratingSaved": "Your rating was saved.",
+      "ratingUpdated": "Your rating was updated.",
+      "ratingRemoved": "Your rating was removed.",
+      "ratingInvalidated": "Rating invalidated.",
+      "commentPosted": "Your comment was posted.",
+      "commentUpdated": "Your comment was updated.",
+      "commentDeleted": "Your comment was deleted.",
+      "correctionProposed": "Your correction was sent to the answer's author.",
+      "correctionResponded": "Your response was saved.",
+      "correctionResolved": "The correction was resolved.",
+      "followed": "You are now following this question.",
+      "unfollowed": "You unfollowed this question.",
+      "saved": "Saved for later.",
+      "unsaved": "Removed from saved questions.",
+      "reported": "Thanks — this was sent to moderators for review.",
+      "reportAssigned": "Report assigned.",
+      "reportResolved": "Report resolved.",
+      "contentRemoved": "Content removed.",
+      "contentRestored": "Content restored.",
+      "errors": {
+        "unauthenticated": "Please sign in to do that.",
+        "forbidden": "You don't have permission to do that.",
+        "notFound": "That could not be found — it may have been removed.",
+        "conflict": "That can't be done right now — try refreshing the page.",
+        "invalid": "Please check the form and try again.",
+        "rateLimited": "You're doing that too often — please wait a bit and try again.",
+        "generic": "Something went wrong. Please try again."
+      }
+    },
+    "detail": {
+      "backToFeed": "Back to MathOverflow",
+      "askedLabel": "Asked by {name}",
+      "answersHeading": "{count, plural, =0 {No answers yet} one {# answer} other {# answers}}",
+      "yourAnswerHeading": "Your answer",
+      "postAnswer": "Post your answer",
+      "posting": "Posting…",
+      "answerPlaceholder": "Explain your reasoning — show your steps, not just the final answer.",
+      "cannotAnswerLocked": "This question is locked and no longer accepting answers.",
+      "cannotAnswerClosed": "This question is closed and no longer accepting answers.",
+      "signInToAnswer": "Sign in to answer this question.",
+      "acceptButton": "Accept this answer",
+      "unacceptButton": "Unaccept",
+      "accepted": "Accepted",
+      "helpfulButton": "Mark helpful",
+      "helpfulCount": "{count, plural, =0 {Helpful} one {# person found this helpful} other {# people found this helpful}}",
+      "followButton": "Follow",
+      "followingButton": "Following",
+      "saveButton": "Save",
+      "savedButton": "Saved",
+      "commentsHeading": "{count, plural, =0 {Comments} one {# comment} other {# comments}}",
+      "reply": "Reply",
+      "commentPlaceholder": "Add a comment…",
+      "postComment": "Comment",
+      "posted": "Posted",
+      "tutorAnswerBadge": "Tutor answer",
+      "ratingAverage": "{average} average from {count, plural, one {# tutor} other {# tutors}}",
+      "notYetRated": "Not yet rated by a tutor",
+      "correctionsHeading": "{count, plural, =1 {# suggested correction} other {# suggested corrections}}",
+      "attachmentsHeading": "{count, plural, =1 {# attachment} other {# attachments}}",
+      "correctionStatus": {
+        "pending": "Awaiting the author's response",
+        "accepted": "Accepted by the author",
+        "partially_accepted": "Partially accepted by the author",
+        "rejected": "Declined by the author",
+        "resolved": "Resolved by a tutor"
+      }
+    },
+    "attachment": {
+      "scan": {
+        "pending": "Scanning…",
+        "clean": "Ready",
+        "infected": "Blocked",
+        "error": "Scan failed"
+      }
+    },
+    "rating": {
+      "rateButton": "Rate this answer",
+      "editButton": "Edit your rating",
+      "dialogTitle": "Rate this answer",
+      "dialogDescription": "Ratings ≤ 2 stars require specific, constructive feedback the student can act on.",
+      "starLabel": "Star rating",
+      "feedbackLabel": "Feedback (optional)",
+      "feedbackRequiredLabel": "Feedback (required for 1–2 stars)",
+      "feedbackPlaceholder": "What was correct, and what could be clearer or more complete?",
+      "feedbackRequiredHint": "Explain what's missing or incorrect — at least 20 characters.",
+      "cancel": "Cancel",
+      "save": "Save rating",
+      "saving": "Saving…",
+      "close": "Close",
+      "breakdownTitle": "Tutor ratings",
+      "noRatings": "No tutor ratings yet."
+    },
+    "verification": {
+      "unverified": "Unverified",
+      "correct": "Verified correct",
+      "mostly_correct": "Mostly correct",
+      "correct_approach_arithmetic_error": "Correct approach, arithmetic error",
+      "needs_revision": "Needs revision",
+      "incorrect": "Incorrect",
+      "incomplete_explanation": "Incomplete explanation"
+    },
+    "status": {
+      "open": "Open",
+      "answered": "Answered",
+      "accepted": "Accepted",
+      "tutor_verified": "Tutor-verified",
+      "needs_tutor_review": "Needs tutor review",
+      "needs_clarification": "Needs clarification",
+      "closed": "Closed",
+      "locked": "Locked",
+      "duplicate": "Duplicate",
+      "resolved": "Resolved",
+      "pending_moderation": "Pending moderation"
+    },
+    "family": {
+      "eyebrow": "Family view",
+      "title": "{name}'s activity",
+      "subtitle": "A read-only summary — no message content, and no comparisons to other students.",
+      "childPickerLabel": "Viewing",
+      "noChildren": {
+        "title": "No linked students yet",
+        "body": "Once a student is linked to your account, their MathOverflow activity will appear here."
+      },
+      "stats": {
+        "questionsAsked": "Questions asked this month",
+        "answersSubmitted": "Answers submitted this month",
+        "acceptedAnswers": "Accepted answers",
+        "tutorVerifiedAnswers": "Tutor-verified answers",
+        "averageRating": "Average tutor rating",
+        "noRatingYet": "No ratings yet"
+      },
+      "unresolvedHeading": "{count, plural, =0 {No unresolved questions} one {# unresolved question} other {# unresolved questions}}",
+      "unresolvedEmpty": "Everything is answered or resolved right now.",
+      "topicsHeading": "Topics that may need extra support",
+      "feedbackHeading": "Recent tutor feedback",
+      "feedbackEmpty": "No tutor verifications yet.",
+      "activityHeading": "Recent activity",
+      "activityEmpty": "No activity yet.",
+      "activityKind": {
+        "question_asked": "Asked: {title}",
+        "answer_submitted": "Answered: {title}",
+        "answer_accepted": "Answer accepted: {title}",
+        "answer_tutor_verified": "Answer verified: {title}"
+      },
+      "viewQuestion": "View question"
+    },
+    "moderation": {
+      "eyebrow": "Moderation",
+      "title": "Moderation queue",
+      "subtitle": "Reports on questions, answers, and comments across MathOverflow.",
+      "statusLabel": "Status",
+      "reportStatus": {
+        "open": "Open",
+        "reviewing": "Reviewing",
+        "resolved": "Resolved",
+        "dismissed": "Dismissed",
+        "escalated": "Escalated",
+        "all": "All"
+      },
+      "severityLabel": "Severity",
+      "severityNone": "No severity set",
+      "severity": {
+        "low": "Low",
+        "medium": "Medium",
+        "high": "High",
+        "critical": "Critical"
+      },
+      "targetType": {
+        "discussion_question": "Question",
+        "discussion_answer": "Answer",
+        "discussion_comment": "Comment"
+      },
+      "targetRemoved": "This content has already been removed.",
+      "reportedBy": "Reported by {name}",
+      "authoredBy": "Posted by {name}",
+      "assignedTo": "Assigned to {name}",
+      "unassigned": "Unassigned",
+      "unknownUser": "a user",
+      "assignToMe": "Assign to me",
+      "resolutionNoteLabel": "Resolution note",
+      "resolutionNotePlaceholder": "What did you decide, and why?",
+      "resolveButton": "Save",
+      "saving": "Saving…",
+      "emptyTitle": "Nothing here",
+      "emptyBody": "No reports currently match this filter."
+    },
+    "ask": {
+      "eyebrow": "Ask MathOverflow",
+      "title": "Ask a question",
+      "subtitle": "Show your thinking so far — tutors and classmates can help faster with more context.",
+      "noScopeOptions": "You're not currently enrolled in a course, so there's nowhere to post a question yet. Ask your tutor or an administrator to check your enrollment.",
+      "draftRestored": "Restored your saved draft.",
+      "discardDraft": "Discard draft",
+      "templateLabel": "What kind of question is this?",
+      "templates": {
+        "concept_explanation": {
+          "label": "Explain a concept",
+          "description": "You want to understand why something works, not just the steps."
+        },
+        "homework_help": {
+          "label": "Homework help",
+          "description": "You're stuck on a specific problem and want a nudge, not the answer."
+        },
+        "check_my_solution": {
+          "label": "Check my solution",
+          "description": "You solved it and want someone to confirm your work."
+        },
+        "alternative_method": {
+          "label": "Alternative method",
+          "description": "You got an answer, but want to see a different way to solve it."
+        },
+        "exam_preparation": {
+          "label": "Exam preparation",
+          "description": "You're reviewing for a test and want to practice or clarify a topic."
+        },
+        "proof_review": {
+          "label": "Proof review",
+          "description": "You wrote a proof and want feedback on its rigor."
+        },
+        "general_discussion": {
+          "label": "General discussion",
+          "description": "Anything else math-related you'd like to talk through."
+        }
+      },
+      "scopeLabel": "Where does this belong?",
+      "scopeGroups": {
+        "courses": "Courses",
+        "groups": "Group classes",
+        "subjects": "Subjects"
+      },
+      "titleLabel": "Title",
+      "titleHint": "Be specific — \"Why does the denominator stay the same when adding fractions?\" beats \"Fractions help\".",
+      "bodyLabel": "Details",
+      "bodyHint": "Markdown and math (LaTeX, e.g. $x^2$) are supported.",
+      "writeTab": "Write",
+      "previewTab": "Preview",
+      "previewEmpty": "Nothing to preview yet.",
+      "whatTriedLabel": "What have you tried so far?",
+      "visibilityLabel": "Who should see this?",
+      "visibilityDescriptions": {
+        "private_support": "Only you and your assigned tutor.",
+        "group_shared": "Everyone in the group class you selected above.",
+        "tutors_only": "Any tutor on the platform, but not the wider student community.",
+        "community": "The whole MathOverflow community — other students, and tutors."
+      },
+      "visibilityGroupSharedDisabled": "Only available when the scope above is a group class.",
+      "tagsLabel": "Tags (optional, up to 5)",
+      "tagsPlaceholder": "Add a tag…",
+      "removeTag": "Remove tag {tag}",
+      "attachmentsLabel": "Attach files (optional)",
+      "attachmentsHint": "JPEG, PNG, or PDF, up to 15 MB each. Files are scanned before anyone else can open them.",
+      "attachmentAdd": "Add a file",
+      "attachmentRemove": "Remove {name}",
+      "attachmentInvalidType": "Only JPEG, PNG, or PDF files are allowed.",
+      "attachmentTooLarge": "This file exceeds the 15 MB limit.",
+      "attachmentLimitReached": "You can attach up to {count} files.",
+      "uploading": "Uploading…",
+      "uploadingAttachments": "Uploading file {index} of {total}…",
+      "postButton": "Post your question",
+      "posting": "Posting…",
+      "autosaveHint": "Your draft is saved automatically on this device."
+    },
     "overview": {
       "eyebrow": "Guided Q&A",
       "title": "Ask where your learning happens.",

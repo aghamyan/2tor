@@ -15,6 +15,7 @@ export function LoginForm({ nextPath }: { nextPath: string }) {
   const t = useTranslations("auth.login");
   const [busy, setBusy] = useState(false);
   const [errorCode, setErrorCode] = useState<string | null>(null);
+  const [needsMfaCode, setNeedsMfaCode] = useState(false);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -23,18 +24,22 @@ export function LoginForm({ nextPath }: { nextPath: string }) {
     setErrorCode(null);
 
     try {
+      const code = form.get("code");
       const response = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
           identifier: form.get("identifier"),
           password: form.get("password"),
+          code: typeof code === "string" && code.length > 0 ? code : undefined,
           next: nextPath,
         }),
       });
       const payload = (await response.json()) as LoginError & { data?: { next?: string } };
       if (!response.ok) {
-        setErrorCode(payload.error?.code ?? "UNKNOWN");
+        const code = payload.error?.code ?? "UNKNOWN";
+        setErrorCode(code);
+        if (code === "MFA_VERIFICATION_REQUIRED") setNeedsMfaCode(true);
         return;
       }
       window.location.assign(payload.data?.next ?? "/dashboard");
@@ -75,6 +80,20 @@ export function LoginForm({ nextPath }: { nextPath: string }) {
         <span>{t("password")}</span>
         <input autoComplete="current-password" name="password" required type="password" />
       </label>
+      {needsMfaCode ? (
+        <label>
+          <span>{t("code")}</span>
+          <input
+            autoComplete="one-time-code"
+            inputMode="numeric"
+            maxLength={6}
+            name="code"
+            pattern="\d{6}"
+            placeholder={t("codePlaceholder")}
+            required
+          />
+        </label>
+      ) : null}
       {errorKey ? (
         <p className={styles.error} role="alert">
           {t(errorKey)}

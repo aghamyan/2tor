@@ -87,6 +87,13 @@ export interface LessonParticipantRecord {
   leftAt: Date | null;
 }
 
+/** The tutor's own reusable meeting, set on `/settings/zoom` (`packages/domain/tutors`) — the
+ * source a newly created lesson is auto-provisioned from unless overridden per-lesson. */
+export interface TutorZoomDefaults {
+  joinUrl: string;
+  passcode: string | null;
+}
+
 export interface ZoomMeetingRecord {
   id: string;
   lessonId: string;
@@ -236,12 +243,25 @@ export interface SchedulingDatabase {
   findLessonById(id: string): Promise<LessonRecord | null>;
   updateLessonStatus(id: string, status: LessonStatus): Promise<LessonRecord>;
   listLessonsForScope(scope: LessonListScope, range: LessonListRange): Promise<LessonRecord[]>;
+  /** All lesson rows for a series, any status — the source `deleteLessonSeries` filters to `"scheduled"` before removing. */
+  listLessonsForSeries(seriesId: string): Promise<LessonRecord[]>;
+  /**
+   * Hard-removes a lesson row (cascading to its participants/zoom/cancellation/attendance rows —
+   * see `packages/db/src/schema/scheduling.ts`'s `onDelete: "cascade"` FKs). Callers must only use
+   * this for a `"scheduled"` lesson with `lessonSeriesId: null`, or a series lesson after the
+   * series itself has been ended — see services.ts `deleteLesson`/`deleteLessonSeries` for why
+   * (deleting a single active-series occurrence would be re-materialized by the next
+   * `scheduling.materialize-lessons` run).
+   */
+  deleteLesson(id: string): Promise<void>;
 
   addParticipant(values: NewLessonParticipantValues): Promise<LessonParticipantRecord>;
   listParticipants(lessonId: string): Promise<LessonParticipantRecord[]>;
 
   upsertZoomMeeting(values: NewZoomMeetingValues): Promise<ZoomMeetingRecord>;
   findZoomMeetingByLessonId(lessonId: string): Promise<ZoomMeetingRecord | null>;
+  /** `null` when the tutor hasn't set a default (or has no join URL configured) — nothing to auto-assign. */
+  findTutorZoomDefaults(tutorProfileId: string): Promise<TutorZoomDefaults | null>;
 
   createCancellation(values: NewCancellationValues): Promise<CancellationRecord>;
   findCancellationByLessonId(lessonId: string): Promise<CancellationRecord | null>;

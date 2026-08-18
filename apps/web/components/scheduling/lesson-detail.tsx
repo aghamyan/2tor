@@ -4,10 +4,13 @@ import { useActionState } from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 
+import type { ParentVisibleFeedback } from "../../../../packages/domain/academics/models";
 import type { LessonDetail } from "../../../../packages/domain/scheduling/models";
 import {
   cancelLessonAction,
   completeLessonAction,
+  deleteLessonAction,
+  deleteLessonSeriesAction,
   recordAttendanceAction,
   recordNoShowAction,
   rescheduleLessonAction,
@@ -351,6 +354,69 @@ function AttendanceSection({
   );
 }
 
+function FeedbackSection({
+  feedback,
+  showGiveFeedbackLink,
+}: {
+  feedback: ParentVisibleFeedback | null;
+  showGiveFeedbackLink: boolean;
+}) {
+  const t = useTranslations("scheduling.detail");
+
+  return (
+    <section className={styles.panel} aria-labelledby="learning-record-title">
+      <h2 className={styles.sectionTitle} id="learning-record-title">
+        {t("learningRecord")}
+      </h2>
+      {feedback ? (
+        <dl className={styles.detailGrid}>
+          <div className={styles.detailItem}>
+            <dt>{t("feedbackTopics")}</dt>
+            <dd>{feedback.topicsCovered}</dd>
+          </div>
+          <div className={styles.detailItem}>
+            <dt>{t("feedbackObjective")}</dt>
+            <dd>{t(`feedbackObjectiveMet.${feedback.objectiveMet}`)}</dd>
+          </div>
+          <div className={styles.detailItem}>
+            <dt>{t("feedbackStrengths")}</dt>
+            <dd>{feedback.strengthsDemonstrated}</dd>
+          </div>
+          <div className={styles.detailItem}>
+            <dt>{t("feedbackImprove")}</dt>
+            <dd>{feedback.skillsToImprove}</dd>
+          </div>
+          <div className={styles.detailItem}>
+            <dt>{t("feedbackNextFocus")}</dt>
+            <dd>{feedback.nextLessonFocus}</dd>
+          </div>
+          <div className={styles.detailItem}>
+            <dt>{t("feedbackHomework")}</dt>
+            <dd>{feedback.assignedHomework}</dd>
+          </div>
+          {feedback.freeTextComment ? (
+            <div className={styles.detailItem}>
+              <dt>{t("feedbackComment")}</dt>
+              <dd>{feedback.freeTextComment}</dd>
+            </div>
+          ) : null}
+        </dl>
+      ) : (
+        <p className={styles.hint}>{t("learningRecordHint")}</p>
+      )}
+      {showGiveFeedbackLink && !feedback ? (
+        <Link className={styles.button} href="/dashboard/tutor">
+          {t("giveFeedback")}
+        </Link>
+      ) : null}
+      <details className={styles.classDisclosure}>
+        <summary>{t("materials")}</summary>
+        <p>{t("materialsHint")}</p>
+      </details>
+    </section>
+  );
+}
+
 function CompleteButton({ lessonId }: { lessonId: string }) {
   const t = useTranslations("scheduling.detail");
   const [state, action, pending] = useActionState(
@@ -374,14 +440,85 @@ function CompleteButton({ lessonId }: { lessonId: string }) {
   );
 }
 
+/**
+ * A recurring occurrence can't be hard-deleted on its own (see services.ts `deleteLesson` — the
+ * daily materialization job would silently recreate it), so this branches between deleting the
+ * single standalone lesson vs. ending + deleting the whole series.
+ */
+function DeleteSection({ lesson }: { lesson: LessonDetail["lesson"] }) {
+  const t = useTranslations("scheduling.detail");
+  const [lessonState, lessonAction, lessonPending] = useActionState(
+    deleteLessonAction,
+    initialSchedulingActionState,
+  );
+  const [seriesState, seriesAction, seriesPending] = useActionState(
+    deleteLessonSeriesAction,
+    initialSchedulingActionState,
+  );
+
+  if (lesson.lessonSeriesId) {
+    return (
+      <section className={styles.panel} aria-labelledby="delete-series-title">
+        <h2 className={styles.sectionTitle} id="delete-series-title">
+          {t("deleteSeriesTitle")}
+        </h2>
+        <p className={styles.hint}>{t("deleteSeriesHint")}</p>
+        <ActionFeedback state={seriesState} />
+        <form
+          action={seriesAction}
+          onSubmit={(event) => {
+            if (!window.confirm(t("deleteSeriesConfirm"))) event.preventDefault();
+          }}
+        >
+          <input type="hidden" name="lessonSeriesId" value={lesson.lessonSeriesId} />
+          <button
+            className={`${styles.button} ${styles.buttonDanger}`}
+            type="submit"
+            disabled={seriesPending}
+          >
+            {t("deleteSeriesSubmit")}
+          </button>
+        </form>
+      </section>
+    );
+  }
+
+  return (
+    <section className={styles.panel} aria-labelledby="delete-title">
+      <h2 className={styles.sectionTitle} id="delete-title">
+        {t("deleteTitle")}
+      </h2>
+      <p className={styles.hint}>{t("deleteHint")}</p>
+      <ActionFeedback state={lessonState} />
+      <form
+        action={lessonAction}
+        onSubmit={(event) => {
+          if (!window.confirm(t("deleteConfirm"))) event.preventDefault();
+        }}
+      >
+        <input type="hidden" name="lessonId" value={lesson.id} />
+        <button
+          className={`${styles.button} ${styles.buttonDanger}`}
+          type="submit"
+          disabled={lessonPending}
+        >
+          {t("deleteSubmit")}
+        </button>
+      </form>
+    </section>
+  );
+}
+
 export function LessonDetailView({
   detail,
   viewerUserId,
   isStaff,
+  feedback,
 }: {
   detail: LessonDetail;
   viewerUserId: string;
   isStaff: boolean;
+  feedback: ParentVisibleFeedback | null;
 }) {
   const t = useTranslations("scheduling.detail");
   const tStatus = useTranslations("scheduling");
@@ -438,14 +575,10 @@ export function LessonDetailView({
         </dl>
       </section>
 
-      <section className={styles.panel}>
-        <h2 className={styles.sectionTitle}>{t("learningRecord")}</h2>
-        <p className={styles.hint}>{t("learningRecordHint")}</p>
-        <details className={styles.classDisclosure}>
-          <summary>{t("materials")}</summary>
-          <p>{t("materialsHint")}</p>
-        </details>
-      </section>
+      <FeedbackSection
+        feedback={feedback}
+        showGiveFeedbackLink={canManage && lesson.status === "completed"}
+      />
 
       <section className={`${styles.panel} ${styles.homeworkHub}`}>
         <div>
@@ -478,6 +611,7 @@ export function LessonDetailView({
         canManage={canManage}
       />
       {canManage && isScheduled ? <CompleteButton lessonId={lesson.id} /> : null}
+      {canManage && isScheduled ? <DeleteSection lesson={lesson} /> : null}
     </div>
   );
 }

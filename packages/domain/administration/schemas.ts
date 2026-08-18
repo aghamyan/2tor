@@ -50,6 +50,14 @@ export const reportDecisionInputSchema = z
   .strict();
 export type ReportDecisionInput = z.infer<typeof reportDecisionInputSchema>;
 
+export const uploadDecisionInputSchema = z
+  .object({
+    uploadId: z.string().trim().min(1),
+    status: z.enum(["approved", "rejected"]),
+  })
+  .strict();
+export type UploadDecisionInput = z.infer<typeof uploadDecisionInputSchema>;
+
 export const requestBulkExportInputSchema = z
   .object({
     type: z.string().trim().min(1),

@@ -120,9 +120,17 @@ export const assessmentVersionInputSchema = z
         required: z.boolean().default(false),
         policyVersion: z.string().trim().min(1).max(100).nullable(),
         headTrackingEnabled: z.boolean().default(false),
+        objectDetectionEnabled: z.boolean().default(false),
+        evidenceCaptureEnabled: z.boolean().default(false),
       })
       .strict()
-      .default({ required: false, policyVersion: null, headTrackingEnabled: false }),
+      .default({
+        required: false,
+        policyVersion: null,
+        headTrackingEnabled: false,
+        objectDetectionEnabled: false,
+        evidenceCaptureEnabled: false,
+      }),
     audience: audienceSchema,
     maxAttempts: z.number().int().min(1).max(100).nullable().default(null),
     integrityPolicy: integrityPolicySchema,
@@ -149,6 +157,20 @@ export const assessmentVersionInputSchema = z
         code: "custom",
         path: ["camera", "headTrackingEnabled"],
         message: "Head tracking requires the camera to be required.",
+      });
+    }
+    if (value.camera.evidenceCaptureEnabled && !value.camera.headTrackingEnabled) {
+      context.addIssue({
+        code: "custom",
+        path: ["camera", "evidenceCaptureEnabled"],
+        message: "Evidence capture requires head tracking to be enabled.",
+      });
+    }
+    if (value.camera.objectDetectionEnabled && !value.camera.headTrackingEnabled) {
+      context.addIssue({
+        code: "custom",
+        path: ["camera", "objectDetectionEnabled"],
+        message: "Object detection requires head tracking to be enabled.",
       });
     }
     const poolSizes = new Map<string, number>();
@@ -235,6 +257,9 @@ const STUDENT_DETECTABLE_EVENT_TYPES = [
   "multiple_faces",
   "gaze_away",
   "external_device_suspected",
+  "phone_detected",
+  "unusual_item_detected",
+  "eyes_closed",
 ] as const;
 
 export const integritySignalSchema = z
@@ -255,6 +280,35 @@ export const integritySignalSchema = z
 export const integritySignalBatchSchema = z
   .object({
     signals: z.array(integritySignalSchema).min(1).max(50),
+  })
+  .strict();
+
+/**
+ * The subset of `AssessmentEventType` an evidence photo may be attached to — the client-reported
+ * *triggering* type, not the `"evidence_captured"` type the stored event row actually carries
+ * (see `AssessmentEvidenceRecord` in models.ts). Shared by the client capture module and the
+ * server-side upload handler so both enforce the same allowlist.
+ */
+export const EVIDENCE_CAPTURE_EVENT_TYPES = [
+  "multiple_faces",
+  "face_missing",
+  "external_device_suspected",
+  "phone_detected",
+  "unusual_item_detected",
+  "eyes_closed",
+] as const;
+
+export const EVIDENCE_MAX_SIZE_BYTES = 500_000;
+
+export const recordEvidenceSchema = z
+  .object({
+    eventType: z.enum(EVIDENCE_CAPTURE_EVENT_TYPES),
+    mimeType: z.literal("image/jpeg"),
+    sizeBytes: z
+      .number()
+      .int()
+      .positive()
+      .max(EVIDENCE_MAX_SIZE_BYTES),
   })
   .strict();
 
@@ -297,3 +351,4 @@ export type AttemptListInput = z.input<typeof attemptListSchema>;
 export type SubmitAssessmentInput = z.input<typeof submitAssessmentSchema>;
 export type DiagnosticReportInput = z.input<typeof diagnosticReportSchema>;
 export type ConsultationInput = z.input<typeof consultationSchema>;
+export type RecordEvidenceInput = z.input<typeof recordEvidenceSchema>;

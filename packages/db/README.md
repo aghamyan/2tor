@@ -26,6 +26,7 @@ src/
     gamification.ts                 points/levels/badges/streaks/challenges
     finance.ts                       prices, charges, invoices, payouts, exchange rates
     operations.ts                     notifications, support, incidents, audit, exports, deletion, flags
+    marketing.ts                       public lead capture (consultation/trial-class/contact intake)
     index.ts                          barrel — re-exports every table/enum from every file above
   client.ts             process-wide `createDb(connectionString)` pool + transaction helper
   seed.ts                idempotent dev seed
@@ -33,9 +34,12 @@ drizzle.config.ts        points drizzle-kit at src/schema/index.ts, outputs to .
 migrations/               generated SQL + one hand-written custom migration (audit_events trigger)
 ```
 
-123 tables total, matching the product spec §15 entity list exactly (7+7+10+3+7+13+8+7+4+7+7+10+8+13+12
-across identity/families/tutors/matching/scheduling/academic/assignments/assessments/milestones/
-projects/content/communication/gamification/finance/operations).
+123 tables match the product spec §15 entity list exactly (7+7+10+3+7+13+8+7+4+7+7+10+8+13+12 across
+identity/families/tutors/matching/scheduling/academic/assignments/assessments/milestones/projects/
+content/communication/gamification/finance/operations). `marketing.ts` adds one further table
+(`marketing_leads`) outside that count — it's public, unauthenticated intake capture, not a spec §15
+product entity, and carries its own 90-day retention deadline rather than the deletion-job workflow
+(see `packages/domain/marketing/services.ts`'s `RETENTION_DAYS` and `apps/web/app/api/leads/route.ts`).
 
 ## Commands
 

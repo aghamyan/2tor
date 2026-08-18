@@ -105,7 +105,10 @@ export class InMemoryAssessmentDatabase implements AssessmentDatabase {
       );
     }
     attempts = attempts.sort((left, right) => (left.id < right.id ? 1 : -1));
-    if (options.cursor) attempts = attempts.filter((attempt) => attempt.id < options.cursor!);
+    if (options.cursor) {
+      const cursor = options.cursor;
+      attempts = attempts.filter((attempt) => attempt.id < cursor);
+    }
     return attempts.slice(0, options.limit).map((attempt) => ({
       id: attempt.id,
       studentProfileId: attempt.studentProfileId,
@@ -145,6 +148,12 @@ export class InMemoryAssessmentDatabase implements AssessmentDatabase {
 
   async isTutorAssignedToStudent(tutorUserId: string, studentProfileId: string) {
     return this.tutorAssignments.has(`${tutorUserId}:${studentProfileId}`);
+  }
+
+  async listAssignedTutorUserIds(studentProfileId: string) {
+    return [...this.tutorAssignments]
+      .filter((key) => key.endsWith(`:${studentProfileId}`))
+      .map((key) => key.slice(0, key.length - studentProfileId.length - 1));
   }
 
   async isParentLinkedToStudent(parentUserId: string, studentProfileId: string) {

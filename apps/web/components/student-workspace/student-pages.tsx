@@ -11,6 +11,8 @@ import {
   ChevronRight,
   CircleHelp,
   Clock3,
+  Download,
+  ExternalLink,
   FileText,
   Flame,
   FolderKanban,
@@ -1081,8 +1083,16 @@ const RESOURCE_THUMB: Record<
   interactive: { label: "Interactive", icon: Sparkles },
   document: { label: "Guide", icon: BookMarked },
   worksheet: { label: "Practice set", icon: BookMarked },
-  link: { label: "Guide", icon: BookMarked },
+  link: { label: "Link", icon: ExternalLink },
 };
+
+async function openResourceFile(uploadId: string) {
+  const response = await fetch(`/api/content/uploads/${uploadId}`);
+  if (!response.ok) return false;
+  const payload = (await response.json()) as { data: { downloadUrl: string } };
+  window.open(payload.data.downloadUrl, "_blank", "noopener,noreferrer");
+  return true;
+}
 
 function messageFromResourceResponse(payload: unknown, fallback: string) {
   if (
@@ -1242,6 +1252,7 @@ export function ResourceLibraryPage({
             const thumb = RESOURCE_THUMB[r.type];
             const ThumbIcon = thumb.icon;
             const videoLink = r.links.find((link) => link.provider === "youtube");
+            const externalLink = r.type === "link" ? r.links[0] : undefined;
             const isOpen = openResourceId === r.id;
             return (
               <article className={s.resourceCard} key={r.id}>
@@ -1250,7 +1261,14 @@ export function ResourceLibraryPage({
                   <span>{thumb.label}</span>
                 </div>
                 <div className={s.resourceBody}>
-                  <p>{subjectName(r.subjectId) ?? "General"}</p>
+                  <p>
+                    {subjectName(r.subjectId) ?? "General"}
+                    {r.visibility === "students" ? (
+                      <span className={s.resourceTargetBadge}>Just for you</span>
+                    ) : r.visibility === "grades" ? (
+                      <span className={s.resourceTargetBadge}>Your grade</span>
+                    ) : null}
+                  </p>
                   <h2>{r.title}</h2>
                   <span>{r.tags.length > 0 ? r.tags.join(" · ") : "No tags yet"}</span>
                   <small>{new Date(r.createdAt).toLocaleDateString()}</small>
@@ -1283,6 +1301,30 @@ export function ResourceLibraryPage({
                           allowFullScreen
                         />
                       ) : null}
+                      {externalLink ? (
+                        <a
+                          className={s.primaryButton}
+                          href={externalLink.url}
+                          rel="noopener noreferrer"
+                          target="_blank"
+                        >
+                          Open link <ExternalLink size={14} />
+                        </a>
+                      ) : null}
+                      {r.file
+                        ? (() => {
+                            const file = r.file;
+                            return (
+                              <button
+                                className={s.secondaryButton}
+                                type="button"
+                                onClick={() => void openResourceFile(file.id)}
+                              >
+                                <Download size={14} /> Download {file.fileName}
+                              </button>
+                            );
+                          })()
+                        : null}
                       {reportedIds.has(r.id) ? (
                         <small>Reported for review.</small>
                       ) : reportingId === r.id ? (

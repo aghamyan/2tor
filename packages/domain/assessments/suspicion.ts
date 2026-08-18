@@ -32,6 +32,15 @@ export const DEFAULT_SUSPICION_WEIGHTS: Partial<Record<AssessmentEventType, numb
   devtools_shortcut: 20,
   external_device_suspected: 20,
   camera_disconnected: 12,
+  phone_detected: 25,
+  unusual_item_detected: 12,
+  // Intentionally 0 for now: `eyeBlinkLeft`/`eyeBlinkRight` blendshapes also spike on normal
+  // blinking, looking down at a keyboard, or a partly-occluded face, and this signal hasn't been
+  // tuned against real footage the way the spec's own examples were. Still logged, still shown to
+  // the tutor, still capturable as evidence — it just doesn't move the score until it's proven
+  // reliable enough not to penalize an honest student for blinking or thinking. See README
+  // "Signals are not proof".
+  eyes_closed: 0,
 };
 
 /** `gaze_away` carries its point value in metadata.direction rather than a flat per-type weight. */

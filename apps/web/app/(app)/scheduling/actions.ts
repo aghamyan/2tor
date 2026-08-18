@@ -10,6 +10,8 @@ import {
   cancelLesson,
   completeLesson,
   createLessonSeries,
+  deleteLesson,
+  deleteLessonSeries,
   recordAttendance,
   recordNoShow,
   rescheduleLesson,
@@ -49,6 +51,18 @@ function parseDateAndTimeToUtc(
   return zonedTimeToUtc(year, month, day, hour, minute, timezone);
 }
 
+/** `<input type="time">` submits "HH:MM" as a single field; the recurrence pattern needs the
+ * hour/minute split out as plain wall-clock numbers (see `createLessonSeriesInputSchema`). */
+function parseTimeOfDay(formData: FormData, timeKey: string): { hour: number; minute: number } {
+  const [hour, minute] = str(formData, timeKey).split(":").map(Number);
+  if (hour === undefined || minute === undefined || Number.isNaN(hour) || Number.isNaN(minute)) {
+    throw new z.ZodError([
+      { code: "custom", path: [timeKey], message: "A valid time is required." },
+    ]);
+  }
+  return { hour, minute };
+}
+
 function errorState(error: unknown): SchedulingActionState {
   if (error instanceof z.ZodError) {
     return { status: "error", message: "errors.invalid", fieldErrors: error.flatten().fieldErrors };
@@ -65,7 +79,9 @@ function errorState(error: unknown): SchedulingActionState {
             ? "errors.notFound"
             : error.code === "LESSON_ALREADY_RESOLVED" ||
                 error.code === "LESSON_NOT_SCHEDULED" ||
-                error.code === "ASSIGNMENT_INACTIVE"
+                error.code === "ASSIGNMENT_INACTIVE" ||
+                error.code === "LESSON_PART_OF_SERIES" ||
+                error.code === "LESSON_HAS_DEPENDENT_RECORDS"
               ? "errors.conflict"
               : error.status < 500
                 ? "errors.invalid"
@@ -110,6 +126,7 @@ export async function createLessonSeriesAction(
     const byDay = formData
       .getAll("byDay")
       .filter((v): v is string => typeof v === "string") as Weekday[];
+    const { hour, minute } = parseTimeOfDay(formData, "seriesTime");
     const { series } = await createLessonSeries(context.database, context.actor, {
       tutorStudentAssignmentId: str(formData, "tutorStudentAssignmentId"),
       subjectId: str(formData, "subjectId"),
@@ -119,8 +136,8 @@ export async function createLessonSeriesAction(
       recurrence: {
         interval: Number(str(formData, "interval") || "1"),
         byDay,
-        hour: Number(str(formData, "hour") || "0"),
-        minute: Number(str(formData, "minute") || "0"),
+        hour,
+        minute,
         timezone: str(formData, "timezone"),
       },
       additionalParticipantUserIds: [],
@@ -156,6 +173,43 @@ export async function cancelLessonAction(
     unstable_rethrow(error);
     return errorState(error);
   }
+}
+
+export async function deleteLessonAction(
+  _previous: SchedulingActionState,
+  formData: FormData,
+): Promise<SchedulingActionState> {
+  try {
+    const context = await currentSchedulingContext();
+    const lessonId = str(formData, "lessonId");
+    await deleteLesson(context.database, context.actor, lessonId, {
+      reason: nullableStr(formData, "reason"),
+    });
+    revalidatePath("/scheduling");
+    revalidatePath(`/scheduling/${lessonId}`);
+  } catch (error: unknown) {
+    unstable_rethrow(error);
+    return errorState(error);
+  }
+  redirect("/scheduling");
+}
+
+export async function deleteLessonSeriesAction(
+  _previous: SchedulingActionState,
+  formData: FormData,
+): Promise<SchedulingActionState> {
+  try {
+    const context = await currentSchedulingContext();
+    const seriesId = str(formData, "lessonSeriesId");
+    await deleteLessonSeries(context.database, context.actor, seriesId, {
+      reason: nullableStr(formData, "reason"),
+    });
+    revalidatePath("/scheduling");
+  } catch (error: unknown) {
+    unstable_rethrow(error);
+    return errorState(error);
+  }
+  redirect("/scheduling");
 }
 
 export async function rescheduleLessonAction(

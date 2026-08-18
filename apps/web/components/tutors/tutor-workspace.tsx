@@ -98,6 +98,13 @@ export async function TutorWorkspace({
             />
           ) : null}
           <div className={styles.card}>
+            <h2 className={styles.cardTitle}>{t("zoomSettingsTitle")}</h2>
+            <p className={styles.cardDescription}>{t("zoomSettingsBody")}</p>
+            <Link className={styles.buttonSecondary} href="/settings/zoom">
+              {t("zoomSettingsCta")}
+            </Link>
+          </div>
+          <div className={styles.card}>
             <h2 className={styles.cardTitle}>{t("helpTitle")}</h2>
             <p className={styles.cardDescription}>{t("helpBody")}</p>
             <Link className={styles.buttonGhost} href="/support">

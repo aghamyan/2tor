@@ -57,3 +57,21 @@ export function headPoseFromColumnMajor4x4(matrix: readonly number[]): HeadPoseA
     [at(0, 2), at(1, 2), at(2, 2)],
   ]);
 }
+
+export type HeadDirection = "center" | "left" | "right" | "up" | "down";
+
+const HEAD_DIRECTION_YAW_THRESHOLD_DEG = 12;
+const HEAD_DIRECTION_PITCH_THRESHOLD_DEG = 10;
+
+/**
+ * A coarse, human-readable label for the live monitoring console — not a detection threshold in
+ * its own right. `gaze_away`/`external_device_suspected` in face-tracking-service.ts use their own
+ * (stricter, grace-period-gated) thresholds; this only labels what the console currently shows.
+ * Yaw sign convention matches face-tracking-service.ts's existing `gaze_away` direction mapping:
+ * positive yaw is "left".
+ */
+export function classifyHeadDirection(yawDeg: number, pitchDeg: number): HeadDirection {
+  if (Math.abs(yawDeg) >= HEAD_DIRECTION_YAW_THRESHOLD_DEG) return yawDeg > 0 ? "left" : "right";
+  if (Math.abs(pitchDeg) >= HEAD_DIRECTION_PITCH_THRESHOLD_DEG) return pitchDeg > 0 ? "up" : "down";
+  return "center";
+}

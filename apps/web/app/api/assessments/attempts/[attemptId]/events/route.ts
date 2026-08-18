@@ -1,8 +1,12 @@
+import { notify } from "@app/notifications/dispatch";
 import { NextResponse, type NextRequest } from "next/server";
+import type { AssessmentNotifier } from "../../../../../../../../packages/domain/assessments/models";
 import { recordAssessmentSignals } from "../../../../../../../../packages/domain/assessments/services";
 import type { IntegritySignalBatchInput } from "../../../../../../../../packages/domain/assessments/schemas";
 import { apiAssessmentContext } from "../../../_context";
 import { assessmentApiError, assessmentRequestId } from "../../../_response";
+
+const notifier: AssessmentNotifier = { notify };
 
 /** Accepts a single signal (`{ eventType, ... }`) or a batch (`{ signals: [...] }`) — the client's
  * proctoring guards coalesce state-transition signals and send them together. The service's Zod
@@ -27,6 +31,7 @@ export async function POST(
       context.actor,
       attemptId,
       batchBody(await request.json()),
+      notifier,
     );
     return NextResponse.json({ data: events, attemptStatus, requestId }, { status: 201 });
   } catch (error) {

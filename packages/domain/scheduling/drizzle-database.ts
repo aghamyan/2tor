@@ -290,6 +290,15 @@ function repository(
       return rows.map((row) => row.scheduledStartAt);
     },
 
+    async listLessonsForSeries(seriesId) {
+      const rows = await executor
+        .select(lessonColumns)
+        .from(lessons)
+        .where(eq(lessons.lessonSeriesId, seriesId))
+        .orderBy(asc(lessons.scheduledStartAt));
+      return rows.map((row) => mapLesson(row as typeof lessons.$inferSelect));
+    },
+
     async findMostRecentLessonForSeries(seriesId) {
       const [row] = await executor
         .select(lessonColumns)
@@ -319,6 +328,10 @@ function repository(
         .returning();
       if (!row) throw new Error("Lesson status update did not return a row.");
       return mapLesson(row);
+    },
+
+    async deleteLesson(id) {
+      await executor.delete(lessons).where(eq(lessons.id, id));
     },
 
     async listLessonsForScope(scope: LessonListScope, range: LessonListRange) {
@@ -420,6 +433,19 @@ function repository(
         .where(eq(zoomMeetings.lessonId, lessonId))
         .limit(1);
       return row ? mapZoom(row) : null;
+    },
+
+    async findTutorZoomDefaults(tutorProfileId) {
+      const [row] = await executor
+        .select({
+          joinUrl: tutorProfiles.defaultZoomJoinUrl,
+          passcode: tutorProfiles.defaultZoomPasscode,
+        })
+        .from(tutorProfiles)
+        .where(eq(tutorProfiles.id, tutorProfileId))
+        .limit(1);
+      if (!row || !row.joinUrl) return null;
+      return { joinUrl: row.joinUrl, passcode: row.passcode };
     },
 
     async createCancellation(values: NewCancellationValues) {

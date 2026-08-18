@@ -127,6 +127,41 @@ describe("computeSuspicionSummary", () => {
     expect(summary.severity).toBe("high");
   });
 
+  it("never lets a logged evidence photo change the score — evidence_captured carries no weight", () => {
+    // recordAssessmentEvidence in services.ts always appends an "evidence_captured" row (never
+    // reusing the triggering type) precisely so this stays true — see README "Camera boundary".
+    const withoutEvidence = computeSuspicionSummary([makeEvent("multiple_faces", at(1))]);
+    const withEvidence = computeSuspicionSummary([
+      makeEvent("multiple_faces", at(1)),
+      makeEvent("evidence_captured", at(1), {
+        evidenceEventType: "multiple_faces",
+        evidenceFileKey: "assessments/evidence/attempt-1/evidence-1.jpg",
+      }),
+    ]);
+    expect(withEvidence.score).toBe(withoutEvidence.score);
+    expect(withEvidence.breakdown).toEqual(withoutEvidence.breakdown);
+    expect(withEvidence.stats.multipleFacesCount).toBe(withoutEvidence.stats.multipleFacesCount);
+  });
+
+  it("weights a phone detection more heavily than a generic unusual item", () => {
+    const phone = computeSuspicionSummary([makeEvent("phone_detected", at(1))]);
+    const unusualItem = computeSuspicionSummary([makeEvent("unusual_item_detected", at(1))]);
+    expect(phone.score).toBeGreaterThan(unusualItem.score);
+  });
+
+  it("never scores eyes_closed — untuned against real footage, so it stays a zero-weight signal", () => {
+    // See README "Camera boundary": eyeBlinkLeft/Right also spike on a normal blink or an angled
+    // face, so this is deliberately excluded from the score until proven reliable — it's still
+    // logged and still shown to the tutor (breakdown just never includes it while rawSum is 0).
+    const summary = computeSuspicionSummary([
+      makeEvent("eyes_closed", at(1)),
+      makeEvent("eyes_closed", at(2)),
+      makeEvent("eyes_closed", at(3)),
+    ]);
+    expect(summary.score).toBe(0);
+    expect(summary.breakdown).toEqual([]);
+  });
+
   it("respects custom weights and thresholds", () => {
     const summary = computeSuspicionSummary([makeEvent("tab_switch", at(1))], {
       weights: { tab_switch: 1 },

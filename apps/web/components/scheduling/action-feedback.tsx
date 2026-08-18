@@ -9,6 +9,8 @@ const MESSAGE_KEYS: Record<Exclude<SchedulingActionState["message"], null>, stri
   lessonScheduled: "feedback.lessonScheduled",
   seriesScheduled: "feedback.seriesScheduled",
   canceled: "feedback.canceled",
+  deleted: "feedback.deleted",
+  seriesDeleted: "feedback.seriesDeleted",
   rescheduled: "feedback.rescheduled",
   noShowRecorded: "feedback.noShowRecorded",
   attendanceRecorded: "feedback.attendanceRecorded",

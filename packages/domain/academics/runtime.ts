@@ -18,18 +18,22 @@ function redis() {
   redisSingleton ??= new Redis(url, { maxRetriesPerRequest: 1 });
   return redisSingleton;
 }
-export async function academicRequestContext(
-  sessionId: string | null | undefined,
-): Promise<{ actor: Actor; database: ReturnType<typeof createDrizzleAcademicDatabase> }> {
+export async function academicRequestContext(sessionId: string | null | undefined): Promise<{
+  actor: Actor & { studentProfileId?: string };
+  database: ReturnType<typeof createDrizzleAcademicDatabase>;
+}> {
   if (!sessionId) throw new AcademicError("UNAUTHENTICATED", "A session is required.", 401);
   const session = await getSession(redis(), sessionId);
   if (!session) throw new AcademicError("UNAUTHENTICATED", "The session is invalid.", 401);
+  const adapter = createDrizzleAcademicDatabase(database());
+  const studentProfileId = await adapter.findStudentProfileIdByUserId(session.userId);
   return {
     actor: {
       userId: session.userId,
       roles: session.roles,
       mfaVerifiedAt: session.mfaVerifiedAt ? new Date(session.mfaVerifiedAt) : null,
+      ...(studentProfileId ? { studentProfileId } : {}),
     },
-    database: createDrizzleAcademicDatabase(database()),
+    database: adapter,
   };
 }

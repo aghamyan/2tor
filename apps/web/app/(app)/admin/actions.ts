@@ -15,6 +15,7 @@ import {
   decideModerationItem,
   decideRoleElevation,
   decideSecuritySettingChange,
+  decideTutorContentUpload,
   decideTutorDocument,
   decideTutorVerification,
   liftTutorSuspension,
@@ -253,6 +254,24 @@ export async function decideModerationActionHandler(
     });
     revalidatePath("/admin/moderation");
     return ok("feedback.moderationDecided");
+  } catch (error) {
+    return errorState(error);
+  }
+}
+
+export async function decideContentUploadActionHandler(
+  _prev: AdminActionState,
+  formData: FormData,
+): Promise<AdminActionState> {
+  try {
+    const context = await currentAdministrationContext();
+    authorizeAdminWorkspace(context.actor);
+    await decideTutorContentUpload(context.database, context.audit, context.actor, {
+      uploadId: str(formData, "uploadId"),
+      status: str(formData, "status") as "approved" | "rejected",
+    });
+    revalidatePath("/admin/moderation");
+    return ok("feedback.uploadDecided");
   } catch (error) {
     return errorState(error);
   }

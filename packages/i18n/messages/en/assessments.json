@@ -69,7 +69,10 @@
         "answers": "saved answers and answer changes",
         "examMode": "keyboard shortcuts, clipboard, and the right-click menu are restricted for the duration",
         "camera": "your camera must stay on and visible",
-        "headTracking": "on-device face and gaze tracking runs locally in your browser — no video ever leaves your device",
+        "headTracking": "on-device face, gaze, and eyes-closed tracking runs locally in your browser — no video ever leaves your device",
+        "objectDetection": "on-device object detection checks your camera view for phones and other unusual items — no video ever leaves your device",
+        "evidenceCapture": "a still photo is saved and shared with your tutor when this assessment detects multiple faces, your face missing, a possible external device, a phone or unusual item, or your eyes closed for a sustained period",
+        "newTab": "the assessment opens in a new browser tab, with your camera preview and the questions side by side",
         "integrityPolicy": {
           "warn": "If this assessment detects {count, plural, one {# instance} other {# instances}} of leaving the exam (switching tabs, exiting fullscreen, losing focus, or minimizing the window), you will see an on-screen warning",
           "auto_submit": "If this assessment detects {count, plural, one {# instance} other {# instances}} of leaving the exam (switching tabs, exiting fullscreen, losing focus, or minimizing the window), it will be automatically submitted"
@@ -83,9 +86,17 @@
       },
       "cameraConsent": "I explicitly consent to the camera requirement described in policy {policy}. I understand this slice does not record video or analyze my face or emotions.",
       "start": "Begin assessment",
-      "starting": "Opening assessment…"
+      "starting": "Opening assessment…",
+      "opened": {
+        "title": "Your assessment opened in a new tab",
+        "body": "Switch to the new tab to confirm your camera and begin. You can close this tab.",
+        "blockedBody": "Your browser blocked the new tab. Use the button below to open it yourself.",
+        "action": "Open assessment tab"
+      }
     },
     "runner": {
+      "beginExam": "Begin exam",
+      "entering": "Entering…",
       "timeRemaining": "Assessment time remaining",
       "inProgress": "Assessment in progress",
       "remaining": "remaining",
@@ -148,7 +159,11 @@
       "multiple_faces": "Multiple faces detected",
       "gaze_away": "Looked away from screen",
       "external_device_suspected": "Possible external device glance",
-      "warning_shown": "Warning shown to student"
+      "phone_detected": "Phone detected in camera view",
+      "unusual_item_detected": "Unusual item detected in camera view",
+      "eyes_closed": "Eyes closed for a sustained period",
+      "warning_shown": "Warning shown to student",
+      "evidence_captured": "Evidence photo logged"
     },
     "proctoring": {
       "preflight": {
@@ -169,10 +184,40 @@
           "unknown": "The camera could not be started. Try again."
         }
       },
-      "overlay": {
-        "active": "Camera monitoring is active",
-        "limited": "Camera is on; on-device face tracking is unavailable in this browser",
-        "disconnected": "Camera disconnected — reconnect to continue"
+      "console": {
+        "live": "Live",
+        "faceLabel": "Tracking",
+        "faceLabelMultiple": "Face {index}",
+        "statusLine": {
+          "low": "Monitoring normally",
+          "medium": "Elevated activity — your tutor will review this",
+          "high": "Review recommended — your tutor will review this closely",
+          "limited": "Camera is on; on-device face tracking is unavailable in this browser",
+          "disconnected": "Camera disconnected — reconnect to continue"
+        },
+        "stats": {
+          "suspicionScore": "Suspicion points",
+          "faces": "Faces detected",
+          "headDirection": "Head direction",
+          "gaze": "Gaze",
+          "objects": "Objects in view",
+          "objectsNone": "None"
+        },
+        "direction": {
+          "center": "Center",
+          "left": "Left",
+          "right": "Right",
+          "up": "Up",
+          "down": "Down"
+        },
+        "category": {
+          "cell_phone": "Phone",
+          "laptop": "Laptop",
+          "book": "Book",
+          "remote": "Remote"
+        },
+        "recentActivity": "Recent activity",
+        "noActivity": "No activity logged yet."
       },
       "warning": {
         "returnToAssessment": "Please return to the assessment.",
@@ -232,6 +277,11 @@
           "count": "Count",
           "points": "Points"
         }
+      },
+      "evidence": {
+        "kicker": "Review signals",
+        "title": "Evidence photos",
+        "empty": "No evidence photos were logged for this attempt."
       },
       "timeline": {
         "kicker": "Full record",
@@ -308,8 +358,12 @@
         "cameraHint": "Students must pass a camera check before starting and stay on camera for the duration.",
         "policyVersion": "Camera policy version",
         "policyVersionPlaceholder": "e.g. camera-v1",
-        "headTracking": "Enable on-device face and gaze tracking",
-        "headTrackingHint": "Runs entirely in the student's browser. No video is recorded or uploaded — only face-presence, count, and gaze-direction signals are logged."
+        "headTracking": "Enable on-device face, gaze, and eyes-closed tracking",
+        "headTrackingHint": "Runs entirely in the student's browser. No video is recorded or uploaded — only face-presence, count, gaze-direction, and sustained-eyes-closed signals are logged.",
+        "objectDetection": "Enable on-device phone and unusual-item detection",
+        "objectDetectionHint": "Runs a second on-device model that checks the camera view for phones, laptops, books, or remotes — no video is recorded or uploaded, only the detection is logged.",
+        "evidenceCapture": "Capture evidence photos on violations",
+        "evidenceCaptureHint": "When multiple faces, a missing face, a possible external device, a phone or unusual item, or sustained eyes-closed is detected, a single still photo is uploaded and logged for your review — never continuous video."
       },
       "audience": {
         "legend": "Who can take this assessment",
@@ -348,6 +402,7 @@
     "errors": {
       "load": "The assessment could not be loaded.",
       "start": "The assessment could not be started.",
+      "fullscreen": "Fullscreen could not be started. Check your browser's fullscreen permissions and try again.",
       "save": "This answer could not be saved.",
       "submit": "The assessment could not be submitted.",
       "review": "The attempt review could not be loaded.",

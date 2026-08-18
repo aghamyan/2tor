@@ -49,7 +49,13 @@ const defaultSettings: AssessmentVersionSettings = {
   fullscreenRequired: false,
   randomizeQuestionOrder: true,
   poolSelections: {},
-  camera: { required: false, policyVersion: null, headTrackingEnabled: false },
+  camera: {
+    required: false,
+    policyVersion: null,
+    headTrackingEnabled: false,
+    objectDetectionEnabled: false,
+    evidenceCaptureEnabled: false,
+  },
   audience: defaultAudience,
   maxAttempts: null,
   integrityPolicy: defaultIntegrityPolicy,
@@ -119,6 +125,8 @@ function decodeVersion(value: string | null): {
               ? settings.camera.policyVersion
               : null,
           headTrackingEnabled: settings.camera?.headTrackingEnabled === true,
+          objectDetectionEnabled: settings.camera?.objectDetectionEnabled === true,
+          evidenceCaptureEnabled: settings.camera?.evidenceCaptureEnabled === true,
         },
         audience: decodeAudience(settings.audience),
         maxAttempts: typeof settings.maxAttempts === "number" ? settings.maxAttempts : null,
@@ -196,6 +204,10 @@ function rawEventType(
     case "multiple_faces":
     case "gaze_away":
     case "external_device_suspected":
+    case "phone_detected":
+    case "unusual_item_detected":
+    case "eyes_closed":
+    case "evidence_captured":
       return "tab_switch";
     case "browser_minimized":
     case "warning_shown":
@@ -242,7 +254,11 @@ const CANONICAL_EVENT_TYPES: readonly AssessmentEventType[] = [
   "multiple_faces",
   "gaze_away",
   "external_device_suspected",
+  "phone_detected",
+  "unusual_item_detected",
+  "eyes_closed",
   "warning_shown",
+  "evidence_captured",
 ];
 
 function isEventType(value: unknown): value is AssessmentEventType {
@@ -731,6 +747,20 @@ function repository(
         )
         .limit(1);
       return Boolean(row);
+    },
+
+    async listAssignedTutorUserIds(studentProfileId) {
+      const rows = await executor
+        .select({ userId: tutorProfiles.userId })
+        .from(tutorStudentAssignments)
+        .innerJoin(tutorProfiles, eq(tutorProfiles.id, tutorStudentAssignments.tutorProfileId))
+        .where(
+          and(
+            eq(tutorStudentAssignments.studentProfileId, studentProfileId),
+            eq(tutorStudentAssignments.status, "active"),
+          ),
+        );
+      return rows.map((row) => row.userId);
     },
 
     async isParentLinkedToStudent(parentUserId, studentProfileId) {

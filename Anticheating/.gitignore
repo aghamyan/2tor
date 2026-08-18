@@ -1,0 +1,10 @@
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.DS_Store
+data/*.db
+data/*.db-*
+data/evidence/
+*.pt
+proctor-events-*.csv

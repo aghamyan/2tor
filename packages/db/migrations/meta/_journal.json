@@ -22,6 +22,69 @@
       "when": 1785798037405,
       "tag": "0002_mixed_synch",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1786030196337,
+      "tag": "0003_high_chimera",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1786050414421,
+      "tag": "0004_smiling_overlord",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1786054208864,
+      "tag": "0005_add_tutor_default_zoom",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1786057247726,
+      "tag": "0006_mathoverflow_discussions",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1786058205569,
+      "tag": "0007_discussion_author_display_names",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1786058433370,
+      "tag": "0008_discussion_helpful_votes",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1786122909943,
+      "tag": "0009_skill_mastery_tracking",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1786123515508,
+      "tag": "0010_resource_visibility",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1786124069708,
+      "tag": "0011_clean_silvermane",
+      "breakpoints": true
     }
   ]
 }

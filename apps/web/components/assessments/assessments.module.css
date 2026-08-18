@@ -764,8 +764,34 @@
 }
 
 .suspicionOverview,
+.evidenceGallery,
 .eventTimeline {
   margin: 2.5rem 0;
+}
+
+.evidenceGrid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(9rem, 1fr));
+  margin-top: 1.25rem;
+}
+
+.evidenceThumb {
+  border: 1px solid var(--line);
+  overflow: hidden;
+}
+
+.evidenceThumb img {
+  aspect-ratio: 4 / 3;
+  display: block;
+  object-fit: cover;
+  width: 100%;
+}
+
+.evidenceThumb figcaption {
+  color: var(--muted);
+  font-size: 0.75rem;
+  padding: 0.4rem 0.5rem;
 }
 
 .severityTag {
@@ -1006,38 +1032,13 @@
   margin: 0;
 }
 
-.detectionOverlay {
-  align-items: center;
-  background: var(--mist);
-  display: flex;
-  gap: 0.75rem;
-  margin: 1.5rem 0;
-  padding: 0.75rem 1rem;
-  position: sticky;
-  top: 0.5rem;
-  z-index: 5;
-}
-
-.detectionVideo {
-  border: 1px solid var(--line);
-  height: 3.4rem;
-  object-fit: cover;
-  transform: scaleX(-1);
-  width: 4.5rem;
-}
-
 .detectionDot {
   animation: proctoring-pulse 2s ease-in-out infinite;
   background: #c0392b;
   border-radius: 50%;
+  flex: none;
   height: 0.5rem;
   width: 0.5rem;
-}
-
-.detectionLabel {
-  color: var(--muted);
-  font-size: 0.82rem;
-  margin: 0;
 }
 
 @keyframes proctoring-pulse {
@@ -1049,6 +1050,145 @@
   50% {
     opacity: 0.35;
   }
+}
+
+.examColumns {
+  display: grid;
+  gap: 2rem;
+  grid-template-columns: minmax(19rem, 24rem) 1fr;
+  margin: 1.5rem 0;
+}
+
+.examLeft {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  position: sticky;
+  top: 1rem;
+}
+
+.examRight {
+  min-width: 0;
+}
+
+.proctoringConsole {
+  background: white;
+  border: 1px solid var(--line);
+}
+
+.consoleVideoWrap {
+  aspect-ratio: 4 / 3;
+  background: var(--ink);
+  overflow: hidden;
+  position: relative;
+}
+
+.consoleVideo,
+.consoleCanvas {
+  height: 100%;
+  inset: 0;
+  position: absolute;
+  transform: scaleX(-1);
+  width: 100%;
+}
+
+.consoleVideo {
+  object-fit: cover;
+}
+
+.consoleCanvas {
+  pointer-events: none;
+}
+
+.consoleLiveChip {
+  align-items: center;
+  background: rgba(23, 32, 51, 0.72);
+  color: white;
+  display: flex;
+  font-family: ui-monospace, monospace;
+  font-size: 0.68rem;
+  gap: 0.45rem;
+  left: 0.6rem;
+  letter-spacing: 0.06em;
+  padding: 0.3rem 0.55rem;
+  position: absolute;
+  text-transform: uppercase;
+  top: 0.6rem;
+}
+
+.consolePanel {
+  padding: 1rem;
+}
+
+.consoleStatusBand {
+  font-size: 0.85rem;
+  font-weight: 700;
+  padding: 0.6rem 0.75rem;
+  text-align: center;
+}
+
+.consoleStats {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: 1fr 1fr;
+  margin: 1rem 0;
+}
+
+.consoleStats dt {
+  color: var(--muted);
+  font-family: ui-monospace, monospace;
+  font-size: 0.66rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.consoleStats dd {
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 0.15rem 0 0;
+}
+
+.consoleFeed {
+  border-top: 1px solid var(--line);
+  padding-top: 0.85rem;
+}
+
+.consoleFeedTitle {
+  color: var(--muted);
+  font-family: ui-monospace, monospace;
+  font-size: 0.66rem;
+  letter-spacing: 0.05em;
+  margin: 0 0 0.5rem;
+  text-transform: uppercase;
+}
+
+.consoleFeedEmpty {
+  color: var(--muted);
+  font-size: 0.82rem;
+  margin: 0;
+}
+
+.consoleFeed ul {
+  display: grid;
+  gap: 0.4rem;
+  list-style: none;
+  margin: 0;
+  max-height: 10rem;
+  overflow-y: auto;
+  padding: 0;
+}
+
+.consoleFeed li {
+  display: flex;
+  font-size: 0.78rem;
+  gap: 0.6rem;
+}
+
+.consoleFeed time {
+  color: var(--muted);
+  font-family: ui-monospace, monospace;
+  font-size: 0.72rem;
+  white-space: nowrap;
 }
 
 .suspicionBanner {
@@ -1130,6 +1270,14 @@
 
   .cameraPreview {
     max-width: 100%;
+  }
+
+  .examColumns {
+    grid-template-columns: 1fr;
+  }
+
+  .examLeft {
+    position: static;
   }
 
   .attemptRow {

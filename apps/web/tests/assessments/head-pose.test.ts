@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  classifyHeadDirection,
   eulerAnglesFromRotationMatrix3x3,
   headPoseFromColumnMajor4x4,
 } from "../../../../packages/domain/assessments/head-pose";
@@ -69,5 +70,25 @@ describe("headPoseFromColumnMajor4x4", () => {
 
   it("rejects a matrix that isn't 16 numbers", () => {
     expect(() => headPoseFromColumnMajor4x4([1, 2, 3])).toThrow(RangeError);
+  });
+});
+
+describe("classifyHeadDirection", () => {
+  it("reports center for small angles in both axes", () => {
+    expect(classifyHeadDirection(2, -3)).toBe("center");
+  });
+
+  it("prioritizes yaw over pitch once yaw crosses its threshold", () => {
+    expect(classifyHeadDirection(20, 20)).toBe(classifyHeadDirection(20, 0));
+  });
+
+  it("matches face-tracking-service.ts's positive-yaw-is-left convention", () => {
+    expect(classifyHeadDirection(20, 0)).toBe("left");
+    expect(classifyHeadDirection(-20, 0)).toBe("right");
+  });
+
+  it("falls back to pitch direction once yaw is centered", () => {
+    expect(classifyHeadDirection(0, 15)).toBe("up");
+    expect(classifyHeadDirection(0, -15)).toBe("down");
   });
 });

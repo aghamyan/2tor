@@ -1,35 +1,27 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import styles from "./assessments.module.css";
-import { CameraPreflight } from "./proctoring/camera-preflight";
-import type { CameraHandle } from "./proctoring/camera-service";
-import { DetectionOverlay } from "./proctoring/detection-overlay";
-import { IntegrityPolicyBanner } from "./proctoring/integrity-policy-banner";
-import { SuspicionBanner } from "./proctoring/suspicion-banner";
-import { useExamProctoring } from "./proctoring/use-exam-proctoring";
 
-type Question = {
-  id: string;
-  orderIndex: number;
-  type: "multiple_choice" | "short_answer" | "numeric" | "essay" | "code";
-  prompt: string;
-  choices: { key: string; label: string }[] | null;
-  points: number;
+type CameraSettings = {
+  required: boolean;
+  policyVersion: string | null;
+  headTrackingEnabled: boolean;
+  objectDetectionEnabled: boolean;
+  evidenceCaptureEnabled: boolean;
 };
-
-type CameraSettings = { required: boolean; policyVersion: string | null; headTrackingEnabled: boolean };
 type IntegrityPolicySettings = {
   violationLimit: number | null;
   action: "log_only" | "warn" | "auto_submit";
 };
 
-type SerializedSession = {
+type Preflight = {
   assessment: { id: string; title: string; description: string | null; type: string };
   version: {
     versionNumber: number;
+    questionCount: number;
     settings: {
       durationSeconds: number | null;
       fullscreenRequired: boolean;
@@ -38,15 +30,6 @@ type SerializedSession = {
       integrityPolicy: IntegrityPolicySettings;
     };
   };
-  attempt: { id: string; status: string; startedAt: string };
-  questions: Question[];
-  answers: { questionId: string; answerText: string | null }[];
-  deadlineAt: string | null;
-};
-
-type Preflight = {
-  assessment: SerializedSession["assessment"];
-  version: SerializedSession["version"] & { questionCount: number };
 };
 
 function messageFromResponse(payload: unknown, fallback: string) {
@@ -64,26 +47,26 @@ function messageFromResponse(payload: unknown, fallback: string) {
   return fallback;
 }
 
-function formatTime(seconds: number) {
-  const safe = Math.max(0, seconds);
-  const hours = Math.floor(safe / 3_600);
-  const minutes = Math.floor((safe % 3_600) / 60);
-  const remainder = safe % 60;
-  return hours > 0
-    ? `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:${String(remainder).padStart(2, "0")}`
-    : `${String(minutes).padStart(2, "0")}:${String(remainder).padStart(2, "0")}`;
+function examRunUrl(attemptId: string) {
+  return `/assessments/attempts/${encodeURIComponent(attemptId)}/run`;
 }
 
+/**
+ * The exam itself runs in a dedicated tab (`ExamRun`, at `/assessments/attempts/<id>/run`) so its
+ * camera preview, live detection console, and fullscreen lock get a clean document of their own
+ * rather than living awkwardly inside this overview/consent page. This screen only collects the
+ * disclosed notice + camera consent and starts the attempt server-side; the new tab then owns
+ * camera confirmation, fullscreen entry, and the actual question flow.
+ */
 export function AssessmentEntry({ assessmentId }: { assessmentId: string }) {
   const t = useTranslations("assessments");
   const [preflight, setPreflight] = useState<Preflight | null>(null);
-  const [session, setSession] = useState<SerializedSession | null>(null);
   const [cameraAccepted, setCameraAccepted] = useState(false);
-  const [cameraHandle, setCameraHandle] = useState<CameraHandle | null>(null);
-  const cameraHandleRef = useRef<CameraHandle | null>(null);
   const [loading, setLoading] = useState(true);
   const [starting, setStarting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [examUrl, setExamUrl] = useState<string | null>(null);
+  const [examOpenedAutomatically, setExamOpenedAutomatically] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -107,27 +90,16 @@ export function AssessmentEntry({ assessmentId }: { assessmentId: string }) {
     };
   }, [assessmentId, t]);
 
-  // Releases the camera if the student never starts (navigates away from the preflight screen).
-  useEffect(() => {
-    return () => {
-      if (!session) cameraHandleRef.current?.stop();
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- runs once on unmount; `session` is read via closure intentionally.
-  }, []);
-
-  function handleCameraReady(handle: CameraHandle) {
-    cameraHandleRef.current = handle;
-    setCameraHandle(handle);
-  }
-
   async function start() {
     if (!preflight) return;
     setStarting(true);
     setError(null);
+    // Opened synchronously, inside the click handler, so it never gets treated as a popup — the
+    // navigation is filled in once the attempt exists. The exam tab requests its own camera
+    // access and fullscreen from its own click; a MediaStream from this tab couldn't be handed
+    // to another tab/document even if we wanted to.
+    const examWindow = window.open("", "_blank");
     try {
-      if (preflight.version.settings.fullscreenRequired && !document.fullscreenElement) {
-        await document.documentElement.requestFullscreen();
-      }
       const policyVersion = preflight.version.settings.camera.policyVersion;
       const response = await fetch(
         `/api/assessments/${encodeURIComponent(assessmentId)}/attempts`,
@@ -144,8 +116,15 @@ export function AssessmentEntry({ assessmentId }: { assessmentId: string }) {
       );
       const payload = (await response.json()) as unknown;
       if (!response.ok) throw new Error(messageFromResponse(payload, t("errors.start")));
-      setSession((payload as { data: SerializedSession }).data);
+      const attemptId = (payload as { data: { attempt: { id: string } } }).data.attempt.id;
+      const url = examRunUrl(attemptId);
+      setExamUrl(url);
+      if (examWindow) {
+        examWindow.location.href = url;
+        setExamOpenedAutomatically(true);
+      }
     } catch (caught) {
+      examWindow?.close();
       setError(caught instanceof Error ? caught.message : t("errors.start"));
     } finally {
       setStarting(false);
@@ -159,21 +138,36 @@ export function AssessmentEntry({ assessmentId }: { assessmentId: string }) {
         {error ?? t("errors.load")}
       </p>
     );
-  if (session)
+
+  if (examUrl) {
     return (
-      <AssessmentRunner
-        session={session}
-        cameraHandle={cameraHandle}
-        onCameraRelease={() => {
-          cameraHandleRef.current?.stop();
-          cameraHandleRef.current = null;
-          setCameraHandle(null);
-        }}
-      />
+      <div className={styles.shell}>
+        <section className={styles.startPanel}>
+          <div>
+            <h2>{t("entry.opened.title")}</h2>
+            <p>
+              {examOpenedAutomatically ? t("entry.opened.body") : t("entry.opened.blockedBody")}
+            </p>
+          </div>
+          <a
+            className={styles.primaryButton}
+            href={examUrl}
+            onClick={(event) => {
+              event.preventDefault();
+              window.open(examUrl, "_blank");
+            }}
+          >
+            {t("entry.opened.action")}
+          </a>
+          <Link className={styles.backLink} href="/assessments">
+            ← {t("entry.back")}
+          </Link>
+        </section>
+      </div>
     );
+  }
 
   const settings = preflight.version.settings;
-  const cameraReady = !settings.camera.required || cameraHandle !== null;
   return (
     <div className={styles.shell}>
       <Link className={styles.backLink} href="/assessments">
@@ -223,6 +217,9 @@ export function AssessmentEntry({ assessmentId }: { assessmentId: string }) {
           {settings.fullscreenRequired ? <li>{t("entry.notice.examMode")}</li> : null}
           {settings.camera.required ? <li>{t("entry.notice.camera")}</li> : null}
           {settings.camera.headTrackingEnabled ? <li>{t("entry.notice.headTracking")}</li> : null}
+          {settings.camera.objectDetectionEnabled ? <li>{t("entry.notice.objectDetection")}</li> : null}
+          {settings.camera.evidenceCaptureEnabled ? <li>{t("entry.notice.evidenceCapture")}</li> : null}
+          <li>{t("entry.notice.newTab")}</li>
           {settings.integrityPolicy.action !== "log_only" && settings.integrityPolicy.violationLimit !== null ? (
             <li>
               {t(`entry.notice.integrityPolicy.${settings.integrityPolicy.action}`, {
@@ -233,8 +230,6 @@ export function AssessmentEntry({ assessmentId }: { assessmentId: string }) {
         </ul>
         <p className={styles.notProof}>{t("entry.notice.notProof")}</p>
       </section>
-
-      {settings.camera.required ? <CameraPreflight onReady={handleCameraReady} /> : null}
 
       <section className={styles.startPanel}>
         <div>
@@ -260,309 +255,11 @@ export function AssessmentEntry({ assessmentId }: { assessmentId: string }) {
         ) : null}
         <button
           className={styles.primaryButton}
-          disabled={starting || (settings.camera.required && !cameraAccepted) || !cameraReady}
+          disabled={starting || (settings.camera.required && !cameraAccepted)}
           onClick={() => void start()}
           type="button"
         >
           {starting ? t("entry.starting") : t("entry.start")}
-        </button>
-      </section>
-    </div>
-  );
-}
-
-function AssessmentRunner({
-  session,
-  cameraHandle,
-  onCameraRelease,
-}: {
-  session: SerializedSession;
-  cameraHandle: CameraHandle | null;
-  onCameraRelease: () => void;
-}) {
-  const t = useTranslations("assessments");
-  const containerRef = useRef<HTMLDivElement | null>(null);
-  const elapsedSeconds = useRef(0);
-  const [answers, setAnswers] = useState<Record<string, string>>(
-    Object.fromEntries(
-      session.answers.map((answer) => [answer.questionId, answer.answerText ?? ""]),
-    ),
-  );
-  const [honorAccepted, setHonorAccepted] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [submitted, setSubmitted] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
-  const closedSideEffectsRan = useRef(false);
-  const duration = session.version.settings.durationSeconds;
-  const strict = session.version.settings.fullscreenRequired;
-  const camera = session.version.settings.camera;
-  const integrityPolicy = session.version.settings.integrityPolicy;
-  const [remaining, setRemaining] = useState(() =>
-    session.deadlineAt
-      ? Math.max(0, Math.ceil((new Date(session.deadlineAt).getTime() - Date.now()) / 1_000))
-      : null,
-  );
-
-  const proctoring = useExamProctoring({
-    attemptId: session.attempt.id,
-    strict,
-    camera: camera.required ? { required: true, headTrackingEnabled: camera.headTrackingEnabled } : null,
-    cameraHandle,
-    containerRef,
-  });
-
-  // The server ended this attempt under the tutor's auto-submit integrity policy. The terminal
-  // screen below reacts directly to `proctoring.attemptClosedByPolicy`; this effect only runs the
-  // one-time teardown (stop guards, drop fullscreen/camera) exactly once, via a ref rather than
-  // state, since nothing here needs to trigger an additional render.
-  useEffect(() => {
-    if (!proctoring.attemptClosedByPolicy || submitted || closedSideEffectsRan.current) return;
-    closedSideEffectsRan.current = true;
-    proctoring.stopAll();
-    if (document.fullscreenElement) void document.exitFullscreen();
-    onCameraRelease();
-    // proctoring/onCameraRelease/submitted are read via closure; this should only ever run once,
-    // on the transition from false to true.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [proctoring.attemptClosedByPolicy]);
-
-  useEffect(() => {
-    if (!session.deadlineAt) return;
-    const timer = window.setInterval(() => {
-      setRemaining(
-        Math.max(
-          0,
-          Math.ceil((new Date(session.deadlineAt as string).getTime() - Date.now()) / 1_000),
-        ),
-      );
-    }, 1_000);
-    return () => window.clearInterval(timer);
-  }, [session.deadlineAt]);
-
-  useEffect(() => {
-    const timer = window.setInterval(() => {
-      elapsedSeconds.current += 1;
-    }, 1_000);
-    return () => window.clearInterval(timer);
-  }, []);
-
-  const progress = useMemo(() => {
-    if (duration === null || remaining === null) return 1;
-    return Math.max(0, Math.min(1, remaining / duration));
-  }, [duration, remaining]);
-
-  const save = useCallback(
-    async (questionId: string, answerText: string) => {
-      if (remaining === 0) return;
-      const response = await fetch(
-        `/api/assessments/attempts/${encodeURIComponent(session.attempt.id)}/answers/${encodeURIComponent(questionId)}`,
-        {
-          method: "PATCH",
-          headers: { "content-type": "application/json" },
-          body: JSON.stringify({
-            answerText: answerText || null,
-            timeSpentSeconds: elapsedSeconds.current,
-          }),
-        },
-      );
-      if (!response.ok) {
-        const payload = (await response.json()) as unknown;
-        setError(messageFromResponse(payload, t("errors.save")));
-      }
-    },
-    [remaining, session.attempt.id, t],
-  );
-
-  async function submit() {
-    if (!honorAccepted) return;
-    setSubmitting(true);
-    setError(null);
-    try {
-      if (remaining !== 0) {
-        await Promise.all(
-          session.questions.map((question) => save(question.id, answers[question.id] ?? "")),
-        );
-      }
-      const response = await fetch(
-        `/api/assessments/attempts/${encodeURIComponent(session.attempt.id)}/submit`,
-        {
-          method: "POST",
-          headers: { "content-type": "application/json" },
-          body: JSON.stringify({ honorStatementAccepted: honorAccepted }),
-        },
-      );
-      const payload = (await response.json()) as unknown;
-      if (!response.ok) throw new Error(messageFromResponse(payload, t("errors.submit")));
-      // Stop every guard before touching fullscreen/camera so their own teardown side effects
-      // (fullscreenchange, track "ended") never re-enter as signals against a closed attempt.
-      proctoring.stopAll();
-      setSubmitted(true);
-      if (document.fullscreenElement) await document.exitFullscreen();
-      onCameraRelease();
-    } catch (caught) {
-      setError(caught instanceof Error ? caught.message : t("errors.submit"));
-    } finally {
-      setSubmitting(false);
-    }
-  }
-
-  if (proctoring.attemptClosedByPolicy) {
-    return (
-      <section className={styles.completion}>
-        <span aria-hidden="true">■</span>
-        <p className={styles.eyebrow}>{t("runner.closedByPolicy.kicker")}</p>
-        <h1>{t("runner.closedByPolicy.title")}</h1>
-        <p>{t("runner.closedByPolicy.body")}</p>
-        <Link className={styles.primaryButton} href="/assessments">
-          {t("runner.closedByPolicy.back")}
-        </Link>
-      </section>
-    );
-  }
-
-  if (submitted) {
-    return (
-      <section className={styles.completion}>
-        <span aria-hidden="true">✓</span>
-        <p className={styles.eyebrow}>{t("runner.complete.kicker")}</p>
-        <h1>{t("runner.complete.title")}</h1>
-        <p>{t("runner.complete.body")}</p>
-        <Link className={styles.primaryButton} href="/assessments">
-          {t("runner.complete.back")}
-        </Link>
-      </section>
-    );
-  }
-
-  return (
-    <div className={strict ? `${styles.runner} ${styles.examLocked}` : styles.runner} ref={containerRef}>
-      <aside className={styles.timeRail} aria-label={t("runner.timeRemaining")}>
-        <div style={{ transform: `scaleY(${progress})` }} />
-      </aside>
-      <header className={styles.runnerHeader}>
-        <div>
-          <p className={styles.eyebrow}>{t("runner.inProgress")}</p>
-          <h1>{session.assessment.title}</h1>
-        </div>
-        <div className={remaining === 0 ? styles.timerElapsed : styles.timer}>
-          <span>{remaining === null ? t("entry.untimed") : formatTime(remaining)}</span>
-          <small>{remaining === 0 ? t("runner.elapsed") : t("runner.remaining")}</small>
-        </div>
-      </header>
-
-      {camera.required ? (
-        <DetectionOverlay
-          videoRef={proctoring.videoRef}
-          faceTrackingUnavailable={proctoring.faceTrackingUnavailable}
-          cameraDisconnected={proctoring.cameraDisconnected}
-        />
-      ) : null}
-
-      <SuspicionBanner suspicion={proctoring.suspicion} bus={proctoring.bus} />
-      <IntegrityPolicyBanner
-        violationCount={proctoring.integrityViolationCount}
-        policy={integrityPolicy}
-        bus={proctoring.bus}
-      />
-
-      {strict && proctoring.fullscreenExited ? (
-        <div className={styles.fullscreenPrompt} role="alertdialog" aria-labelledby="fullscreen-prompt-title">
-          <p id="fullscreen-prompt-title">{t("proctoring.fullscreen.exited")}</p>
-          <button
-            className={styles.primaryButton}
-            onClick={() => proctoring.requestFullscreenReentry()}
-            type="button"
-          >
-            {t("proctoring.fullscreen.reenter")}
-          </button>
-        </div>
-      ) : null}
-
-      {remaining === 0 ? <p className={styles.elapsedNotice}>{t("runner.elapsedNotice")}</p> : null}
-
-      <main className={styles.questionStack}>
-        {session.questions.map((question, index) => (
-          <section className={styles.questionCard} key={question.id}>
-            <header>
-              <span>
-                {t("runner.question", { current: index + 1, total: session.questions.length })}
-              </span>
-              <small>{t("runner.points", { count: question.points })}</small>
-            </header>
-            <h2>{question.prompt}</h2>
-            {question.type === "multiple_choice" && question.choices ? (
-              <fieldset disabled={remaining === 0}>
-                <legend className={styles.srOnly}>{t("runner.chooseAnswer")}</legend>
-                {question.choices.map((choice) => (
-                  <label className={styles.choice} key={choice.key}>
-                    <input
-                      checked={answers[question.id] === choice.key}
-                      name={question.id}
-                      onChange={() => {
-                        setAnswers((current) => ({ ...current, [question.id]: choice.key }));
-                        void save(question.id, choice.key);
-                      }}
-                      type="radio"
-                      value={choice.key}
-                    />
-                    <span>{choice.label}</span>
-                  </label>
-                ))}
-              </fieldset>
-            ) : question.type === "essay" || question.type === "code" ? (
-              <textarea
-                className={question.type === "code" ? styles.codeAnswer : styles.longAnswer}
-                disabled={remaining === 0}
-                onBlur={() => void save(question.id, answers[question.id] ?? "")}
-                onChange={(event) =>
-                  setAnswers((current) => ({ ...current, [question.id]: event.target.value }))
-                }
-                placeholder={t(`runner.placeholders.${question.type}`)}
-                value={answers[question.id] ?? ""}
-              />
-            ) : (
-              <input
-                className={styles.shortAnswer}
-                disabled={remaining === 0}
-                inputMode={question.type === "numeric" ? "decimal" : "text"}
-                onBlur={() => void save(question.id, answers[question.id] ?? "")}
-                onChange={(event) =>
-                  setAnswers((current) => ({ ...current, [question.id]: event.target.value }))
-                }
-                placeholder={t(`runner.placeholders.${question.type}`)}
-                value={answers[question.id] ?? ""}
-              />
-            )}
-          </section>
-        ))}
-      </main>
-
-      <section className={styles.submitPanel}>
-        <div>
-          <p className={styles.eyebrow}>{t("runner.submit.kicker")}</p>
-          <h2>{t("runner.submit.title")}</h2>
-          <p>{t("runner.submit.body")}</p>
-        </div>
-        <label className={styles.honorCheck}>
-          <input
-            checked={honorAccepted}
-            onChange={(event) => setHonorAccepted(event.target.checked)}
-            type="checkbox"
-          />
-          <span>{t("runner.submit.honor")}</span>
-        </label>
-        {error ? (
-          <p className={styles.inlineError} role="alert">
-            {error}
-          </p>
-        ) : null}
-        <button
-          className={styles.primaryButton}
-          disabled={!honorAccepted || submitting}
-          onClick={() => void submit()}
-          type="button"
-        >
-          {submitting ? t("runner.submit.submitting") : t("runner.submit.action")}
         </button>
       </section>
     </div>

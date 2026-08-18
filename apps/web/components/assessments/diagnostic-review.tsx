@@ -22,6 +22,8 @@ type SuspicionSummary = {
   };
 };
 
+type EvidenceItem = { id: string; eventType: string; capturedAt: string; downloadUrl: string };
+
 type Review = {
   assessment: { title: string };
   version: { questions: { id: string; prompt: string; points: number }[] };
@@ -30,6 +32,7 @@ type Review = {
   events: { id: string; eventType: string; occurredAt: string; metadata: Record<string, unknown> | null }[];
   eventCounts: Record<string, number>;
   suspicion: SuspicionSummary;
+  evidence: EvidenceItem[];
   report: Report | null;
 };
 
@@ -39,6 +42,7 @@ const HIGH_WEIGHT_EVENTS = new Set([
   "external_device_suspected",
   "copy_attempt",
   "paste_attempt",
+  "phone_detected",
 ]);
 const MEDIUM_WEIGHT_EVENTS = new Set([
   "face_missing",
@@ -48,6 +52,8 @@ const MEDIUM_WEIGHT_EVENTS = new Set([
   "cut_attempt",
   "tab_switch",
   "view_source_attempt",
+  "unusual_item_detected",
+  "eyes_closed",
 ]);
 
 function eventSeverity(eventType: string): "low" | "medium" | "high" {
@@ -266,6 +272,32 @@ export function DiagnosticReview({ attemptId }: { attemptId: string }) {
             </tbody>
           </table>
         ) : null}
+      </section>
+
+      <section className={styles.evidenceGallery} aria-labelledby="evidence-gallery-title">
+        <div className={styles.sectionHeading}>
+          <div>
+            <p className={styles.eyebrow}>{t("review.evidence.kicker")}</p>
+            <h2 id="evidence-gallery-title">{t("review.evidence.title")}</h2>
+          </div>
+        </div>
+        {review.evidence.length === 0 ? (
+          <p className={styles.empty}>{t("review.evidence.empty")}</p>
+        ) : (
+          <ul className={styles.evidenceGrid}>
+            {review.evidence.map((item) => (
+              <li className={styles.evidenceThumb} key={item.id}>
+                <figure>
+                  <img alt={t(`signals.${item.eventType}`)} loading="lazy" src={item.downloadUrl} />
+                  <figcaption>
+                    {t(`signals.${item.eventType}`)} ·{" "}
+                    {new Date(item.capturedAt).toLocaleTimeString()}
+                  </figcaption>
+                </figure>
+              </li>
+            ))}
+          </ul>
+        )}
       </section>
 
       <section className={styles.eventTimeline} aria-labelledby="event-timeline-title">

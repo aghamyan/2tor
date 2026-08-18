@@ -152,11 +152,20 @@ export function NavItemIcon({ itemId, ...props }: { itemId: string } & SVGProps<
       </svg>
     );
   }
-  if (moduleName === "communication" || moduleName === "discussions" || moduleName === "support") {
+  if (moduleName === "communication" || moduleName === "support") {
     return (
       <svg {...baseProps(props)}>
         <path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4Z" />
         <path d="M8 9h8M8 13h5" />
+      </svg>
+    );
+  }
+  if (moduleName === "discussions") {
+    return (
+      <svg {...baseProps(props)}>
+        <circle cx="12" cy="12" r="9" />
+        <path d="M9.2 9.5a2.8 2.8 0 0 1 5.4.9c0 1.8-2.4 2.1-2.6 3.6" />
+        <path d="M12 17.2h.01" />
       </svg>
     );
   }

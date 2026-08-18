@@ -84,6 +84,8 @@ export function NewAssessmentForm({
   const [cameraRequired, setCameraRequired] = useState(false);
   const [cameraPolicyVersion, setCameraPolicyVersion] = useState("");
   const [headTrackingEnabled, setHeadTrackingEnabled] = useState(false);
+  const [objectDetectionEnabled, setObjectDetectionEnabled] = useState(false);
+  const [evidenceCaptureEnabled, setEvidenceCaptureEnabled] = useState(false);
   const [audienceMode, setAudienceMode] = useState<AudienceMode>("everyone");
   const [selectedStudentIds, setSelectedStudentIds] = useState<string[]>([]);
   const [maxAttempts, setMaxAttempts] = useState("");
@@ -217,6 +219,8 @@ export function NewAssessmentForm({
               required: cameraRequired,
               policyVersion: cameraRequired ? cameraPolicyVersion.trim() : null,
               headTrackingEnabled: cameraRequired && headTrackingEnabled,
+              objectDetectionEnabled: cameraRequired && headTrackingEnabled && objectDetectionEnabled,
+              evidenceCaptureEnabled: cameraRequired && headTrackingEnabled && evidenceCaptureEnabled,
             },
             audience:
               audienceMode === "everyone"
@@ -397,6 +401,36 @@ export function NewAssessmentForm({
                 </label>
               </div>
               <p className={styles.hint}>{t("newAssessment.proctoring.headTrackingHint")}</p>
+
+              {headTrackingEnabled ? (
+                <>
+                  <div className={styles.checkboxRow}>
+                    <input
+                      checked={objectDetectionEnabled}
+                      id={`${idPrefix}-object-detection`}
+                      onChange={(event) => setObjectDetectionEnabled(event.target.checked)}
+                      type="checkbox"
+                    />
+                    <label htmlFor={`${idPrefix}-object-detection`}>
+                      {t("newAssessment.proctoring.objectDetection")}
+                    </label>
+                  </div>
+                  <p className={styles.hint}>{t("newAssessment.proctoring.objectDetectionHint")}</p>
+
+                  <div className={styles.checkboxRow}>
+                    <input
+                      checked={evidenceCaptureEnabled}
+                      id={`${idPrefix}-evidence-capture`}
+                      onChange={(event) => setEvidenceCaptureEnabled(event.target.checked)}
+                      type="checkbox"
+                    />
+                    <label htmlFor={`${idPrefix}-evidence-capture`}>
+                      {t("newAssessment.proctoring.evidenceCapture")}
+                    </label>
+                  </div>
+                  <p className={styles.hint}>{t("newAssessment.proctoring.evidenceCaptureHint")}</p>
+                </>
+              ) : null}
             </>
           ) : null}
         </fieldset>

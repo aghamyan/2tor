@@ -96,4 +96,16 @@ export class SignalBus {
     }
     this.flush(true);
   }
+
+  /**
+   * Undoes `stop()` — narrowly for React Strict Mode's dev-only mount→cleanup→mount cycle, which
+   * runs a bodyless effect's cleanup once immediately after the real mount (see
+   * use-exam-proctoring.ts's always-on focus-guard effect). Without this, that simulated cleanup
+   * would permanently stop the bus a moment after mount, in dev only, and every real signal for
+   * the rest of the attempt would silently no-op. Never called from anywhere a genuine, final stop
+   * (submit, real unmount) is intended.
+   */
+  resume(): void {
+    this.stopped = false;
+  }
 }
