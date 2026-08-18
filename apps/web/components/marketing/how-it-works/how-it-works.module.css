@@ -2824,15 +2824,38 @@
 }
 .verifySection {
   background: hsl(var(--vz-surface-2));
+  /*
+   * `clip-path`, NOT `overflow: hidden`. This section's copy column is sticky, and a sticky element
+   * resolves against its nearest scrollport — `overflow: hidden` makes this section one, so the rule
+   * computes as `position: sticky` and then does nothing at all. `clip-path` clips the blooms
+   * identically and creates no scrollport. `.betweenSection` carries the same pair for the same
+   * reason.
+   */
+  clip-path: inset(0);
   isolation: isolate;
-  overflow: hidden;
+  /* Explicitly unset, not merely omitted: the shared rule near the top of this file sets
+     `overflow: hidden` on thirteen sections at the same specificity, so dropping the declaration
+     here inherits it straight back. */
+  overflow: visible;
+  padding-block: clamp(6.5rem, 10vw, 11rem);
   position: relative;
 }
 .verifyLayout {
   align-items: start;
   display: grid;
-  gap: clamp(3rem, 7vw, 7rem);
-  grid-template-columns: 1.2fr 0.8fr;
+  gap: clamp(2.5rem, 5vw, 5rem);
+  /* The right column is the tall one now — it carries the profile and the path beneath it — so it
+     takes the larger share and gives the sticky column something to travel against. */
+  grid-template-columns: 0.88fr 1.12fr;
+}
+.verifyCopy {
+  position: sticky;
+  /* Clears the floating header, the same offset `.betweenCopy` and `.formIntro` use. */
+  top: 7rem;
+}
+.verifyStack {
+  display: grid;
+  gap: clamp(2rem, 3.5vw, 3.25rem);
 }
 /*
  * The policy statement, as its own pane of the site's light glass.
@@ -2976,7 +2999,6 @@
   border-radius: var(--vz-r-card);
   box-shadow: var(--vz-fx-glass-shadow);
   isolation: isolate;
-  margin-top: 5rem;
   overflow: hidden;
   padding: 1.35rem;
 }
@@ -3512,6 +3534,12 @@
   .recordLayout,
   .verifyLayout {
     grid-template-columns: 1fr;
+  }
+  /* Static once the columns stack, matching `.betweenCopy` and group lessons' `.formIntro`. Sticky
+     here would pin the headline under the header while the profile scrolled beneath it, which on a
+     phone spends a third of the screen on text the reader has already passed. */
+  .verifyCopy {
+    position: static;
   }
   .heroCopy h1 {
     max-width: 13ch;

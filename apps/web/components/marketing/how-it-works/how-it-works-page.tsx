@@ -766,26 +766,20 @@ export function HowItWorksPage({ locale }: { locale: Locale }) {
         <div className={styles.shell}>
           <Reveal>
             <div className={styles.verifyLayout}>
-              <div>
+              {/*
+               * The headline and its policy statement hold at the top of the viewport while the
+               * profile and the approval path scroll past them — the construction `05 · Continue`
+               * takes from group lessons' "Join the list". It only works because the right column is
+               * now the tall one: the pipeline moved into it, under the card it produces.
+               */}
+              <div className={styles.verifyCopy}>
                 <Heading eyebrow={c.verify.eyebrow} title={c.verify.title} titleAccent={c.verify.titleAccent} />
                 <p className={styles.policy}>
                   <ShieldCheck />
                   {c.verify.policy}
                 </p>
-                <ol className={styles.verifyPipeline}>
-                  {c.verify.stages.map(([title, body], index) => (
-                    <li key={title}>
-                      <span>
-                        {index === c.verify.stages.length - 1 ? <Check /> : `0${index + 1}`}
-                      </span>
-                      <div>
-                        <strong>{title}</strong>
-                        <small>{body}</small>
-                      </div>
-                    </li>
-                  ))}
-                </ol>
               </div>
+              <div className={styles.verifyStack}>
               <aside className={styles.tutorProfile}>
                 <div className={styles.tutorHero}>
                   <span>
@@ -813,6 +807,22 @@ export function HowItWorksPage({ locale }: { locale: Locale }) {
                   {c.common.example}
                 </p>
               </aside>
+              {/* The path that produced the profile above it. Under the card, not beside the
+                  headline, so the column reads result-then-how rather than as two lists. */}
+              <ol className={styles.verifyPipeline}>
+                {c.verify.stages.map(([title, body], index) => (
+                  <li key={title}>
+                    <span>
+                      {index === c.verify.stages.length - 1 ? <Check /> : `0${index + 1}`}
+                    </span>
+                    <div>
+                      <strong>{title}</strong>
+                      <small>{body}</small>
+                    </div>
+                  </li>
+                ))}
+              </ol>
+              </div>
             </div>
           </Reveal>
         </div>
