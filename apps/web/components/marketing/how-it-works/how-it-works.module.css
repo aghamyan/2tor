@@ -3886,8 +3886,13 @@
   background: hsl(var(--vz-block));
   isolation: isolate;
   overflow: hidden;
+  /* Symmetric, so the block is centred in its own section rather than pinned to the top of it. The
+     top was zero and the foot was `clamp(5rem, 8vw, 8rem)`, which sat the heading against the
+     block's edge with all the air below the button — fine when a two-column panel with its own
+     padding filled the section, wrong once the content became a centred column. Equal padding is
+     what makes "centred" true vertically as well as horizontally. */
+  padding-block: clamp(5rem, 8vw, 8rem);
   position: relative;
-  padding: 0 0 clamp(5rem, 8vw, 8rem);
 }
 /*
  * NO PANEL. The closing call to action sits on the block itself.
@@ -3948,7 +3953,10 @@
   font-size: 0.92rem;
   gap: 0.5rem;
   margin-top: 1.15rem;
-  max-width: 40ch;
+  /* No `max-width`. `inline-flex` already shrinks to its content, so a cap only forces a wrap that
+     the available width would not have — a 40ch cap broke this onto two lines at 1440, where it
+     fits on one with room to spare. Narrow widths still wrap it, because there the column is the
+     constraint. */
   text-align: left;
 }
 /* `--teal` is `--vz-accent-ink`, a DARK accent — a dark red tick on dark green. On the block only
