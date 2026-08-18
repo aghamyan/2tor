@@ -853,7 +853,14 @@ export function HowItWorksPage({ locale }: { locale: Locale }) {
                * fixed size and offset so it agreed with the cards at no width at all. This is the
                * same bracket `07 · Match` uses: verticals on the column centres, a spine, one drop.
                */}
-              <div className={styles.systemWire} aria-hidden="true" />
+              <div className={styles.systemWire} aria-hidden="true">
+                {/* A node where each branch leaves its card, and one where the three meet. Decorative
+                    only, which is why they are bare elements inside an `aria-hidden` wrapper. */}
+                <i data-branch="0" />
+                <i data-branch="1" />
+                <i data-branch="2" />
+                <b />
+              </div>
               <article className={styles.systemCore}>
                 <span>
                   <Waypoints />
