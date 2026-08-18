@@ -3210,91 +3210,132 @@
  * match section's bracket cost eight pixels to that arithmetic before it was measured, so it is
  * written out here rather than approximated.
  */
+/*
+ * The tree: six dotted segments running from the three cards into the system below them.
+ *
+ * Every position derives from `--col-c`, the distance from the row's edge to the outer columns'
+ * centre line — `(100% - 2 * gap) / 6`, because with a gutter a column's centre is not a sixth of
+ * the row. `- 1px` wherever a 2px segment is being centred on that line, since a box placed AT the
+ * centre line has its own centre 1px past it.
+ *
+ * The dots flow, and their direction is the argument: the three feeds run down, the two spine halves
+ * run inward toward each other, and the drop carries the result into the panel. Nothing loops
+ * outward, so the motion reads as convergence rather than as decoration going round.
+ */
 .systemWire {
-  /* One place to change the branch's turn radius; the row's height is derived from it so the elbows
-     always have room to complete rather than being clipped into a corner. */
-  --branch-r: 1.7rem;
+  --col-c: calc((100% - 2 * var(--sys-gap)) / 6);
+  --spine-y: 2.1rem;
+  --dot: hsl(var(--vz-field-1) / 88%);
+  --dot-period: 9px;
   grid-column: 1 / -1;
-  height: calc(var(--branch-r) + 2.5rem);
+  height: 3.7rem;
   position: relative;
 }
-/*
- * └──┬──┘ — the outer two branches, turning into the spine.
- *
- * A FLAT border colour, not a `border-image` gradient. Setting `border-image-source` makes the
- * browser stop applying `border-radius` to the border at all, so the gradient version squared off
- * the two elbows — and the rounded turn is the whole reason this reads as a branch rather than as a
- * bracket. The flow is carried by the drop below instead, which is a background and keeps both.
- */
-.systemWire::before {
-  border-color: hsl(var(--vz-field-1) / 72%);
-  border-radius: 0 0 var(--branch-r) var(--branch-r);
-  border-style: solid;
-  border-width: 0 2px 2px;
-  content: "";
-  height: calc(var(--branch-r) + 0.6rem);
-  /* Less 1px on each side: these insets place the box EDGE on the column centre, and the 2px border
-     drawn on that edge has its own centre 1px inboard of it. Measuring the box instead of the line
-     is how a wire passes an alignment check and still sits off-centre. */
-  left: calc((100% - 2 * var(--sys-gap)) / 6 - 1px);
+.systemWire span {
+  background-repeat: repeat;
   position: absolute;
-  right: calc((100% - 2 * var(--sys-gap)) / 6 - 1px);
-  top: 0;
 }
-/* The middle column's feed and the drop into the core are one continuous line, because the middle
-   column's centre and the core's centre are both 50%. It brightens as it descends — the three
-   branches have joined by then, and the line carries all of them. */
-.systemWire::after {
-  background: linear-gradient(
+/* The three feeds, and the drop: vertical dotted rules. */
+.systemWire span[data-seg^="feed"],
+.systemWire span[data-seg="drop"] {
+  background-image: linear-gradient(
     180deg,
-    hsl(var(--vz-field-1) / 45%),
-    hsl(var(--vz-field-1) / 95%) 60%,
-    hsl(var(--vz-accent) / 85%)
+    var(--dot) 0 3px,
+    transparent 3px var(--dot-period)
   );
-  border-radius: 99px;
-  bottom: 0;
-  content: "";
-  left: calc(50% - 1px);
-  position: absolute;
-  top: 0;
+  background-size: 2px var(--dot-period);
   width: 2px;
 }
-/* The node each branch leaves from, sitting on its column's centre line at the row's top edge. */
-.systemWire i {
-  background: hsl(var(--vz-field-1) / 85%);
-  border-radius: 50%;
-  box-shadow: 0 0 0 3px hsl(var(--vz-field-1) / 14%);
-  height: 6px;
-  margin-left: -3px;
-  margin-top: -3px;
-  position: absolute;
+.systemWire span[data-seg^="feed"] {
+  height: var(--spine-y);
   top: 0;
-  width: 6px;
 }
-.systemWire i[data-branch="0"] {
-  left: calc((100% - 2 * var(--sys-gap)) / 6);
+.systemWire span[data-seg="feed-l"] {
+  left: calc(var(--col-c) - 1px);
 }
-.systemWire i[data-branch="1"] {
+.systemWire span[data-seg="feed-m"] {
+  left: calc(50% - 1px);
+}
+.systemWire span[data-seg="feed-r"] {
+  left: calc(100% - var(--col-c) - 1px);
+}
+.systemWire span[data-seg="drop"] {
+  --dot: hsl(var(--vz-accent) / 92%);
+  bottom: 0;
+  left: calc(50% - 1px);
+  top: var(--spine-y);
+}
+/* The spine, in two halves so each can run toward the junction rather than both sliding one way. */
+.systemWire span[data-seg^="spine"] {
+  background-image: linear-gradient(
+    90deg,
+    var(--dot) 0 3px,
+    transparent 3px var(--dot-period)
+  );
+  background-size: var(--dot-period) 2px;
+  height: 2px;
+  top: calc(var(--spine-y) - 1px);
+}
+.systemWire span[data-seg="spine-l"] {
+  left: var(--col-c);
+  width: calc(50% - var(--col-c));
+}
+.systemWire span[data-seg="spine-r"] {
   left: 50%;
+  width: calc(50% - var(--col-c));
 }
-.systemWire i[data-branch="2"] {
-  left: calc(100% - (100% - 2 * var(--sys-gap)) / 6);
-}
-/* The junction, where the spine meets the drop. Larger and accent-lit, because it is the one point
-   in the drawing where the three become one. */
+/* The junction: the one point where the three become one. */
 .systemWire b {
   background: hsl(var(--vz-accent));
   border-radius: 50%;
   box-shadow:
-    0 0 0 4px hsl(var(--vz-accent) / 18%),
+    0 0 0 4px hsl(var(--vz-accent) / 20%),
     0 0 1.1rem hsl(var(--vz-accent) / 55%);
   height: 9px;
   left: 50%;
   margin-left: -4.5px;
   margin-top: -4.5px;
   position: absolute;
-  top: calc(var(--branch-r) + 0.6rem);
+  top: var(--spine-y);
   width: 9px;
+}
+/*
+ * The flow. `background-position` repaints rather than compositing, which this file argues against
+ * for the header's full-width button sheen — the trade is different here: six segments 2px thick,
+ * so the repainted area is a few hundred pixels rather than a whole control, and there is no way to
+ * march a dash pattern on the compositor without duplicating every segment into a clipped wrapper.
+ */
+@keyframes wireFlowDown {
+  to {
+    background-position: 0 var(--dot-period);
+  }
+}
+@keyframes wireFlowRight {
+  to {
+    background-position: var(--dot-period) 0;
+  }
+}
+@keyframes wireFlowLeft {
+  to {
+    background-position: calc(-1 * var(--dot-period)) 0;
+  }
+}
+.systemWire span[data-seg^="feed"],
+.systemWire span[data-seg="drop"] {
+  animation: wireFlowDown 900ms linear infinite;
+}
+.systemWire span[data-seg="spine-l"] {
+  animation: wireFlowRight 900ms linear infinite;
+}
+.systemWire span[data-seg="spine-r"] {
+  animation: wireFlowLeft 900ms linear infinite;
+}
+/* Indefinite motion is exactly what this query is for. The dots stay — they are the drawing — and
+   only the marching stops. */
+@media (prefers-reduced-motion: reduce) {
+  .systemWire span {
+    animation: none;
+  }
 }
 /*
  * The system itself: the one panel carrying the accent, because it is what the three above it add
@@ -3313,27 +3354,40 @@
  * above it), and it is the only card here whose icon is a filled accent tile, so the surface now
  * agrees with the badge on it.
  */
+/*
+ * OPAQUE ORANGE, not a tint.
+ *
+ * Every translucent version of this card mixed with the pine underneath it and came out olive —
+ * the accent at 34% over `--vz-block` is roughly `#6B5A31`, which is a brown. A card that has to
+ * read orange cannot be transparent on a dark green ground, so this one stops being glass: a solid
+ * gradient from the accent lightened toward `--vz-field-2` (the peach, hue 15 — the warm end of
+ * this palette, not a new colour) down to `--vz-accent-ink`.
+ *
+ * `backdrop-filter: none` because it inherits the role cards' glass and an opaque fill makes that a
+ * filter pass with nothing to show for it.
+ */
 .systemDiagram .systemCore {
+  backdrop-filter: none;
   background: linear-gradient(
-    150deg,
-    hsl(var(--vz-accent) / 34%),
-    hsl(var(--vz-accent) / 17%)
+    152deg,
+    color-mix(in srgb, hsl(var(--vz-accent)) 72%, hsl(var(--vz-field-2))) 0%,
+    hsl(var(--vz-accent)) 52%,
+    hsl(var(--vz-accent-ink)) 100%
   );
   box-shadow:
-    var(--vz-fx-glass-shadow),
-    inset 0 1px 0 hsl(0 0% 100% / 28%),
-    inset 0 0 0 1px hsl(var(--vz-accent) / 62%),
-    0 1.4rem 3rem -1rem hsl(var(--vz-accent) / 42%);
+    inset 0 1px 0 hsl(0 0% 100% / 30%),
+    inset 0 0 0 1px hsl(var(--vz-accent-ink) / 70%),
+    0 1.6rem 3.4rem -1rem hsl(var(--vz-accent) / 48%);
   color: hsl(var(--vz-block-on));
   grid-column: 2;
   min-height: 0;
 }
+/* Paper on orange, the inverse of the role cards' chips — an accent tile on an accent card would
+   be the same disappearing act the ink-on-ink cards were. */
 .systemDiagram .systemCore > span {
-  background: hsl(var(--vz-accent));
-  box-shadow:
-    inset 0 1px 0 hsl(0 0% 100% / 30%),
-    0 0.5rem 1.2rem -0.35rem hsl(var(--vz-accent) / 55%);
-  color: hsl(var(--vz-paper));
+  background: hsl(var(--vz-paper) / 92%);
+  box-shadow: inset 0 0 0 1px hsl(0 0% 100% / 50%);
+  color: hsl(var(--vz-accent-ink));
 }
 .systemDiagram .systemCore p {
   color: hsl(var(--vz-block-on) / 88%);
@@ -3728,14 +3782,14 @@
      describe a layout that is no longer on screen. One centred drop still says "these lead to
      that", which is the part worth keeping. */
   .systemWire {
+    --spine-y: 0px;
     height: 2.6rem;
   }
-  .systemWire::before,
-  .systemWire i {
+  .systemWire span[data-seg="feed-l"],
+  .systemWire span[data-seg="feed-r"],
+  .systemWire span[data-seg="feed-m"],
+  .systemWire span[data-seg^="spine"] {
     display: none;
-  }
-  .systemWire b {
-    top: 0;
   }
   .overviewPath {
     grid-template-columns: repeat(4, 1fr);
@@ -4542,21 +4596,37 @@
 }
 .revealed .systemDiagram > article[data-role="1"] { animation-delay: 80ms; }
 .revealed .systemDiagram > article[data-role="2"] { animation-delay: 160ms; }
-.revealed .systemWire::before,
-.revealed .systemWire::after {
-  animation: matchWireIn 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
+/* The segments fade in behind the marching dots rather than being wiped: `clip-path` would fight
+   the flow animation for the same element, and two animations cannot both own it. */
+.revealed .systemWire span {
+  animation:
+    wireSegmentIn 380ms cubic-bezier(0.22, 1, 0.36, 1) both,
+    wireFlowDown 900ms linear 380ms infinite;
 }
-.revealed .systemWire::before { animation-delay: 280ms; }
-.revealed .systemWire::after { animation-delay: 440ms; }
-/* The nodes land with their branches — origins as the elbows draw, the junction as the drop leaves
-   it. Never from `scale(0)`: a dot that grows from nothing reads as a popup. */
-.revealed .systemWire i {
-  animation: stepIn 380ms cubic-bezier(0.22, 1, 0.36, 1) both;
-  animation-delay: 240ms;
+.revealed .systemWire span[data-seg="spine-l"] {
+  animation:
+    wireSegmentIn 380ms cubic-bezier(0.22, 1, 0.36, 1) both,
+    wireFlowRight 900ms linear 380ms infinite;
 }
+.revealed .systemWire span[data-seg="spine-r"] {
+  animation:
+    wireSegmentIn 380ms cubic-bezier(0.22, 1, 0.36, 1) both,
+    wireFlowLeft 900ms linear 380ms infinite;
+}
+.revealed .systemWire span[data-seg^="feed"] { animation-delay: 240ms, 620ms; }
+.revealed .systemWire span[data-seg^="spine"] { animation-delay: 340ms, 720ms; }
+.revealed .systemWire span[data-seg="drop"] { animation-delay: 440ms, 820ms; }
+/* Never from `scale(0)`: a dot that grows from nothing reads as a popup rather than as something
+   arriving. */
 .revealed .systemWire b {
   animation: stepIn 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
   animation-delay: 480ms;
+}
+
+@keyframes wireSegmentIn {
+  from {
+    opacity: 0;
+  }
 }
 .revealed .systemDiagram .systemCore {
   animation: matchCardIn 560ms cubic-bezier(0.22, 1, 0.36, 1) both;
@@ -4566,9 +4636,7 @@
 @media (prefers-reduced-motion: reduce) {
   .revealed .systemDiagram > article:not(.systemCore),
   .revealed .systemDiagram .systemCore,
-  .revealed .systemWire::before,
-  .revealed .systemWire::after,
-  .revealed .systemWire i,
+  .revealed .systemWire span,
   .revealed .systemWire b {
     animation: none;
   }
@@ -4822,18 +4890,16 @@
     background: hsl(var(--vz-paper));
     box-shadow: inset 0 0 0 1px hsl(var(--vz-line));
   }
-  /* The role cards. Opaque and one step lighter than the block they sit on — an ink tint would
-     resolve back to the ground's own colour without the material, which is the state these cards
-     were rescued from. The system panel keeps its accent tint, which carries meaning, and gains the
-     drawn edge the others get. */
-  .systemDiagram article {
+  /* The three role cards. Opaque and one step lighter than the block they sit on — an ink tint
+     would resolve back to the ground's own colour without the material, which is the state these
+     cards were rescued from.
+     The system panel is deliberately NOT listed: it is already an opaque orange gradient, so it has
+     nothing to lose here. It had a fallback while it was a tint, and leaving that in place turned
+     the one orange card on the page back into the olive it was rescued from. */
+  .systemDiagram article:not(.systemCore) {
     backdrop-filter: none;
     background: color-mix(in srgb, hsl(var(--vz-block)) 92%, hsl(var(--vz-block-on)));
     box-shadow: inset 0 0 0 1px hsl(0 0% 100% / 18%);
-  }
-  .systemDiagram .systemCore {
-    background: color-mix(in srgb, hsl(var(--vz-block)) 84%, hsl(var(--vz-accent)));
-    box-shadow: inset 0 0 0 1px hsl(var(--vz-accent) / 60%);
   }
 }
 

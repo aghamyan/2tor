@@ -854,11 +854,14 @@ export function HowItWorksPage({ locale }: { locale: Locale }) {
                * same bracket `07 · Match` uses: verticals on the column centres, a spine, one drop.
                */}
               <div className={styles.systemWire} aria-hidden="true">
-                {/* A node where each branch leaves its card, and one where the three meet. Decorative
-                    only, which is why they are bare elements inside an `aria-hidden` wrapper. */}
-                <i data-branch="0" />
-                <i data-branch="1" />
-                <i data-branch="2" />
+                {/* Six dotted segments and the junction they meet at. Each is positioned from the
+                    grid's own column centres, so the tree cannot drift off the cards. */}
+                <span data-seg="feed-l" />
+                <span data-seg="feed-m" />
+                <span data-seg="feed-r" />
+                <span data-seg="spine-l" />
+                <span data-seg="spine-r" />
+                <span data-seg="drop" />
                 <b />
               </div>
               <article className={styles.systemCore}>
