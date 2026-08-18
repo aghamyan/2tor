@@ -891,7 +891,11 @@ export function HowItWorksPage({ locale }: { locale: Locale }) {
       </section>
 
       <section className={styles.curriculumSection}>
-        <SectionGround tone="paper" mask="radial-gradient(112% 90% at 50% 44%, black 24%, transparent 78%)" />
+        <SectionGround
+          tone="paper"
+          mask="radial-gradient(112% 90% at 50% 44%, black 24%, transparent 78%)"
+          blooms={[styles.currBloomOne, styles.currBloomTwo]}
+        />
         <div className={styles.shell}>
           <Reveal>
             <Heading title={c.curriculum.title} titleAccent={c.curriculum.titleAccent} />
