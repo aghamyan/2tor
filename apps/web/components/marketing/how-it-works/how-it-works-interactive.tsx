@@ -195,7 +195,13 @@ export function LearningLogic({ c }: { c: HowItWorksCopy["logic"] }) {
         <span>
           <Check aria-hidden="true" />
         </span>
-        <p>{c.items[active]?.[1]}</p>
+        {/*
+         * `key={active}` remounts the paragraph so its entrance replays on every change. Without it
+         * the text swaps between two frames with nothing in between, which reads as a glitch rather
+         * than as an answer arriving. The animation is short and collapses under
+         * `prefers-reduced-motion` — see `.logicAnswer p`.
+         */}
+        <p key={active}>{c.items[active]?.[1]}</p>
       </div>
     </div>
   );

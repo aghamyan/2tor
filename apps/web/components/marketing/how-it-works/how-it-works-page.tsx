@@ -877,7 +877,11 @@ export function HowItWorksPage({ locale }: { locale: Locale }) {
       </section>
 
       <section className={styles.logicSection}>
-        <SectionGround tone="paper" mask="radial-gradient(110% 88% at 44% 46%, black 24%, transparent 76%)" />
+        <SectionGround
+          tone="paper"
+          mask="radial-gradient(110% 88% at 44% 46%, black 24%, transparent 76%)"
+          blooms={[styles.logicBloomOne, styles.logicBloomTwo]}
+        />
         <div className={styles.shell}>
           <Reveal>
             <Heading eyebrow={c.logic.eyebrow} title={c.logic.title} titleAccent={c.logic.titleAccent} body={c.logic.body} />
