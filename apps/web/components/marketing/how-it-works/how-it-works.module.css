@@ -2587,8 +2587,10 @@
   border-radius: 0 0 0.7rem 0.7rem;
   border-width: 0 2px 2px;
   height: 55%;
-  left: calc(25% - var(--match-gap) / 4);
-  right: calc(25% - var(--match-gap) / 4);
+  /* The extra 1px is the border's own half-width: these insets place the box edge on the column
+     centre, and the line drawn on that edge is centred 1px inboard. See `.systemWire::before`. */
+  left: calc(25% - var(--match-gap) / 4 - 1px);
+  right: calc(25% - var(--match-gap) / 4 - 1px);
   top: 0;
 }
 /* The single drop from the join into the result card. */
@@ -3138,69 +3140,136 @@
   position: relative;
 }
 .systemDiagram {
+  --sys-gap: clamp(1rem, 1.8vw, 1.6rem);
   display: grid;
-  gap: 1rem;
-  grid-template-columns: repeat(3, 1fr);
+  gap: var(--sys-gap);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   margin-top: 3.5rem;
   position: relative;
 }
-.systemDiagram:before {
-  border: 1px dashed hsl(var(--vz-ink));
-  border-radius: 50%;
-  content: "";
-  height: 18rem;
-  left: 50%;
-  position: absolute;
-  top: 52%;
-  transform: translate(-50%, -50%);
-  width: 42rem;
-}
+/*
+ * The role cards, in the ink-tinted glass this page uses on pine.
+ *
+ * They were `background: hsl(var(--vz-ink))` with an `hsl(var(--vz-ink))` border on a `--vz-block`
+ * section — two near-identical dark greens, so there were no cards at all, only text floating on the
+ * band. Exactly the state `.matchBoard` was rescued from, and the recipe is the same one:
+ * ink-tinted, because glass lightens what is behind it and a white tint on pine washes the ground
+ * out from under its own text.
+ */
 .systemDiagram article {
-  background: hsl(var(--vz-ink));
-  border: 1px solid hsl(var(--vz-ink));
+  backdrop-filter: var(--vz-fx-glass-blur);
+  background: hsl(var(--vz-ink) / 42%);
   border-radius: var(--vz-r-card);
-  color: white;
+  box-shadow:
+    var(--vz-fx-glass-shadow),
+    inset 0 1.5px 0 0 hsl(0 0% 100% / 20%),
+    inset 0 0 0 1px hsl(0 0% 100% / 11%);
+  color: hsl(var(--vz-block-on));
+  isolation: isolate;
   min-height: 10rem;
-  padding: 1.2rem;
+  padding: 1.35rem;
   position: relative;
   z-index: 2;
 }
+/* `--vz-field-1`, not `--vz-positive`: the dark green measures 1.73:1 on this block, which is why
+   three of these icons were not on the page as far as a reader was concerned. Fifth instance of
+   that substitution on this page; the token's own note in `globals.css` says it outright. */
 .systemDiagram article > span {
   align-items: center;
-  background: hsl(var(--vz-field-1) / 16%);
+  background: hsl(var(--vz-ink) / 52%);
   border-radius: var(--vz-r-input);
-  color: hsl(var(--vz-positive));
+  box-shadow: inset 0 0 0 1px hsl(var(--vz-field-1) / 40%);
+  color: hsl(var(--vz-field-1));
   display: flex;
-  height: 2.5rem;
+  height: 2.8rem;
   justify-content: center;
-  width: 2.5rem;
+  width: 2.8rem;
 }
 .systemDiagram article svg {
-  height: 1rem;
+  height: 1.25rem;
+  width: 1.25rem;
 }
 .systemDiagram h3 {
-  font-size: 0.9rem;
-  margin-top: 0.8rem;
+  font-size: 1.12rem;
+  letter-spacing: -0.008em;
+  margin-top: 1rem;
 }
 .systemDiagram p {
-  color: hsl(var(--vz-block-on) / 62%);
-  font-size: 0.77rem;
+  /* 62% white on this ground is the faintest text in the section and the reason it reads as a
+     caption rather than as the card's content. */
+  color: hsl(var(--vz-block-on) / 82%);
+  font-size: 0.92rem;
   line-height: 1.55;
-  margin-top: 0.45rem !important;
+  margin-top: 0.55rem !important;
 }
+/*
+ * The wire: three feeds descending from the column centres, joined at a spine, one drop into the
+ * system below.
+ *
+ * With a gutter, a column's centre is NOT at a sixth of the row — it is at `(100% - 2g)/6`. The
+ * match section's bracket cost eight pixels to that arithmetic before it was measured, so it is
+ * written out here rather than approximated.
+ */
+.systemWire {
+  grid-column: 1 / -1;
+  height: 3.4rem;
+  position: relative;
+}
+.systemWire::before,
+.systemWire::after {
+  border-color: hsl(var(--vz-field-1) / 62%);
+  border-style: solid;
+  content: "";
+  position: absolute;
+}
+/* └────┘ across the outer two columns. */
+.systemWire::before {
+  border-radius: 0 0 0.7rem 0.7rem;
+  border-width: 0 2px 2px;
+  height: 55%;
+  /* Less 1px on each side: these insets place the box EDGE on the column centre, and the 2px border
+     drawn on that edge has its own centre 1px inboard of it. Measuring the box instead of the line
+     is how a wire passes an alignment check and still sits off-centre. */
+  left: calc((100% - 2 * var(--sys-gap)) / 6 - 1px);
+  right: calc((100% - 2 * var(--sys-gap)) / 6 - 1px);
+  top: 0;
+}
+/* The middle column's feed and the drop into the core are one continuous line, because the middle
+   column's centre and the core's centre are both 50%. */
+.systemWire::after {
+  border-width: 0 0 0 2px;
+  bottom: 0;
+  left: calc(50% - 1px);
+  top: 0;
+}
+/*
+ * The system itself: the one panel carrying the accent, because it is what the three above it add
+ * up to.
+ *
+ * It was `linear-gradient(145deg, positive/12%, surface)` — transparent at one corner and cream at
+ * the other, over a dark block, with dark text on top. Half of its own copy was unreadable at any
+ * moment: dark ink on dark pine at the top-left, and by the bottom-right the ground had become
+ * paper. A card's text cannot sit on a surface that changes lightness underneath it.
+ */
 .systemDiagram .systemCore {
-  background: linear-gradient(145deg, hsl(var(--vz-positive) / 12%), hsl(var(--vz-surface)));
-  border-color: hsl(var(--vz-positive));
-  color: var(--navy);
+  background: hsl(var(--vz-field-1) / 14%);
+  box-shadow:
+    var(--vz-fx-glass-shadow),
+    inset 0 1px 0 hsl(0 0% 100% / 26%),
+    inset 0 0 0 1px hsl(var(--vz-field-1) / 34%);
+  color: hsl(var(--vz-block-on));
   grid-column: 2;
-  min-height: 11rem;
+  min-height: 0;
 }
 .systemDiagram .systemCore > span {
-  background: var(--teal);
-  color: white;
+  background: hsl(var(--vz-accent));
+  box-shadow:
+    inset 0 1px 0 hsl(0 0% 100% / 30%),
+    0 0.5rem 1.2rem -0.35rem hsl(var(--vz-accent) / 55%);
+  color: hsl(var(--vz-paper));
 }
 .systemDiagram .systemCore p {
-  color: var(--muted);
+  color: hsl(var(--vz-block-on) / 88%);
 }
 .logicSection {
   background: hsl(var(--vz-surface));
@@ -3588,7 +3657,12 @@
     max-width: 42rem;
     width: 100%;
   }
-  .systemDiagram:before {
+  /* Two columns, so a three-feed bracket describes a layout that is no longer on screen. One
+     centred drop still says "these lead to that", which is the part worth keeping. */
+  .systemWire {
+    height: 2.4rem;
+  }
+  .systemWire::before {
     display: none;
   }
   .overviewPath {
@@ -4387,6 +4461,36 @@
 }
 
 /*
+ * The three roles arriving, then the wire, then the system they add up to. Same staging as the match
+ * board — order is the argument, and here the argument is that the system is what the three
+ * contribute to rather than a fourth participant beside them.
+ */
+.revealed .systemDiagram > article:not(.systemCore) {
+  animation: matchCardIn 520ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.revealed .systemDiagram > article[data-role="1"] { animation-delay: 80ms; }
+.revealed .systemDiagram > article[data-role="2"] { animation-delay: 160ms; }
+.revealed .systemWire::before,
+.revealed .systemWire::after {
+  animation: matchWireIn 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.revealed .systemWire::before { animation-delay: 280ms; }
+.revealed .systemWire::after { animation-delay: 440ms; }
+.revealed .systemDiagram .systemCore {
+  animation: matchCardIn 560ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: 580ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .revealed .systemDiagram > article:not(.systemCore),
+  .revealed .systemDiagram .systemCore,
+  .revealed .systemWire::before,
+  .revealed .systemWire::after {
+    animation: none;
+  }
+}
+
+/*
  * The orbit assembling itself — the section's claim acted out rather than merely drawn.
  *
  * Order is the whole point. The lesson lands first, then each spoke draws OUT of it and its card
@@ -4634,6 +4738,19 @@
     background: hsl(var(--vz-paper));
     box-shadow: inset 0 0 0 1px hsl(var(--vz-line));
   }
+  /* The role cards. Opaque and one step lighter than the block they sit on — an ink tint would
+     resolve back to the ground's own colour without the material, which is the state these cards
+     were rescued from. The system panel keeps its accent tint, which carries meaning, and gains the
+     drawn edge the others get. */
+  .systemDiagram article {
+    backdrop-filter: none;
+    background: color-mix(in srgb, hsl(var(--vz-block)) 92%, hsl(var(--vz-block-on)));
+    box-shadow: inset 0 0 0 1px hsl(0 0% 100% / 18%);
+  }
+  .systemDiagram .systemCore {
+    background: color-mix(in srgb, hsl(var(--vz-block)) 86%, hsl(var(--vz-field-1)));
+    box-shadow: inset 0 0 0 1px hsl(var(--vz-field-1) / 50%);
+  }
 }
 
 /* Reduced transparency: an opaque block with a drawn edge, since the rim here is an inset shadow
@@ -4708,6 +4825,27 @@
   right: -4%;
   top: 56%;
   width: 30rem;
+}
+
+/*
+ * The system section's blooms — the first it has had, and required rather than decorative now that
+ * the four cards are glass. Same tints and strengths as the match band, the other pine section
+ * carrying glass, so the two blocks are lit the same way.
+ */
+.systemBloomOne {
+  background: hsl(var(--vz-field-1) / 32%);
+  height: 26rem;
+  left: 4%;
+  top: 22%;
+  width: 30rem;
+}
+
+.systemBloomTwo {
+  background: hsl(var(--vz-accent) / 28%);
+  bottom: -10%;
+  height: 24rem;
+  right: 6%;
+  width: 28rem;
 }
 
 /*

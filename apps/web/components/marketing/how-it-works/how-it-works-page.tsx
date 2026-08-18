@@ -829,7 +829,11 @@ export function HowItWorksPage({ locale }: { locale: Locale }) {
       </section>
 
       <section className={styles.systemSection}>
-        <SectionGround tone="pine" mask="radial-gradient(115% 95% at 52% 46%, black 24%, transparent 78%)" />
+        <SectionGround
+          tone="pine"
+          mask="radial-gradient(115% 95% at 52% 46%, black 24%, transparent 78%)"
+          blooms={[styles.systemBloomOne, styles.systemBloomTwo]}
+        />
         <div className={styles.shell}>
           <Reveal>
             <Heading title={c.system.title} titleAccent={c.system.titleAccent} tone="pine" inverse />
@@ -843,6 +847,13 @@ export function HowItWorksPage({ locale }: { locale: Locale }) {
                   <p>{contribution}</p>
                 </article>
               ))}
+              {/*
+               * The three roles feeding the system. It replaces a dashed 42rem x 18rem ellipse that
+               * was drawn in `--vz-ink` on an ink-coloured block — invisible, and positioned at a
+               * fixed size and offset so it agreed with the cards at no width at all. This is the
+               * same bracket `07 · Match` uses: verticals on the column centres, a spine, one drop.
+               */}
+              <div className={styles.systemWire} aria-hidden="true" />
               <article className={styles.systemCore}>
                 <span>
                   <Waypoints />
