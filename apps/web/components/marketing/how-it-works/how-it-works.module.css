@@ -2536,7 +2536,14 @@
   /* One width and one gutter for the whole diagram. The wire spans the same box as the pair, and the
      held card is exactly one card wide, so every part stays aligned by arithmetic rather than by
      three numbers that have to be kept in step by hand. */
-  --match-w: 100%;
+  /*
+   * Capped, not just `100%`. At 1440 the diagram column is ~950px, which made each student card
+   * 460px wide around about 200px of content — a frame with a third of itself empty on either side
+   * of the text. The cap pulls the two cards in until the type fills them; the slack it leaves
+   * around the whole diagram reads as margin, which is what it is, rather than as a hole inside a
+   * card. Below ~52rem it resolves to 100% and nothing changes.
+   */
+  --match-w: min(100%, 44rem);
   --match-gap: clamp(1rem, 2.2vw, 2rem);
   display: grid;
   justify-items: center;
@@ -2545,6 +2552,9 @@
   display: grid;
   gap: var(--match-gap);
   grid-template-columns: repeat(2, minmax(0, 1fr));
+  /* Centred in their tracks, so a card that hits its own cap still sits on the column centre the
+     wire descends from. */
+  justify-items: center;
   max-width: var(--match-w);
   width: 100%;
 }
@@ -2614,7 +2624,16 @@
     inset 0 0 0 1px hsl(0 0% 100% / 10%);
   display: flex;
   gap: 0.75rem;
-  padding: 0.9rem;
+  /*
+   * A ceiling on the card itself, not just on the row it sits in.
+   *
+   * The container caps only help where there is a container to cap: once the pair stacks, one card
+   * spans the whole diagram and was 704px around 238px of content — 34% of the frame carrying
+   * anything. This holds every card at a width its type can fill, at every width and in both
+   * layouts, which is the fix the row-level cap could not reach.
+   */
+  max-width: 22rem;
+  padding: 1rem;
   width: 100%;
 }
 .matchNetwork article > span {
@@ -2625,11 +2644,11 @@
   color: hsl(var(--vz-field-1));
   display: flex;
   flex: none;
-  font-size: 0.88rem;
+  font-size: 1rem;
   font-weight: 700;
-  height: 2.6rem;
+  height: 2.9rem;
   justify-content: center;
-  width: 2.6rem;
+  width: 2.9rem;
 }
 .matchNetwork article[data-held] > span {
   background: hsl(var(--vz-ink) / 70%);
@@ -2643,24 +2662,27 @@
 /* `--vz-field-2`, the peach: `--teal` is `--vz-accent-ink`, a DARK accent, and on this ground it was
    a dark red label on dark green. On the block only `--vz-block-on` at alpha and the two field
    tints read as text — the rule this file states at the top and this section broke four times. */
+/* The type was set for a card a third this size. Sized up together rather than one line at a time,
+   so the hierarchy holds: the name stays the quiet label, the subject stays the thing the eye
+   stops on, and the two detail lines stay subordinate to it. */
 .matchNetwork article small {
   color: hsl(var(--vz-field-2));
   display: block;
-  font-size: 0.72rem;
+  font-size: 0.79rem;
   font-weight: 700;
   letter-spacing: 0.02em;
 }
 .matchNetwork article strong {
   display: block;
-  font-size: 0.92rem;
-  letter-spacing: -0.006em;
-  margin-top: 0.2rem;
+  font-size: 1.12rem;
+  letter-spacing: -0.008em;
+  margin-top: 0.24rem;
 }
 .matchNetwork article p {
   color: hsl(var(--vz-block-on) / 76%);
-  font-size: 0.79rem;
+  font-size: 0.9rem;
   line-height: 1.45;
-  margin-top: 0.22rem !important;
+  margin-top: 0.3rem !important;
 }
 /* The schedule line is a flex row, so `text-align` does not reach it — it needs its own centring. */
 .matchNetwork article p:last-child {
@@ -2671,8 +2693,8 @@
 }
 .matchNetwork article svg {
   flex: none;
-  height: 0.7rem;
-  width: 0.7rem;
+  height: 0.8rem;
+  width: 0.8rem;
 }
 /*
  * The result. The one element on the board that should stop the eye, so it is the only one carrying
