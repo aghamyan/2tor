@@ -2476,15 +2476,26 @@
   gap: 0.7rem;
   justify-items: start;
 }
+/*
+ * A pane of its own, on the same recipe as the student cards — a card inside the card.
+ *
+ * It was a hairline and a paragraph, which made it read as a footnote to the chips above rather than
+ * as the panel's conclusion. Given the same fill and rim as the nodes in the drawing beside it, it
+ * reads as another object on the board, which is what it is: the sentence the picture adds up to.
+ */
 .matchNote {
   align-self: end;
-  border-top: 1px solid hsl(var(--vz-block-on) / 16%);
+  background: hsl(var(--vz-ink) / 30%);
+  border-radius: var(--vz-r-input);
+  box-shadow:
+    inset 0 1px 0 hsl(0 0% 100% / 22%),
+    inset 0 0 0 1px hsl(0 0% 100% / 10%);
   color: hsl(var(--vz-block-on) / 82%);
   font-size: 1rem;
   font-weight: 600;
   letter-spacing: -0.004em;
   line-height: 1.5;
-  padding-top: 1.1rem;
+  padding: 1rem 1.1rem;
   text-wrap: pretty;
 }
 /*
@@ -2588,6 +2599,10 @@
  */
 .matchNetwork article {
   align-items: center;
+  /* Centred, not flush left. These are nodes in a diagram, not rows in a table: four short lines
+     pinned to the left edge of a 460px card left most of each card empty and made the drawing read
+     as three list items that happen to have lines between them. */
+  justify-content: center;
   /* Ink, not the block's foreground. A pane lightened to sit "on" the glass measured 4.26:1 for its
      name line and 3.12:1 for its letter chip where the bloom is strongest — glass lightens what is
      behind it and the pane was lightening it again. The panes nested inside a glass frame need a
@@ -2623,6 +2638,7 @@
 }
 .matchNetwork article div {
   min-width: 0;
+  text-align: center;
 }
 /* `--vz-field-2`, the peach: `--teal` is `--vz-accent-ink`, a DARK accent, and on this ground it was
    a dark red label on dark green. On the block only `--vz-block-on` at alpha and the two field
@@ -2646,10 +2662,12 @@
   line-height: 1.45;
   margin-top: 0.22rem !important;
 }
+/* The schedule line is a flex row, so `text-align` does not reach it — it needs its own centring. */
 .matchNetwork article p:last-child {
   align-items: center;
   display: flex;
   gap: 0.3rem;
+  justify-content: center;
 }
 .matchNetwork article svg {
   flex: none;
@@ -2661,9 +2679,17 @@
  * the accent — a lit ring and a filled badge, against panes that are all the same quiet tint.
  */
 /*
- * The result spans the full width of the pair above it, rather than being a chip centred under them
- * with a column of empty board either side. Two students becoming one group is a widening, so the
- * card the wire lands in should be the widest thing in the drawing, not the narrowest.
+ * The result, at 72% of the pair's width with its content centred.
+ *
+ * It has been both extremes now. As a chip it left a column of empty board either side; spanning the
+ * full pair it was a 950px band holding one short phrase against its left edge. This is the middle
+ * term, and it gives the column a taper — pair at 100%, result at 72%, the held card at 50% — so the
+ * drawing narrows as it resolves instead of stepping out and back.
+ *
+ * 72 rather than 62 because of `hy`: "A + B կարող են համատեղելի լինել" is long enough that the
+ * narrower cap broke it onto two lines at 1024 while English still fit on one. Checked at
+ * 1440/1024/800/600/390 in both locales — one line everywhere except `hy` at 390, where the card is
+ * full width already and the string simply does not fit.
  */
 .matchResult {
   align-items: center;
@@ -2675,8 +2701,9 @@
     0 1.2rem 2.8rem -0.8rem hsl(var(--vz-ink) / 46%);
   display: flex;
   gap: 0.85rem;
-  max-width: var(--match-w);
-  padding: 1rem 1.4rem 1rem 1.1rem;
+  justify-content: center;
+  max-width: calc(var(--match-w) * 0.72);
+  padding: 1rem 1.4rem;
   width: 100%;
 }
 .matchResult svg {
@@ -2739,10 +2766,13 @@
   margin-top: 1.8rem;
 }
 /*
- * A grid, not a wrapping flex row. Five benefits in `flex-wrap` broke 4 + 1, and a single orphan
- * under a full line is the shape that reads as an accident. `auto-fit` with a floor wide enough for
- * the longest label puts all five on one line where there is room and drops to a whole number of
- * even columns where there is not — so it never leaves one item alone on a line of its own.
+ * A grid with a COUNTED number of columns, not `auto-fit`.
+ *
+ * Five items orphan at any column count except 5, 3 and 1 — four columns leave one alone on a line
+ * of its own, and so do two. `auto-fit` picks its count from the space available, so it chose 4 as
+ * soon as the Armenian button grew and took width off this track: the exact shape this grid replaced
+ * `flex-wrap` to avoid. Counting the columns instead means the only counts that can occur are ones
+ * that divide five without stranding anything.
  *
  * `--vz-muted` measures ~2.25:1 on this block and must never be used here — the rule this file
  * states twice, which the whole footer was breaking. White at alpha is the only tone that clears.
@@ -2750,7 +2780,7 @@
 .matchFooter ul {
   display: grid;
   gap: 0.7rem 1.2rem;
-  grid-template-columns: repeat(auto-fit, minmax(10.5rem, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
 }
 .matchFooter li {
   align-items: center;
@@ -3374,6 +3404,10 @@
   .parentLayout {
     grid-template-columns: 1fr;
   }
+  /* Three, the other count that does not strand a fifth item on its own line. */
+  .matchFooter ul {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
   /* Static once the columns stack, matching `.formIntro` on group lessons. Sticky here would pin the
      headline under the header while the diagram scrolled beneath it, which on a phone is a third of
      the screen spent on text the reader has already read. */
@@ -3530,8 +3564,9 @@
     grid-template-rows: auto;
     row-gap: 0.85rem;
   }
+  /* The nested card keeps its own padding stacked; only the column-anchoring goes. */
   .matchNote {
-    padding-top: 0.9rem;
+    align-self: stretch;
   }
   /* One column, so the two feeds become one. The bracket's 25%/75% verticals are the centres of two
      equal columns; with a single column there is nothing for them to be the centres OF, and leaving
@@ -3558,8 +3593,11 @@
   .matchHold {
     max-width: var(--match-w);
   }
+  /* Full width once the column is narrow. 62% of a 320px column is 198px, which broke "A + B may be
+     compatible" onto three lines — the taper only means anything while there is a wider pair above
+     it to taper from. */
   .matchResult {
-    text-align: left;
+    max-width: var(--match-w);
   }
 }
 @media (max-width: 560px) {
@@ -3806,6 +3844,10 @@
   }
   .orbitNote {
     margin-top: 1rem !important;
+  }
+  /* One column: at this width three tracks are narrower than the labels in them. */
+  .matchFooter ul {
+    grid-template-columns: minmax(0, 1fr);
   }
   .dashboardGrid {
     grid-template-columns: minmax(0, 1fr);
