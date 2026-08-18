@@ -3889,41 +3889,61 @@
   position: relative;
   padding: 0 0 clamp(5rem, 8vw, 8rem);
 }
+/*
+ * NO PANEL. The closing call to action sits on the block itself.
+ *
+ * It was `linear-gradient(135deg, hsl(var(--vz-surface)), hsl(var(--vz-positive) / 12%))` — opaque
+ * near-white at the top-left, fading to a 12% green that let the dark block through at the
+ * bottom-right. A surface whose lightness reverses across its own diagonal cannot carry text: the
+ * white heading vanished into the pale corner, and the body copy and the note faded out mid-sentence
+ * on their way across it. The section already has a filled ground; a second surface laid over it was
+ * doing nothing this one does not, and doing it at the cost of every string on top.
+ */
 .finalPanel {
   align-items: center;
-  background: linear-gradient(135deg, hsl(var(--vz-surface)), hsl(var(--vz-positive) / 12%));
-  border: 1px solid hsl(var(--vz-line-soft));
-  border-radius: var(--vz-r-card);
   display: grid;
-  gap: 3rem;
+  gap: clamp(2rem, 4vw, 4rem);
   grid-template-columns: 13rem 1fr;
-  padding: clamp(2rem, 5vw, 4rem);
+  padding-block: clamp(1rem, 2vw, 2rem);
 }
 .finalIcon {
   height: 12rem;
   position: relative;
   width: 12rem;
 }
+/* Accent-filled on the block, not `--navy`: an ink disc on `--vz-block` is the ink-on-ink
+   disappearing act this page has now corrected in four places. */
 .finalIcon > svg {
-  background: var(--navy);
+  background: linear-gradient(
+    150deg,
+    hsl(var(--vz-accent)) 0%,
+    hsl(var(--vz-accent-ink)) 100%
+  );
   border-radius: 50%;
-  color: white;
-  height: 5rem;
+  box-shadow:
+    inset 0 1.5px 0 hsl(0 0% 100% / 34%),
+    0 1.2rem 2.6rem -0.6rem hsl(var(--vz-accent) / 55%);
+  color: hsl(var(--vz-paper));
+  height: 5.4rem;
   left: 50%;
-  padding: 1.3rem;
+  padding: 1.4rem;
   position: absolute;
   top: 50%;
   transform: translate(-50%, -50%);
-  width: 5rem;
+  width: 5.4rem;
 }
+/* The satellites read as nodes around the mark. Their ring is the block's own foreground rather
+   than white, which on pine was a hard bright halo with nothing behind it. */
 .finalIcon i {
-  background: var(--teal);
-  border: 4px solid white;
+  background: hsl(var(--vz-field-1));
   border-radius: 50%;
-  box-shadow: 0 0.5rem 1rem hsl(var(--vz-ink) / 15%);
-  height: 1.8rem;
+  box-shadow:
+    0 0 0 4px hsl(var(--vz-block)),
+    0 0 0 5px hsl(var(--vz-field-1) / 34%),
+    0 0.5rem 1.2rem hsl(var(--vz-ink) / 40%);
+  height: 1.5rem;
   position: absolute;
-  width: 1.8rem;
+  width: 1.5rem;
 }
 .finalIcon i:nth-child(2) {
   left: 1rem;
@@ -3945,23 +3965,57 @@
   line-height: 1.02;
   max-width: 17ch;
 }
+/* `--vz-muted` measures ~2.25:1 on this block and must never be used here — the rule this file
+   states twice, and which both of these were breaking. Sized up with it: this is the last thing the
+   page says before the button, and it was set two steps below the body copy of every section above
+   it. */
 .finalPanel > div > p {
-  color: var(--muted);
-  font-size: 0.96rem;
-  line-height: 1.65;
-  margin-top: 1rem !important;
+  color: hsl(var(--vz-block-on) / 84%);
+  font-size: 1.12rem;
+  line-height: 1.6;
+  margin-top: 1.15rem !important;
+  max-width: 46ch;
+  text-wrap: pretty;
 }
 .finalPanel small {
   align-items: center;
-  color: var(--muted);
+  color: hsl(var(--vz-block-on) / 80%);
   display: flex;
-  font-size: 0.78rem;
-  gap: 0.4rem;
-  margin-top: 1rem;
+  font-size: 0.92rem;
+  gap: 0.5rem;
+  margin-top: 1.15rem;
 }
+/* `--teal` is `--vz-accent-ink`, a DARK accent — a dark red tick on dark green. On the block only
+   `--vz-block-on` at alpha and the two field tints read. */
 .finalPanel small svg {
-  color: var(--teal);
-  height: 0.8rem;
+  color: hsl(var(--vz-field-1));
+  flex: none;
+  height: 1rem;
+  width: 1rem;
+}
+/*
+ * The two actions at one size. The consultation button is the header's, so its height comes from
+ * `.buttonPrimary` plus `.consultAction`; the secondary has to be told the same numbers rather than
+ * left to whatever its own padding produces, or the pair sits at two heights on one row.
+ */
+.finalPanel .actions {
+  align-items: center;
+  margin-top: 1.9rem;
+}
+.finalPanel .secondary {
+  background: hsl(var(--vz-surface));
+  border-radius: var(--vz-r-pill);
+  /* The consultation button's measured box, not a guess at it: `min-h-11` is 2.75rem and `text-sm`
+     is 0.875rem, and both come from `headerButtonClass`.
+     `line-height` and `padding-block` have to be pinned too. The shared `.primary, .secondary` rule
+     carries `padding: 0.75rem 1rem`, and `.page a { font: inherit }` hands this button the body's
+     line-height — together they made the content box taller than the floor, so the pair still sat at
+     49px beside 44px after the heights were "matched". */
+  font-size: 0.875rem;
+  line-height: 1.15;
+  min-height: 2.75rem;
+  padding-block: 0;
+  padding-inline: 1.15rem;
 }
 .mobileCta {
   display: none;
@@ -4305,6 +4359,8 @@
 }
 
 
+
+
 /* ── Pine blocks ─────────────────────────────────────────────────────────────
    Three sections carry the filled block: the group-matching story, the "more than
    tutoring software" statement, and the closing CTA. On the home page pine marks a
@@ -4342,13 +4398,6 @@
  * discipline. This class only scales it to hero proportions and must not restate any of the
  * button's own appearance.
  */
-.heroConsultAction {
-  border-radius: var(--vz-r-pill) !important;
-  font-size: 0.96rem !important;
-  min-height: 3.4rem !important;
-  padding-left: 1.35rem !important;
-  padding-right: 1.15rem !important;
-}
   .actions {
     align-items: stretch;
     flex-direction: column;
@@ -4651,7 +4700,7 @@
    This page's `.page *` reset is the same specificity and lands later, silently flipping it to
    `border-box` and collapsing the arrow inside a circle that keeps its diameter. One class deeper
    wins it back — the same fix the home hero carries. */
-.heroConsultAction svg {
+.consultAction svg {
   box-sizing: content-box;
 }
 
@@ -5320,6 +5369,27 @@
 }
 
 /*
+ * The final block's blooms — the first it has had. With the pale panel gone the section is one flat
+ * dark field, and the accent mark's shadow needs something to fall on. Warm behind the mark, cool
+ * behind the copy, so the two halves are not lit identically.
+ */
+.finalBloomOne {
+  background: hsl(var(--vz-accent) / 30%);
+  height: 24rem;
+  left: 2%;
+  top: 12%;
+  width: 28rem;
+}
+
+.finalBloomTwo {
+  background: hsl(var(--vz-field-1) / 26%);
+  bottom: -8%;
+  height: 22rem;
+  right: 6%;
+  width: 30rem;
+}
+
+/*
  * The overview section's blooms. No glass here, so these are not load-bearing the way the others
  * are — the eight discs carry real shadows now, and a shadow over flat paper has nothing to sit on.
  * Placed low and wide, under the rail rather than the heading.
@@ -5491,4 +5561,35 @@
   right: -6%;
   top: 44%;
   width: 30rem;
+}
+
+
+/*
+ * The two consultation buttons on this page, at top level — and they were NOT.
+ *
+ * `.consultAction` sat inside `@media (max-width: 560px)`, so above that width the hero's button
+ * never received any of it: measured at 1440 as 54px tall, 17px, Atkinson 400 — the surrounding body
+ * copy's type on a control that is supposed to BE the header's button. `.headerSizedAction` had
+ * landed in the same block for the same reason.
+ *
+ * Both need `!important` and both need to restate family and weight, not just size. The preflight
+ * `.page button, .page a { font: inherit }` is (0,1,1) and beats Tailwind's `.text-sm` AND
+ * `.buttonPrimary`'s own `font-family` / `font-weight`, all of which are (0,1,0). `font: inherit`
+ * resets the whole shorthand, so overriding size alone leaves the button in the wrong face.
+ */
+.consultAction {
+  border-radius: var(--vz-r-pill) !important;
+  font-family: var(--vz-display) !important;
+  font-size: 0.96rem !important;
+  font-weight: 600 !important;
+  min-height: 3.4rem !important;
+  padding-left: 1.35rem !important;
+  padding-right: 1.15rem !important;
+}
+
+/* The closing CTA takes the header's own numbers rather than the hero's larger ones. */
+.headerSizedAction {
+  font-family: var(--vz-display) !important;
+  font-size: 0.875rem !important;
+  font-weight: 600 !important;
 }

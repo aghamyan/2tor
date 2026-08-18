@@ -250,7 +250,7 @@ export function HowItWorksPage({ locale }: { locale: Locale }) {
                  */}
                 <Link
                   href={consultation}
-                  className={`${siteStyles.scope} ${siteStyles.buttonPrimary} ${headerButtonClass} ${styles.heroConsultAction}`}
+                  className={`${siteStyles.scope} ${siteStyles.buttonPrimary} ${headerButtonClass} ${styles.consultAction}`}
                 >
                   {c.hero.primary}
                   <ArrowUpRightIcon className={siteStyles.buttonIcon} />
@@ -959,10 +959,14 @@ export function HowItWorksPage({ locale }: { locale: Locale }) {
       </section>
 
       <section className={styles.finalSection} id="final-cta">
-        <SectionGround tone="pine" mask="radial-gradient(115% 95% at 50% 46%, black 26%, transparent 78%)" />
+        <SectionGround
+          tone="pine"
+          mask="radial-gradient(115% 95% at 50% 46%, black 26%, transparent 78%)"
+          blooms={[styles.finalBloomOne, styles.finalBloomTwo]}
+        />
         <div className={styles.shell}>
           <Reveal className={styles.finalPanel}>
-            <div className={styles.finalIcon}>
+            <div className={styles.finalIcon} aria-hidden="true">
               <BrainCircuit />
               <i />
               <i />
@@ -972,9 +976,23 @@ export function HowItWorksPage({ locale }: { locale: Locale }) {
               <h2>{accentedTitle(c.final.title, c.final.titleAccent, "pine")}</h2>
               <p>{c.final.body}</p>
               <div className={styles.actions}>
-                <Link className={styles.primary} href={consultation}>
+                {/*
+                 * The header's own button, exactly as the hero composes it: `.scope` for the
+                 * `--site-*` tokens it paints with, `.buttonPrimary` and `headerButtonClass` for the
+                 * pill, the travelling sheen and the arrow badge. This was a local `.primary`, which
+                 * meant the page's closing call to action was a lookalike of the one in the nav
+                 * rather than the same control — and lookalikes drift.
+                 *
+                 * Deliberately WITHOUT `.consultAction`. That class is the hero's, and all it does is
+                 * scale this button up — `min-height: 3.4rem`, `0.96rem`, a full pill. Adding it here
+                 * would reproduce the hero's button, not the header's, which is the one asked for.
+                 */}
+                <Link
+                  href={consultation}
+                  className={`${siteStyles.scope} ${siteStyles.buttonPrimary} ${headerButtonClass} ${styles.headerSizedAction}`}
+                >
                   {c.final.primary}
-                  <ArrowRight />
+                  <ArrowUpRightIcon className={siteStyles.buttonIcon} />
                 </Link>
                 <Link className={styles.secondary} href={localHref(locale, "/mathematics")}>
                   {c.final.secondary}
