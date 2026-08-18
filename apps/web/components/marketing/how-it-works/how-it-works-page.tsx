@@ -966,12 +966,6 @@ export function HowItWorksPage({ locale }: { locale: Locale }) {
         />
         <div className={styles.shell}>
           <Reveal className={styles.finalPanel}>
-            <div className={styles.finalIcon} aria-hidden="true">
-              <BrainCircuit />
-              <i />
-              <i />
-              <i />
-            </div>
             <div>
               <h2>{accentedTitle(c.final.title, c.final.titleAccent, "pine")}</h2>
               <p>{c.final.body}</p>

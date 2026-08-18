@@ -3899,63 +3899,19 @@
  * on their way across it. The section already has a filled ground; a second surface laid over it was
  * doing nothing this one does not, and doing it at the cost of every string on top.
  */
+/*
+ * Centred, one column. It was a two-column grid with a decorative mark in the left track, which put
+ * the copy off the section's axis and left the right half empty — a closing call to action reading
+ * as though it had been pushed aside by something. With the mark gone there is no second column to
+ * justify, so the block sits on the centre line and the text is centred with it.
+ */
 .finalPanel {
-  align-items: center;
   display: grid;
-  gap: clamp(2rem, 4vw, 4rem);
-  grid-template-columns: 13rem 1fr;
+  justify-items: center;
+  margin-inline: auto;
+  max-width: 56rem;
   padding-block: clamp(1rem, 2vw, 2rem);
-}
-.finalIcon {
-  height: 12rem;
-  position: relative;
-  width: 12rem;
-}
-/* Accent-filled on the block, not `--navy`: an ink disc on `--vz-block` is the ink-on-ink
-   disappearing act this page has now corrected in four places. */
-.finalIcon > svg {
-  background: linear-gradient(
-    150deg,
-    hsl(var(--vz-accent)) 0%,
-    hsl(var(--vz-accent-ink)) 100%
-  );
-  border-radius: 50%;
-  box-shadow:
-    inset 0 1.5px 0 hsl(0 0% 100% / 34%),
-    0 1.2rem 2.6rem -0.6rem hsl(var(--vz-accent) / 55%);
-  color: hsl(var(--vz-paper));
-  height: 5.4rem;
-  left: 50%;
-  padding: 1.4rem;
-  position: absolute;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  width: 5.4rem;
-}
-/* The satellites read as nodes around the mark. Their ring is the block's own foreground rather
-   than white, which on pine was a hard bright halo with nothing behind it. */
-.finalIcon i {
-  background: hsl(var(--vz-field-1));
-  border-radius: 50%;
-  box-shadow:
-    0 0 0 4px hsl(var(--vz-block)),
-    0 0 0 5px hsl(var(--vz-field-1) / 34%),
-    0 0.5rem 1.2rem hsl(var(--vz-ink) / 40%);
-  height: 1.5rem;
-  position: absolute;
-  width: 1.5rem;
-}
-.finalIcon i:nth-child(2) {
-  left: 1rem;
-  top: 2rem;
-}
-.finalIcon i:nth-child(3) {
-  right: 0.5rem;
-  top: 1rem;
-}
-.finalIcon i:nth-child(4) {
-  bottom: 0.8rem;
-  right: 2rem;
+  text-align: center;
 }
 .finalPanel h2 {
   font-family: var(--vz-display);
@@ -3963,7 +3919,11 @@
   font-weight: 500;
   letter-spacing: -0.04em;
   line-height: 1.02;
-  max-width: 17ch;
+  /* Wider than the two-column version's 17ch: centred, the heading has the whole column and a
+     narrow measure would leave it stacked in the middle of a much wider block. */
+  margin-inline: auto;
+  max-width: 21ch;
+  text-wrap: balance;
 }
 /* `--vz-muted` measures ~2.25:1 on this block and must never be used here — the rule this file
    states twice, and which both of these were breaking. Sized up with it: this is the last thing the
@@ -3973,17 +3933,23 @@
   color: hsl(var(--vz-block-on) / 84%);
   font-size: 1.12rem;
   line-height: 1.6;
+  margin-inline: auto;
   margin-top: 1.15rem !important;
   max-width: 46ch;
   text-wrap: pretty;
 }
+/* `inline-flex`, so the note shrinks to its own content and the centred text alignment above places
+   it. As a block-level flex it spanned the full column, which left the tick pinned to the far left
+   of a centred sentence once the text wrapped. */
 .finalPanel small {
   align-items: center;
   color: hsl(var(--vz-block-on) / 80%);
-  display: flex;
+  display: inline-flex;
   font-size: 0.92rem;
   gap: 0.5rem;
   margin-top: 1.15rem;
+  max-width: 40ch;
+  text-align: left;
 }
 /* `--teal` is `--vz-accent-ink`, a DARK accent — a dark red tick on dark green. On the block only
    `--vz-block-on` at alpha and the two field tints read. */
@@ -3994,12 +3960,14 @@
   width: 1rem;
 }
 /*
- * The two actions at one size. The consultation button is the header's, so its height comes from
- * `.buttonPrimary` plus `.consultAction`; the secondary has to be told the same numbers rather than
- * left to whatever its own padding produces, or the pair sits at two heights on one row.
+ * The two actions at one size, on the block's centre line. The consultation button is the header's,
+ * so its height comes from `.buttonPrimary` and `headerButtonClass`; the secondary has to be told
+ * the same numbers rather than left to whatever its own padding produces, or the pair sits at two
+ * heights on one row.
  */
 .finalPanel .actions {
   align-items: center;
+  justify-content: center;
   margin-top: 1.9rem;
 }
 .finalPanel .secondary {
@@ -4194,12 +4162,8 @@
   .plus {
     margin-inline: auto;
   }
-  .finalPanel {
-    grid-template-columns: 1fr;
-  }
-  .finalIcon {
-    display: none;
-  }
+  /* `.finalPanel` is a single centred column at every width now, and the decorative mark it used to
+     hide here no longer exists — both rules were describing a two-column layout that is gone. */
   /* Two columns, and the spans have to be reset with them: a child still carrying `span 3` on a
      two-column grid generates implicit columns and pushes the card into horizontal overflow. The
      closing row keeps its full width, which here is both columns. */
@@ -5373,20 +5337,23 @@
  * dark field, and the accent mark's shadow needs something to fall on. Warm behind the mark, cool
  * behind the copy, so the two halves are not lit identically.
  */
+/* Placed off the centre line rather than on it: a bloom directly behind centred copy lights the text
+   evenly and reads as a vignette, where two set either side of it light the block instead. They were
+   left-heavy while the decorative mark was there to justify it. */
 .finalBloomOne {
-  background: hsl(var(--vz-accent) / 30%);
+  background: hsl(var(--vz-accent) / 26%);
   height: 24rem;
-  left: 2%;
-  top: 12%;
+  left: 12%;
+  top: 4%;
   width: 28rem;
 }
 
 .finalBloomTwo {
-  background: hsl(var(--vz-field-1) / 26%);
-  bottom: -8%;
+  background: hsl(var(--vz-field-1) / 24%);
+  bottom: -10%;
   height: 22rem;
-  right: 6%;
-  width: 30rem;
+  right: 12%;
+  width: 28rem;
 }
 
 /*
@@ -5592,4 +5559,17 @@
   font-family: var(--vz-display) !important;
   font-size: 0.875rem !important;
   font-weight: 600 !important;
+}
+/*
+ * The arrow badge, and the reason it needs saying twice.
+ *
+ * `.buttonIcon` sizes the badge with `box-sizing: content-box` so its padding sits OUTSIDE the
+ * glyph. This page's `.page *` reset is the same specificity and lands later, flipping it to
+ * `border-box`: the circle keeps its diameter and the arrow collapses to nothing inside it. Measured
+ * here as a 14x14 badge against the header's 27x27 — the button matched the header on every box
+ * property while its most visible detail did not. `.consultAction svg` carries this for the hero;
+ * dropping that class from the closing CTA dropped this with it.
+ */
+.headerSizedAction svg {
+  box-sizing: content-box;
 }
