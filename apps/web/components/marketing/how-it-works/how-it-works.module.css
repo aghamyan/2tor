@@ -2834,161 +2834,280 @@
   gap: clamp(3rem, 7vw, 7rem);
   grid-template-columns: 1.2fr 0.8fr;
 }
+/*
+ * The policy statement, as its own pane of the site's light glass.
+ *
+ * It was body copy behind a 2px accent rule — a blockquote, which is the wrong register for the one
+ * claim in this section a parent is actually checking. On its own surface it reads as a statement
+ * the page is standing behind rather than as an aside to the headline above it.
+ *
+ * The `!important` stays. The preflight `.page p { margin: 0 }` is (0,1,1) and beats a bare class;
+ * dropping it here would silently zero the margin, which is the trap this file records for
+ * `.heroLede` and `.orbitNote` too.
+ */
 .policy {
   align-items: flex-start;
-  border-left: 2px solid var(--teal);
-  color: var(--muted);
+  backdrop-filter: var(--vz-fx-glass-blur);
+  background: var(--vz-fx-glass-bg);
+  border-radius: var(--vz-r-card);
+  box-shadow: var(--vz-fx-glass-shadow);
+  /* Ink at alpha, not `--vz-muted`: this text now sits on a translucent pane over blooms that
+     PARALLAX, so its backdrop changes as the section scrolls. Same substitution `.comparison` and
+     the parent workspace carry. */
+  color: hsl(var(--vz-ink) / 82%);
   display: flex;
-  font-size: 0.83rem;
-  gap: 0.6rem;
+  font-size: 1rem;
+  gap: 0.75rem;
+  isolation: isolate;
   line-height: 1.6;
-  margin-top: 1.5rem !important;
+  margin-top: 1.9rem !important;
   max-width: 40rem;
-  padding-left: 1rem;
+  padding: 1.15rem 1.35rem;
+  text-wrap: pretty;
 }
 .policy svg {
-  color: var(--teal);
+  color: hsl(var(--vz-accent));
   flex: none;
-  height: 1rem;
+  height: 1.25rem;
+  margin-top: 0.1rem;
+  width: 1.25rem;
 }
+/*
+ * The approval pipeline.
+ *
+ * Seven markers with a 1.2rem stub floating between them — a dashed suggestion of a sequence rather
+ * than a sequence. Both the marker size and the thread's position now come from ONE property, so the
+ * thread cannot drift off the discs' centre line when the discs change size. That is the same class
+ * of error as a wire drawn at a hardcoded percentage over cards placed at another.
+ *
+ * The thread spans marker-bottom to next-marker-top exactly, which is deterministic at any content
+ * height: with the markers aligned to the top of each row, a connector inset by the marker's own
+ * height and run to the row's bottom edge lands on the next marker whatever the text does.
+ */
 .verifyPipeline {
-  margin-top: 2rem !important;
+  --rail-marker: 2.4rem;
+  margin-top: 2.2rem !important;
 }
 .verifyPipeline li {
-  align-items: center;
+  align-items: flex-start;
   display: flex;
-  gap: 0.75rem;
+  gap: 0.9rem;
+  padding-bottom: 1.5rem;
   position: relative;
 }
-.verifyPipeline li:not(:last-child):after {
-  background: var(--line);
-  content: "";
-  height: 1.2rem;
-  left: 1.1rem;
-  position: absolute;
-  top: 2.8rem;
-  width: 1px;
+.verifyPipeline li:last-child {
+  padding-bottom: 0;
 }
+.verifyPipeline li:not(:last-child):after {
+  /* Warms toward the approval it leads to. `--line` was a content hairline at 1.15:1 — invisible
+     here, which is why the steps read as a list rather than as a path. */
+  background: linear-gradient(
+    180deg,
+    hsl(var(--vz-accent) / 34%),
+    hsl(var(--vz-accent) / 20%)
+  );
+  border-radius: 99px;
+  bottom: 0;
+  content: "";
+  left: calc(var(--rail-marker) / 2 - 1px);
+  position: absolute;
+  top: var(--rail-marker);
+  width: 2px;
+}
+/* A lit disc, not a ring: a rim, a specular top edge and a soft drop, so the marker sits ON the
+   ground rather than being a hole cut in it. */
 .verifyPipeline > li > span {
   align-items: center;
   background: hsl(var(--vz-surface));
-  border: 1px solid var(--line);
   border-radius: 50%;
-  color: var(--royal);
+  box-shadow:
+    inset 0 1px 0 hsl(0 0% 100% / 90%),
+    inset 0 0 0 1px hsl(var(--vz-accent) / 26%),
+    0 0.35rem 0.9rem -0.35rem hsl(var(--vz-ink) / 22%);
+  color: hsl(var(--vz-accent-ink));
   display: flex;
-  font-size: 0.7rem;
-  font-weight: 600;
-  height: 2.2rem;
+  flex: none;
+  font-size: 0.82rem;
+  font-weight: 700;
+  height: var(--rail-marker);
   justify-content: center;
-  width: 2.2rem;
+  width: var(--rail-marker);
 }
+/* The terminus. Filled, and the only marker carrying the accent as a surface — the step the other
+   six exist to reach. */
 .verifyPipeline li:last-child > span {
-  background: var(--teal);
-  border-color: var(--teal);
-  color: white;
+  background: hsl(var(--vz-accent));
+  box-shadow:
+    inset 0 1px 0 hsl(0 0% 100% / 30%),
+    0 0.5rem 1.2rem -0.35rem hsl(var(--vz-accent) / 55%);
+  color: hsl(var(--vz-paper));
 }
 .verifyPipeline span svg {
-  height: 0.8rem;
+  height: 0.95rem;
+  width: 0.95rem;
 }
 .verifyPipeline div {
   display: flex;
   flex-direction: column;
-  padding: 0.5rem 0;
+  /* Optical alignment with the disc's centre line rather than its box top. */
+  padding-top: 0.28rem;
 }
 .verifyPipeline strong {
-  font-size: 0.87rem;
+  font-size: 1rem;
+  letter-spacing: -0.006em;
 }
 .verifyPipeline small {
-  color: var(--muted);
-  font-size: 0.76rem;
-  margin-top: 0.15rem;
+  color: hsl(var(--vz-ink) / 74%);
+  font-size: 0.88rem;
+  line-height: 1.45;
+  margin-top: 0.2rem;
 }
+/*
+ * The tutor profile, in the site's light glass.
+ *
+ * It was an opaque `--vz-surface` card with a drawn border — the only showcase panel on the page
+ * still built that way. The header block inside it is a PANE on the glass, never a second sheet of
+ * it: nesting `backdrop-filter` re-blurs an already-composited image and is the "never stack a light
+ * translucent surface on another" case. See `.classroom` for the long version.
+ */
 .tutorProfile {
-  background: hsl(var(--vz-surface));
-  border: 1px solid var(--line);
+  backdrop-filter: var(--vz-fx-glass-blur);
+  background: var(--vz-fx-glass-bg);
   border-radius: var(--vz-r-card);
-  box-shadow: 0 1.7rem 4rem hsl(var(--vz-ink) / 10%);
+  box-shadow: var(--vz-fx-glass-shadow);
+  isolation: isolate;
   margin-top: 5rem;
   overflow: hidden;
-  padding: 1.2rem;
+  padding: 1.35rem;
 }
 .tutorHero {
   align-items: center;
-  background: var(--mist);
+  /* A pane on the glass: a lighter fill, a bright hairline where light would catch the lip, and a
+     faint ring to close the shape. `--mist` was opaque paper and covered the material under it. */
+  background: hsl(0 0% 100% / 42%);
   border-radius: var(--vz-r-input);
+  box-shadow:
+    inset 0 1px 0 hsl(0 0% 100% / 80%),
+    inset 0 0 0 1px hsl(var(--vz-ink) / 7%);
   display: flex;
-  gap: 0.7rem;
-  padding: 0.8rem;
+  gap: 0.85rem;
+  padding: 0.95rem;
 }
+/* The subject tile. An accent ring and an inner highlight rather than a flat 12% wash, so it reads
+   as a badge on the profile instead of a coloured square behind an icon. */
 .tutorHero > span {
   align-items: center;
-  background: var(--blue);
+  background: linear-gradient(
+    150deg,
+    hsl(var(--vz-accent) / 20%),
+    hsl(var(--vz-accent) / 9%)
+  );
   border-radius: var(--vz-r-input);
-  color: var(--royal);
+  box-shadow:
+    inset 0 1px 0 hsl(0 0% 100% / 70%),
+    inset 0 0 0 1px hsl(var(--vz-accent) / 26%);
+  color: hsl(var(--vz-accent-ink));
   display: flex;
-  height: 2.8rem;
+  flex: none;
+  height: 3.1rem;
   justify-content: center;
-  width: 2.8rem;
+  width: 3.1rem;
 }
 .tutorHero > span svg {
-  height: 1.2rem;
+  height: 1.4rem;
+  width: 1.4rem;
 }
 .tutorHero div {
   display: flex;
   flex-direction: column;
+  min-width: 0;
 }
 .tutorHero small {
-  color: var(--muted);
-  font-size: 0.7rem;
+  color: hsl(var(--vz-ink) / 74%);
+  font-size: 0.79rem;
 }
 .tutorHero strong {
-  font-size: 0.8rem;
-  margin-top: 0.15rem;
+  font-size: 1rem;
+  letter-spacing: -0.006em;
+  margin-top: 0.18rem;
 }
+/* The seal. It was a flat tinted pill; it is the card's one assertion, so it gets a real edge and a
+   filled check rather than an outline glyph on a wash. */
 .tutorHero > i {
   align-items: center;
-  background: var(--teal2);
+  background: hsl(var(--vz-accent) / 12%);
   border-radius: 999px;
-  color: var(--teal);
+  box-shadow:
+    inset 0 1px 0 hsl(0 0% 100% / 60%),
+    inset 0 0 0 1px hsl(var(--vz-accent) / 30%);
+  color: hsl(var(--vz-accent-ink));
   display: flex;
-  font-size: 0.67rem;
+  flex: none;
+  font-size: 0.76rem;
   font-style: normal;
-  font-weight: 600;
-  gap: 0.2rem;
+  font-weight: 700;
+  gap: 0.35rem;
   margin-left: auto;
-  padding: 0.35rem 0.5rem;
+  padding: 0.42rem 0.7rem 0.42rem 0.42rem;
 }
 .tutorHero > i svg {
-  height: 0.65rem;
+  background: hsl(var(--vz-accent));
+  border-radius: 50%;
+  color: hsl(var(--vz-paper));
+  flex: none;
+  height: 1.05rem;
+  padding: 0.2rem;
+  width: 1.05rem;
 }
 .tutorProfile dl {
-  margin-top: 1rem !important;
+  margin-top: 1.15rem !important;
 }
+/* The divider fades at both ends rather than butting into the panel's rim — the same treatment the
+   prepare sidebar and the classroom panel use, and what stops a hairline reading as a table border
+   drawn across a piece of glass. `border-image-source` is reset as the LONGHAND on the last row:
+   lightningcss compiles `border-image: none` to an empty declaration that browsers drop. */
 .tutorProfile dl > div {
-  border-bottom: 1px solid var(--line);
+  align-items: baseline;
+  border-bottom: 1px solid transparent;
+  border-image: linear-gradient(
+      90deg,
+      transparent,
+      hsl(var(--vz-ink) / 12%) 8%,
+      hsl(var(--vz-ink) / 12%) 92%,
+      transparent
+    )
+    1;
   display: grid;
-  grid-template-columns: 7rem 1fr;
-  padding: 0.75rem 0.2rem;
+  gap: 0.75rem;
+  grid-template-columns: 7.5rem 1fr;
+  padding: 0.8rem 0.25rem;
+}
+.tutorProfile dl > div:last-child {
+  border-image-source: none;
 }
 .tutorProfile dt {
-  color: var(--muted);
-  font-size: 0.76rem;
+  color: hsl(var(--vz-ink) / 74%);
+  font-size: 0.84rem;
 }
 .tutorProfile dd {
-  font-size: 0.79rem;
+  font-size: 0.9rem;
   font-weight: 700;
+  letter-spacing: -0.004em;
   margin: 0;
 }
 .tutorProfile > p {
   align-items: center;
-  color: var(--muted);
+  border-top: 1px solid hsl(var(--vz-ink) / 8%);
+  color: hsl(var(--vz-ink) / 74%);
   display: flex;
-  font-size: 0.7rem;
-  gap: 0.35rem;
-  margin-top: 1rem !important;
+  font-size: 0.78rem;
+  gap: 0.4rem;
+  margin-top: 1.1rem !important;
+  padding-top: 0.9rem;
 }
 .tutorProfile > p svg {
-  height: 0.7rem;
+  height: 0.8rem;
+  width: 0.8rem;
 }
 .systemSection {
   background: hsl(var(--vz-block));
@@ -3881,8 +4000,24 @@
   .verifyLayout {
     gap: 2rem;
   }
+  /* The label column stops earning a column of its own once it is narrower than its own labels —
+     "Supported grades" was wrapping to two lines beside a one-line value. Stacked, each row reads as
+     a label and its answer. */
   .tutorProfile dl > div {
-    grid-template-columns: 6rem 1fr;
+    gap: 0.2rem;
+    grid-template-columns: minmax(0, 1fr);
+  }
+  /* The seal drops to its own line rather than squeezing the name beside it: at this width the
+     header was breaking "Illustrative tutor profile" and "Mathematics tutor" across four lines to
+     make room for a pill that does not shrink. */
+  .tutorHero {
+    flex-wrap: wrap;
+  }
+  .tutorHero div {
+    flex: 1 1 9rem;
+  }
+  .tutorHero > i {
+    margin-left: 0;
   }
   .systemDiagram {
     grid-template-columns: 1fr;
@@ -4177,6 +4312,53 @@
 }
 
 /*
+ * The approval pipeline running its length.
+ *
+ * Seven steps in order, thread one beat ahead of the marker it leads to — the same staging as the
+ * evidence path and the orbit, because a reader arriving from either already knows how to read it.
+ * The order is the argument: approval is the end of a sequence, not a status somebody set.
+ *
+ * The thread draws with `scaleY` from its top edge; unlike the orbit's spokes these carry no
+ * placement in `transform`, so there is nothing for a scale to fight.
+ */
+.revealed .verifyPipeline > li > span {
+  animation: stepIn 520ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.revealed .verifyPipeline li:nth-child(1) > span { animation-delay: 0ms; }
+.revealed .verifyPipeline li:nth-child(2) > span { animation-delay: 80ms; }
+.revealed .verifyPipeline li:nth-child(3) > span { animation-delay: 160ms; }
+.revealed .verifyPipeline li:nth-child(4) > span { animation-delay: 240ms; }
+.revealed .verifyPipeline li:nth-child(5) > span { animation-delay: 320ms; }
+.revealed .verifyPipeline li:nth-child(6) > span { animation-delay: 400ms; }
+.revealed .verifyPipeline li:nth-child(7) > span { animation-delay: 480ms; }
+
+.revealed .verifyPipeline li:not(:last-child):after {
+  animation: threadDown 380ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  transform-origin: center top;
+}
+.revealed .verifyPipeline li:nth-child(1):after { animation-delay: 40ms; }
+.revealed .verifyPipeline li:nth-child(2):after { animation-delay: 120ms; }
+.revealed .verifyPipeline li:nth-child(3):after { animation-delay: 200ms; }
+.revealed .verifyPipeline li:nth-child(4):after { animation-delay: 280ms; }
+.revealed .verifyPipeline li:nth-child(5):after { animation-delay: 360ms; }
+.revealed .verifyPipeline li:nth-child(6):after { animation-delay: 440ms; }
+
+@keyframes threadDown {
+  from {
+    opacity: 0;
+    transform: scaleY(0);
+  }
+}
+
+/* The finished state, not a faster version of it — the row already says everything the motion does. */
+@media (prefers-reduced-motion: reduce) {
+  .revealed .verifyPipeline > li > span,
+  .revealed .verifyPipeline li:not(:last-child):after {
+    animation: none;
+  }
+}
+
+/*
  * The orbit assembling itself — the section's claim acted out rather than merely drawn.
  *
  * Order is the whole point. The lesson lands first, then each spoke draws OUT of it and its card
@@ -4406,6 +4588,24 @@
   .matchResult {
     box-shadow: inset 0 0 0 1px hsl(var(--vz-field-1) / 50%);
   }
+  /*
+   * The verify section's two panes, and they need different fallbacks. The policy box is a block of
+   * text whose only edge is an inset rim, so it needs an opaque fill AND a drawn border or it
+   * dissolves into the ground. The profile's header pane is the urgent one — at 42% white it is
+   * defined entirely by the material, and without it becomes an invisible rectangle.
+   */
+  .policy,
+  .tutorProfile {
+    backdrop-filter: none;
+    background: hsl(var(--vz-surface));
+    box-shadow:
+      inset 0 0 0 1px hsl(var(--vz-line)),
+      var(--vz-fx-shadow);
+  }
+  .tutorHero {
+    background: hsl(var(--vz-paper));
+    box-shadow: inset 0 0 0 1px hsl(var(--vz-line));
+  }
 }
 
 /* Reduced transparency: an opaque block with a drawn edge, since the rim here is an inset shadow
@@ -4480,6 +4680,30 @@
   right: -4%;
   top: 56%;
   width: 30rem;
+}
+
+/*
+ * The verify section's blooms — the first it has had, and now required rather than decorative: it
+ * carries two glass panes, and glass over a flat fill is a tinted div. Placed under each of them,
+ * in different tints so the two panels are not lit by the same colour.
+ *
+ * This ground is `--vz-surface-2`, a step warmer and darker than the paper the other sections use,
+ * so the tints run a little stronger than `.informBloomOne/Two` to register against it.
+ */
+.verifyBloomOne {
+  background: hsl(var(--vz-field-1) / 50%);
+  height: 25rem;
+  left: -4%;
+  top: 30%;
+  width: 30rem;
+}
+
+.verifyBloomTwo {
+  background: hsl(var(--vz-field-2) / 46%);
+  height: 26rem;
+  right: -3%;
+  top: 6%;
+  width: 31rem;
 }
 
 /*

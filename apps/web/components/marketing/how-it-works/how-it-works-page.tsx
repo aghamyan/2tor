@@ -758,7 +758,11 @@ export function HowItWorksPage({ locale }: { locale: Locale }) {
       </section>
 
       <section className={styles.verifySection} id="verify">
-        <SectionGround tone="paper" mask="radial-gradient(112% 88% at 36% 46%, black 24%, transparent 76%)" />
+        <SectionGround
+          tone="paper"
+          mask="radial-gradient(112% 88% at 36% 46%, black 24%, transparent 76%)"
+          blooms={[styles.verifyBloomOne, styles.verifyBloomTwo]}
+        />
         <div className={styles.shell}>
           <Reveal>
             <div className={styles.verifyLayout}>
