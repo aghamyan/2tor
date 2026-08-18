@@ -3410,8 +3410,12 @@
  * Tracking follows size, per the same rule the headings use: the answer is tightened, the questions
  * sit at zero. A single `letter-spacing` across a 2x size range is wrong at one end of it.
  */
+/* `stretch`, not `start`: both columns take the row's height, so the answer panel ends level with
+   the last question instead of running past it. Whichever column is taller sets the row and the
+   other fills to it — with `.logicAnswer`'s own floor removed below, that is normally the three
+   questions. */
 .logicExplorer {
-  align-items: start;
+  align-items: stretch;
   display: grid;
   gap: clamp(1.25rem, 2.4vw, 2.25rem);
   grid-template-columns: 0.92fr 1.08fr;
@@ -3529,7 +3533,9 @@
   display: flex;
   gap: 1.25rem;
   isolation: isolate;
-  min-height: 16rem;
+  /* No floor. A fixed 16rem was what made this panel overshoot the question column — its height
+     should come from the row it shares, not from a number chosen against one answer's length. */
+  min-height: 0;
   padding: clamp(1.5rem, 3.4vw, 2.6rem);
 }
 /* `--vz-field-1`, not `--vz-positive`: the dark green measures 1.73:1 on this panel, so the tick
