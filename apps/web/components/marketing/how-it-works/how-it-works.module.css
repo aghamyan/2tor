@@ -3921,7 +3921,11 @@
 .finalPanel h2 {
   font-family: var(--vz-display);
   font-size: clamp(2.3rem, 4.2vw, 4.4rem);
-  font-weight: 500;
+  /* 670, the weight `.heading h2` uses for every other section on this page. This one was set at
+     500 — light enough that the page's closing statement read as a different heading level from the
+     fourteen above it. Instrument Sans is loaded variable across `wght 400-700`, so 670 is a real
+     drawing here rather than a value that clamps. */
+  font-weight: 670;
   letter-spacing: -0.04em;
   line-height: 1.02;
   /* Wider than the two-column version's 17ch: centred, the heading has the whole column and a
