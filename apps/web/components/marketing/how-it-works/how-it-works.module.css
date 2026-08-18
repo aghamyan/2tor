@@ -3732,19 +3732,40 @@
   background: hsl(var(--vz-surface));
 }
 .overviewPath {
+  /* One marker size, and everything positioned from it — the rail's height, its vertical centre and
+     both of its ends. A hardcoded offset here is how a rail ends up describing a marker that has
+     since changed size. */
+  --step: 2.8rem;
   display: grid;
-  grid-template-columns: repeat(8, 1fr);
+  grid-template-columns: repeat(8, minmax(0, 1fr));
   margin-top: 3rem !important;
   position: relative;
 }
+/*
+ * The rail, and where it stops.
+ *
+ * It ran `left: 1rem` to `right: 1rem`, so past the eighth marker it carried on for another eighth
+ * of the row — 145px at 1440 of line leading nowhere. The markers sit at the start of eight equal
+ * columns, so the last one's centre is a column-width in from the right; the rail ends there.
+ *
+ * It also fades at both ends rather than butting into the first and last discs, which is what stops
+ * a line reading as welded to them — the same treatment `.evidencePath` uses, and the reason its
+ * discs read as beads on a thread instead of segments that happen to touch.
+ */
 .overviewPath:before {
-  background: linear-gradient(90deg, var(--royal), var(--teal));
+  background: linear-gradient(
+    90deg,
+    hsl(var(--vz-accent) / 0%) 0%,
+    hsl(var(--vz-accent) / 42%) 6%,
+    hsl(var(--vz-accent) / 42%) 94%,
+    hsl(var(--vz-accent) / 0%) 100%
+  );
   content: "";
   height: 2px;
-  left: 1rem;
+  left: calc(var(--step) / 2);
   position: absolute;
-  right: 1rem;
-  top: 1.1rem;
+  right: calc(100% / 8 - var(--step) / 2);
+  top: calc(var(--step) / 2 - 1px);
 }
 .overviewPath a {
   color: var(--navy);
@@ -3754,31 +3775,112 @@
   text-decoration: none;
   z-index: 1;
 }
+/*
+ * The markers, on `.evidencePath`'s lit-disc recipe. These were flat 2px outlines — the treatment
+ * that rule's own comment describes as sitting outside the page's language entirely, on a page
+ * where every other surface has layered edges and light from the top-left.
+ *
+ * `tabular-nums` because 01 through 08 are a sequence: proportional figures set them at different
+ * widths and the row visibly wobbles.
+ */
 .overviewPath span {
   align-items: center;
-  background: hsl(var(--vz-surface));
-  border: 2px solid var(--royal);
+  background:
+    radial-gradient(120% 120% at 30% 22%, hsl(var(--vz-surface)) 0%, hsl(var(--vz-paper)) 78%);
   border-radius: 50%;
-  color: var(--royal);
+  box-shadow:
+    inset 0 1px 0 hsl(0 0% 100% / 90%),
+    inset 0 0 0 1.5px hsl(var(--vz-accent) / 42%),
+    inset 0 -1px 0 hsl(var(--vz-ink) / 6%),
+    0 1px 1px hsl(var(--vz-ink) / 6%),
+    0 6px 14px -6px hsl(var(--vz-ink) / 22%);
+  color: hsl(var(--vz-accent-ink));
   display: flex;
-  font-size: 0.67rem;
+  font-family: var(--vz-display);
+  font-size: 0.86rem;
+  font-variant-numeric: tabular-nums;
   font-weight: 600;
-  height: 2.2rem;
+  height: var(--step);
   justify-content: center;
-  width: 2.2rem;
+  /* Slightly open, because these are numerals at small size — the opposite of what the display
+     heading above them wants. */
+  letter-spacing: 0.01em;
+  transition:
+    box-shadow 260ms var(--vz-ease),
+    transform 260ms var(--vz-ease);
+  width: var(--step);
 }
-.overviewPath li:nth-child(n + 5) span {
-  border-color: var(--teal);
-  color: var(--teal);
+/*
+ * The last step is the destination, so it is the one filled disc — the same device `.evidencePath`
+ * uses to give a row of markers somewhere to arrive.
+ *
+ * The `nth-child(n + 5)` rule that used to sit here recoloured the last four from `--royal` to
+ * `--teal`. Both resolve through the same accent, so it drew nothing; `.evidencePath` removed the
+ * identical rule for the identical reason. If the 1-4 / 5-8 split is meant to say something, it
+ * needs copy that says it rather than two shades of the same red.
+ */
+.overviewPath li:last-child span {
+  background: radial-gradient(
+    120% 120% at 30% 22%,
+    hsl(var(--vz-accent) / 92%) 0%,
+    hsl(var(--vz-accent)) 70%
+  );
+  box-shadow:
+    inset 0 1px 0 hsl(0 0% 100% / 30%),
+    0 1px 1px hsl(var(--vz-ink) / 8%),
+    0 8px 18px -6px hsl(var(--vz-accent) / 50%);
+  color: hsl(var(--vz-paper));
 }
+/*
+ * The label cap, and why it is absolute rather than a percentage of the column.
+ *
+ * "Parent consultation" and "Student-level review" measure 139px and 146px against a 149px box at
+ * 1440, so they sat on one line while their neighbours ran to two — a row of steps reading as two
+ * different rhythms. A percentage cap fixes that and then keeps biting as the row narrows: at 82%
+ * it pushed "Tutor and format selection" onto a third line at 1200, where nothing was wrong.
+ *
+ * 8.6rem is wider than the column below about 1250px, so it is simply inert down there — measured
+ * at 1101 as byte-identical to no cap at all — and only takes effect where the column is genuinely
+ * wide enough to leave these two short. Verified at 1600/1440/1300/1200/1101, no spill, no overflow.
+ */
 .overviewPath strong {
   display: block;
-  font-size: 0.78rem;
-  line-height: 1.45;
-  margin-top: 0.8rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: -0.004em;
+  line-height: 1.4;
+  margin-top: 0.9rem;
+  max-width: 8.6rem;
+  transition: color 200ms var(--vz-ease);
 }
-.overviewPath a:hover strong {
-  color: var(--royal);
+/*
+ * These are links to the sections above, so they behave like links. The disc lifts under the
+ * pointer and the label takes the accent-as-text token; the press is answered on the whole item,
+ * because the target here is the pair, not the disc alone.
+ */
+@media (hover: hover) and (pointer: fine) {
+  .overviewPath a:hover span {
+    box-shadow:
+      inset 0 1px 0 hsl(0 0% 100% / 90%),
+      inset 0 0 0 1.5px hsl(var(--vz-accent) / 70%),
+      inset 0 -1px 0 hsl(var(--vz-ink) / 6%),
+      0 1px 1px hsl(var(--vz-ink) / 6%),
+      0 10px 20px -6px hsl(var(--vz-accent) / 38%);
+    transform: translateY(-2px);
+  }
+  .overviewPath a:hover strong {
+    color: hsl(var(--vz-accent-ink));
+  }
+  .overviewPath a:hover li:last-child span,
+  .overviewPath li:last-child a:hover span {
+    box-shadow:
+      inset 0 1px 0 hsl(0 0% 100% / 30%),
+      0 1px 1px hsl(var(--vz-ink) / 8%),
+      0 12px 24px -6px hsl(var(--vz-accent) / 62%);
+  }
+}
+.overviewPath a:active span {
+  transform: scale(0.94);
 }
 .finalSection {
   background: hsl(var(--vz-block));
@@ -4760,6 +4862,38 @@
 }
 
 /*
+ * The overview path arriving left to right, and the rail drawing under it.
+ *
+ * Eight markers fading in together would throw away the one thing this row is: an order. The rail
+ * draws from its left edge so the line looks like what carries the sequence forward rather than
+ * something added after the markers landed. Same staging, same 70ms step and same curve as
+ * `.evidencePath`, because a reader who has scrolled past that row already knows how to read this
+ * one.
+ */
+.revealed .overviewPath:before {
+  animation: threadIn 620ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  transform-origin: left center;
+}
+.revealed .overviewPath span {
+  animation: stepIn 520ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.revealed .overviewPath li:nth-child(1) span { animation-delay: 60ms; }
+.revealed .overviewPath li:nth-child(2) span { animation-delay: 130ms; }
+.revealed .overviewPath li:nth-child(3) span { animation-delay: 200ms; }
+.revealed .overviewPath li:nth-child(4) span { animation-delay: 270ms; }
+.revealed .overviewPath li:nth-child(5) span { animation-delay: 340ms; }
+.revealed .overviewPath li:nth-child(6) span { animation-delay: 410ms; }
+.revealed .overviewPath li:nth-child(7) span { animation-delay: 480ms; }
+.revealed .overviewPath li:nth-child(8) span { animation-delay: 550ms; }
+
+@media (prefers-reduced-motion: reduce) {
+  .revealed .overviewPath:before,
+  .revealed .overviewPath span {
+    animation: none;
+  }
+}
+
+/*
  * The three roles arriving, then the wire, then the system they add up to. Same staging as the match
  * board — order is the argument, and here the argument is that the system is what the three
  * contribute to rather than a fourth participant beside them.
@@ -5182,6 +5316,27 @@
   height: 24rem;
   right: -4%;
   top: 56%;
+  width: 30rem;
+}
+
+/*
+ * The overview section's blooms. No glass here, so these are not load-bearing the way the others
+ * are — the eight discs carry real shadows now, and a shadow over flat paper has nothing to sit on.
+ * Placed low and wide, under the rail rather than the heading.
+ */
+.overviewBloomOne {
+  background: hsl(var(--vz-field-2) / 34%);
+  bottom: 4%;
+  height: 20rem;
+  left: 6%;
+  width: 32rem;
+}
+
+.overviewBloomTwo {
+  background: hsl(var(--vz-field-1) / 32%);
+  bottom: 0%;
+  height: 20rem;
+  right: 4%;
   width: 30rem;
 }
 
